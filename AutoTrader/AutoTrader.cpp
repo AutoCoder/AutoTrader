@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 #include "printer.h"
+#include "DBWrapper.h"
 
 void test_md(void){
 	//³õÊ¼»¯UserApi
@@ -36,6 +37,10 @@ void test_order(void)
 }
 
 void main(int argc, const char* argv[]){
+
+	//DBWrapper::GetDBWrapper().ExecuteNoResult("")
+	DBWrapper::GetDBWrapper().ExecuteNoResult("INSERT INTO `test` (`name`) VALUES (1234) ");
+
 	g_hEvent = CreateEvent(NULL, true, false, NULL);
 
 	if (argc < 2)  cerr << "miss arguments." << endl;

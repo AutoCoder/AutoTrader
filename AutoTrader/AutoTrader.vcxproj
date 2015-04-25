@@ -108,7 +108,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>thostmduserapi.lib;thosttraderapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>thostmduserapi.lib;thosttraderapi.lib;libmysql.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -148,7 +148,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>thostmduserapi.lib;thosttraderapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>thostmduserapi.lib;thosttraderapi.lib;libmysql;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -162,7 +162,9 @@
     <ClInclude Include="..\include\ThostFtdcUserApiStruct.h" />
     <ClInclude Include="config.h" />
     <ClInclude Include="ctpworker.h" />
+    <ClInclude Include="DBWrapper.h" />
     <ClInclude Include="mdspi.h" />
+    <ClInclude Include="mysqlwrapper.h" />
     <ClInclude Include="Order.h" />
     <ClInclude Include="OrderQueue.h" />
     <ClInclude Include="printer.h" />
@@ -175,7 +177,9 @@
   <ItemGroup>
     <ClCompile Include="AutoTrader.cpp" />
     <ClCompile Include="ctpworker.cpp" />
+    <ClCompile Include="DBWrapper.cpp" />
     <ClCompile Include="mdspi.cpp" />
+    <ClCompile Include="mysqlwrapper.cpp" />
     <ClCompile Include="Order.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

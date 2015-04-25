@@ -17,7 +17,7 @@
 class CtpMdSpi : public CThostFtdcMdSpi
 {
 public:
-  CtpMdSpi(CThostFtdcMdApi* api):pUserApi(api){};
+	CtpMdSpi(CThostFtdcMdApi* api);
 
 	virtual void OnRspError(CThostFtdcRspInfoField *pRspInfo,
 		int nRequestID, bool bIsLast);

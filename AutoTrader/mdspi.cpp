@@ -5,6 +5,7 @@
 #include "windows.h"
 #include "Order.h"
 #include "OrderQueue.h"
+#include "Strategy.h"
 
 
 using namespace std;
@@ -15,6 +16,12 @@ static threadsafe_queue<Order> order_queue;
 extern int requestId;  
 extern HANDLE g_hEvent;
 
+
+CtpMdSpi::CtpMdSpi(CThostFtdcMdApi* api) 
+	:pUserApi(api)
+{
+	m_strategies.push_back(k3UpThroughK5());
+}
 
 void CtpMdSpi::OnRspError(CThostFtdcRspInfoField *pRspInfo,
 		int nRequestID, bool bIsLast)
@@ -133,7 +140,7 @@ bool CtpMdSpi::AppendRealTimeData(const CThostFtdcDepthMDFieldWrapper& info){
 	m_DataSeq.push(info);
 	//loop the Strategies
 	for (auto&& item : m_strategies){
-		if (item.check()){
+		if (item.check(m_DataSeq)){
 			order_queue.push(item.generateOrder());
 		}
 	}
