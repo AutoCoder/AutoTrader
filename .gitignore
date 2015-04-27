@@ -46,3 +46,8 @@ Temporary Items
 *.pdb
 *.sdf
 /x64
+*.obj
+*.pch
+*.idb
+*.tlog
+*.log

@@ -3,15 +3,75 @@
 #include "ThostFtdcUserApiStruct.h"
 #include "DBWrapper.h"
 #include <sstream>
+#include <time.h>
 
 CThostFtdcDepthMDFieldWrapper::CThostFtdcDepthMDFieldWrapper(CThostFtdcDepthMarketDataField* p):
-	m_innerPtr(p)
+	m_innerPtr(p),
+	m_k5m(0.0),
+	m_k3m(0.0)
 {
 }
 
 
 CThostFtdcDepthMDFieldWrapper::~CThostFtdcDepthMDFieldWrapper()
 {
+}
+
+double CThostFtdcDepthMDFieldWrapper::turnOver() const{
+	return m_innerPtr->Turnover;
+}
+
+int CThostFtdcDepthMDFieldWrapper::volume() const{
+	return m_innerPtr->Volume;
+}
+
+int CThostFtdcDepthMDFieldWrapper::toTimeStamp() const{
+	const char* pDate = m_innerPtr->TradingDay;
+
+	char szYear[5], szMonth[3], szDay[3], szHour[3], szMin[3], szSec[3];
+
+	szYear[0] = *pDate++;
+	szYear[1] = *pDate++;
+	szYear[2] = *pDate++;
+	szYear[3] = *pDate++;
+	szYear[4] = 0x0;
+
+	szMonth[0] = *pDate++;
+	szMonth[1] = *pDate++;
+	szMonth[2] = 0x0;
+
+	szDay[0] = *pDate++;
+	szDay[1] = *pDate++;
+	szDay[2] = 0x0;
+
+	const char* pTime = m_innerPtr->UpdateTime;
+
+	szHour[0] = *pDate++;
+	szHour[1] = *pDate++;
+	szHour[2] = 0x0;
+	pDate++;
+
+	szMin[0] = *pDate++;
+	szMin[1] = *pDate++;
+	szMin[2] = 0x0;
+	pDate++;
+
+	szSec[0] = *pDate++;
+	szSec[1] = *pDate++;
+	szSec[2] = 0x0;
+
+	tm tmObj;
+
+	tmObj.tm_year = atoi(szYear) - 1970;
+	tmObj.tm_mon = atoi(szMonth) - 1;
+	tmObj.tm_mday = atoi(szDay);
+	tmObj.tm_hour = atoi(szHour);
+	tmObj.tm_min = atoi(szMin);
+	tmObj.tm_sec = atoi(szSec);
+	tmObj.tm_isdst = -1;
+
+	int&& ret = mktime(&tmObj) * 2 + m_innerPtr->UpdateMillisec / 500;
+	return ret;
 }
 
 void CThostFtdcDepthMDFieldWrapper::serializeToDB() const {

@@ -3,12 +3,12 @@
 //#pragma once
 
 #ifdef _DEBUG
-#define QueueSize 1
+#define QueueSize 10
 #else
 #define QueueSize 1000
 #endif
 
-#include <queue>
+#include <list>
 #include <vector>
 #include "ThostFtdcMdApi.h"
 #include "Strategy.h"
@@ -42,10 +42,10 @@ public:
 	void SubscribeMarketData(char* instIdList);
 	bool IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo);
 
-	bool AppendRealTimeData(const CThostFtdcDepthMDFieldWrapper& info);
+	bool AppendRealTimeData(CThostFtdcDepthMDFieldWrapper& info);
 private:
   CThostFtdcMdApi* pUserApi;
-  std::queue<CThostFtdcDepthMDFieldWrapper> m_DataSeq;
+  std::list<CThostFtdcDepthMDFieldWrapper> m_DataSeq;
   std::vector<Strategy> m_strategies;
 };
 
