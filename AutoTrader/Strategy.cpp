@@ -23,8 +23,8 @@ double Strategy::calculateK(const std::list<CThostFtdcDepthMDFieldWrapper>& data
 	for (auto it = data.begin(); it != data.end(); it++)
 	{
 		if (it->toTimeStamp() < rangeright){
-			totalExchangePrice += it->turnOver();
-			totalVolume += it->volume();
+			totalExchangePrice += it->TurnOver();
+			totalVolume += it->Volume();
 		}
 		else{
 			break;

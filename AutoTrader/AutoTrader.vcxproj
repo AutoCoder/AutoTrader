@@ -168,6 +168,8 @@
     <ClInclude Include="Order.h" />
     <ClInclude Include="OrderQueue.h" />
     <ClInclude Include="printer.h" />
+    <ClInclude Include="RealTimeDataProcessor.h" />
+    <ClInclude Include="RealTimeDataProcessorPool.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Strategy.h" />
     <ClInclude Include="targetver.h" />
@@ -181,6 +183,8 @@
     <ClCompile Include="mdspi.cpp" />
     <ClCompile Include="mysqlwrapper.cpp" />
     <ClCompile Include="Order.cpp" />
+    <ClCompile Include="RealTimeDataProcessor.cpp" />
+    <ClCompile Include="RealTimeDataProcessorPool.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

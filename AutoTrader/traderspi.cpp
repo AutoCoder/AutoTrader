@@ -51,7 +51,7 @@ void CtpTraderSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
 		CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
 	if ( !IsErrorRspInfo(pRspInfo) && pRspUserLogin ) {  
-    // ±£´æ»á»°²ÎÊý	
+    
 		frontId = pRspUserLogin->FrontID;
 		sessionId = pRspUserLogin->SessionID;
 		int nextOrderRef = atoi(pRspUserLogin->MaxOrderRef);
@@ -128,7 +128,7 @@ void CtpTraderSpi::OnRspQryTradingAccount(
       <<" PositionProfit:"<<pTradingAccount->PositionProfit
       <<" Commission:"<<pTradingAccount->Commission
       <<" FrozenMargin:"<<pTradingAccount->FrozenMargin
-      //<<" ¶³½áÊÖÐø·Ñ:"<<pTradingAccount->FrozenCommission 
+    
       << endl;    
   }
   if(bIsLast) SetEvent(g_hEvent);

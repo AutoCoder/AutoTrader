@@ -1,4 +1,6 @@
-#pragma once
+#ifndef STRATEGY_H
+#define STRATEGY_H
+
 #include "Order.h"
 #include "ThostFtdcDepthMDFieldWrapper.h"
 #include <list>
@@ -29,3 +31,5 @@ public:
 private:
 	Order* m_curOrder;
 };
+
+#endif

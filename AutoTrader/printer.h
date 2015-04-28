@@ -105,7 +105,7 @@ void ShowMdCommand(CtpMdSpi* p, bool print = false){
 				cerr << " BrokerID > "; cin >> appId;
 				cerr << " UserID > "; cin >> userId;
 				cerr << " Password > "; cin >> passwd;
-				ResetEvent(g_hEvent);
+				//ResetEvent(g_hEvent);
 				p->ReqUserLogin(appId, userId, passwd);
 				WaitForSingleObject(g_hEvent, INFINITE);
 				ResetEvent(g_hEvent);

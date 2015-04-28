@@ -1,18 +1,8 @@
 ﻿#ifndef MD_SPI_H_
 #define MD_SPI_H_
-//#pragma once
 
-#ifdef _DEBUG
-#define QueueSize 10
-#else
-#define QueueSize 1000
-#endif
-
-#include <list>
-#include <vector>
 #include "ThostFtdcMdApi.h"
-#include "Strategy.h"
-#include "ThostFtdcDepthMDFieldWrapper.h"
+#include "windows.h"
 
 class CtpMdSpi : public CThostFtdcMdSpi
 {
@@ -41,12 +31,8 @@ public:
 	        TThostFtdcUserIDType	userId,	TThostFtdcPasswordType	passwd);
 	void SubscribeMarketData(char* instIdList);
 	bool IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo);
-
-	bool AppendRealTimeData(CThostFtdcDepthMDFieldWrapper& info);
 private:
   CThostFtdcMdApi* pUserApi;
-  std::list<CThostFtdcDepthMDFieldWrapper> m_DataSeq;
-  std::vector<Strategy> m_strategies;
 };
 
 #endif

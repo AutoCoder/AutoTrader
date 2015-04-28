@@ -1,70 +1,14 @@
 #include "stdafx.h"
 #include "ThostFtdcDepthMDFieldWrapper.h"
-#include "ThostFtdcUserApiStruct.h"
 #include "DBWrapper.h"
 #include <sstream>
 #include <iostream>
 #include <time.h>
 
-namespace {
-	int createTickTable(const std::string& dbname, const std::string& tableName){
-		const char* sqltempl = "CREATE TABLE `%s`.`%s` ( \
-			`id` INT NOT NULL AUTO_INCREMENT, \
-			`Date` DATETIME NULL, \
-			`InstrumentID` VARCHAR(32) NULL, \
-			`ExchangeID` VARCHAR(16) NULL, \
-			`ExchangeInstID` VARCHAR(32) NULL, \
-			`LastPrice` DOUBLE NULL, \
-			`PreSettlementPrice` DOUBLE NULL, \
-			`PreClosePrice` DOUBLE NULL, \
-			`PreOpenInterest` DOUBLE NULL, \
-			`OpenPrice` DOUBLE NULL, \
-			`HighestPrice` DOUBLE NULL, \
-			`LowestPrice` DOUBLE NULL, \
-			`Volume` DOUBLE NULL, \
-			`Turnover` DOUBLE NULL, \
-			`OpenInterest` DOUBLE NULL, \
-			`ClosePrice` DOUBLE NULL, \
-			`SettlementPrice` DOUBLE NULL, \
-			`LowerLimitPrice` DOUBLE NULL, \
-			`PreDelta` DOUBLE NULL, \
-			`CurrDelta` DOUBLE NULL, \
-			`UpdateTime` TIME NULL, \
-			`UpdateMillisec` INT NULL, \
-			`BidPrice1` DOUBLE NULL, \
-			`BidVolume1` DOUBLE NULL, \
-			`AskPrice1` DOUBLE NULL, \
-			`AskVolume1` DOUBLE NULL, \
-			`BidPrice2` DOUBLE NULL, \
-			`BidVolume2` DOUBLE NULL, \
-			`AskPrice2` DOUBLE NULL, \
-			`AskVolume2` DOUBLE NULL, \
-			`BidPrice3` DOUBLE NULL, \
-			`BidVolume3` DOUBLE NULL, \
-			`AskPrice3` DOUBLE NULL, \
-			`AskVolume3` DOUBLE NULL, \
-			`BidPrice4` DOUBLE NULL, \
-			`BidVolume4` DOUBLE NULL, \
-			`AskPrice4` DOUBLE NULL, \
-			`AskVolume4` DOUBLE NULL, \
-			`BidPrice5` DOUBLE NULL, \
-			`BidVolume5` DOUBLE NULL, \
-			`AskPrice5` DOUBLE NULL, \
-			`AskVolume5` DOUBLE NULL, \
-			`AveragePrice` DOUBLE NULL, \
-			`ActionDay` DATE NULL, \
-			`k3m` DOUBLE NULL, \
-			`k5m` DOUBLE NULL, \
-			PRIMARY KEY(`id`));";
-		char sqlbuf[2046];
-		sprintf_s(sqlbuf, sqltempl, dbname, tableName);
-		return DBWrapper::GetDBWrapper().ExecuteNoResult(sqlbuf);
-	}
-}
-
+bool CThostFtdcDepthMDFieldWrapper::firstlanuch = true;
 
 CThostFtdcDepthMDFieldWrapper::CThostFtdcDepthMDFieldWrapper(CThostFtdcDepthMarketDataField* p):
-	m_innerPtr(new CThostFtdcDepthMarketDataField())
+	m_innerPtr(new CThostFtdcDepthMarketDataField()),
 	m_k5m(0.0),
 	m_k3m(0.0)
 {
@@ -75,14 +19,6 @@ CThostFtdcDepthMDFieldWrapper::CThostFtdcDepthMDFieldWrapper(CThostFtdcDepthMark
 CThostFtdcDepthMDFieldWrapper::~CThostFtdcDepthMDFieldWrapper()
 {
 	delete m_innerPtr;
-}
-
-double CThostFtdcDepthMDFieldWrapper::turnOver() const{
-	return m_innerPtr->Turnover;
-}
-
-int CThostFtdcDepthMDFieldWrapper::volume() const{
-	return m_innerPtr->Volume;
 }
 
 int CThostFtdcDepthMDFieldWrapper::toTimeStamp() const{
@@ -135,6 +71,14 @@ int CThostFtdcDepthMDFieldWrapper::toTimeStamp() const{
 }
 
 void CThostFtdcDepthMDFieldWrapper::serializeToDB() const {
+	std::string tableName(this->m_innerPtr->InstrumentID);
+
+	if (firstlanuch){
+		int&& ret = DBUtils::CreateTickTableIfNotExists(DBWrapper::DBName, tableName);
+		if (ret == 0)
+			firstlanuch = false;
+	}
+
 	std::stringstream sql;
 	sql << "INSERT INTO `test` (` ";
 	sql << "Date" << "`,`";

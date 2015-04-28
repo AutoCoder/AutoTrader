@@ -72,6 +72,12 @@
     <ClInclude Include="DBWrapper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="RealTimeDataProcessor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RealTimeDataProcessorPool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -102,6 +108,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DBWrapper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RealTimeDataProcessor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RealTimeDataProcessorPool.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

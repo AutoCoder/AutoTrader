@@ -1,6 +1,8 @@
-#pragma once
+#ifndef THOST_FTDC_DEPTH_MD_FIELD_WRAPPER_H
+#define THOST_FTDC_DEPTH_MD_FIELD_WRAPPER_H
+//#pragma once
 
-class CThostFtdcDepthMarketDataField;
+#include "ThostFtdcUserApiStruct.h"
 
 class CThostFtdcDepthMDFieldWrapper
 {
@@ -13,9 +15,13 @@ public:
 	// return value:(unit: half second = 500ms, time to 19700101 00:00:00 + UTC8)
 	int toTimeStamp() const;
 
-	inline double turnOver() const;
+	double TurnOver() const{
+		return m_innerPtr->Turnover;
+	}
 
-	inline int volume() const;
+	int Volume() const{
+		return m_innerPtr->Volume;
+	}
 
 	inline void setK3(double input){
 		m_k3m = input;
@@ -37,6 +43,7 @@ private:
 	CThostFtdcDepthMarketDataField* m_innerPtr;
 	double m_k5m;
 	double m_k3m;
+	static bool firstlanuch;
 };
 
-
+#endif

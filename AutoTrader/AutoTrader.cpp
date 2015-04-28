@@ -6,27 +6,25 @@
 #include "DBWrapper.h"
 
 void test_md(void){
-	//³õÊ¼»¯UserApi
+	
 	CThostFtdcMdApi* pUserApi = CThostFtdcMdApi::CreateFtdcMdApi();
-	CtpMdSpi* pUserSpi = new CtpMdSpi(pUserApi); //´´½¨»Øµ÷´¦ÀíÀà¶ÔÏóMdSpi
-	pUserApi->RegisterSpi(pUserSpi);			// »Øµ÷¶ÔÏó×¢Èë½Ó¿ÚÀà
-	pUserApi->RegisterFront(mdFront);		  // ×¢²áÐÐÇéÇ°ÖÃµØÖ·
+	CtpMdSpi* pUserSpi = new CtpMdSpi(pUserApi); 
+	pUserApi->RegisterSpi(pUserSpi);			
+	pUserApi->RegisterFront(mdFront);		 
 
-	pUserApi->Init();      //½Ó¿ÚÏß³ÌÆô¶¯, ¿ªÊ¼¹¤×÷
+	pUserApi->Init();     
 	ShowMdCommand(pUserSpi, true);
-	pUserApi->Join();      //µÈ´ý½Ó¿ÚÏß³ÌÍË³ö
-	//pUserApi->Release(); //½Ó¿Ú¶ÔÏóÊÍ·Å
+	pUserApi->Join();      
 }
 
 void test_order(void)
 {
-	//³õÊ¼»¯UserApi
 	CThostFtdcTraderApi* pUserApi = CThostFtdcTraderApi::CreateFtdcTraderApi();
 	CtpTraderSpi* pUserSpi = new CtpTraderSpi(pUserApi);
-	pUserApi->RegisterSpi((CThostFtdcTraderSpi*)pUserSpi);			// ×¢²áÊÂ¼þÀà
-	pUserApi->SubscribePublicTopic(THOST_TERT_RESTART);					// ×¢²á¹«ÓÐÁ÷
-	pUserApi->SubscribePrivateTopic(THOST_TERT_RESTART);			  // ×¢²áË½ÓÐÁ÷
-	pUserApi->RegisterFront(tradeFront);							// ×¢²á½»Ò×Ç°ÖÃµØÖ·
+	pUserApi->RegisterSpi((CThostFtdcTraderSpi*)pUserSpi);			
+	pUserApi->SubscribePublicTopic(THOST_TERT_RESTART);					
+	pUserApi->SubscribePrivateTopic(THOST_TERT_RESTART);			 
+	pUserApi->RegisterFront(tradeFront);							
 
 	pUserApi->Init();
 	WaitForSingleObject(g_hEvent, INFINITE);
@@ -36,12 +34,48 @@ void test_order(void)
 	//pUserApi->Release();
 }
 
+void MonitorInstruments(CtpMdSpi* p, char* instrumentIds)
+{
+	//wait for frontconnected
+	WaitForSingleObject(g_hEvent, INFINITE);
+	ResetEvent(g_hEvent);
+
+	//login
+	cerr << "Start Moniter Instrument: " << instrumentIds;
+	cerr << "\n BrokerID > " << "0292\n";
+	cerr << " UserID > " << "00127\n";
+	cerr << " Password > " << "asdfgh\n";
+	p->ReqUserLogin("0292", "00127", "asdfgh");
+
+	//wait for login response received
+	WaitForSingleObject(g_hEvent, INFINITE);
+	ResetEvent(g_hEvent);
+
+	p->SubscribeMarketData(instrumentIds);
+	WaitForSingleObject(g_hEvent, INFINITE); // wait for Subscribe success
+	ResetEvent(g_hEvent);
+}
+
+void StartInstrumentMonitor(char* instrumentIds){
+	CThostFtdcMdApi* pUserApi = CThostFtdcMdApi::CreateFtdcMdApi();
+	CtpMdSpi* pUserSpi = new CtpMdSpi(pUserApi);
+	pUserApi->RegisterSpi(pUserSpi);
+	pUserApi->RegisterFront(mdFront);
+
+	pUserApi->Init();
+	MonitorInstruments(pUserSpi, instrumentIds);
+	pUserApi->Join();
+}
+
 void main(int argc, const char* argv[]){
+	g_hEvent = CreateEvent(NULL, true, false, NULL);
+
+	//todo : read instruments from file
+	char instruments[] = "rb1510,rb1511,rb1512";
+	StartInstrumentMonitor(instruments);
 
 	//DBWrapper::GetDBWrapper().ExecuteNoResult("")
-	DBWrapper::GetDBWrapper().ExecuteNoResult("INSERT INTO `test` (`name`) VALUES (1234) ");
-
-	g_hEvent = CreateEvent(NULL, true, false, NULL);
+	//int ret = DBUtils::CreateTickTableIfNotExists("qihuo", "rb1511");
 
 	if (argc < 2)  cerr << "miss arguments." << endl;
 	else if (strcmp(argv[1], "--md") == 0)    test_md();
