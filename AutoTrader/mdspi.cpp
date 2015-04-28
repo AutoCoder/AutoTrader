@@ -164,17 +164,17 @@ bool CtpMdSpi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo)
   return ret;
 }
 
-bool CtpMdSpi::AppendRealTimeData(const CThostFtdcDepthMDFieldWrapper& info){
-
+bool CtpMdSpi::AppendRealTimeData(CThostFtdcDepthMDFieldWrapper& info){
+	//(in)front-------------back(out)
 	if (m_DataSeq.size() >= QueueSize){
-		const CThostFtdcDepthMDFieldWrapper& firstDataBlock = m_DataSeq.front();
+		const CThostFtdcDepthMDFieldWrapper& firstDataBlock = m_DataSeq.back();
 		firstDataBlock.serializeToDB();
-		m_DataSeq.pop();
+		m_DataSeq.pop_back();
 	}
-	m_DataSeq.push(info);
+
 	//loop the Strategies
 	for (auto&& item : m_strategies){
-		if (item.check(m_DataSeq)){
+		if (item.TryInvoke(m_DataSeq, info)){
 			order_queue.push(item.generateOrder());
 		}
 	}
