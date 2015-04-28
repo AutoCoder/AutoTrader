@@ -3,15 +3,75 @@
 #include "ThostFtdcUserApiStruct.h"
 #include "DBWrapper.h"
 #include <sstream>
+#include <iostream>
+
+namespace {
+	int createTickTable(const std::string& dbname, const std::string& tableName){
+		const char* sqltempl = "CREATE TABLE `%s`.`%s` ( \
+			`id` INT NOT NULL AUTO_INCREMENT, \
+			`Date` DATETIME NULL, \
+			`InstrumentID` VARCHAR(32) NULL, \
+			`ExchangeID` VARCHAR(16) NULL, \
+			`ExchangeInstID` VARCHAR(32) NULL, \
+			`LastPrice` DOUBLE NULL, \
+			`PreSettlementPrice` DOUBLE NULL, \
+			`PreClosePrice` DOUBLE NULL, \
+			`PreOpenInterest` DOUBLE NULL, \
+			`OpenPrice` DOUBLE NULL, \
+			`HighestPrice` DOUBLE NULL, \
+			`LowestPrice` DOUBLE NULL, \
+			`Volume` DOUBLE NULL, \
+			`Turnover` DOUBLE NULL, \
+			`OpenInterest` DOUBLE NULL, \
+			`ClosePrice` DOUBLE NULL, \
+			`SettlementPrice` DOUBLE NULL, \
+			`LowerLimitPrice` DOUBLE NULL, \
+			`PreDelta` DOUBLE NULL, \
+			`CurrDelta` DOUBLE NULL, \
+			`UpdateTime` TIME NULL, \
+			`UpdateMillisec` INT NULL, \
+			`BidPrice1` DOUBLE NULL, \
+			`BidVolume1` DOUBLE NULL, \
+			`AskPrice1` DOUBLE NULL, \
+			`AskVolume1` DOUBLE NULL, \
+			`BidPrice2` DOUBLE NULL, \
+			`BidVolume2` DOUBLE NULL, \
+			`AskPrice2` DOUBLE NULL, \
+			`AskVolume2` DOUBLE NULL, \
+			`BidPrice3` DOUBLE NULL, \
+			`BidVolume3` DOUBLE NULL, \
+			`AskPrice3` DOUBLE NULL, \
+			`AskVolume3` DOUBLE NULL, \
+			`BidPrice4` DOUBLE NULL, \
+			`BidVolume4` DOUBLE NULL, \
+			`AskPrice4` DOUBLE NULL, \
+			`AskVolume4` DOUBLE NULL, \
+			`BidPrice5` DOUBLE NULL, \
+			`BidVolume5` DOUBLE NULL, \
+			`AskPrice5` DOUBLE NULL, \
+			`AskVolume5` DOUBLE NULL, \
+			`AveragePrice` DOUBLE NULL, \
+			`ActionDay` DATE NULL, \
+			`k3m` DOUBLE NULL, \
+			`k5m` DOUBLE NULL, \
+			PRIMARY KEY(`id`));";
+		char sqlbuf[2046];
+		sprintf_s(sqlbuf, sqltempl, dbname, tableName);
+		return DBWrapper::GetDBWrapper().ExecuteNoResult(sqlbuf);
+	}
+}
+
 
 CThostFtdcDepthMDFieldWrapper::CThostFtdcDepthMDFieldWrapper(CThostFtdcDepthMarketDataField* p):
-	m_innerPtr(p)
+	m_innerPtr(new CThostFtdcDepthMarketDataField())
 {
+	memcpy(m_innerPtr, p, sizeof(CThostFtdcDepthMarketDataField));
 }
 
 
 CThostFtdcDepthMDFieldWrapper::~CThostFtdcDepthMDFieldWrapper()
 {
+	delete m_innerPtr;
 }
 
 void CThostFtdcDepthMDFieldWrapper::serializeToDB() const {
@@ -61,7 +121,7 @@ void CThostFtdcDepthMDFieldWrapper::serializeToDB() const {
 	sql << "AskPrice5" << "`,`";
 	sql << "AskVolume5" << "`,`";
 	sql << "AveragePrice" << "`,`";
-	sql << "ActionDay" << "`,`";
+	sql << "ActionDay";
 	sql << ") VALUES(";
 	sql << m_innerPtr->TradingDay << ", ";
 	sql << m_innerPtr->InstrumentID << ", ";
@@ -108,5 +168,6 @@ void CThostFtdcDepthMDFieldWrapper::serializeToDB() const {
 	sql << m_innerPtr->AveragePrice << ", ";
 	sql << m_innerPtr->ActionDay << ")";
 	//"INSERT INTO `test` (`name`) VALUES (1234) 
+	std::cerr << sql.str() << std::endl;
 	DBWrapper::GetDBWrapper().ExecuteNoResult(sql.str());
 }

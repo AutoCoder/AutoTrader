@@ -20,7 +20,7 @@ extern HANDLE g_hEvent;
 CtpMdSpi::CtpMdSpi(CThostFtdcMdApi* api) 
 	:pUserApi(api)
 {
-	m_strategies.push_back(k3UpThroughK5());
+	//m_strategies.push_back(k3UpThroughK5());
 }
 
 void CtpMdSpi::OnRspError(CThostFtdcRspInfoField *pRspInfo,
@@ -106,17 +106,51 @@ void CtpMdSpi::OnRspUnSubMarketData(
 void CtpMdSpi::OnRtnDepthMarketData(
              CThostFtdcDepthMarketDataField *pDepthMarketData)
 {
-  cerr<<" md | Instrument:"<<pDepthMarketData->InstrumentID
-	<< "\n Timestamp:" << pDepthMarketData->TradingDay
-    <<"\n price:"<<pDepthMarketData->LastPrice
-    <<"\n Highest price:" << pDepthMarketData->HighestPrice
-    <<"\n Lowest price:" << pDepthMarketData->LowestPrice
-    <<"\n ask price1:" << pDepthMarketData->AskPrice1 
-    <<"\n ask volume1:" << pDepthMarketData->AskVolume1 
-    <<"\n Bid price1:" << pDepthMarketData->BidPrice1
-    <<"\n Bid volume1:" << pDepthMarketData->BidVolume1
-    <<"\n OpenInterest:"<< pDepthMarketData->OpenInterest 
-	<<"\n Average Price:" << pDepthMarketData->AveragePrice << endl;
+  cerr << "................\n"
+  << "\n TradingDay: " << pDepthMarketData->TradingDay
+  << "\n InstrumentID: " << pDepthMarketData->InstrumentID
+  << "\n ExchangeID: " << pDepthMarketData->ExchangeID
+  << "\n ExchangeInstID: " << pDepthMarketData->ExchangeInstID
+  << "\n LastPrice: " << pDepthMarketData->LastPrice
+  << "\n PreSettlementPrice: " << pDepthMarketData->PreSettlementPrice
+  << "\n PreClosePrice: " << pDepthMarketData->PreClosePrice
+  << "\n PreOpenInterest: " << pDepthMarketData->PreOpenInterest
+  << "\n OpenPrice: " << pDepthMarketData->OpenPrice
+  << "\n HighestPrice: " << pDepthMarketData->HighestPrice
+  << "\n LowestPrice: " << pDepthMarketData->LowestPrice
+  << "\n Volume: " << pDepthMarketData->Volume
+  << "\n Turnover: " << pDepthMarketData->Turnover
+  << "\n OpenInterest: " << pDepthMarketData->OpenInterest
+  << "\n ClosePrice: " << pDepthMarketData->ClosePrice
+  << "\n SettlementPrice: " << pDepthMarketData->SettlementPrice
+  << "\n UpperLimitPrice: " << pDepthMarketData->UpperLimitPrice
+  << "\n LowerLimitPrice:" << pDepthMarketData->LowerLimitPrice
+  << "\n PreDelta: " << pDepthMarketData->PreDelta
+  << "\n CurrDelta: " << pDepthMarketData->CurrDelta
+  << "\n UpdateTime: " << pDepthMarketData->UpdateTime
+  << "\n UpdateMillisec: " << pDepthMarketData->UpdateMillisec
+  << "\n BidPrice1: " << pDepthMarketData->BidPrice1
+  << "\n BidVolume1: " << pDepthMarketData->BidVolume1
+  << "\n AskPrice1:" << pDepthMarketData->AskPrice1
+  << "\n AskVolume1: " << pDepthMarketData->AskVolume1
+  << "\n BidPrice2: " << pDepthMarketData->BidPrice2
+  << "\n BidVolume2: " << pDepthMarketData->BidVolume2
+  << "\n AskPrice2: " << pDepthMarketData->AskPrice2
+  << "\n AskVolume2: " << pDepthMarketData->AskVolume2
+  << "\n BidPrice3: " << pDepthMarketData->BidPrice3
+  << "\n BidVolume3: " << pDepthMarketData->BidVolume3
+  << "\n AskPrice3: " << pDepthMarketData->AskPrice3
+  << "\n AskVolume3: " << pDepthMarketData->AskVolume3
+  << "\n BidPrice4: " << pDepthMarketData->BidPrice4
+  << "\n BidVolume4: " << pDepthMarketData->BidVolume4
+  << "\n AskPrice4: " << pDepthMarketData->AskPrice4
+  << "\n AskVolume4: " << pDepthMarketData->AskVolume4
+  << "\n BidPrice5: " << pDepthMarketData->BidPrice5
+  << "\n BidVolume5: " << pDepthMarketData->BidVolume5
+  << "\n AskPrice5: " << pDepthMarketData->AskPrice5
+  << "\n AskVolume5: " << pDepthMarketData->AskVolume5
+  << "\n AveragePrice: " << pDepthMarketData->AveragePrice
+  << "\n ActionDay: " << pDepthMarketData->ActionDay << std::endl;
   AppendRealTimeData(CThostFtdcDepthMDFieldWrapper(pDepthMarketData));
   SetEvent(g_hEvent);
 }

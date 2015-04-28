@@ -8,7 +8,7 @@ class DBWrapper
 public:
 	static DBWrapper& GetDBWrapper();
 	~DBWrapper();
-	void ExecuteNoResult(const std::string& sql);
+	int ExecuteNoResult(const std::string& sql);
 private:
 	DBWrapper();
 	std::shared_ptr<mysql_db> m_MysqlImpl;

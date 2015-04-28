@@ -30,6 +30,8 @@ DBWrapper::~DBWrapper()
 }
 
 
-void DBWrapper::ExecuteNoResult(const std::string& sql){
-	if (-1 == m_MysqlImpl->mysql_noResult_query(sql.c_str()))		std::cerr << m_MysqlImpl->mysql_lasterror() << std::endl;
+int DBWrapper::ExecuteNoResult(const std::string& sql){
+	int ret = m_MysqlImpl->mysql_noResult_query(sql.c_str());
+	if (-1 == ret)		std::cerr << m_MysqlImpl->mysql_lasterror() << std::endl;
+	return ret;
 }
