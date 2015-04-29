@@ -11,7 +11,7 @@ public:
 	Strategy();
 	~Strategy();
 
-	virtual bool TryInvoke(std::list<CThostFtdcDepthMDFieldWrapper>& data, CThostFtdcDepthMDFieldWrapper& info) = 0;
+	virtual bool TryInvoke(const std::list<CThostFtdcDepthMDFieldWrapper>& data, CThostFtdcDepthMDFieldWrapper& info) = 0;
 
 	virtual Order generateOrder() = 0;
 
@@ -24,7 +24,7 @@ public:
 	k3UpThroughK5();
 	~k3UpThroughK5();
 
-	virtual bool TryInvoke(std::list<CThostFtdcDepthMDFieldWrapper>& data, CThostFtdcDepthMDFieldWrapper& info);
+	virtual bool TryInvoke(const std::list<CThostFtdcDepthMDFieldWrapper>& data, CThostFtdcDepthMDFieldWrapper& info);
 
 	virtual Order generateOrder();
 

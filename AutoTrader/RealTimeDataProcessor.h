@@ -13,14 +13,15 @@ class Strategy;
 class RealTimeDataProcessor
 {
 public:
-	RealTimeDataProcessor(Strategy* strag);
+	RealTimeDataProcessor(Strategy* strag, const std::string& InstrumentName);
 	~RealTimeDataProcessor();
 
 	void AppendRealTimeData(CThostFtdcDepthMDFieldWrapper& info);
 
 private:
 	std::list<CThostFtdcDepthMDFieldWrapper> m_DataSeq;
-	std::shared_ptr<Strategy> m_strategy;
+	std::string m_Name;
+	Strategy* m_strategy;
 };
 
 

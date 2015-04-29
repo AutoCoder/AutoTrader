@@ -67,11 +67,11 @@ void StartInstrumentMonitor(char* instrumentIds){
 	pUserApi->Join();
 }
 
-void main(int argc, const char* argv[]){
+int main(int argc, const char* argv[]){
 	g_hEvent = CreateEvent(NULL, true, false, NULL);
 
 	//todo : read instruments from file
-	char instruments[] = "rb1510,rb1511,rb1512";
+	char instruments[] = "rb1510,rb1511";
 	StartInstrumentMonitor(instruments);
 
 	//DBWrapper::GetDBWrapper().ExecuteNoResult("")
@@ -82,4 +82,5 @@ void main(int argc, const char* argv[]){
 	else if (strcmp(argv[1], "--order") == 0) test_order();
 
 	std::cerr << "quit ... " << std::endl;
+	return 0;
 }

@@ -10,6 +10,13 @@ using namespace std;
 extern int requestId;  
 extern HANDLE g_hEvent;
 
+namespace {
+	void TryTerminate(const char * time){
+		if (0 == strcmp(time, "15:30:23"))
+			exit(0);
+	}
+}
+
 
 CtpMdSpi::CtpMdSpi(CThostFtdcMdApi* api) 
 	:pUserApi(api)
@@ -130,9 +137,13 @@ void CtpMdSpi::OnRtnDepthMarketData(
 	<< "\n AveragePrice: " << pDepthMarketData->AveragePrice
 	<< "\n ActionDay: " << pDepthMarketData->ActionDay << std::endl;
 
-	auto processor = RealTimeDataProcessorPool::getInstance()->GenRealTimeDataProcessor(pDepthMarketData->InstrumentID);
-	processor->AppendRealTimeData(CThostFtdcDepthMDFieldWrapper(pDepthMarketData));
-   // SetEvent(g_hEvent);
+	//Important Node:
+	//1) must create the local variable "pool" here, otherwise it will not call destruction fucntion when exit(0)
+	//2) can't define a local RealTimeDataProcessor variable here, otherwise it will plus the ref-count, so that it will not call destruction fucntion when exit(0)
+	auto pool = RealTimeDataProcessorPool::getInstance();
+	pool->GenRealTimeDataProcessor(pDepthMarketData->InstrumentID)->AppendRealTimeData(CThostFtdcDepthMDFieldWrapper(pDepthMarketData));
+
+	TryTerminate(pDepthMarketData->UpdateTime);
 }
 
 bool CtpMdSpi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo)

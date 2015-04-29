@@ -2,6 +2,7 @@
 #define REALTIME_DATA_PROCESSOR_POOL_H
 #include <string>
 #include <map>
+#include <set>
 #include "RealTimeDataProcessor.h"
 
 //not for multi-thread: this singleton should be called on main()
@@ -34,7 +35,8 @@ private:
 	};
 
 private:
-	std::map<std::string, std::shared_ptr<RealTimeDataProcessor>> m_dict;
+	std::map<std::string, std::shared_ptr<Strategy>> m_dict;
+	std::map<std::string, std::shared_ptr<RealTimeDataProcessor>> m_processorDict;
 };
 
 #endif
