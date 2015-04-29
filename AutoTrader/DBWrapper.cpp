@@ -3,6 +3,7 @@
 #include <winsock2.h>
 #include "mysqlwrapper.h"
 #include <iostream>
+#include "config.h"
 
 const char * DBWrapper::DBHost = "127.0.0.1";
 const int DBWrapper::DBPort = 3306;
@@ -80,8 +81,15 @@ DBWrapper& DBWrapper::GetDBWrapper(){
 DBWrapper::DBWrapper()
 	:m_MysqlImpl(new mysql_db())
 {
-	if (-1 == m_MysqlImpl->mysql_open(DBHost, User, Password, DBName, DBPort))
+	if (-1 == m_MysqlImpl->mysql_open(Config::Instance()->DBHost().c_str() \
+		, Config::Instance()->DBUser().c_str() \
+		, Config::Instance()->DBPassword().c_str() \
+		, Config::Instance()->DBName().c_str() \
+		, Config::Instance()->DBPort()))
+	{
 		std::cerr << m_MysqlImpl->mysql_lasterror() << std::endl;
+	}
+		
 	//ExecuteNoResult("ExecuteNoResult")
 }
 

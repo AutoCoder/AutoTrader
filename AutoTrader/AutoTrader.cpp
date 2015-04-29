@@ -4,13 +4,16 @@
 #include "stdafx.h"
 #include "printer.h"
 #include "DBWrapper.h"
+#include "config.h"
+
+int requestId = 0;
 
 void test_md(void){
 	
 	CThostFtdcMdApi* pUserApi = CThostFtdcMdApi::CreateFtdcMdApi();
 	CtpMdSpi* pUserSpi = new CtpMdSpi(pUserApi); 
 	pUserApi->RegisterSpi(pUserSpi);			
-	pUserApi->RegisterFront(mdFront);		 
+	pUserApi->RegisterFront(const_cast<char*>(Config::Instance()->CtpMdFront().c_str()));
 
 	pUserApi->Init();     
 	ShowMdCommand(pUserSpi, true);
@@ -24,7 +27,7 @@ void test_order(void)
 	pUserApi->RegisterSpi((CThostFtdcTraderSpi*)pUserSpi);			
 	pUserApi->SubscribePublicTopic(THOST_TERT_RESTART);					
 	pUserApi->SubscribePrivateTopic(THOST_TERT_RESTART);			 
-	pUserApi->RegisterFront(tradeFront);							
+	pUserApi->RegisterFront(const_cast<char*>(Config::Instance()->CtpTradeFront().c_str()));
 
 	pUserApi->Init();
 	WaitForSingleObject(g_hEvent, INFINITE);
@@ -42,10 +45,12 @@ void MonitorInstruments(CtpMdSpi* p, char* instrumentIds)
 
 	//login
 	cerr << "Start Moniter Instrument: " << instrumentIds;
-	cerr << "\n BrokerID > " << "0292\n";
-	cerr << " UserID > " << "00127\n";
-	cerr << " Password > " << "asdfgh\n";
-	p->ReqUserLogin("0292", "00127", "asdfgh");
+	cerr << "\n BrokerID > " << Config::Instance()->CtpBrokerID();
+	cerr << "\n UserID > " << Config::Instance()->CtpUserID();
+	cerr << "\n Password > " << Config::Instance()->CtpPassword();
+	p->ReqUserLogin(const_cast<char*>(Config::Instance()->CtpBrokerID().c_str()) \
+		, const_cast<char*>(Config::Instance()->CtpUserID().c_str())\
+		, const_cast<char*>(Config::Instance()->CtpPassword().c_str()));
 
 	//wait for login response received
 	WaitForSingleObject(g_hEvent, INFINITE);
@@ -60,7 +65,7 @@ void StartInstrumentMonitor(char* instrumentIds){
 	CThostFtdcMdApi* pUserApi = CThostFtdcMdApi::CreateFtdcMdApi();
 	CtpMdSpi* pUserSpi = new CtpMdSpi(pUserApi);
 	pUserApi->RegisterSpi(pUserSpi);
-	pUserApi->RegisterFront(mdFront);
+	pUserApi->RegisterFront(const_cast<char*>(Config::Instance()->CtpMdFront().c_str()));
 
 	pUserApi->Init();
 	MonitorInstruments(pUserSpi, instrumentIds);
@@ -70,9 +75,7 @@ void StartInstrumentMonitor(char* instrumentIds){
 int main(int argc, const char* argv[]){
 	g_hEvent = CreateEvent(NULL, true, false, NULL);
 
-	//todo : read instruments from file
-	char instruments[] = "rb1510,rb1511";
-	StartInstrumentMonitor(instruments);
+	StartInstrumentMonitor(const_cast<char*>(Config::Instance()->CtpInstrumentIDs().c_str()));
 
 	//DBWrapper::GetDBWrapper().ExecuteNoResult("")
 	//int ret = DBUtils::CreateTickTableIfNotExists("qihuo", "rb1511");

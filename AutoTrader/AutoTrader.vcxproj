@@ -163,6 +163,7 @@
     <ClInclude Include="config.h" />
     <ClInclude Include="ctpworker.h" />
     <ClInclude Include="DBWrapper.h" />
+    <ClInclude Include="ini_parser.h" />
     <ClInclude Include="mdspi.h" />
     <ClInclude Include="mysqlwrapper.h" />
     <ClInclude Include="Order.h" />
@@ -178,6 +179,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AutoTrader.cpp" />
+    <ClCompile Include="config.cpp" />
     <ClCompile Include="ctpworker.cpp" />
     <ClCompile Include="DBWrapper.cpp" />
     <ClCompile Include="mdspi.cpp" />

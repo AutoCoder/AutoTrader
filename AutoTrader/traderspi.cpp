@@ -1,7 +1,6 @@
 ﻿#include "stdafx.h"
 #include <iostream>
 #include <vector>
-#include "stdafx.h"
 using namespace std;
 #include "ThostFtdcTraderApi.h"
 #include "traderspi.h"
