@@ -19,6 +19,9 @@ public:
 	void AppendRealTimeData(CThostFtdcDepthMDFieldWrapper& info);
 
 private:
+	void recoverHistoryData(int beforeSeconds);
+
+private:
 	std::list<CThostFtdcDepthMDFieldWrapper> m_DataSeq;
 	std::string m_Name;
 	Strategy* m_strategy;

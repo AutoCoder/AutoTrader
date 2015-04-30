@@ -2,6 +2,8 @@
 #define DB_WRAPPER_H
 #include <memory>
 #include <string>
+#include <map>
+#include <vector>
 class mysql_db;
 
 class DBWrapper
@@ -10,23 +12,21 @@ public:
 	static DBWrapper& GetDBWrapper();
 	~DBWrapper();
 	int ExecuteNoResult(const std::string& sql);
-
-public:
-	static const char *DBName;
-
+	int Query(const std::string& sql, std::map<int, std::vector<std::string>> & map_results);
 private:
 	DBWrapper();
 	std::shared_ptr<mysql_db> m_MysqlImpl;
-	static const char *DBHost;
-	static const int DBPort;
-	static const char *User;
-	static const char *Password;
 };
 
-namespace DBUtils{
 
-	int CreateTickTableIfNotExists(const std::string& dbname, const std::string& tableName);
 
-}
+class DBUtils
+{
+public:
+	static int CreateTickTableIfNotExists(const std::string& dbname, const std::string& tableName);
+
+private:
+	static std::map<std::string, bool> m_dict;
+};
 
 #endif

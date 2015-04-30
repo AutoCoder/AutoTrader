@@ -1,16 +1,120 @@
 #include "stdafx.h"
-#include "ThostFtdcDepthMDFieldWrapper.h"
 #include "DBWrapper.h"
 #include <sstream>
 #include <iostream>
 #include <time.h>
+#include "config.h"
+#include "ThostFtdcDepthMDFieldWrapper.h"
 
 bool CThostFtdcDepthMDFieldWrapper::firstlanuch = true;
+
+namespace {
+	/*
+	Usage: "20150430" to 1430382950
+	*/
+	long long DateTimeToTimestamp(const char* date_src, const char* time_src){
+		char szYear[5], szMonth[3], szDay[3], szHour[3], szMin[3], szSec[3];
+
+		szYear[0] = *date_src++;
+		szYear[1] = *date_src++;
+		szYear[2] = *date_src++;
+		szYear[3] = *date_src++;
+		szYear[4] = 0x0;
+
+		szMonth[0] = *date_src++;
+		szMonth[1] = *date_src++;
+		szMonth[2] = 0x0;
+
+		szDay[0] = *date_src++;
+		szDay[1] = *date_src++;
+		szDay[2] = 0x0;
+
+		szHour[0] = *time_src++;
+		szHour[1] = *time_src++;
+		szHour[2] = 0x0;
+		time_src++;
+
+		szMin[0] = *time_src++;
+		szMin[1] = *time_src++;
+		szMin[2] = 0x0;
+		time_src++;
+
+		szSec[0] = *time_src++;
+		szSec[1] = *time_src++;
+		szSec[2] = 0x0; 
+
+		tm tmObj;
+
+		tmObj.tm_year = atoi(szYear) - 1900;
+		tmObj.tm_mon = atoi(szMonth) - 1;
+		tmObj.tm_mday = atoi(szDay);
+		tmObj.tm_hour = atoi(szHour);
+		tmObj.tm_min = atoi(szMin);
+		tmObj.tm_sec = atoi(szSec);
+		tmObj.tm_isdst = -1;
+
+		return mktime(&tmObj);
+	}
+
+	double StringtoDouble(const std::string& str)
+	{
+		std::stringstream ss;
+		double ret;
+		ss << str;
+		ss >> ret;
+		return ret;
+	}
+
+	int StringtoInt(const std::string& str)
+	{
+		std::stringstream ss;
+		int ret;
+		ss << str;
+		ss >> ret;
+		return ret;
+	}
+
+	long long Stringtolong(const std::string& str)
+	{
+		std::stringstream ss;
+		long long ret;
+		ss << str;
+		ss >> ret;
+		return ret;
+	}
+
+	std::string ConvertTime(const std::string& src){
+		//from "2015-04-30 00:00:00" to "20150430"
+		//assert(src.length() > 10);
+		char ret[9];
+		const char* _src = src.c_str();
+
+		//year
+		ret[0] = *_src++;
+		ret[1] = *_src++;
+		ret[2] = *_src++;
+		ret[3] = *_src++;
+		_src++;//skip '-'
+
+		//month
+		ret[4] = *_src++;
+		ret[5] = *_src++;
+		_src++;
+
+		//day
+		ret[6] = *_src++;
+		ret[7] = *_src++;
+		ret[8] = 0x0;
+
+		return std::string(ret);
+	}
+}
 
 CThostFtdcDepthMDFieldWrapper::CThostFtdcDepthMDFieldWrapper(CThostFtdcDepthMarketDataField* p):
 	m_k5m(0.0),
 	m_k3m(0.0)
 {
+	assert(p);
 	memcpy(&m_MdData, p, sizeof(CThostFtdcDepthMarketDataField));
 }
 
@@ -19,65 +123,17 @@ CThostFtdcDepthMDFieldWrapper::~CThostFtdcDepthMDFieldWrapper()
 }
 
 long long CThostFtdcDepthMDFieldWrapper::toTimeStamp() const{
-	const char* pDate = m_MdData.TradingDay;
-
-	char szYear[5], szMonth[3], szDay[3], szHour[3], szMin[3], szSec[3];
-
-	szYear[0] = *pDate++;
-	szYear[1] = *pDate++;
-	szYear[2] = *pDate++;
-	szYear[3] = *pDate++;
-	szYear[4] = 0x0;
-
-	szMonth[0] = *pDate++;
-	szMonth[1] = *pDate++;
-	szMonth[2] = 0x0;
-
-	szDay[0] = *pDate++;
-	szDay[1] = *pDate++;
-	szDay[2] = 0x0;
-
-	const char* pTime =  m_MdData.UpdateTime;
-
-	szHour[0] = *pTime++;
-	szHour[1] = *pTime++;
-	szHour[2] = 0x0;
-	pTime++;
-
-	szMin[0] = *pTime++;
-	szMin[1] = *pTime++;
-	szMin[2] = 0x0;
-	pTime++;
-
-	szSec[0] = *pTime++;
-	szSec[1] = *pTime++;
-	szSec[2] = 0x0;
-
-	tm tmObj;
-
-	tmObj.tm_year = atoi(szYear) - 1900;
-	tmObj.tm_mon = atoi(szMonth) - 1;
-	tmObj.tm_mday = atoi(szDay);
-	tmObj.tm_hour = atoi(szHour);
-	tmObj.tm_min = atoi(szMin);
-	tmObj.tm_sec = atoi(szSec);
-	tmObj.tm_isdst = -1;
-
-	long long ret = mktime(&tmObj) * 2 +  m_MdData.UpdateMillisec / 500;
+	long long ret = DateTimeToTimestamp(m_MdData.TradingDay, m_MdData.UpdateTime) * 2 + m_MdData.UpdateMillisec / 500;
 	return ret;
 }
 
 void CThostFtdcDepthMDFieldWrapper::serializeToDB() const {
 	std::string tableName(m_MdData.InstrumentID);
 
-	if (firstlanuch){
-		int&& ret = DBUtils::CreateTickTableIfNotExists(DBWrapper::DBName, tableName);
-		if (ret == 0)
-			firstlanuch = false;
-	}
+	DBUtils::CreateTickTableIfNotExists(Config::Instance()->DBName(), tableName);
 
 	std::stringstream sql;
-	sql << "INSERT INTO `" << tableName << "` (` ";
+	sql << "INSERT INTO `" << tableName << "` (`";
 	sql << "Date" << "`,`";
 	sql << "InstrumentID" << "`,`";
 	sql << "ExchangeID" << "`,`";
@@ -91,7 +147,6 @@ void CThostFtdcDepthMDFieldWrapper::serializeToDB() const {
 	sql << "LowestPrice" << "`,`";
 	sql << "Volume" << "`,`";
 	sql << "Turnover" << "`,`";
-	sql << "OpenPrice" << "`,`";
 	sql << "OpenInterest" << "`,`";
 	sql << "ClosePrice" << "`,`";
 	sql << "SettlementPrice" << "`,`";
@@ -125,11 +180,11 @@ void CThostFtdcDepthMDFieldWrapper::serializeToDB() const {
 	sql << "ActionDay" << "`,`";
 	sql << "k3m" << "`,`";
 	sql << "k5m" << "`";
-	sql << ") VALUES(";
-	sql <<  m_MdData.TradingDay << ", ";
-	sql <<  m_MdData.InstrumentID << ", ";
-	sql <<  m_MdData.ExchangeID << ", ";
-	sql <<  m_MdData.ExchangeInstID << ", ";
+	sql << ") VALUES(\"";
+	sql << m_MdData.TradingDay << "\", \"";//m_MdData.TradingDay
+	sql <<  m_MdData.InstrumentID << "\", \"";
+	sql <<  m_MdData.ExchangeID << "\", \"";
+	sql <<  m_MdData.ExchangeInstID << "\", ";
 	sql <<  m_MdData.LastPrice << ", ";
 	sql <<  m_MdData.PreSettlementPrice << ", ";
 	sql <<  m_MdData.PreClosePrice << ", ";
@@ -145,8 +200,8 @@ void CThostFtdcDepthMDFieldWrapper::serializeToDB() const {
 	sql <<  m_MdData.UpperLimitPrice << ", ";
 	sql <<  m_MdData.LowerLimitPrice << ", ";
 	sql <<  m_MdData.PreDelta << ", ";
-	sql <<  m_MdData.CurrDelta << ", ";
-	sql <<  m_MdData.UpdateTime << ", ";
+	sql <<  m_MdData.CurrDelta << ", \"";
+	sql <<  m_MdData.UpdateTime << "\", ";  // m_MdData.UpdateTime
 	sql <<  m_MdData.UpdateMillisec << ", ";
 	sql <<  m_MdData.BidPrice1 << ", ";
 	sql <<  m_MdData.BidVolume1 << ", ";
@@ -168,11 +223,118 @@ void CThostFtdcDepthMDFieldWrapper::serializeToDB() const {
 	sql <<  m_MdData.BidVolume5 << ", ";
 	sql <<  m_MdData.AskPrice5 << ", ";
 	sql <<  m_MdData.AskVolume5 << ", ";
-	sql <<  m_MdData.AveragePrice << ", ";
-	sql <<  m_MdData.ActionDay << ", ";
+	sql <<  m_MdData.AveragePrice << ", \"";
+	sql <<  m_MdData.ActionDay << "\", "; // m_MdData.ActionDay
 	sql <<  m_k3m << ", ";
 	sql <<  m_k5m << ")";
 	//"INSERT INTO `test` (`name`) VALUES (1234) 
 	std::cerr << sql.str() << std::endl;
 	DBWrapper::GetDBWrapper().ExecuteNoResult(sql.str());
 }
+
+CThostFtdcDepthMDFieldWrapper CThostFtdcDepthMDFieldWrapper::RecoverFromDB(const CThostFtdcDepthMDFieldDBStruct& vec)
+{
+	CThostFtdcDepthMarketDataField mdStuct;
+	memset(&mdStuct, 0, sizeof(mdStuct));
+	strcpy_s(mdStuct.TradingDay, ConvertTime(vec[1]).c_str());// todo: from "2015-04-30 00:00:00" to "20150430"
+	strcpy_s(mdStuct.InstrumentID, vec[2].c_str());
+	strcpy_s(mdStuct.ExchangeID, vec[3].c_str());
+	strcpy_s(mdStuct.ExchangeInstID, vec[4].c_str());
+	mdStuct.LastPrice = StringtoDouble(vec[5]);
+	mdStuct.PreSettlementPrice = StringtoDouble(vec[6]);
+	mdStuct.PreClosePrice = StringtoDouble(vec[7]);
+	mdStuct.PreOpenInterest = StringtoDouble(vec[8]);
+	mdStuct.OpenPrice = StringtoDouble(vec[9]);
+	mdStuct.HighestPrice = StringtoDouble(vec[10]);
+	mdStuct.LowestPrice = StringtoDouble(vec[11]);
+	mdStuct.Volume = Stringtolong(vec[12]);
+	mdStuct.Turnover = StringtoDouble(vec[13]);
+	mdStuct.OpenInterest = StringtoDouble(vec[14]);
+	mdStuct.ClosePrice = StringtoDouble(vec[15]);
+	mdStuct.SettlementPrice = StringtoDouble(vec[16]);
+
+	mdStuct.UpperLimitPrice = StringtoDouble(vec[17]);
+	mdStuct.LowerLimitPrice = StringtoDouble(vec[18]);
+	mdStuct.PreDelta = StringtoDouble(vec[19]);
+	mdStuct.CurrDelta = StringtoDouble(vec[20]);
+	strcpy_s(mdStuct.UpdateTime, vec[21].c_str());// todo: from "00:00:00" to "150430" // enhance :specify the size of str
+	mdStuct.UpdateMillisec = StringtoInt(vec[22]);
+	mdStuct.BidPrice1 = StringtoDouble(vec[23]);
+	mdStuct.BidVolume1 = Stringtolong(vec[24]);
+	mdStuct.AskPrice1 = StringtoDouble(vec[25]);
+	mdStuct.AskVolume1 = Stringtolong(vec[26]);
+	mdStuct.BidPrice2 = StringtoDouble(vec[27]);
+	mdStuct.BidVolume2 = Stringtolong(vec[28]);
+	mdStuct.AskPrice2 = StringtoDouble(vec[29]);
+	mdStuct.AskVolume2 = Stringtolong(vec[30]);
+	mdStuct.BidPrice3 = StringtoDouble(vec[31]);
+	mdStuct.BidVolume3 = Stringtolong(vec[32]);
+	mdStuct.AskPrice3 = StringtoDouble(vec[33]);
+	mdStuct.AskVolume3 = Stringtolong(vec[34]);
+	mdStuct.BidPrice4 = StringtoDouble(vec[35]);
+	mdStuct.BidVolume4 = Stringtolong(vec[36]);
+	mdStuct.AskPrice4 = StringtoDouble(vec[37]);
+	mdStuct.AskVolume4 = Stringtolong(vec[38]);
+	mdStuct.BidPrice5 = StringtoDouble(vec[39]);
+	mdStuct.BidVolume5 = Stringtolong(vec[40]);
+	mdStuct.AskPrice5 = StringtoDouble(vec[41]);
+	mdStuct.AskVolume5 = Stringtolong(vec[42]);
+	mdStuct.AveragePrice = StringtoDouble(vec[43]);
+	strcpy_s(mdStuct.ActionDay, ConvertTime(vec[44]).c_str());
+	CThostFtdcDepthMDFieldWrapper mdObject(&mdStuct);
+	mdObject.setK3(StringtoDouble(vec[45]));
+	mdObject.setK5(StringtoDouble(vec[46]));
+
+	return mdObject;
+}
+
+
+//
+//long long CThostFtdcDepthMDFieldWrapper::toTimeStamp() const{
+//	const char* pDate = m_MdData.TradingDay;
+//
+//	char szYear[5], szMonth[3], szDay[3], szHour[3], szMin[3], szSec[3];
+//
+//	szYear[0] = *pDate++;
+//	szYear[1] = *pDate++;
+//	szYear[2] = *pDate++;
+//	szYear[3] = *pDate++;
+//	szYear[4] = 0x0;
+//
+//	szMonth[0] = *pDate++;
+//	szMonth[1] = *pDate++;
+//	szMonth[2] = 0x0;
+//
+//	szDay[0] = *pDate++;
+//	szDay[1] = *pDate++;
+//	szDay[2] = 0x0;
+//
+//	const char* pTime = m_MdData.UpdateTime;
+//
+//	szHour[0] = *pTime++;
+//	szHour[1] = *pTime++;
+//	szHour[2] = 0x0;
+//	pTime++;
+//
+//	szMin[0] = *pTime++;
+//	szMin[1] = *pTime++;
+//	szMin[2] = 0x0;
+//	pTime++;
+//
+//	szSec[0] = *pTime++;
+//	szSec[1] = *pTime++;
+//	szSec[2] = 0x0;
+//
+//	tm tmObj;
+//
+//	tmObj.tm_year = atoi(szYear) - 1900;
+//	tmObj.tm_mon = atoi(szMonth) - 1;
+//	tmObj.tm_mday = atoi(szDay);
+//	tmObj.tm_hour = atoi(szHour);
+//	tmObj.tm_min = atoi(szMin);
+//	tmObj.tm_sec = atoi(szSec);
+//	tmObj.tm_isdst = -1;
+//
+//	long long ret = mktime(&tmObj) * 2 + m_MdData.UpdateMillisec / 500;
+//	return ret;
+//}

@@ -1,8 +1,10 @@
 #ifndef THOST_FTDC_DEPTH_MD_FIELD_WRAPPER_H
 #define THOST_FTDC_DEPTH_MD_FIELD_WRAPPER_H
-//#pragma once
 
 #include "ThostFtdcUserApiStruct.h"
+#include <vector>
+
+typedef std::vector<std::string> CThostFtdcDepthMDFieldDBStruct;
 
 class CThostFtdcDepthMDFieldWrapper
 {
@@ -38,6 +40,8 @@ public:
 	inline double K5() const {
 		return m_k5m;
 	}
+
+	static CThostFtdcDepthMDFieldWrapper RecoverFromDB(const CThostFtdcDepthMDFieldDBStruct& vec);
 
 private:
 	CThostFtdcDepthMarketDataField m_MdData;

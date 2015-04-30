@@ -12,7 +12,7 @@ extern HANDLE g_hEvent;
 
 namespace {
 	void TryTerminate(const char * time){
-		if (0 == strcmp(time, "15:30:23"))
+		if (0 == strcmp(time, "15:00:00"))
 			exit(0);
 	}
 }
@@ -21,6 +21,7 @@ namespace {
 CtpMdSpi::CtpMdSpi(CThostFtdcMdApi* api) 
 	:pUserApi(api)
 {
+	auto pool = RealTimeDataProcessorPool::getInstance();
 }
 
 void CtpMdSpi::OnRspError(CThostFtdcRspInfoField *pRspInfo,

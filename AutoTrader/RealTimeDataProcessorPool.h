@@ -35,6 +35,9 @@ private:
 	};
 
 private:
+	void recoverHistoryData(int beforeSeconds, const std::string& instrumentId);
+
+private:
 	std::map<std::string, std::shared_ptr<Strategy>> m_dict;
 	std::map<std::string, std::shared_ptr<RealTimeDataProcessor>> m_processorDict;
 };
