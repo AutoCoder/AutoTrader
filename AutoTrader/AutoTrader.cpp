@@ -5,37 +5,41 @@
 #include "printer.h"
 #include "DBWrapper.h"
 #include "config.h"
+#include "AccountManger.h"
+#include <thread>
 
 int requestId = 0;
+HANDLE g_hEvent;
+HANDLE g_tradehEvent;
 
-void test_md(void){
-	
-	CThostFtdcMdApi* pUserApi = CThostFtdcMdApi::CreateFtdcMdApi();
-	CtpMdSpi* pUserSpi = new CtpMdSpi(pUserApi); 
-	pUserApi->RegisterSpi(pUserSpi);			
-	pUserApi->RegisterFront(const_cast<char*>(Config::Instance()->CtpMdFront().c_str()));
+//void test_md(void){
+//	
+//	CThostFtdcMdApi* pUserApi = CThostFtdcMdApi::CreateFtdcMdApi();
+//	CtpMdSpi* pUserSpi = new CtpMdSpi(pUserApi); 
+//	pUserApi->RegisterSpi(pUserSpi);			
+//	pUserApi->RegisterFront(const_cast<char*>(Config::Instance()->CtpMdFront().c_str()));
+//
+//	pUserApi->Init();     
+//	ShowMdCommand(pUserSpi, true);
+//	pUserApi->Join();
+//} 
 
-	pUserApi->Init();     
-	ShowMdCommand(pUserSpi, true);
-	pUserApi->Join();      
-}
-
-void test_order(void)
-{
-	CThostFtdcTraderApi* pUserApi = CThostFtdcTraderApi::CreateFtdcTraderApi();
-	CtpTraderSpi* pUserSpi = new CtpTraderSpi(pUserApi);
-	pUserApi->RegisterSpi((CThostFtdcTraderSpi*)pUserSpi);			
-	pUserApi->SubscribePublicTopic(THOST_TERT_RESTART);					
-	pUserApi->SubscribePrivateTopic(THOST_TERT_RESTART);			 
-	pUserApi->RegisterFront(const_cast<char*>(Config::Instance()->CtpTradeFront().c_str()));
-
-	pUserApi->Init();
-	WaitForSingleObject(g_hEvent, INFINITE);
-	ResetEvent(g_hEvent);
-	ShowTraderCommand(pUserSpi, true);
-	pUserApi->Join();
-	//pUserApi->Release();
-}
+//void test_order(void)
+//{
+//	CThostFtdcTraderApi* pUserApi = CThostFtdcTraderApi::CreateFtdcTraderApi();
+//	CtpTraderSpi* pUserSpi = new CtpTraderSpi(pUserApi);
+//	pUserApi->RegisterSpi((CThostFtdcTraderSpi*)pUserSpi);			
+//	pUserApi->SubscribePublicTopic(THOST_TERT_RESTART);					
+//	pUserApi->SubscribePrivateTopic(THOST_TERT_RESTART);			 
+//	pUserApi->RegisterFront(const_cast<char*>(Config::Instance()->CtpTradeFront().c_str()));
+//
+//	pUserApi->Init();
+//	WaitForSingleObject(g_hEvent, INFINITE);
+//	ResetEvent(g_hEvent);
+//	ShowTraderCommand(pUserSpi, true);
+//	pUserApi->Join();
+//	//pUserApi->Release();
+//}
 
 void MonitorInstruments(CtpMdSpi* p, char* instrumentIds)
 {
@@ -47,7 +51,7 @@ void MonitorInstruments(CtpMdSpi* p, char* instrumentIds)
 	cerr << "Start Moniter Instrument: " << instrumentIds;
 	cerr << "\n BrokerID > " << Config::Instance()->CtpBrokerID();
 	cerr << "\n UserID > " << Config::Instance()->CtpUserID();
-	cerr << "\n Password > " << Config::Instance()->CtpPassword();
+	cerr << "\n Password > " << Config::Instance()->CtpPassword() << std::endl;
 	p->ReqUserLogin(const_cast<char*>(Config::Instance()->CtpBrokerID().c_str()) \
 		, const_cast<char*>(Config::Instance()->CtpUserID().c_str())\
 		, const_cast<char*>(Config::Instance()->CtpPassword().c_str()));
@@ -61,28 +65,58 @@ void MonitorInstruments(CtpMdSpi* p, char* instrumentIds)
 	ResetEvent(g_hEvent);
 }
 
-void StartInstrumentMonitor(char* instrumentIds){
-	CThostFtdcMdApi* pUserApi = CThostFtdcMdApi::CreateFtdcMdApi();
+void StartMdThread(CThostFtdcMdApi* pUserApi, char* instrumentIds){
+	//CThostFtdcMdApi* pUserApi = CThostFtdcMdApi::CreateFtdcMdApi();
 	CtpMdSpi* pUserSpi = new CtpMdSpi(pUserApi);
 	pUserApi->RegisterSpi(pUserSpi);
 	pUserApi->RegisterFront(const_cast<char*>(Config::Instance()->CtpMdFront().c_str()));
 
 	pUserApi->Init();
 	MonitorInstruments(pUserSpi, instrumentIds);
-	pUserApi->Join();
+}
+
+void StartTradeThread(CThostFtdcTraderApi* pUserApi)
+{
+	AccountMangerSpi* pUserSpi = new AccountMangerSpi(pUserApi, \
+		Config::Instance()->CtpBrokerID().c_str(), \
+		Config::Instance()->CtpUserID().c_str(), \
+		Config::Instance()->CtpPassword().c_str());
+	pUserApi->RegisterSpi((CThostFtdcTraderSpi*)pUserSpi);
+	pUserApi->SubscribePublicTopic(THOST_TERT_RESTART);
+	pUserApi->SubscribePrivateTopic(THOST_TERT_RESTART);
+	pUserApi->RegisterFront(const_cast<char*>(Config::Instance()->CtpTradeFront().c_str()));
+
+	pUserApi->Init();
+	WaitForSingleObject(g_tradehEvent, INFINITE);
+	ResetEvent(g_tradehEvent);
+
+	pUserSpi->ReqUserLogin();
+	WaitForSingleObject(g_tradehEvent, INFINITE);
+	ResetEvent(g_tradehEvent);
+
+	pUserSpi->ReqQryTradingAccount();
+	WaitForSingleObject(g_tradehEvent, INFINITE);
+	ResetEvent(g_tradehEvent);
+
+	pUserSpi->ExcuteOrderQueue();
 }
 
 int main(int argc, const char* argv[]){
 	g_hEvent = CreateEvent(NULL, true, false, NULL);
 
-	StartInstrumentMonitor(const_cast<char*>(Config::Instance()->CtpInstrumentIDs().c_str()));
+	CThostFtdcMdApi* pMdUserApi = CThostFtdcMdApi::CreateFtdcMdApi();
+	CThostFtdcTraderApi* pTradeUserApi = CThostFtdcTraderApi::CreateFtdcTraderApi();
+	StartMdThread(pMdUserApi, const_cast<char*>(Config::Instance()->CtpInstrumentIDs().c_str()));
 
-	//DBWrapper::GetDBWrapper().ExecuteNoResult("")
-	//int ret = DBUtils::CreateTickTableIfNotExists("qihuo", "rb1511");
+	StartTradeThread(pTradeUserApi);
+	//std::thread tradeThread(mgr);
 
-	if (argc < 2)  cerr << "miss arguments." << endl;
-	else if (strcmp(argv[1], "--md") == 0)    test_md();
-	else if (strcmp(argv[1], "--order") == 0) test_order();
+	pMdUserApi->Join();
+	pTradeUserApi->Join();
+
+	//if (argc < 2)  cerr << "miss arguments." << endl;
+	//else if (strcmp(argv[1], "--md") == 0)    test_md();
+	//else if (strcmp(argv[1], "--order") == 0) test_order();
 
 	std::cerr << "quit ... " << std::endl;
 	return 0;

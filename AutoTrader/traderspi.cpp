@@ -13,7 +13,7 @@ TThostFtdcUserIDType userId;
 
 
 extern int requestId; 
-extern HANDLE g_hEvent;
+extern HANDLE g_tradehEvent;
 
 int	 frontId;	
 int	 sessionId;	
@@ -30,7 +30,7 @@ char MapOffset(char src, bool toOrig);
 void CtpTraderSpi::OnFrontConnected()
 {
 	cerr << __FUNCTION__ << endl;
-  SetEvent(g_hEvent);
+  SetEvent(g_tradehEvent);
 }
 
 void CtpTraderSpi::ReqUserLogin(TThostFtdcBrokerIDType	vAppId,
@@ -58,7 +58,7 @@ void CtpTraderSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
     cerr<<" Response | login successfully...CurrentDate:"
       <<pRspUserLogin->TradingDay<<endl;     
   }
-  if(bIsLast) SetEvent(g_hEvent);
+  if(bIsLast) SetEvent(g_tradehEvent);
 }
 
 void CtpTraderSpi::ReqSettlementInfoConfirm()
@@ -80,7 +80,7 @@ void CtpTraderSpi::OnRspSettlementInfoConfirm(
       <<"...<"<<pSettlementInfoConfirm->ConfirmDate
       <<" "<<pSettlementInfoConfirm->ConfirmTime<<">...Confirm"<<endl;
   }
-  if(bIsLast) SetEvent(g_hEvent);
+  if(bIsLast) SetEvent(g_tradehEvent);
 }
 
 void CtpTraderSpi::ReqQryInstrument(TThostFtdcInstrumentIDType instId)
@@ -100,8 +100,8 @@ void CtpTraderSpi::OnRspQryInstrument(CThostFtdcInstrumentField *pInstrument,
       <<" DeliveryMonth:"<<pInstrument->DeliveryMonth
       <<" LongMarginRatio:"<<pInstrument->LongMarginRatio
       <<" ShortMarginRatio:"<<pInstrument->ShortMarginRatio<<endl;    
-  }
-  if(bIsLast) SetEvent(g_hEvent);
+  } 
+  if(bIsLast) SetEvent(g_tradehEvent);
 }
 
 void CtpTraderSpi::ReqQryTradingAccount()
@@ -115,7 +115,7 @@ void CtpTraderSpi::ReqQryTradingAccount()
 
 }
 
-void CtpTraderSpi::OnRspQryTradingAccount(
+void CtpTraderSpi::OnRspQryTradingAccount(  
     CThostFtdcTradingAccountField *pTradingAccount, 
    CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 { 
@@ -130,7 +130,7 @@ void CtpTraderSpi::OnRspQryTradingAccount(
     
       << endl;    
   }
-  if(bIsLast) SetEvent(g_hEvent);
+  if(bIsLast) SetEvent(g_tradehEvent);
 }
 
 void CtpTraderSpi::ReqQryInvestorPosition(TThostFtdcInstrumentIDType instId)
@@ -157,7 +157,7 @@ void CtpTraderSpi::OnRspQryInvestorPosition(
       <<" Position Profit:"<<pInvestorPosition->PositionProfit
       <<" UseMargin:"<<pInvestorPosition->UseMargin<<endl;
   }
-  if(bIsLast) SetEvent(g_hEvent);	
+  if(bIsLast) SetEvent(g_tradehEvent);	
 }
 
 void CtpTraderSpi::ReqOrderInsert(TThostFtdcInstrumentIDType instId,
@@ -199,7 +199,7 @@ void CtpTraderSpi::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder,
   if( !IsErrorRspInfo(pRspInfo) && pInputOrder ){
     cerr<<"Response | Insert order success...Order Reference:"<<pInputOrder->OrderRef<<endl;  
   }
-  if(bIsLast) SetEvent(g_hEvent);	
+  if(bIsLast) SetEvent(g_tradehEvent);	
 }
 
 void CtpTraderSpi::ReqOrderAction(TThostFtdcSequenceNoType orderSeq)
@@ -234,7 +234,7 @@ void CtpTraderSpi::OnRspOrderAction(
       << "Exchange ID:"<<pInputOrderAction->ExchangeID
       <<" Order System ID:"<<pInputOrderAction->OrderSysID<<endl;
   }
-  if(bIsLast) SetEvent(g_hEvent);	
+  if(bIsLast) SetEvent(g_tradehEvent);	
 }
 
 ///±¨µ¥»Ø±¨
@@ -251,7 +251,7 @@ void CtpTraderSpi::OnRtnOrder(CThostFtdcOrderField *pOrder)
   if(founded) orderList[i]= order;   
   else  orderList.push_back(order);
   cerr<<" Response | order submitted...ID:"<<order->BrokerOrderSeq<<endl;
-  SetEvent(g_hEvent);	
+  SetEvent(g_tradehEvent);	
 }
 
 ///³É½»Í¨Öª
@@ -268,7 +268,7 @@ void CtpTraderSpi::OnRtnTrade(CThostFtdcTradeField *pTrade)
   if(founded) tradeList[i] = trade;   
   else  tradeList.push_back(trade);
   cerr<<" Response | order traded...TradeID:"<<trade->TradeID<<endl;
-  SetEvent(g_hEvent);
+  SetEvent(g_tradehEvent);
 }
 
 void CtpTraderSpi::OnFrontDisconnected(int nReason)
@@ -311,7 +311,7 @@ void CtpTraderSpi::PrintOrders(){
       <<" Order System ID:"<<pOrder->OrderSysID
       <<" Status Msg:"<<pOrder->StatusMsg<<endl;
   }
-  SetEvent(g_hEvent);
+  SetEvent(g_tradehEvent);
 }
 void CtpTraderSpi::PrintTrades(){
   CThostFtdcTradeField* pTrade;
@@ -325,7 +325,7 @@ void CtpTraderSpi::PrintTrades(){
       <<" Order System ID:"<<pTrade->OrderSysID
       <<" Trade ID:"<<pTrade->TradeID<<endl;
   }
-  SetEvent(g_hEvent);
+  SetEvent(g_tradehEvent);
 }
 char MapDirection(char src, bool toOrig=true){
   if(toOrig){

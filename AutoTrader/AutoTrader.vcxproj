@@ -160,6 +160,7 @@
     <ClInclude Include="..\include\ThostFtdcTraderApi.h" />
     <ClInclude Include="..\include\ThostFtdcUserApiDataType.h" />
     <ClInclude Include="..\include\ThostFtdcUserApiStruct.h" />
+    <ClInclude Include="AccountManger.h" />
     <ClInclude Include="config.h" />
     <ClInclude Include="ctpworker.h" />
     <ClInclude Include="DBWrapper.h" />
@@ -171,6 +172,7 @@
     <ClInclude Include="printer.h" />
     <ClInclude Include="RealTimeDataProcessor.h" />
     <ClInclude Include="RealTimeDataProcessorPool.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Strategy.h" />
     <ClInclude Include="targetver.h" />
@@ -178,6 +180,7 @@
     <ClInclude Include="traderspi.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AccountManger.cpp" />
     <ClCompile Include="AutoTrader.cpp" />
     <ClCompile Include="config.cpp" />
     <ClCompile Include="ctpworker.cpp" />
@@ -196,6 +199,9 @@
     <ClCompile Include="Strategy.cpp" />
     <ClCompile Include="ThostFtdcDepthMDFieldWrapper.cpp" />
     <ClCompile Include="traderspi.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="AutoTrader.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
