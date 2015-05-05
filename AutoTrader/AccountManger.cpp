@@ -45,6 +45,7 @@ void AccountMangerSpi::ExcuteOrderQueue()
 
 		//query accout to refresh the cashed the investor position
 		// todo : sleep 500ms
+		Sleep(500);
 	}
 
 	std::cout << "> end to loop order queue" << std::endl;
@@ -60,9 +61,9 @@ void AccountMangerSpi::ReqUserLogin()
 {
 	CThostFtdcReqUserLoginField req;
 	memset(&req, 0, sizeof(req));
-	strcpy(req.BrokerID, m_brokerID);
-	strcpy(req.UserID, m_userID);
-	strcpy(req.Password, m_password);
+	strcpy_s(req.BrokerID, m_brokerID);
+	strcpy_s(req.UserID, m_userID);
+	strcpy_s(req.Password, m_password);
 	int ret = pUserApi->ReqUserLogin(&req, ++requestId);
 	std::cout << " Request | send logging ..." << ((ret == 0) ? "success" : "fail") << std::endl;
 }
@@ -75,7 +76,7 @@ void AccountMangerSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin
 		m_frontID = pRspUserLogin->FrontID;
 		m_sessionID = pRspUserLogin->SessionID;
 		int nextOrderRef = atoi(pRspUserLogin->MaxOrderRef);
-		sprintf(m_orderRef, "%d", ++nextOrderRef);
+		sprintf_s(m_orderRef, "%d", ++nextOrderRef);
 		std::cout << " Response | login successfully...CurrentDate:"
 			<< pRspUserLogin->TradingDay << std::endl;
 	}
@@ -86,8 +87,8 @@ void AccountMangerSpi::ReqSettlementInfoConfirm()
 {
 	CThostFtdcSettlementInfoConfirmField req;
 	memset(&req, 0, sizeof(req));
-	strcpy(req.BrokerID, m_brokerID);
-	strcpy(req.InvestorID, m_userID);
+	strcpy_s(req.BrokerID, m_brokerID);
+	strcpy_s(req.InvestorID, m_userID);
 	int ret = pUserApi->ReqSettlementInfoConfirm(&req, ++requestId);
 	std::cout << " Request | sending settlementInfo confirmation..." << ((ret == 0) ? "success" : "fail") << std::endl;
 }
@@ -108,7 +109,7 @@ void AccountMangerSpi::ReqQryInstrument(TThostFtdcInstrumentIDType instId)
 {
 	CThostFtdcQryInstrumentField req;
 	memset(&req, 0, sizeof(req));
-	strcpy(req.InstrumentID, instId);
+	strcpy_s(req.InstrumentID, instId);
 	int ret = pUserApi->ReqQryInstrument(&req, ++requestId);
 	std::cout << " Request | send Instrument Query..." << ((ret == 0) ? "success" : "fail") << std::endl;
 }
@@ -129,8 +130,8 @@ void AccountMangerSpi::ReqQryTradingAccount()
 {
 	CThostFtdcQryTradingAccountField req;
 	memset(&req, 0, sizeof(req));
-	strcpy(req.BrokerID, m_brokerID);
-	strcpy(req.InvestorID, m_userID);
+	strcpy_s(req.BrokerID, m_brokerID);
+	strcpy_s(req.InvestorID, m_userID);
 	int ret = pUserApi->ReqQryTradingAccount(&req, ++requestId);
 	std::cout << " Request | send trading account query..." << ((ret == 0) ? "success" : "fail") << std::endl;
 
@@ -159,9 +160,9 @@ void AccountMangerSpi::ReqQryInvestorPosition(TThostFtdcInstrumentIDType instId)
 {
 	CThostFtdcQryInvestorPositionField req;
 	memset(&req, 0, sizeof(req));
-	strcpy(req.BrokerID, m_brokerID);
-	strcpy(req.InvestorID, m_userID);
-	strcpy(req.InstrumentID, instId);
+	strcpy_s(req.BrokerID, m_brokerID);
+	strcpy_s(req.InvestorID, m_userID);
+	strcpy_s(req.InstrumentID, instId);
 	int ret = pUserApi->ReqQryInvestorPosition(&req, ++requestId);
 	std::cout << " Request | send InvestorPosition query..." << ((ret == 0) ? "success" : "fail") << std::endl;
 }
@@ -188,12 +189,12 @@ void AccountMangerSpi::ReqOrderInsert(TThostFtdcInstrumentIDType instId,
 {
 	CThostFtdcInputOrderField req;
 	memset(&req, 0, sizeof(req));
-	strcpy(req.BrokerID, m_brokerID);
-	strcpy(req.InvestorID, m_userID);
-	strcpy(req.InstrumentID, instId);
-	strcpy(req.OrderRef, m_orderRef);
+	strcpy_s(req.BrokerID, m_brokerID);
+	strcpy_s(req.InvestorID, m_userID);
+	strcpy_s(req.InstrumentID, instId);
+	strcpy_s(req.OrderRef, m_orderRef);
 	int nextOrderRef = atoi(m_orderRef);
-	sprintf(m_orderRef, "%d", ++nextOrderRef);
+	sprintf_s(m_orderRef, "%d", ++nextOrderRef);
 
 	req.OrderPriceType = THOST_FTDC_OPT_LimitPrice;
 	req.Direction = MapDirection(dir, true); 
@@ -234,13 +235,13 @@ void AccountMangerSpi::ReqOrderAction(TThostFtdcSequenceNoType orderSeq)
 
 	CThostFtdcInputOrderActionField req;
 	memset(&req, 0, sizeof(req));
-	strcpy(req.BrokerID, m_brokerID);
-	strcpy(req.InvestorID, m_userID);
-	//strcpy(req.OrderRef, pOrderRef); 
+	strcpy_s(req.BrokerID, m_brokerID);
+	strcpy_s(req.InvestorID, m_userID);
+	//strcpy_s(req.OrderRef, pOrderRef); 
 	//req.FrontID = frontId;           
 	//req.SessionID = sessionId;       
-	strcpy(req.ExchangeID, orderList[i]->ExchangeID);
-	strcpy(req.OrderSysID, orderList[i]->OrderSysID);
+	strcpy_s(req.ExchangeID, orderList[i]->ExchangeID);
+	strcpy_s(req.OrderSysID, orderList[i]->OrderSysID);
 	req.ActionFlag = THOST_FTDC_AF_Delete;
 
 	int ret = pUserApi->ReqOrderAction(&req, ++requestId);

@@ -17,8 +17,9 @@ RealTimeDataProcessorPool* RealTimeDataProcessorPool::getInstance()
 }
 
 RealTimeDataProcessorPool::RealTimeDataProcessorPool()
+	:m_dbptr(new DBWrapper)
 {
-	//construct the Strategy dict
+	//construct the Strategy dict 
 	m_dict.clear();
 	m_dict["k3UpThroughK5"] = std::shared_ptr<Strategy>(new k3UpThroughK5());
 
@@ -36,7 +37,7 @@ void RealTimeDataProcessorPool::recoverHistoryData(int beforeSeconds, const std:
 	sprintf_s(sqlbuf, sqlselect, Config::Instance()->DBName(), instrumentId.c_str(), beforeSeconds*2); //beforeSeconds*2  ==  n(s) * (1 call back /500ms)
 
 	std::map<int, std::vector<std::string>> map_results;
-	DBWrapper::GetDBWrapper().Query(sqlbuf, map_results);
+	m_dbptr->Query(sqlbuf, map_results);
 
 	auto& pRealTimeDataProcessor = m_processorDict[instrumentId];
 

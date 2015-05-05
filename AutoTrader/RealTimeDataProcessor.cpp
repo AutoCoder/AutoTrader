@@ -14,6 +14,7 @@ threadsafe_queue<Order> order_queue;
 RealTimeDataProcessor::RealTimeDataProcessor(Strategy* strag, const std::string& InstrumentName)
 	: m_strategy(strag)
 	, m_Name(InstrumentName)
+	, m_dbptr(new DBWrapper)
 {
 	recoverHistoryData(600);
 }
@@ -21,8 +22,8 @@ RealTimeDataProcessor::RealTimeDataProcessor(Strategy* strag, const std::string&
 RealTimeDataProcessor::~RealTimeDataProcessor()
 {
 	//store all item in memory into db
-	for (auto iter = m_DataSeq.cbegin(); iter != m_DataSeq.cend(); iter++){
-		iter->serializeToDB();
+	for (auto iter = m_DataSeq.rbegin(); iter != m_DataSeq.rend(); iter++){
+		iter->serializeToDB(*(m_dbptr.get()));
 	}
 
 	//for (auto&& iter : m_DataSeq)
@@ -54,12 +55,9 @@ void RealTimeDataProcessor::recoverHistoryData(int beforeSeconds)
 	sprintf_s(sqlbuf, sqlselect, Config::Instance()->DBName().c_str(), m_Name.c_str(), beforeSeconds * 2); //beforeSeconds*2  ==  n(s) * (1 call back /500ms)
 
 	std::map<int, std::vector<std::string>> map_results;
-	DBWrapper::GetDBWrapper().Query(sqlbuf, map_results);
+	m_dbptr->Query(sqlbuf, map_results);
 	
 	for (auto item : map_results){
 		m_DataSeq.push_front(CThostFtdcDepthMDFieldWrapper::RecoverFromDB(item.second));
 	}
-
-	//auto tem = m_DataSeq.front();
-	//auto tem2 = m_DataSeq.back();
 }

@@ -66,15 +66,9 @@ int DBUtils::CreateTickTableIfNotExists(const std::string& dbname, const std::st
 			PRIMARY KEY(`id`));";
 		char sqlbuf[2046];
 		sprintf_s(sqlbuf, sqltempl, dbname.c_str(), tableName.c_str());
-		return DBWrapper::GetDBWrapper().ExecuteNoResult(sqlbuf);
+		DBWrapper db;
+		return db.ExecuteNoResult(sqlbuf);
 	}
-}
-
-DBWrapper& DBWrapper::GetDBWrapper(){
-	static DBWrapper db;
-
-	//for now, it doesn't support multi-thread
-	return db;
 }
 
 DBWrapper::DBWrapper()

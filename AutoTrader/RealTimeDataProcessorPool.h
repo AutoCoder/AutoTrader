@@ -4,6 +4,7 @@
 #include <map>
 #include <set>
 #include "RealTimeDataProcessor.h"
+class DBWrapper;
 
 //not for multi-thread: this singleton should be called on main()
 class RealTimeDataProcessorPool
@@ -38,6 +39,7 @@ private:
 	void recoverHistoryData(int beforeSeconds, const std::string& instrumentId);
 
 private:
+	std::shared_ptr<DBWrapper> m_dbptr;
 	std::map<std::string, std::shared_ptr<Strategy>> m_dict;
 	std::map<std::string, std::shared_ptr<RealTimeDataProcessor>> m_processorDict;
 };

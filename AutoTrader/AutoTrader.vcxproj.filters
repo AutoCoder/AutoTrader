@@ -36,12 +36,6 @@
     <ClInclude Include="mdspi.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="traderspi.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ctpworker.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\ThostFtdcMdApi.h">
       <Filter>include</Filter>
     </ClInclude>
@@ -96,12 +90,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="mdspi.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="traderspi.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ctpworker.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Order.cpp">

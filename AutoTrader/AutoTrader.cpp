@@ -7,6 +7,7 @@
 #include "config.h"
 #include "AccountManger.h"
 #include <thread>
+#include "RealTimeDataProcessorPool.h"
 
 int requestId = 0;
 HANDLE g_hEvent;
@@ -90,7 +91,16 @@ void StartTradeThread(CThostFtdcTraderApi* pUserApi)
 	WaitForSingleObject(g_tradehEvent, INFINITE);
 	ResetEvent(g_tradehEvent);
 
+	//pUserApi->ReqAuthenticate();
+
 	pUserSpi->ReqUserLogin();
+	WaitForSingleObject(g_tradehEvent, INFINITE);
+	ResetEvent(g_tradehEvent);
+
+
+	//pUserSpi->
+
+	pUserSpi->ReqSettlementInfoConfirm();
 	WaitForSingleObject(g_tradehEvent, INFINITE);
 	ResetEvent(g_tradehEvent);
 
@@ -102,7 +112,10 @@ void StartTradeThread(CThostFtdcTraderApi* pUserApi)
 }
 
 int main(int argc, const char* argv[]){
+	RealTimeDataProcessorPool::getInstance();
+
 	g_hEvent = CreateEvent(NULL, true, false, NULL);
+	g_tradehEvent = CreateEvent(NULL, true, false, NULL);
 
 	CThostFtdcMdApi* pMdUserApi = CThostFtdcMdApi::CreateFtdcMdApi();
 	CThostFtdcTraderApi* pTradeUserApi = CThostFtdcTraderApi::CreateFtdcTraderApi();
@@ -110,10 +123,10 @@ int main(int argc, const char* argv[]){
 
 	StartTradeThread(pTradeUserApi);
 	//std::thread tradeThread(mgr);
-
+	exit(0);
 	pMdUserApi->Join();
 	pTradeUserApi->Join();
-
+	
 	//if (argc < 2)  cerr << "miss arguments." << endl;
 	//else if (strcmp(argv[1], "--md") == 0)    test_md();
 	//else if (strcmp(argv[1], "--order") == 0) test_order();

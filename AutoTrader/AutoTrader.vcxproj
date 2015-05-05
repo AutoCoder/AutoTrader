@@ -162,7 +162,6 @@
     <ClInclude Include="..\include\ThostFtdcUserApiStruct.h" />
     <ClInclude Include="AccountManger.h" />
     <ClInclude Include="config.h" />
-    <ClInclude Include="ctpworker.h" />
     <ClInclude Include="DBWrapper.h" />
     <ClInclude Include="ini_parser.h" />
     <ClInclude Include="mdspi.h" />
@@ -177,13 +176,11 @@
     <ClInclude Include="Strategy.h" />
     <ClInclude Include="targetver.h" />
     <ClInclude Include="ThostFtdcDepthMDFieldWrapper.h" />
-    <ClInclude Include="traderspi.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AccountManger.cpp" />
     <ClCompile Include="AutoTrader.cpp" />
     <ClCompile Include="config.cpp" />
-    <ClCompile Include="ctpworker.cpp" />
     <ClCompile Include="DBWrapper.cpp" />
     <ClCompile Include="mdspi.cpp" />
     <ClCompile Include="mysqlwrapper.cpp" />
@@ -198,7 +195,6 @@
     </ClCompile>
     <ClCompile Include="Strategy.cpp" />
     <ClCompile Include="ThostFtdcDepthMDFieldWrapper.cpp" />
-    <ClCompile Include="traderspi.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="AutoTrader.rc" />

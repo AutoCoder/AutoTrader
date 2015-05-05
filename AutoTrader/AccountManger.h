@@ -1,8 +1,6 @@
 #pragma once
 #include <iostream>
-
-//#include "ThostFtdcTraderApi.h"
-class CThostFtdcTraderApi;
+#include "ThostFtdcTraderApi.h"
 
 class AccountMangerSpi : public CThostFtdcTraderSpi
 {

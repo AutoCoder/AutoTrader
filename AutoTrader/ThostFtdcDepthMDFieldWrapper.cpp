@@ -112,7 +112,8 @@ namespace {
 
 CThostFtdcDepthMDFieldWrapper::CThostFtdcDepthMDFieldWrapper(CThostFtdcDepthMarketDataField* p):
 	m_k5m(0.0),
-	m_k3m(0.0)
+	m_k3m(0.0),
+	recoveryData(false)
 {
 	assert(p);
 	memcpy(&m_MdData, p, sizeof(CThostFtdcDepthMarketDataField));
@@ -127,7 +128,11 @@ long long CThostFtdcDepthMDFieldWrapper::toTimeStamp() const{
 	return ret;
 }
 
-void CThostFtdcDepthMDFieldWrapper::serializeToDB() const {
+void CThostFtdcDepthMDFieldWrapper::serializeToDB(DBWrapper& db) const {
+	// if this item is recovered from db, so that we don't need serialize it to db again. 
+	if (recoveryData)
+		return;
+
 	std::string tableName(m_MdData.InstrumentID);
 
 	DBUtils::CreateTickTableIfNotExists(Config::Instance()->DBName(), tableName);
@@ -229,7 +234,7 @@ void CThostFtdcDepthMDFieldWrapper::serializeToDB() const {
 	sql <<  m_k5m << ")";
 	//"INSERT INTO `test` (`name`) VALUES (1234) 
 	std::cerr << sql.str() << std::endl;
-	DBWrapper::GetDBWrapper().ExecuteNoResult(sql.str());
+	db.ExecuteNoResult(sql.str());
 }
 
 CThostFtdcDepthMDFieldWrapper CThostFtdcDepthMDFieldWrapper::RecoverFromDB(const CThostFtdcDepthMDFieldDBStruct& vec)
@@ -284,7 +289,7 @@ CThostFtdcDepthMDFieldWrapper CThostFtdcDepthMDFieldWrapper::RecoverFromDB(const
 	CThostFtdcDepthMDFieldWrapper mdObject(&mdStuct);
 	mdObject.setK3(StringtoDouble(vec[45]));
 	mdObject.setK5(StringtoDouble(vec[46]));
-
+	mdObject.recoveryData = true;
 	return mdObject;
 }
 

@@ -5,14 +5,14 @@
 #include <vector>
 
 typedef std::vector<std::string> CThostFtdcDepthMDFieldDBStruct;
-
+class DBWrapper;
 class CThostFtdcDepthMDFieldWrapper
 {
 public:
 	CThostFtdcDepthMDFieldWrapper(CThostFtdcDepthMarketDataField* p);
 	~CThostFtdcDepthMDFieldWrapper();
 
-	void serializeToDB() const;
+	void serializeToDB(DBWrapper& db) const;
 
 	// return value:(unit: half second = 500ms, time to 19700101 00:00:00 + UTC8)
 	long long toTimeStamp() const;
@@ -48,6 +48,7 @@ private:
 	double m_k5m;
 	double m_k3m;
 	static bool firstlanuch;
+	bool recoveryData;
 };
 
 #endif

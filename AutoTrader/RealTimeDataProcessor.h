@@ -7,6 +7,7 @@
 
 class CThostFtdcDepthMDFieldWrapper;
 class Strategy;
+class DBWrapper;
 
 #define QueueSize 10
 
@@ -25,6 +26,7 @@ private:
 	std::list<CThostFtdcDepthMDFieldWrapper> m_DataSeq;
 	std::string m_Name;
 	Strategy* m_strategy;
+	std::shared_ptr<DBWrapper> m_dbptr;
 };
 
 

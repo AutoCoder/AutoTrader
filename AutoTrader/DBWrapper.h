@@ -9,12 +9,11 @@ class mysql_db;
 class DBWrapper
 {
 public:
-	static DBWrapper& GetDBWrapper();
+	DBWrapper();
 	~DBWrapper();
 	int ExecuteNoResult(const std::string& sql);
 	int Query(const std::string& sql, std::map<int, std::vector<std::string>> & map_results);
 private:
-	DBWrapper();
 	std::shared_ptr<mysql_db> m_MysqlImpl;
 };
 
