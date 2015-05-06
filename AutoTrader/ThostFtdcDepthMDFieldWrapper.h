@@ -41,6 +41,10 @@ public:
 		return m_k5m;
 	}
 
+	inline double LastPrice() {
+		return m_MdData.LastPrice;
+	}
+
 	static CThostFtdcDepthMDFieldWrapper RecoverFromDB(const CThostFtdcDepthMDFieldDBStruct& vec);
 
 private:
