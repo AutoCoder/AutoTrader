@@ -49,7 +49,7 @@ void RealTimeDataProcessor::AppendRealTimeData(CThostFtdcDepthMDFieldWrapper& in
 void RealTimeDataProcessor::recoverHistoryData(int beforeSeconds)
 {
 	//the previous tradeDay's 1200
-	const char * sqlselect = "SELECT * FROM %s.%s order by id limit %d;";
+	const char * sqlselect = "select * from (select * from %s.%s order by id desc limit %d) as tbl order by tbl.id;";
 
 	char sqlbuf[512];
 	sprintf_s(sqlbuf, sqlselect, Config::Instance()->DBName().c_str(), m_Name.c_str(), beforeSeconds * 2); //beforeSeconds*2  ==  n(s) * (1 call back /500ms)
@@ -60,4 +60,5 @@ void RealTimeDataProcessor::recoverHistoryData(int beforeSeconds)
 	for (auto item : map_results){
 		m_DataSeq.push_front(CThostFtdcDepthMDFieldWrapper::RecoverFromDB(item.second));
 	}
+
 }

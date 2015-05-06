@@ -36,9 +36,9 @@ void AccountMangerSpi::ExcuteOrderQueue()
 {
 	std::cout << "Start to trade" << std::endl;
 	std::cout << "> start to loop order queue" << std::endl;
-	while (!order_queue.empty()){
+	while (true){
 		Order ord;
-		if (order_queue.try_pop(ord)){ // if pop success
+		if (!order_queue.empty() && order_queue.try_pop(ord)){ // if pop success
 			std::cout << "Excute Order regarding instrumentID:" << ord.GetInstrumentId() << std::endl;
 			//Todo: according ord to insert order
 		}

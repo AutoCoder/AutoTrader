@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "Strategy.h"
-
+#include <iostream>
 const double minDelta = 0.3;
 
 Strategy::Strategy()
@@ -19,7 +19,7 @@ double Strategy::calculateK(const std::list<CThostFtdcDepthMDFieldWrapper>& data
 	long long totalVolume = current.Volume();
 
 	long long leftedge = current.toTimeStamp() - seconds * 2;
-	for (auto it = data.rbegin(); it != data.rend(); it++)
+	for (auto it = data.begin(); it != data.end(); it++)
 	{
 		if (it->toTimeStamp() > leftedge){
 			totalExchangePrice += it->TurnOver();
@@ -64,6 +64,8 @@ bool k3UpThroughK5::TryInvoke(const std::list<CThostFtdcDepthMDFieldWrapper>& da
 		if (info.K3() > info.K5()){
 			// Buy Singal
 			// construct Buy Order ptr
+			std::cout << "[Buy Signal]" << std::endl;
+			std::cout << "LastPrice: " << info.LastPrice() << std::endl;
 			orderSingal = true;	
 		}
 	}
@@ -71,6 +73,8 @@ bool k3UpThroughK5::TryInvoke(const std::list<CThostFtdcDepthMDFieldWrapper>& da
 		if (info.K3() < info.K5()){
 			//Sell Singal
 			// construct Sell Order ptr
+			std::cout << "[Sell Signal]" << std::endl;
+			std::cout << "LastPrice: " << info.LastPrice() << std::endl;
 			orderSingal = true;
 		}
 	}

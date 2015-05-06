@@ -112,8 +112,7 @@ void StartTradeThread(CThostFtdcTraderApi* pUserApi)
 }
 
 int main(int argc, const char* argv[]){
-	RealTimeDataProcessorPool::getInstance();
-
+	
 	g_hEvent = CreateEvent(NULL, true, false, NULL);
 	g_tradehEvent = CreateEvent(NULL, true, false, NULL);
 
@@ -123,7 +122,7 @@ int main(int argc, const char* argv[]){
 
 	StartTradeThread(pTradeUserApi);
 	//std::thread tradeThread(mgr);
-	exit(0);
+
 	pMdUserApi->Join();
 	pTradeUserApi->Join();
 	
