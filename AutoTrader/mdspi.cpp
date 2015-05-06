@@ -12,7 +12,7 @@ extern HANDLE g_hEvent;
 
 namespace {
 	void TryTerminate(const char * time){
-		if (0 == strcmp(time, "14:58:00"))
+		if (0 == strcmp(time, "14:56:00"))
 			exit(0);
 	}
 }

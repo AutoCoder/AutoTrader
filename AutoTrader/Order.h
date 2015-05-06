@@ -17,6 +17,18 @@ public:
 		return m_instrumentId;
 	}
 
+	void SetInstrumentId(const std::string& in){
+		m_instrumentId = in;
+	}
+
+	void SetRefExchangePrice(double price){
+		m_refExchangePrice = price;
+	}
+
+	void SetExchangeDirection(ExchangeDirection in){
+		m_direction = in;
+	}
+
 private:
 
 	enum class OrderType{

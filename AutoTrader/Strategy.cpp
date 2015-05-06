@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "Strategy.h"
 #include <iostream>
+#include "Order.h"
+
 const double minDelta = 0.3;
 
 Strategy::Strategy()
@@ -38,6 +40,7 @@ double Strategy::calculateK(const std::list<CThostFtdcDepthMDFieldWrapper>& data
 
 
 k3UpThroughK5::k3UpThroughK5()
+	:m_curOrder(new Order())
 {
 }
 
@@ -66,6 +69,11 @@ bool k3UpThroughK5::TryInvoke(const std::list<CThostFtdcDepthMDFieldWrapper>& da
 			// construct Buy Order ptr
 			std::cout << "[Buy Signal]" << std::endl;
 			std::cout << "LastPrice: " << info.LastPrice() << std::endl;
+			//Order ord(info.InstrumentId(), info.LastPrice(), ExchangeDirection::Buy);
+			m_curOrder->SetInstrumentId(info.InstrumentId());
+			m_curOrder->SetRefExchangePrice(info.LastPrice());
+			m_curOrder->SetExchangeDirection(ExchangeDirection::Buy);
+			info.SetTickType(TickType::BuyPoint);
 			orderSingal = true;	
 		}
 	}
@@ -75,6 +83,11 @@ bool k3UpThroughK5::TryInvoke(const std::list<CThostFtdcDepthMDFieldWrapper>& da
 			// construct Sell Order ptr
 			std::cout << "[Sell Signal]" << std::endl;
 			std::cout << "LastPrice: " << info.LastPrice() << std::endl;
+			//Order ord(info.InstrumentId(), info.LastPrice(), ExchangeDirection::Sell);
+			m_curOrder->SetInstrumentId(info.InstrumentId());
+			m_curOrder->SetRefExchangePrice(info.LastPrice());
+			m_curOrder->SetExchangeDirection(ExchangeDirection::Sell);
+			info.SetTickType(TickType::SellPoint);
 			orderSingal = true;
 		}
 	}
@@ -83,5 +96,5 @@ bool k3UpThroughK5::TryInvoke(const std::list<CThostFtdcDepthMDFieldWrapper>& da
 }
  
 Order k3UpThroughK5::generateOrder(){
-	return Order();
+	return *m_curOrder;
 }

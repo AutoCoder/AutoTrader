@@ -113,7 +113,8 @@ namespace {
 CThostFtdcDepthMDFieldWrapper::CThostFtdcDepthMDFieldWrapper(CThostFtdcDepthMarketDataField* p):
 	m_k5m(0.0),
 	m_k3m(0.0),
-	recoveryData(false)
+	recoveryData(false),
+	m_ticktype(TickType::Commom)
 {
 	assert(p);
 	memcpy(&m_MdData, p, sizeof(CThostFtdcDepthMarketDataField));
@@ -184,7 +185,8 @@ void CThostFtdcDepthMDFieldWrapper::serializeToDB(DBWrapper& db) const {
 	sql << "AveragePrice" << "`,`";
 	sql << "ActionDay" << "`,`";
 	sql << "k3m" << "`,`";
-	sql << "k5m" << "`";
+	sql << "k5m" << "`,`";
+	sql << "TickType" << "`,";
 	sql << ") VALUES(\"";
 	sql << m_MdData.TradingDay << "\", \"";//m_MdData.TradingDay
 	sql <<  m_MdData.InstrumentID << "\", \"";
@@ -231,7 +233,8 @@ void CThostFtdcDepthMDFieldWrapper::serializeToDB(DBWrapper& db) const {
 	sql <<  m_MdData.AveragePrice << ", \"";
 	sql <<  m_MdData.ActionDay << "\", "; // m_MdData.ActionDay
 	sql <<  m_k3m << ", ";
-	sql <<  m_k5m << ")";
+	sql << m_k5m << ", ";
+	sql << (int)m_ticktype << ")";
 	//"INSERT INTO `test` (`name`) VALUES (1234) 
 	std::cerr << sql.str() << std::endl;
 	db.ExecuteNoResult(sql.str());
@@ -289,6 +292,7 @@ CThostFtdcDepthMDFieldWrapper CThostFtdcDepthMDFieldWrapper::RecoverFromDB(const
 	CThostFtdcDepthMDFieldWrapper mdObject(&mdStuct);
 	mdObject.setK3(StringtoDouble(vec[45]));
 	mdObject.setK5(StringtoDouble(vec[46]));
+	mdObject.SetTickType((TickType)StringtoInt(vec[47]));
 	mdObject.recoveryData = true;
 	return mdObject;
 }

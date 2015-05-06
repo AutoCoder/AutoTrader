@@ -1,9 +1,10 @@
 #ifndef STRATEGY_H
 #define STRATEGY_H
 
-#include "Order.h"
 #include "ThostFtdcDepthMDFieldWrapper.h"
 #include <list>
+
+class Order;
 
 class Strategy
 {

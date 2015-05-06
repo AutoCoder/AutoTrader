@@ -63,6 +63,7 @@ int DBUtils::CreateTickTableIfNotExists(const std::string& dbname, const std::st
 			`ActionDay` DATE NULL, \
 			`k3m` DOUBLE NULL, \
 			`k5m` DOUBLE NULL, \
+			`TickType` INT NULL, \
 			PRIMARY KEY(`id`));";
 		char sqlbuf[2046];
 		sprintf_s(sqlbuf, sqltempl, dbname.c_str(), tableName.c_str());

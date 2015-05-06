@@ -4,6 +4,12 @@
 #include "ThostFtdcUserApiStruct.h"
 #include <vector>
 
+enum class TickType{
+	Commom = 0x0,
+	BuyPoint = 0x1,
+	SellPoint = 0x2,
+};
+
 typedef std::vector<std::string> CThostFtdcDepthMDFieldDBStruct;
 class DBWrapper;
 class CThostFtdcDepthMDFieldWrapper
@@ -45,6 +51,14 @@ public:
 		return m_MdData.LastPrice;
 	}
 
+	inline std::string InstrumentId(){
+		return std::string(m_MdData.InstrumentID);
+	}
+
+	inline void SetTickType(TickType type){
+		m_ticktype = type;
+	}
+
 	static CThostFtdcDepthMDFieldWrapper RecoverFromDB(const CThostFtdcDepthMDFieldDBStruct& vec);
 
 private:
@@ -53,6 +67,7 @@ private:
 	double m_k3m;
 	static bool firstlanuch;
 	bool recoveryData;
+	TickType m_ticktype;
 };
 
 #endif
