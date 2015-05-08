@@ -186,7 +186,7 @@ void CThostFtdcDepthMDFieldWrapper::serializeToDB(DBWrapper& db) const {
 	sql << "ActionDay" << "`,`";
 	sql << "k3m" << "`,`";
 	sql << "k5m" << "`,`";
-	sql << "TickType" << "`,";
+	sql << "TickType" << "`";
 	sql << ") VALUES(\"";
 	sql << m_MdData.TradingDay << "\", \"";//m_MdData.TradingDay
 	sql <<  m_MdData.InstrumentID << "\", \"";
