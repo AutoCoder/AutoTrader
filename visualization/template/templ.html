@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <title>ECharts</title>
+</head>
+<body>
+
+    <div id="k35lineChart" style="height:300px"></div>
+    <div id="kstandardChart" style="height:300px"></div>
+
+    <script src="http://echarts.baidu.com/build/dist/echarts.js"></script>
+    <script type="text/javascript">
+
+        require.config({
+            paths: {
+                echarts: 'http://echarts.baidu.com/build/dist'
+            }
+        });
+        
+
+        require(
+            [
+                'echarts',
+                'echarts/chart/k', 
+                'echarts/chart/bar'
+            ],
+            function (ec) {
+
+                var myKChart = ec.init(document.getElementById('k35lineChart')); 
+                
+                var option = ${option1}
+        
+
+                myKChart.setOption(option); 
+
+                var myALChart = ec.init(document.getElementById('kstandardChart')); 
+                
+                var option2 = ${option2}
+        
+
+                myALChart.setOption(option2); 
+            }
+        );
+    </script>
+</body>
