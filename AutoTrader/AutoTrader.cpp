@@ -13,6 +13,7 @@
 #include "Order.h"
 #include "OrderQueue.h"
 #include <atomic>
+#include "spdlog/spdlog.h"
 
 int requestId = 0;
 HANDLE g_hEvent;
@@ -30,10 +31,10 @@ void MonitorInstruments(CtpMdSpi* p, char* instrumentIds)
 	ResetEvent(g_hEvent);
 
 	//login
-	cerr << "Start Moniter Instrument: " << instrumentIds;
-	cerr << "\n BrokerID > " << Config::Instance()->CtpBrokerID();
-	cerr << "\n UserID > " << Config::Instance()->CtpUserID();
-	cerr << "\n Password > " << Config::Instance()->CtpPassword() << std::endl;
+	spdlog::get("console")->info() << "Start Moniter Instrument: " << instrumentIds
+		<< "BrokerID > " << Config::Instance()->CtpBrokerID()
+		<< "UserID > " << Config::Instance()->CtpUserID()
+		<< "Password > " << Config::Instance()->CtpPassword();
 	p->ReqUserLogin(const_cast<char*>(Config::Instance()->CtpBrokerID().c_str()) \
 		, const_cast<char*>(Config::Instance()->CtpUserID().c_str())\
 		, const_cast<char*>(Config::Instance()->CtpPassword().c_str()));
@@ -53,10 +54,10 @@ void StartMDLoginThread(CtpMdSpi* p){
 	while (true){
 		cv.wait(lck, [&](){ return p->IsFrontConnected() && !p->IsLogin(); });
 
-		cerr << "Login..." << std::endl;
-		cerr << "> BrokerID > " << Config::Instance()->CtpBrokerID() << std::endl;
-		cerr << "> UserID > " << Config::Instance()->CtpUserID() << std::endl;
-		cerr << "> Password > " << Config::Instance()->CtpPassword() << std::endl;
+		spdlog::get("console")->info() << "Login...";
+		spdlog::get("console")->info() << "\n> BrokerID > " << Config::Instance()->CtpBrokerID();
+		spdlog::get("console")->info() << "\n> UserID > " << Config::Instance()->CtpUserID();
+		spdlog::get("console")->info() << "\n> Password > " << Config::Instance()->CtpPassword();
 		p->ReqUserLogin(const_cast<char*>(Config::Instance()->CtpBrokerID().c_str()) \
 			, const_cast<char*>(Config::Instance()->CtpUserID().c_str())\
 			, const_cast<char*>(Config::Instance()->CtpPassword().c_str()));
@@ -95,12 +96,12 @@ void StartTradeThread(CThostFtdcTraderApi* pUserApi, AccountMangerSpi* pUserSpi)
 }
 
 void ExcuteOrderQueue(AccountMangerSpi* pUserSpi){
-	std::cout << "Start to trade" << std::endl;
-	std::cout << "> start to loop order queue" << std::endl;
+	spdlog::get("console")->info() << "Start to trade";
+	spdlog::get("console")->info() << "Start to loop order queue";
 	while (true){
 		Order ord;
 		if (!order_queue.empty() && order_queue.try_pop(ord)){ // if pop success
-			std::cout << "Excute Order regarding instrumentID:" << ord.GetInstrumentId() << std::endl;
+			spdlog::get("console")->info() << "Excute Order regarding instrumentID:" << ord.GetInstrumentId();
 			//Todo: according ord to insert order
 		}
 
@@ -109,11 +110,13 @@ void ExcuteOrderQueue(AccountMangerSpi* pUserSpi){
 		Sleep(500);
 	}
 
-	std::cout << "> end to loop order queue" << std::endl;
+	spdlog::get("console")->info() << "End to loop order queue";
 }
 
 int main(int argc, const char* argv[]){
 	
+	auto console = spdlog::stdout_logger_mt("console");
+
 	g_hEvent = CreateEvent(NULL, true, false, NULL);
 	g_tradehEvent = CreateEvent(NULL, true, false, NULL);
 
@@ -143,7 +146,7 @@ int main(int argc, const char* argv[]){
 	//[Main Thread]Release the resource and pointer.
 	while (true){
 		if (g_quit){
-			std::cout << "Start to release resource..." << std::endl;
+			console->info() << "Start to release resource...";
 			if (pMdUserApi)
 			{
 				pMdUserApi->RegisterSpi(NULL);
@@ -166,7 +169,7 @@ int main(int argc, const char* argv[]){
 				delete pTradeUserSpi;
 				pTradeUserSpi = NULL;
 			}
-			std::cerr << "Quit ... " << std::endl;
+			console->info() << "Quit ... ";
 			exit(0);
 		}
 		Sleep(1000);

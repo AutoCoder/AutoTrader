@@ -4,6 +4,7 @@
 #include "mysqlwrapper.h"
 #include <iostream>
 #include "config.h"
+#include "spdlog/spdlog.h"
 
 std::map<std::string, bool> DBUtils::m_dict = {};
 
@@ -81,7 +82,7 @@ DBWrapper::DBWrapper()
 		, Config::Instance()->DBName().c_str() \
 		, Config::Instance()->DBPort()))
 	{
-		std::cerr << m_MysqlImpl->mysql_lasterror() << std::endl;
+		spdlog::get("console")->info() << m_MysqlImpl->mysql_lasterror();
 	}
 		
 	//ExecuteNoResult("ExecuteNoResult")
@@ -94,13 +95,13 @@ DBWrapper::~DBWrapper()
 
 int DBWrapper::ExecuteNoResult(const std::string& sql){
 	int ret = m_MysqlImpl->mysql_noResult_query(sql.c_str());
-	if (-1 == ret)		std::cerr << m_MysqlImpl->mysql_lasterror() << std::endl;
+	if (-1 == ret)		spdlog::get("console")->info() << m_MysqlImpl->mysql_lasterror();
 	return ret;
 }
 
 int DBWrapper::Query(const std::string& sql, std::map<int, std::vector<std::string>> & map_results)
 {
 	int ret = m_MysqlImpl->mysql_select_query(sql.c_str(), map_results);
-	if (-1 == ret)		std::cerr << m_MysqlImpl->mysql_lasterror() << std::endl;
+	if (-1 == ret)		spdlog::get("console")->info() << m_MysqlImpl->mysql_lasterror();
 	return ret;
 }

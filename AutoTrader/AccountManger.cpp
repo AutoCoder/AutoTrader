@@ -6,6 +6,7 @@
 #include "traderspi.h"
 #include "windows.h"
 #include "config.h"
+#include "spdlog/spdlog.h"
 
 extern HANDLE g_tradehEvent;
 extern int requestId;
@@ -44,7 +45,7 @@ void AccountMangerSpi::ReqUserLogin()
 	strcpy_s(req.UserID, m_userID);
 	strcpy_s(req.Password, m_password);
 	int ret = pUserApi->ReqUserLogin(&req, ++requestId);
-	std::cout << " Request | send logging ..." << ((ret == 0) ? "success" : "fail") << std::endl;
+	spdlog::get("console")->info() << " Request | send logging ..." << ((ret == 0) ? "success" : "fail");
 }
 
 void AccountMangerSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
@@ -56,8 +57,8 @@ void AccountMangerSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin
 		m_sessionID = pRspUserLogin->SessionID;
 		int nextOrderRef = atoi(pRspUserLogin->MaxOrderRef);
 		sprintf_s(m_orderRef, "%d", ++nextOrderRef);
-		std::cout << " Response | login successfully...CurrentDate:"
-			<< pRspUserLogin->TradingDay << std::endl;
+		spdlog::get("console")->info() << " Response | login successfully...CurrentDate:"
+			<< pRspUserLogin->TradingDay;
 	}
 	if (bIsLast) SetEvent(g_tradehEvent);
 }
@@ -69,7 +70,7 @@ void AccountMangerSpi::ReqSettlementInfoConfirm()
 	strcpy_s(req.BrokerID, m_brokerID);
 	strcpy_s(req.InvestorID, m_userID);
 	int ret = pUserApi->ReqSettlementInfoConfirm(&req, ++requestId);
-	std::cout << " Request | sending settlementInfo confirmation..." << ((ret == 0) ? "success" : "fail") << std::endl;
+	spdlog::get("console")->info() << " Request | sending settlementInfo confirmation..." << ((ret == 0) ? "success" : "fail");
 }
 
 void AccountMangerSpi::OnRspSettlementInfoConfirm(
@@ -77,9 +78,9 @@ void AccountMangerSpi::OnRspSettlementInfoConfirm(
 	CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
 	if (!IsErrorRspInfo(pRspInfo) && pSettlementInfoConfirm){
-		std::cout << " Response | settlementInfo..." << pSettlementInfoConfirm->InvestorID
+		spdlog::get("console")->info() << " Response | settlementInfo..." << pSettlementInfoConfirm->InvestorID
 			<< "...<" << pSettlementInfoConfirm->ConfirmDate
-			<< " " << pSettlementInfoConfirm->ConfirmTime << ">...Confirm" << std::endl;
+			<< " " << pSettlementInfoConfirm->ConfirmTime << ">...Confirm";
 	}
 	if (bIsLast) SetEvent(g_tradehEvent);
 }
@@ -90,17 +91,17 @@ void AccountMangerSpi::ReqQryInstrument(TThostFtdcInstrumentIDType instId)
 	memset(&req, 0, sizeof(req));
 	strcpy_s(req.InstrumentID, instId);
 	int ret = pUserApi->ReqQryInstrument(&req, ++requestId);
-	std::cout << " Request | send Instrument Query..." << ((ret == 0) ? "success" : "fail") << std::endl;
+	spdlog::get("console")->info() << " Request | send Instrument Query..." << ((ret == 0) ? "success" : "fail");
 }
 
 void AccountMangerSpi::OnRspQryInstrument(CThostFtdcInstrumentField *pInstrument,
 	CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
 	if (!IsErrorRspInfo(pRspInfo) && pInstrument){
-		std::cout << " Response | Instrument:" << pInstrument->InstrumentID
+		spdlog::get("console")->info() << " Response | Instrument:" << pInstrument->InstrumentID
 			<< " DeliveryMonth:" << pInstrument->DeliveryMonth
 			<< " LongMarginRatio:" << pInstrument->LongMarginRatio
-			<< " ShortMarginRatio:" << pInstrument->ShortMarginRatio << std::endl;
+			<< " ShortMarginRatio:" << pInstrument->ShortMarginRatio;
 	}
 	if (bIsLast) SetEvent(g_tradehEvent);
 }
@@ -112,7 +113,7 @@ void AccountMangerSpi::ReqQryTradingAccount()
 	strcpy_s(req.BrokerID, m_brokerID);
 	strcpy_s(req.InvestorID, m_userID);
 	int ret = pUserApi->ReqQryTradingAccount(&req, ++requestId);
-	std::cout << " Request | send trading account query..." << ((ret == 0) ? "success" : "fail") << std::endl;
+	spdlog::get("console")->info() << " Request | send trading account query..." << ((ret == 0) ? "success" : "fail");
 
 }
 
@@ -122,14 +123,13 @@ void AccountMangerSpi::OnRspQryTradingAccount(
 {
 	if (!IsErrorRspInfo(pRspInfo) && pTradingAccount){
 		memcpy(&m_accountInfo, pTradingAccount, sizeof(CThostFtdcTradingAccountField));
-		std::cout << " Response | Balance:" << pTradingAccount->Balance
+		spdlog::get("console")->info() << " Response | Balance:" << pTradingAccount->Balance
 			<< " Available:" << pTradingAccount->Available
 			<< " CurrMargin:" << pTradingAccount->CurrMargin
 			<< " CloseProfit:" << pTradingAccount->CloseProfit
 			<< " PositionProfit:" << pTradingAccount->PositionProfit
 			<< " Commission:" << pTradingAccount->Commission
-			<< " FrozenMargin:" << pTradingAccount->FrozenMargin
-			<< std::endl;
+			<< " FrozenMargin:" << pTradingAccount->FrozenMargin;
 	}
 
 	if (bIsLast) SetEvent(g_tradehEvent);
@@ -143,7 +143,7 @@ void AccountMangerSpi::ReqQryInvestorPosition(TThostFtdcInstrumentIDType instId)
 	strcpy_s(req.InvestorID, m_userID);
 	strcpy_s(req.InstrumentID, instId);
 	int ret = pUserApi->ReqQryInvestorPosition(&req, ++requestId);
-	std::cout << " Request | send InvestorPosition query..." << ((ret == 0) ? "success" : "fail") << std::endl;
+	spdlog::get("console")->info() << " Request | send InvestorPosition query..." << ((ret == 0) ? "success" : "fail");
 }
 
 void AccountMangerSpi::OnRspQryInvestorPosition(
@@ -151,13 +151,13 @@ void AccountMangerSpi::OnRspQryInvestorPosition(
 	CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
 	if (!IsErrorRspInfo(pRspInfo) && pInvestorPosition){
-		std::cout << " Response| Instrument:" << pInvestorPosition->InstrumentID
+		spdlog::get("console")->info() << " Response| Instrument:" << pInvestorPosition->InstrumentID
 			<< " PosiDirection:" << MapDirection(pInvestorPosition->PosiDirection - 2, false)
 			<< " Position:" << pInvestorPosition->Position
 			<< " Yesterday Position:" << pInvestorPosition->YdPosition
 			<< " Today Position:" << pInvestorPosition->TodayPosition
 			<< " Position Profit:" << pInvestorPosition->PositionProfit
-			<< " UseMargin:" << pInvestorPosition->UseMargin << std::endl;
+			<< " UseMargin:" << pInvestorPosition->UseMargin;
 	}
 	if (bIsLast) SetEvent(g_tradehEvent);
 }
@@ -192,14 +192,14 @@ void AccountMangerSpi::ReqOrderInsert(TThostFtdcInstrumentIDType instId,
 	req.UserForceClose = 0; 
 
 	int ret = pUserApi->ReqOrderInsert(&req, ++requestId);
-	std::cout << " Request | insert order..." << ((ret == 0) ? "success" : "fail") << std::endl;
+	spdlog::get("console")->info() << " Request | insert order..." << ((ret == 0) ? "success" : "fail");
 }
 
 void AccountMangerSpi::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder,
 	CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
 	if (!IsErrorRspInfo(pRspInfo) && pInputOrder){
-		std::cout << "Response | Insert order success...Order Reference:" << pInputOrder->OrderRef << std::endl;
+		spdlog::get("console")->info() << "Response | Insert order success...Order Reference:" << pInputOrder->OrderRef;
 	}
 	if (bIsLast) SetEvent(g_tradehEvent);
 }
@@ -210,7 +210,7 @@ void AccountMangerSpi::ReqOrderAction(TThostFtdcSequenceNoType orderSeq)
 	for (i = 0; i<orderList.size(); i++){
 		if (orderList[i]->BrokerOrderSeq == orderSeq){ found = true; break; }
 	}
-	if (!found){ std::cout << " Request | Insert order doesn't exist." << std::endl; return; }
+	if (!found){ spdlog::get("console")->info() << " Request | Insert order doesn't exist."; return; }
 
 	CThostFtdcInputOrderActionField req;
 	memset(&req, 0, sizeof(req));
@@ -224,7 +224,7 @@ void AccountMangerSpi::ReqOrderAction(TThostFtdcSequenceNoType orderSeq)
 	req.ActionFlag = THOST_FTDC_AF_Delete;
 
 	int ret = pUserApi->ReqOrderAction(&req, ++requestId);
-	std::cout << " Request | backout order..." << ((ret == 0) ? "success" : "fail") << std::endl;
+	spdlog::get("console")->info() << " Request | backout order..." << ((ret == 0) ? "success" : "fail");
 }
 
 void AccountMangerSpi::OnRspOrderAction(
@@ -232,9 +232,9 @@ void AccountMangerSpi::OnRspOrderAction(
 	CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
 	if (!IsErrorRspInfo(pRspInfo) && pInputOrderAction){
-		std::cout << " Response | backout order success..."
+		spdlog::get("console")->info() << " Response | backout order success..."
 			<< "Exchange ID:" << pInputOrderAction->ExchangeID
-			<< " Order System ID:" << pInputOrderAction->OrderSysID << std::endl;
+			<< " Order System ID:" << pInputOrderAction->OrderSysID;
 	}
 	if (bIsLast) SetEvent(g_tradehEvent);
 }
@@ -251,7 +251,7 @@ void AccountMangerSpi::OnRtnOrder(CThostFtdcOrderField *pOrder)
 	}
 	if (founded) orderList[i] = order;
 	else  orderList.push_back(order);
-	std::cout << " Response | order submitted...ID:" << order->BrokerOrderSeq << std::endl;
+	spdlog::get("console")->info() << " Response | order submitted...ID:" << order->BrokerOrderSeq;
 	SetEvent(g_tradehEvent);
 }
 
@@ -267,20 +267,20 @@ void AccountMangerSpi::OnRtnTrade(CThostFtdcTradeField *pTrade)
 	}
 	if (founded) tradeList[i] = trade;
 	else  tradeList.push_back(trade);
-	std::cout << " Response | order traded...TradeID:" << trade->TradeID << std::endl;
+	spdlog::get("console")->info() << " Response | order traded...TradeID:" << trade->TradeID;
 	SetEvent(g_tradehEvent);
 }
 
 void AccountMangerSpi::OnFrontDisconnected(int nReason)
 {
-	std::cout << " Response | Disconnected..."
-		<< " reason=" << nReason << std::endl;
+	spdlog::get("console")->info() << " Response | Disconnected..."
+		<< " reason=" << nReason ;
 }
 
 void AccountMangerSpi::OnHeartBeatWarning(int nTimeLapse)
 {
-	std::cout << "Response | heartbeat is out of time limit..."
-		<< " TimerLapse = " << nTimeLapse << std::endl;
+	spdlog::get("console")->info() << "Response | heartbeat is out of time limit..."
+		<< " TimerLapse = " << nTimeLapse ;
 }
 
 void AccountMangerSpi::OnRspError(CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
@@ -292,7 +292,7 @@ bool AccountMangerSpi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo)
 {
 	bool ret = ((pRspInfo) && (pRspInfo->ErrorID != 0));
 	if (ret){
-		std::cout << " Response | " << pRspInfo->ErrorMsg << std::endl;
+		spdlog::get("console")->info() << " Response | " << pRspInfo->ErrorMsg;
 	}
 	return ret;
 }

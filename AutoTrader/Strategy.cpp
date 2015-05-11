@@ -32,8 +32,8 @@ double Strategy::calculateK(const std::list<CThostFtdcDepthMDFieldWrapper>& data
 		}
 	}
 
-	assert(totalVolume != 0);
-	assert(totalExchangePrice >= 0.0);
+	//assert(totalVolume != 0);
+	//assert(totalExchangePrice >= 0.0);
 
 	return totalExchangePrice / totalVolume;
 }

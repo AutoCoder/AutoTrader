@@ -5,6 +5,7 @@
 #include "RealTimeDataProcessorPool.h"
 #include <condition_variable>
 #include <atomic>
+#include "spdlog/spdlog.h"
 
 using namespace std;
 #pragma warning(disable : 4996)
@@ -41,21 +42,20 @@ void CtpMdSpi::OnRspError(CThostFtdcRspInfoField *pRspInfo,
 
 void CtpMdSpi::OnFrontDisconnected(int nReason)
 {
-	cerr << __FUNCTION__
-    << " reason=" << nReason << endl;
+	spdlog::get("console")->info() << __FUNCTION__ << " reason=" << nReason;
 	m_isFrontConnected = false;
-	
+	m_isLogin = false;
+	m_isSubscribed = false;
 }
 		
 void CtpMdSpi::OnHeartBeatWarning(int nTimeLapse)
 {
-	cerr << __FUNCTION__
-    << " TimerLapse = " << nTimeLapse << endl;
+	spdlog::get("console")->info() << __FUNCTION__ << " TimerLapse = " << nTimeLapse;
 }
 
 void CtpMdSpi::OnFrontConnected()
 {
-	cerr << __FUNCTION__ << endl;
+	spdlog::get("console")->info() << __FUNCTION__ ;
 	SetEvent(g_hEvent);
 	m_isFrontConnected = true;
 	cv.notify_all();
@@ -69,7 +69,7 @@ bool CtpMdSpi::ReqUserLogin(TThostFtdcBrokerIDType appId, TThostFtdcUserIDType u
 	strcpy(req.UserID, userId);
 	strcpy(req.Password, passwd);
 	int ret = pUserApi->ReqUserLogin(&req, ++requestId);
-  cerr<<" Request | send login request ..."<<((ret == 0) ? "success" : "fail") << endl;	
+	spdlog::get("console")->info() << " Request | send login request ..." << ((ret == 0) ? "success" : "fail");
   return (ret == 0);
   //SetEvent(g_hEvent);
 }
@@ -79,35 +79,34 @@ void CtpMdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
 {
 	if (!IsErrorRspInfo(pRspInfo) && pRspUserLogin)
 	{
-    cerr<<" Response | login successfully...CurrentDate:"
-      <<pRspUserLogin->TradingDay<<endl;
-	m_isLogin = true;
-	cv.notify_all();
+		spdlog::get("console")->info() << " Response | login successfully...CurrentDate:" <<pRspUserLogin->TradingDay;
+		m_isLogin = true;
+		cv.notify_all();
 	}
 	if (bIsLast) SetEvent(g_hEvent);
 }
 
 void CtpMdSpi::SubscribeMarketData(char* instIdList)
 {
-  vector<char*> list;
-  char *token = strtok(instIdList, ",");
-  while( token != NULL ){
-    list.push_back(token); 
-    token = strtok(NULL, ",");
-  }
-  unsigned int len = list.size();
-  char** pInstId = new char* [len];  
-  for(unsigned int i=0; i<len;i++)  pInstId[i]=list[i]; 
+	vector<char*> list;
+	char *token = strtok(instIdList, ",");
+	while( token != NULL ){
+		list.push_back(token); 
+		token = strtok(NULL, ",");
+	}
+	unsigned int len = list.size();
+	char** pInstId = new char* [len];  
+	for(unsigned int i=0; i<len;i++)  pInstId[i]=list[i]; 
+
 	int ret=pUserApi->SubscribeMarketData(pInstId, len);
-	cerr << " Request | send md subscribe request... " << ((ret == 0) ? "success" : "fail") << endl;
-  //SetEvent(g_hEvent);
+	spdlog::get("console")->info() << " Request | send md subscribe request... " << ((ret == 0) ? "success" : "fail");
 }
 
 void CtpMdSpi::OnRspSubMarketData(
          CThostFtdcSpecificInstrumentField *pSpecificInstrument, 
          CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
-	cerr << " Response | [OnRspSubMarketData] : " << ((pRspInfo->ErrorID == 0) ? "success" : "fail") << "; DetailInfo : " << pRspInfo->ErrorMsg << endl;
+	spdlog::get("console")->info() << " Response | [OnRspSubMarketData] : " << ((pRspInfo->ErrorID == 0) ? "success" : "fail") << "; DetailInfo : " << pRspInfo->ErrorMsg;
   //if(bIsLast)  SetEvent(g_hEvent);
 	SetEvent(g_hEvent);
 	if (pRspInfo->ErrorID == 0){
@@ -119,7 +118,7 @@ void CtpMdSpi::OnRspUnSubMarketData(
              CThostFtdcSpecificInstrumentField *pSpecificInstrument,
              CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
-	cerr << " Response | [OnRspUnSubMarketData] : " << ((pRspInfo->ErrorID == 0) ? "success" : "fail") << "; DetailInfo : " << pRspInfo->ErrorMsg << endl;
+	spdlog::get("console")->info() << " Response | [OnRspUnSubMarketData] : " << ((pRspInfo->ErrorID == 0) ? "success" : "fail") << "; DetailInfo : " << pRspInfo->ErrorMsg;
   //if(bIsLast)  SetEvent(g_hEvent);
 	SetEvent(g_hEvent);
 	if (pRspInfo->ErrorID == 0){
@@ -130,7 +129,7 @@ void CtpMdSpi::OnRspUnSubMarketData(
 void CtpMdSpi::OnRtnDepthMarketData(
              CThostFtdcDepthMarketDataField *pDepthMarketData)
 {
-	cerr << "................\n"
+	spdlog::get("console")->info()
 	<< "\n TradingDay: " << pDepthMarketData->TradingDay
 	<< "\n InstrumentID: " << pDepthMarketData->InstrumentID
 	<< "\n ExchangeID: " << pDepthMarketData->ExchangeID
@@ -157,7 +156,7 @@ void CtpMdSpi::OnRtnDepthMarketData(
 	<< "\n BidVolume1: " << pDepthMarketData->BidVolume1
 	<< "\n AskVolume5: " << pDepthMarketData->AskVolume5
 	<< "\n AveragePrice: " << pDepthMarketData->AveragePrice
-	<< "\n ActionDay: " << pDepthMarketData->ActionDay << std::endl;
+	<< "\n ActionDay: " << pDepthMarketData->ActionDay;
 
 	//Important Node:
 	//1) must create the local variable "pool" here, otherwise it will not call destruction fucntion when exit(0)
@@ -172,7 +171,7 @@ bool CtpMdSpi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo)
 {	
   bool ret = ((pRspInfo) && (pRspInfo->ErrorID != 0));
   if (ret){
-    cerr<<" Response | "<<pRspInfo->ErrorMsg<<endl;
+	  spdlog::get("console")->info() << " Response | " << pRspInfo->ErrorMsg;
   }
   return ret;
 }

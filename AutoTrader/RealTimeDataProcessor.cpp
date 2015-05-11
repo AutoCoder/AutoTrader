@@ -8,6 +8,7 @@
 #include <assert.h>
 #include "config.h"
 #include "DBWrapper.h"
+#include "spdlog/spdlog.h"
 
 extern threadsafe_queue<Order> order_queue;
 
@@ -39,7 +40,7 @@ void RealTimeDataProcessor::AppendRealTimeData(CThostFtdcDepthMDFieldWrapper& in
 	bool triggered = m_strategy->TryInvoke(m_DataSeq, info);
 	m_DataSeq.push_front(info);
 #ifdef _DEBUG
-	std::cerr << "> Data queue size :" << m_DataSeq.size()<< std::endl;
+	spdlog::get("console")->info() << "> Data queue size :" << m_DataSeq.size();
 #endif
 	if (triggered){
 		order_queue.push(m_strategy->generateOrder());
