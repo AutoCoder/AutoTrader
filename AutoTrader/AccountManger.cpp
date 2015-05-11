@@ -7,8 +7,6 @@
 #include "windows.h"
 #include "config.h"
 
-
-extern threadsafe_queue<Order> order_queue;
 extern HANDLE g_tradehEvent;
 extern int requestId;
 
@@ -30,25 +28,6 @@ AccountMangerSpi::AccountMangerSpi(CThostFtdcTraderApi* p, const char * brokerID
 
 AccountMangerSpi::~AccountMangerSpi()
 {
-}
-
-void AccountMangerSpi::ExcuteOrderQueue()
-{
-	std::cout << "Start to trade" << std::endl;
-	std::cout << "> start to loop order queue" << std::endl;
-	while (true){
-		Order ord;
-		if (!order_queue.empty() && order_queue.try_pop(ord)){ // if pop success
-			std::cout << "Excute Order regarding instrumentID:" << ord.GetInstrumentId() << std::endl;
-			//Todo: according ord to insert order
-		}
-
-		//query accout to refresh the cashed the investor position
-		// todo : sleep 500ms
-		Sleep(500);
-	}
-
-	std::cout << "> end to loop order queue" << std::endl;
 }
 
 void AccountMangerSpi::OnFrontConnected()

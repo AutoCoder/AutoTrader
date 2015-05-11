@@ -3,23 +3,32 @@
 #include <iostream>
 #include "ThostFtdcDepthMDFieldWrapper.h"
 #include "RealTimeDataProcessorPool.h"
+#include <condition_variable>
+#include <atomic>
 
 using namespace std;
 #pragma warning(disable : 4996)
 
 extern int requestId;  
 extern HANDLE g_hEvent;
+extern std::condition_variable cv;
+extern std::atomic<bool> g_quit;
 
 namespace {
 	void TryTerminate(const char * time){
-		if (0 == strcmp(time, "14:56:00"))
-			exit(0);
+		if (0 == strcmp(time, "15:30:36")){
+			g_quit = true;
+			cv.notify_all();
+		}
 	}
 }
 
 
 CtpMdSpi::CtpMdSpi(CThostFtdcMdApi* api) 
-	:pUserApi(api)
+	: pUserApi(api)
+	, m_isSubscribed(false)
+	, m_isFrontConnected(false)
+	, m_isLogin(false)
 {
 	auto pool = RealTimeDataProcessorPool::getInstance();
 }
@@ -34,6 +43,8 @@ void CtpMdSpi::OnFrontDisconnected(int nReason)
 {
 	cerr << __FUNCTION__
     << " reason=" << nReason << endl;
+	m_isFrontConnected = false;
+	
 }
 		
 void CtpMdSpi::OnHeartBeatWarning(int nTimeLapse)
@@ -46,6 +57,8 @@ void CtpMdSpi::OnFrontConnected()
 {
 	cerr << __FUNCTION__ << endl;
 	SetEvent(g_hEvent);
+	m_isFrontConnected = true;
+	cv.notify_all();
 }
 
 bool CtpMdSpi::ReqUserLogin(TThostFtdcBrokerIDType appId, TThostFtdcUserIDType userId, TThostFtdcPasswordType passwd)
@@ -68,6 +81,8 @@ void CtpMdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
 	{
     cerr<<" Response | login successfully...CurrentDate:"
       <<pRspUserLogin->TradingDay<<endl;
+	m_isLogin = true;
+	cv.notify_all();
 	}
 	if (bIsLast) SetEvent(g_hEvent);
 }
@@ -95,6 +110,9 @@ void CtpMdSpi::OnRspSubMarketData(
 	cerr << " Response | [OnRspSubMarketData] : " << ((pRspInfo->ErrorID == 0) ? "success" : "fail") << "; DetailInfo : " << pRspInfo->ErrorMsg << endl;
   //if(bIsLast)  SetEvent(g_hEvent);
 	SetEvent(g_hEvent);
+	if (pRspInfo->ErrorID == 0){
+		m_isSubscribed = true;
+	}
 }
 
 void CtpMdSpi::OnRspUnSubMarketData(
@@ -104,6 +122,9 @@ void CtpMdSpi::OnRspUnSubMarketData(
 	cerr << " Response | [OnRspUnSubMarketData] : " << ((pRspInfo->ErrorID == 0) ? "success" : "fail") << "; DetailInfo : " << pRspInfo->ErrorMsg << endl;
   //if(bIsLast)  SetEvent(g_hEvent);
 	SetEvent(g_hEvent);
+	if (pRspInfo->ErrorID == 0){
+		m_isSubscribed = false;
+	}
 }
 
 void CtpMdSpi::OnRtnDepthMarketData(

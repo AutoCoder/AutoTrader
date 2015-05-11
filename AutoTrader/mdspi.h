@@ -31,8 +31,14 @@ public:
 	        TThostFtdcUserIDType	userId,	TThostFtdcPasswordType	passwd);
 	void SubscribeMarketData(char* instIdList);
 	bool IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo);
+	bool IsSubscribed(){ return m_isSubscribed; }
+	bool IsFrontConnected() { return m_isFrontConnected; }
+	bool IsLogin() { return m_isLogin; }
 private:
   CThostFtdcMdApi* pUserApi;
+  bool m_isSubscribed;
+  bool m_isLogin;
+  bool m_isFrontConnected;
 };
 
 #endif

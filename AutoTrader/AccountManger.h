@@ -58,8 +58,6 @@ public:
 
 	bool IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo);
 
-	void ExcuteOrderQueue();
-
 private:
 	double m_availCash;
 	double m_totalFund;

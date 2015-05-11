@@ -9,7 +9,7 @@
 #include "config.h"
 #include "DBWrapper.h"
 
-threadsafe_queue<Order> order_queue;
+extern threadsafe_queue<Order> order_queue;
 
 RealTimeDataProcessor::RealTimeDataProcessor(Strategy* strag, const std::string& InstrumentName)
 	: m_strategy(strag)
