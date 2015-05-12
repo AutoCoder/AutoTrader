@@ -52,18 +52,19 @@ void StartMDLoginThread(CtpMdSpi* p){
 
 	std::unique_lock <std::mutex> lck(mtx);
 	while (!g_quit){
-		cv.wait(lck, [&](){ return p->IsFrontConnected() && !p->IsLogin(); });
-
-		spdlog::get("console")->info() << "Login...";
-		spdlog::get("console")->info() << "\n> BrokerID > " << Config::Instance()->CtpBrokerID();
-		spdlog::get("console")->info() << "\n> UserID > " << Config::Instance()->CtpUserID();
-		spdlog::get("console")->info() << "\n> Password > " << Config::Instance()->CtpPassword();
-		p->ReqUserLogin(const_cast<char*>(Config::Instance()->CtpBrokerID().c_str()) \
-			, const_cast<char*>(Config::Instance()->CtpUserID().c_str())\
-			, const_cast<char*>(Config::Instance()->CtpPassword().c_str()));
-
-		cv.wait(lck, [&](){ return p->IsLogin() && !p->IsSubscribed();});
-		p->SubscribeMarketData(const_cast<char*>(Config::Instance()->CtpInstrumentIDs().c_str()));
+		cv.wait(lck);
+		if (p->IsFrontConnected() && !p->IsLogin()){
+			spdlog::get("console")->info() << "Login...";
+			spdlog::get("console")->info() << "\n> BrokerID > " << Config::Instance()->CtpBrokerID();
+			spdlog::get("console")->info() << "\n> UserID > " << Config::Instance()->CtpUserID();
+			spdlog::get("console")->info() << "\n> Password > " << Config::Instance()->CtpPassword();
+			p->ReqUserLogin(const_cast<char*>(Config::Instance()->CtpBrokerID().c_str()) \
+				, const_cast<char*>(Config::Instance()->CtpUserID().c_str())\
+				, const_cast<char*>(Config::Instance()->CtpPassword().c_str()));
+		}
+		else if (p->IsLogin() && !p->IsSubscribed()){
+			p->SubscribeMarketData(const_cast<char*>(Config::Instance()->CtpInstrumentIDs().c_str()));
+		}	
 	}
 }
 
@@ -132,6 +133,7 @@ int main(int argc, const char* argv[]){
 
 	//Create a thread, Once FrontDisconnect ,try to reconnect and subscribe MD again if needed.
 	std::thread mdthread(StartMDLoginThread, pUserSpi);
+	
 	//[End]******start md thread******
 
 	//[Begin]*******start trade thread********
@@ -146,39 +148,37 @@ int main(int argc, const char* argv[]){
 	std::thread tradeThread(ExcuteOrderQueue, pTradeUserSpi);
 	//[End]*******start trade thread*******
 
+	mdthread.join();
+	tradeThread.join();
 	//[Main Thread]Release the resource and pointer.
-#if 0
-	while (true){
-		if (g_quit){
-			console->info() << "Start to release resource...";
-			if (pMdUserApi)
-			{
-				pMdUserApi->RegisterSpi(NULL);
-				pMdUserApi->Release();
-				pMdUserApi = NULL;
-			}
-			if (pUserSpi)
-			{
-				delete pUserSpi;
-				pUserSpi = NULL;
-			}
-			if (pTradeUserApi)
-			{
-				pTradeUserApi->RegisterSpi(NULL);
-				pTradeUserApi->Release();
-				pTradeUserApi = NULL;
-			}
-			if (pTradeUserSpi)
-			{
-				delete pTradeUserSpi;
-				pTradeUserSpi = NULL;
-			}
-			console->info() << "Quit ... ";
-			exit(0);
-		}
-		Sleep(1000);
+#if 1
+	console->info() << "Start to release resource...";
+	if (pMdUserApi)
+	{
+		pMdUserApi->RegisterSpi(NULL);
+		pMdUserApi->Release();
+		pMdUserApi = NULL;
 	}
+	if (pUserSpi)
+	{
+		delete pUserSpi;
+		pUserSpi = NULL;
+	}
+	if (pTradeUserApi)
+	{
+		pTradeUserApi->RegisterSpi(NULL);
+		pTradeUserApi->Release();
+		pTradeUserApi = NULL;
+	}
+	if (pTradeUserSpi)
+	{
+		delete pTradeUserSpi;
+		pTradeUserSpi = NULL;
+	}
+	console->info() << "Quit ... ";
 #endif
 
+	//todo: write to db
+	
 	return 0;
 }
