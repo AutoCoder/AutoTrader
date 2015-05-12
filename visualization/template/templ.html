@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <head>
     <meta charset="utf-8">
-    <title>ECharts</title>
+    <title>Stock</title>
 </head>
 <body>
 
     <div id="k35lineChart" style="height:300px"></div>
     <div id="kstandardChart" style="height:300px"></div>
-
+    <div id="volumeChart" style="height:300px"></div>
     <script src="http://echarts.baidu.com/build/dist/echarts.js"></script>
     <script type="text/javascript">
 
@@ -22,23 +22,28 @@
             [
                 'echarts',
                 'echarts/chart/k', 
-                'echarts/chart/bar'
+                'echarts/chart/bar',
+                'echarts/chart/line'
             ],
             function (ec) {
 
-                var myKChart = ec.init(document.getElementById('k35lineChart')); 
+                var myLChart = ec.init(document.getElementById('k35lineChart')); 
                 
                 var option = ${option1}
         
+                myLChart.setOption(option); 
 
-                myKChart.setOption(option); 
-
-                var myALChart = ec.init(document.getElementById('kstandardChart')); 
+                var myKChart = ec.init(document.getElementById('kstandardChart')); 
                 
                 var option2 = ${option2}
-        
 
-                myALChart.setOption(option2); 
+                myKChart.setOption(option2); 
+        
+                var myALChart = ec.init(document.getElementById('volumeChart')); 
+                
+                var option3 = ${option3}
+
+                myALChart.setOption(option3); 
             }
         );
     </script>

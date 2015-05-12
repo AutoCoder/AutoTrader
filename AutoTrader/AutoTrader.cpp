@@ -51,7 +51,7 @@ void MonitorInstruments(CtpMdSpi* p, char* instrumentIds)
 void StartMDLoginThread(CtpMdSpi* p){
 
 	std::unique_lock <std::mutex> lck(mtx);
-	while (true){
+	while (!g_quit){
 		cv.wait(lck, [&](){ return p->IsFrontConnected() && !p->IsLogin(); });
 
 		spdlog::get("console")->info() << "Login...";
@@ -62,7 +62,7 @@ void StartMDLoginThread(CtpMdSpi* p){
 			, const_cast<char*>(Config::Instance()->CtpUserID().c_str())\
 			, const_cast<char*>(Config::Instance()->CtpPassword().c_str()));
 
-		cv.wait(lck, [&](){ return p->IsLogin() && !p->IsSubscribed(); });
+		cv.wait(lck, [&](){ return p->IsLogin() && !p->IsSubscribed();});
 		p->SubscribeMarketData(const_cast<char*>(Config::Instance()->CtpInstrumentIDs().c_str()));
 	}
 }
@@ -105,6 +105,9 @@ void ExcuteOrderQueue(AccountMangerSpi* pUserSpi){
 			//Todo: according ord to insert order
 		}
 
+		if (g_quit && order_queue.empty())
+			break;
+
 		//query accout to refresh the cashed the investor position
 		// todo : sleep 500ms
 		Sleep(500);
@@ -144,6 +147,7 @@ int main(int argc, const char* argv[]){
 	//[End]*******start trade thread*******
 
 	//[Main Thread]Release the resource and pointer.
+#if 0
 	while (true){
 		if (g_quit){
 			console->info() << "Start to release resource...";
@@ -174,9 +178,7 @@ int main(int argc, const char* argv[]){
 		}
 		Sleep(1000);
 	}
-
-	pMdUserApi->Join();
-	pTradeUserApi->Join();
+#endif
 
 	return 0;
 }

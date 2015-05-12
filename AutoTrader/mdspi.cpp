@@ -17,9 +17,10 @@ extern std::atomic<bool> g_quit;
 
 namespace {
 	void TryTerminate(const char * time){
-		if (0 == strcmp(time, "15:30:36")){
+		if (0 == strcmp(time, "11:30:00") || 0 == strcmp(time, "15:30:22") || 0 == strcmp(time, "01:00:00")){
 			g_quit = true;
-			cv.notify_all();
+			//cv.notify_all();
+			exit(0);
 		}
 	}
 }

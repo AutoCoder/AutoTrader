@@ -101,6 +101,63 @@ def plotAll():
 
 	plt.show()
 
+def k3k5Data():
+    return """option = {
+    title : {
+        text: 'K-3min & K-5min',
+    },
+    tooltip : {
+        trigger: 'axis'
+    },
+    legend: {
+        data:['K-3min','K-5min']
+    },
+    toolbox: {
+        show : true,
+        feature : {
+            mark : {show: true},
+            dataView : {show: true, readOnly: false},
+            restore : {show: true},
+            saveAsImage : {show: true}
+        }
+    },
+    calculable : true,
+    xAxis : [
+        {
+            type : 'time',
+            boundaryGap : false,
+            data : ['15:00:01','15:00:02','15:00:03,'15:00:04','15:00:05','15:00:06','15:00:07']
+        }
+    ],
+    yAxis : [
+        {
+            type : 'value',
+            scale : true,
+            axisLabel : {
+                formatter: '{value} RMB'
+            }
+        }
+    ],
+    series : [
+        {
+            name:'K-3min',
+            type:'line',
+            data:[11, 11, 15, 13, 12, 13, 10, 11, 11, 15, 13, 12, 13, 10, 11, 11, 15, 13, 12, 13, 10],
+        },
+        {
+            name:'K-5min',
+            type:'line',
+            data:[1, -2, 2, 5, 3, 2, 0, 1, -2, 2, 5, 3, 2, 0, 1, -2, 2, 5, 3, 2, 0],
+            markPoint : {
+                data : [
+                    {name : 'Buy Point', value : -2, xAxis: 1, yAxis: -1.5}
+                ]
+            }
+        }
+    ]
+};"""
+
+
 def renderktempl():
 	return """{
                     tooltip : {
@@ -336,7 +393,7 @@ def testMoko():
 	from mako.template import Template
 	mytemplate = Template(filename='./template/templ.html')
 	f = open('kchart.html', 'w')
-	f.write(mytemplate.render(option1=renderktempl(), option2=renderbartempl()))
+	f.write(mytemplate.render(option1=k3k5Data(), option2=renderktempl(), option3=renderbartempl()))
 	f.close()	
 
 #usage:  cmd instrumentId date       --- cmd "rb1510" "20150510"
