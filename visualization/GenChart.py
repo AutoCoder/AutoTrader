@@ -1,12 +1,24 @@
 #!/usr/bin/env python
 import sys
 import MySQLdb
+from datetime import date, datetime
 
 #CONFIG
 dbhost = '127.0.0.1'
 dbuser = 'root'
 dbpassword = 'wodemima'
 port = 3306
+
+	# markPoint : {
+	#	 symbol: 'star',
+	#	 //symbolSize:20,
+	#	 itemStyle:{
+	#		 normal:{label:{position:'top'}}
+	#	 },
+	#	 data : [
+	#		 {name : 'BuyPoint', value : 3, xAxis: new Date(1970, 10, 5, 13, 00, 15, 100), yAxis: 3}
+	#	 ]
+	# }
 
 def getK3K5Data(date, instrumentID):
 	"""
@@ -21,7 +33,7 @@ def getK3K5Data(date, instrumentID):
 		
 		conn.select_db('qihuo')
 
-		sql = "select `k3m`,`k5m`,`UpdateTime`,`UpdateMillisec` from %s where `Date` = '%s' limit 10" % (instrumentID, date)
+		sql = "select `k3m`,`k5m`,`UpdateTime`,`UpdateMillisec` from %s where `Date` = '%s' limit 10000" % (instrumentID, date)
 
 		print sql
 
@@ -30,8 +42,17 @@ def getK3K5Data(date, instrumentID):
 
 		results=cur.fetchall()
 
-		print results
+		k3list = ""
+		k5list = ""
+		for item in results:
+			t = datetime(date.year, date.month, date.day)
+			t += item[2]
+			k3list += "[new Date(%d, %d, %d, %d, %d, %d, %d), %s]" % (t.year, t.month, t.day, t.hour, t.minute, t.second, item[3], str(item[0]))
+			k3list += ","
+			k5list += "[new Date(%d, %d, %d, %d, %d, %d, %d), %s]" % (t.year, t.month, t.day, t.hour, t.minute, t.second, item[3], str(item[1]))
+			k5list += ","
 
+		return k3list, k5list
 
 	except MySQLdb.Error,e:
 		print "Mysql Error %d: %s" % (e.args[0], e.args[1])
@@ -130,12 +151,12 @@ def k3k5Data():
 						show : true,
 						realtime: true,
 						start : 0,
-						end : 100
+						end : 10
 					},
 					xAxis : [
 						{
 							type : 'time',
-							splitNumber:5
+							splitNumber:30
 						}
 					],
 					yAxis : [
@@ -151,35 +172,15 @@ def k3k5Data():
 						{
 							name:'K-5min',
 							type:'line',
-							data: [ [new Date(1970, 10, 5, 12, 30, 15, 100), 10] , [new Date(1970, 10, 5, 13, 00, 15, 100), 3], [new Date(1970, 10, 5, 13, 30, 15, 100), 7], [new Date(1970, 10, 5, 14, 00, 15, 100), 3] , [new Date(1970, 10, 5, 14, 30, 15, 100), 5], [new Date(1970, 10, 5, 15, 00, 15, 100), 9],  [new Date(1970, 10, 5, 16, 30, 15, 100), 3] , [new Date(1970, 10, 5, 16, 50, 15, 100), 5], [new Date(1970, 10, 5, 17, 00, 15, 100), 9] ],
-							markPoint : {
-								symbol: 'heart',
-								//symbolSize:20,
-								itemStyle:{
-									normal:{label:{position:'top'}}
-								},
-								data : [
-									{name : 'SellPoint', value : 5, xAxis: new Date(1970, 10, 5, 14, 30, 15, 100), yAxis: 5}
-								]
-							}
+							data: [ %s ],
 						},
 						{
 							name:'K-3min',
 							type:'line',
-							data: [ [new Date(1970, 10, 5, 12, 30, 15, 100), 3] , [new Date(1970, 10, 5, 13, 00, 15, 100), 5], [new Date(1970, 10, 5, 13, 30, 15, 100), 9], [new Date(1970, 10, 5, 14, 00, 15, 100), 10] , [new Date(1970, 10, 5, 14, 30, 15, 100), 3], [new Date(1970, 10, 5, 15, 00, 15, 100), 7], [new Date(1970, 10, 5, 16, 30, 15, 100), 10] , [new Date(1970, 10, 5, 16, 50, 15, 100), 3], [new Date(1970, 10, 5, 17, 00, 15, 100), 7] ],
-							markPoint : {
-								symbol: 'star',
-								//symbolSize:20,
-								itemStyle:{
-									normal:{label:{position:'top'}}
-								},
-								data : [
-									{name : 'BuyPoint', value : 3, xAxis: new Date(1970, 10, 5, 13, 00, 15, 100), yAxis: 3}
-								]
-							}
+							data: [ %s ],
 						}
 					]
-				};"""
+				};""" % getK3K5Data(date=date(2015,5,13), instrumentID='rb1510')
 
 
 def renderktempl():
@@ -426,8 +427,10 @@ def testMoko():
 #usage:  cmd instrumentId date	   --- cmd "rb1510" "20150510"
 if __name__ == "__main__":
 	print sys.argv
-	#testMoko()
+	testMoko()
 	if (len(sys.argv) == 3):
 		data = getData(sys.argv[2], sys.argv[1])
 	#plotAll()
-	getK3K5Data(date='2015-05-13', instrumentID='rb1510')
+	# d = date(2015,5,13)
+	# print d
+	#getK3K5Data(date=date(2015,5,13), instrumentID='rb1510')
