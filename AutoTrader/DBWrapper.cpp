@@ -18,7 +18,7 @@ int DBUtils::CreateTickTableIfNotExists(const std::string& dbname, const std::st
 		DBUtils::m_dict[tableName] = true;
 		const char* sqltempl = "CREATE TABLE IF NOT EXISTS `%s`.`%s` (\
 			`id` INT NOT NULL AUTO_INCREMENT, \
-			`Date` DATETIME NULL, \
+			`Date` DATE NULL, \
 			`InstrumentID` VARCHAR(32) NULL, \
 			`ExchangeID` VARCHAR(16) NULL, \
 			`ExchangeInstID` VARCHAR(32) NULL, \
