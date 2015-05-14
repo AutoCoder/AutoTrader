@@ -58,6 +58,18 @@ public:
 
 	bool IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo);
 
+	bool IsFrontConnected() const{
+		return m_isFrontConnected;
+	}
+
+	bool IsLogin() const {
+		return m_islogin;
+	}
+
+	bool IsConfirmedSettlementInfo() const {
+		return m_isConfirmSettlementInfo;
+	}
+
 private:
 	double m_availCash;
 	double m_totalFund;
@@ -71,5 +83,8 @@ private:
 	CThostFtdcTradingAccountField m_accountInfo;
 private:
 	CThostFtdcTraderApi* pUserApi;
+	bool m_isFrontConnected;
+	bool m_islogin;
+	bool m_isConfirmSettlementInfo;
 };
 

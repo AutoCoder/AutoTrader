@@ -6,10 +6,13 @@
 #include "traderspi.h"
 #include "windows.h"
 #include "config.h"
+#include <condition_variable>
 #include "spdlog/spdlog.h"
 
 extern HANDLE g_tradehEvent;
 extern int requestId;
+
+extern std::condition_variable cv;
 
 std::vector<CThostFtdcOrderField*> orderList;
 std::vector<CThostFtdcTradeField*> tradeList;
@@ -21,6 +24,9 @@ AccountMangerSpi::AccountMangerSpi(CThostFtdcTraderApi* p, const char * brokerID
 	: pUserApi(p)
 	, m_frontID(-1)
 	, m_sessionID(-1)
+	, m_isFrontConnected(false)
+	, m_islogin(false)
+	, m_isConfirmSettlementInfo(false)
 {
 	strcpy_s(m_brokerID, brokerID);
 	strcpy_s(m_userID, userID);
@@ -35,6 +41,17 @@ void AccountMangerSpi::OnFrontConnected()
 {
 	std::cout << __FUNCTION__ << std::endl;
 	SetEvent(g_tradehEvent);
+	m_isFrontConnected = true;
+	cv.notify_all();
+}
+
+void AccountMangerSpi::OnFrontDisconnected(int nReason)
+{
+	spdlog::get("console")->info() << " Response | Disconnected..."
+		<< " reason=" << nReason;
+
+	m_isFrontConnected = false;
+	m_islogin = false;
 }
 
 void AccountMangerSpi::ReqUserLogin()
@@ -59,6 +76,9 @@ void AccountMangerSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin
 		sprintf_s(m_orderRef, "%d", ++nextOrderRef);
 		spdlog::get("console")->info() << " Response | login successfully...CurrentDate:"
 			<< pRspUserLogin->TradingDay;
+		m_islogin = true;
+		cv.notify_all();
+
 	}
 	if (bIsLast) SetEvent(g_tradehEvent);
 }
@@ -71,6 +91,7 @@ void AccountMangerSpi::ReqSettlementInfoConfirm()
 	strcpy_s(req.InvestorID, m_userID);
 	int ret = pUserApi->ReqSettlementInfoConfirm(&req, ++requestId);
 	spdlog::get("console")->info() << " Request | sending settlementInfo confirmation..." << ((ret == 0) ? "success" : "fail");
+
 }
 
 void AccountMangerSpi::OnRspSettlementInfoConfirm(
@@ -81,6 +102,9 @@ void AccountMangerSpi::OnRspSettlementInfoConfirm(
 		spdlog::get("console")->info() << " Response | settlementInfo..." << pSettlementInfoConfirm->InvestorID
 			<< "...<" << pSettlementInfoConfirm->ConfirmDate
 			<< " " << pSettlementInfoConfirm->ConfirmTime << ">...Confirm";
+
+		m_isConfirmSettlementInfo = true;
+		cv.notify_all();
 	}
 	if (bIsLast) SetEvent(g_tradehEvent);
 }
@@ -271,11 +295,6 @@ void AccountMangerSpi::OnRtnTrade(CThostFtdcTradeField *pTrade)
 	SetEvent(g_tradehEvent);
 }
 
-void AccountMangerSpi::OnFrontDisconnected(int nReason)
-{
-	spdlog::get("console")->info() << " Response | Disconnected..."
-		<< " reason=" << nReason ;
-}
 
 void AccountMangerSpi::OnHeartBeatWarning(int nTimeLapse)
 {
