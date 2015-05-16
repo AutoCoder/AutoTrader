@@ -53,6 +53,8 @@ void StartLoginThread(CtpMdSpi* pMdUserSpi, AccountMangerSpi* pTradeUserSpi){
 void ExcuteOrderQueue(AccountMangerSpi* pUserSpi){
 	spdlog::get("console")->info() << "Start to trade";
 	spdlog::get("console")->info() << "Start to loop order queue";
+	pUserSpi->ReqQryTradingAccount();
+	pUserSpi->ReqQryInvestorPosition("rb1510");
 	while (true){
 		Order ord;
 		if (!order_queue.empty() && order_queue.try_pop(ord)){ // if pop success

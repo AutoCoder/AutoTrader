@@ -55,8 +55,8 @@ public:
 		return std::string(m_MdData.InstrumentID);
 	}
 
-	inline void SetTickType(TickType type){
-		m_ticktype = type;
+	inline void SetTickType(TickType type, int strategy_idx){
+		m_ticktype[strategy_idx] = type;
 	}
 
 	static CThostFtdcDepthMDFieldWrapper RecoverFromDB(const CThostFtdcDepthMDFieldDBStruct& vec);
@@ -67,7 +67,7 @@ private:
 	double m_k3m;
 	static bool firstlanuch;
 	bool recoveryData;
-	TickType m_ticktype;
+	TickType m_ticktype[5];
 };
 
 #endif

@@ -64,7 +64,11 @@ int DBUtils::CreateTickTableIfNotExists(const std::string& dbname, const std::st
 			`ActionDay` DATE NULL, \
 			`k3m` DOUBLE NULL, \
 			`k5m` DOUBLE NULL, \
-			`TickType` INT NULL, \
+			`Strategy1` INT NULL, \
+			`Strategy2` INT NULL, \
+			`Strategy3` INT NULL, \
+			`Strategy4` INT NULL, \
+			`Strategy5` INT NULL, \
 			PRIMARY KEY(`id`));";
 		char sqlbuf[2046];
 		sprintf_s(sqlbuf, sqltempl, dbname.c_str(), tableName.c_str());
@@ -95,13 +99,15 @@ DBWrapper::~DBWrapper()
 
 int DBWrapper::ExecuteNoResult(const std::string& sql){
 	int ret = m_MysqlImpl->mysql_noResult_query(sql.c_str());
-	if (-1 == ret)		spdlog::get("console")->info() << m_MysqlImpl->mysql_lasterror();
+	if (-1 == ret)
+		spdlog::get("console")->info() << m_MysqlImpl->mysql_lasterror();
 	return ret;
 }
 
 int DBWrapper::Query(const std::string& sql, std::map<int, std::vector<std::string>> & map_results)
 {
 	int ret = m_MysqlImpl->mysql_select_query(sql.c_str(), map_results);
-	if (-1 == ret)		spdlog::get("console")->info() << m_MysqlImpl->mysql_lasterror();
+	if (-1 == ret)
+		spdlog::get("console")->info() << m_MysqlImpl->mysql_lasterror();
 	return ret;
 }

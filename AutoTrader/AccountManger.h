@@ -71,9 +71,10 @@ public:
 	}
 
 private:
-	double m_availCash;
-	double m_totalFund;
-	double m_position;
+	double m_available; //可用资金
+	double m_currMargin; //当前保证金总额
+	double m_frozenCommission;//冻结手续费
+	double m_frozenMargin;//冻结保证金
 	TThostFtdcBrokerIDType m_brokerID;
 	TThostFtdcUserIDType m_userID;
 	TThostFtdcPasswordType m_password;
@@ -81,6 +82,7 @@ private:
 	TThostFtdcSessionIDType m_sessionID;
 	char m_orderRef[13];
 	CThostFtdcTradingAccountField m_accountInfo;
+	const double ganggan = 0.2;
 private:
 	CThostFtdcTraderApi* pUserApi;
 	bool m_isFrontConnected;
