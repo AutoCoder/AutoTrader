@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "DBWrapper.h"
 #include <sstream>
-#include <iostream>
+#include <assert.h>
 #include <time.h>
 #include "config.h"
 #include "ThostFtdcDepthMDFieldWrapper.h"
@@ -246,7 +246,7 @@ void CThostFtdcDepthMDFieldWrapper::serializeToDB(DBWrapper& db) const {
 	sql << (int)m_ticktype[3] << ", ";
 	sql << (int)m_ticktype[4] << ")";
 	//"INSERT INTO `test` (`name`) VALUES (1234) 
-	std::cerr << sql.str() << std::endl;
+	//std::cerr << sql.str() << std::endl;
 	db.ExecuteNoResult(sql.str());
 }
 
@@ -310,54 +310,3 @@ CThostFtdcDepthMDFieldWrapper CThostFtdcDepthMDFieldWrapper::RecoverFromDB(const
 	mdObject.recoveryData = true;
 	return mdObject;
 }
-
-
-//
-//long long CThostFtdcDepthMDFieldWrapper::toTimeStamp() const{
-//	const char* pDate = m_MdData.TradingDay;
-//
-//	char szYear[5], szMonth[3], szDay[3], szHour[3], szMin[3], szSec[3];
-//
-//	szYear[0] = *pDate++;
-//	szYear[1] = *pDate++;
-//	szYear[2] = *pDate++;
-//	szYear[3] = *pDate++;
-//	szYear[4] = 0x0;
-//
-//	szMonth[0] = *pDate++;
-//	szMonth[1] = *pDate++;
-//	szMonth[2] = 0x0;
-//
-//	szDay[0] = *pDate++;
-//	szDay[1] = *pDate++;
-//	szDay[2] = 0x0;
-//
-//	const char* pTime = m_MdData.UpdateTime;
-//
-//	szHour[0] = *pTime++;
-//	szHour[1] = *pTime++;
-//	szHour[2] = 0x0;
-//	pTime++;
-//
-//	szMin[0] = *pTime++;
-//	szMin[1] = *pTime++;
-//	szMin[2] = 0x0;
-//	pTime++;
-//
-//	szSec[0] = *pTime++;
-//	szSec[1] = *pTime++;
-//	szSec[2] = 0x0;
-//
-//	tm tmObj;
-//
-//	tmObj.tm_year = atoi(szYear) - 1900;
-//	tmObj.tm_mon = atoi(szMonth) - 1;
-//	tmObj.tm_mday = atoi(szDay);
-//	tmObj.tm_hour = atoi(szHour);
-//	tmObj.tm_min = atoi(szMin);
-//	tmObj.tm_sec = atoi(szSec);
-//	tmObj.tm_isdst = -1;
-//
-//	long long ret = mktime(&tmObj) * 2 + m_MdData.UpdateMillisec / 500;
-//	return ret;
-//}
