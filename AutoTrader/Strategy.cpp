@@ -3,8 +3,6 @@
 #include <iostream>
 #include "Order.h"
 
-const double minDelta = 0.3;
-
 Strategy::Strategy()
 {
 }
@@ -73,7 +71,7 @@ bool k3UpThroughK5::TryInvoke(const std::list<CThostFtdcDepthMDFieldWrapper>& da
 			m_curOrder->SetInstrumentId(info.InstrumentId());
 			m_curOrder->SetRefExchangePrice(info.LastPrice());
 			m_curOrder->SetExchangeDirection(ExchangeDirection::Buy);
-			info.SetTickType(TickType::BuyPoint);
+			info.SetTickType(TickType::BuyPoint, 0);
 			orderSingal = true;	
 		}
 	}
@@ -87,7 +85,7 @@ bool k3UpThroughK5::TryInvoke(const std::list<CThostFtdcDepthMDFieldWrapper>& da
 			m_curOrder->SetInstrumentId(info.InstrumentId());
 			m_curOrder->SetRefExchangePrice(info.LastPrice());
 			m_curOrder->SetExchangeDirection(ExchangeDirection::Sell);
-			info.SetTickType(TickType::SellPoint);
+			info.SetTickType(TickType::SellPoint, 0);
 			orderSingal = true;
 		}
 	}

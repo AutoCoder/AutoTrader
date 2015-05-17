@@ -4,12 +4,11 @@
 #include "Order.h"
 #include "ThostFtdcTraderApi.h"
 #include "traderspi.h"
-#include "windows.h"
+//#include "windows.h"
 #include "config.h"
 #include <condition_variable>
 #include "spdlog/spdlog.h"
 
-extern HANDLE g_tradehEvent;
 extern int requestId;
 
 extern std::condition_variable cv;
@@ -40,7 +39,7 @@ AccountMangerSpi::~AccountMangerSpi()
 void AccountMangerSpi::OnFrontConnected()
 {
 	std::cout << __FUNCTION__ << std::endl;
-	SetEvent(g_tradehEvent);
+	//SetEvent(g_tradehEvent);
 	m_isFrontConnected = true;
 	cv.notify_all();
 }
@@ -80,7 +79,7 @@ void AccountMangerSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin
 		cv.notify_all();
 
 	}
-	if (bIsLast) SetEvent(g_tradehEvent);
+	//if (bIsLast) SetEvent(g_tradehEvent);
 }
 
 void AccountMangerSpi::ReqSettlementInfoConfirm()
@@ -106,7 +105,7 @@ void AccountMangerSpi::OnRspSettlementInfoConfirm(
 		m_isConfirmSettlementInfo = true;
 		cv.notify_all();
 	}
-	if (bIsLast) SetEvent(g_tradehEvent);
+	//if (bIsLast) SetEvent(g_tradehEvent);
 }
 
 void AccountMangerSpi::ReqQryInstrument(TThostFtdcInstrumentIDType instId)
@@ -127,7 +126,7 @@ void AccountMangerSpi::OnRspQryInstrument(CThostFtdcInstrumentField *pInstrument
 			<< " LongMarginRatio:" << pInstrument->LongMarginRatio
 			<< " ShortMarginRatio:" << pInstrument->ShortMarginRatio;
 	}
-	if (bIsLast) SetEvent(g_tradehEvent);
+	//if (bIsLast) SetEvent(g_tradehEvent);
 }
 
 void AccountMangerSpi::ReqQryTradingAccount()
@@ -156,7 +155,7 @@ void AccountMangerSpi::OnRspQryTradingAccount(
 			<< " FrozenMargin:" << pTradingAccount->FrozenMargin;
 	}
 
-	if (bIsLast) SetEvent(g_tradehEvent);
+	//if (bIsLast) SetEvent(g_tradehEvent);
 }
 
 void AccountMangerSpi::ReqQryInvestorPosition(TThostFtdcInstrumentIDType instId)
@@ -183,7 +182,7 @@ void AccountMangerSpi::OnRspQryInvestorPosition(
 			<< " Position Profit:" << pInvestorPosition->PositionProfit
 			<< " UseMargin:" << pInvestorPosition->UseMargin;
 	}
-	if (bIsLast) SetEvent(g_tradehEvent);
+	//if (bIsLast) SetEvent(g_tradehEvent);
 }
 
 void AccountMangerSpi::ReqOrderInsert(TThostFtdcInstrumentIDType instId,
@@ -225,7 +224,7 @@ void AccountMangerSpi::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder,
 	if (!IsErrorRspInfo(pRspInfo) && pInputOrder){
 		spdlog::get("console")->info() << "Response | Insert order success...Order Reference:" << pInputOrder->OrderRef;
 	}
-	if (bIsLast) SetEvent(g_tradehEvent);
+	//if (bIsLast) SetEvent(g_tradehEvent);
 }
 
 void AccountMangerSpi::ReqOrderAction(TThostFtdcSequenceNoType orderSeq)
@@ -260,7 +259,7 @@ void AccountMangerSpi::OnRspOrderAction(
 			<< "Exchange ID:" << pInputOrderAction->ExchangeID
 			<< " Order System ID:" << pInputOrderAction->OrderSysID;
 	}
-	if (bIsLast) SetEvent(g_tradehEvent);
+	//if (bIsLast) SetEvent(g_tradehEvent);
 }
 
 void AccountMangerSpi::OnRtnOrder(CThostFtdcOrderField *pOrder)
@@ -276,7 +275,7 @@ void AccountMangerSpi::OnRtnOrder(CThostFtdcOrderField *pOrder)
 	if (founded) orderList[i] = order;
 	else  orderList.push_back(order);
 	spdlog::get("console")->info() << " Response | order submitted...ID:" << order->BrokerOrderSeq;
-	SetEvent(g_tradehEvent);
+	//SetEvent(g_tradehEvent);
 }
 
 void AccountMangerSpi::OnRtnTrade(CThostFtdcTradeField *pTrade)
@@ -292,7 +291,7 @@ void AccountMangerSpi::OnRtnTrade(CThostFtdcTradeField *pTrade)
 	if (founded) tradeList[i] = trade;
 	else  tradeList.push_back(trade);
 	spdlog::get("console")->info() << " Response | order traded...TradeID:" << trade->TradeID;
-	SetEvent(g_tradehEvent);
+	//SetEvent(g_tradehEvent);
 }
 
 

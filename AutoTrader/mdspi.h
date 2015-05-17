@@ -2,7 +2,6 @@
 #define MD_SPI_H_
 
 #include "ThostFtdcMdApi.h"
-#include "windows.h"
 
 class CtpMdSpi : public CThostFtdcMdSpi
 {

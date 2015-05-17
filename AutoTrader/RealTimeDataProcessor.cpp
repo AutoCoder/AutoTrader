@@ -27,10 +27,6 @@ RealTimeDataProcessor::~RealTimeDataProcessor()
 		iter->serializeToDB(*(m_dbptr.get()));
 	}
 
-	//for (auto&& iter : m_DataSeq)
-	//{
-	//	iter.serializeToDB();
-	//}
 	m_DataSeq.clear();
 }
 

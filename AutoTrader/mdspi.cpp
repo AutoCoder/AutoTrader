@@ -7,17 +7,15 @@
 #include <atomic>
 #include "spdlog/spdlog.h"
 
-using namespace std;
 #pragma warning(disable : 4996)
 
 extern int requestId;  
-extern HANDLE g_hEvent;
 extern std::condition_variable cv;
 extern std::atomic<bool> g_quit;
 
 namespace {
 	void TryTerminate(const char * time){
-		if (0 == strcmp(time, "11:30:00") || 0 == strcmp(time, "15:00:00") || 0 == strcmp(time, "01:00:00")){
+		if (0 == strcmp(time, "11:30:00") || 0 == strcmp(time, "15:30:15") || 0 == strcmp(time, "01:00:00")){
 			g_quit = true;
 			cv.notify_all();
 		}
@@ -56,7 +54,6 @@ void CtpMdSpi::OnHeartBeatWarning(int nTimeLapse)
 void CtpMdSpi::OnFrontConnected()
 {
 	spdlog::get("console")->info() << __FUNCTION__ ;
-	SetEvent(g_hEvent);
 	m_isFrontConnected = true;
 	cv.notify_all();
 }
@@ -83,12 +80,12 @@ void CtpMdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
 		m_isLogin = true;
 		cv.notify_all();
 	}
-	if (bIsLast) SetEvent(g_hEvent);
+	//if (bIsLast) SetEvent(g_hEvent);
 }
 
 void CtpMdSpi::SubscribeMarketData(char* instIdList)
 {
-	vector<char*> list;
+	std::vector<char*> list;
 	char *token = strtok(instIdList, ",");
 	while( token != NULL ){
 		list.push_back(token); 
@@ -108,7 +105,6 @@ void CtpMdSpi::OnRspSubMarketData(
 {
 	spdlog::get("console")->info() << " Response | [OnRspSubMarketData] : " << ((pRspInfo->ErrorID == 0) ? "success" : "fail") << "; DetailInfo : " << pRspInfo->ErrorMsg;
   //if(bIsLast)  SetEvent(g_hEvent);
-	SetEvent(g_hEvent);
 	if (pRspInfo->ErrorID == 0){
 		m_isSubscribed = true;
 	}
@@ -120,7 +116,7 @@ void CtpMdSpi::OnRspUnSubMarketData(
 {
 	spdlog::get("console")->info() << " Response | [OnRspUnSubMarketData] : " << ((pRspInfo->ErrorID == 0) ? "success" : "fail") << "; DetailInfo : " << pRspInfo->ErrorMsg;
   //if(bIsLast)  SetEvent(g_hEvent);
-	SetEvent(g_hEvent);
+	
 	if (pRspInfo->ErrorID == 0){
 		m_isSubscribed = false;
 	}

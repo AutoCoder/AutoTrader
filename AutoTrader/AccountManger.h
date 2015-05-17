@@ -1,5 +1,6 @@
-#pragma once
-#include <iostream>
+#ifndef ACCOUNT_MANAGER_H_
+#define ACCOUNT_MANAGER_H_
+
 #include "ThostFtdcTraderApi.h"
 
 class AccountMangerSpi : public CThostFtdcTraderSpi
@@ -90,3 +91,4 @@ private:
 	bool m_isConfirmSettlementInfo;
 };
 
+#endif 

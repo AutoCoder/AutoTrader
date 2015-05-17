@@ -1,10 +1,13 @@
 #include "stdafx.h"
 #include "DBWrapper.h"
+//must put "#include <winsock2.h>" before #include "mysqlwrapper.h". otherwise will cause compile error
+#ifdef WIN32
 #include <winsock2.h>
+#endif
 #include "mysqlwrapper.h"
-#include <iostream>
 #include "config.h"
 #include "spdlog/spdlog.h"
+
 
 std::map<std::string, bool> DBUtils::m_dict = {};
 

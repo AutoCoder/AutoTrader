@@ -3,7 +3,8 @@
 // are changed infrequently
 //
 
-#pragma once
+#ifdef STDAFX_H_
+#define STDAFX_H_
 
 #include "targetver.h"
 
@@ -14,3 +15,4 @@
 
 
 // TODO: reference additional headers your program requires here
+#endif

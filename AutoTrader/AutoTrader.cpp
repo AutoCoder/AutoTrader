@@ -16,8 +16,6 @@
 #include "spdlog/spdlog.h"
 
 int requestId = 0;
-HANDLE g_hEvent;
-HANDLE g_tradehEvent;
 
 std::mutex mtx;
 std::condition_variable cv;
@@ -77,8 +75,8 @@ int main(int argc, const char* argv[]){
 	
 	auto console = spdlog::stdout_logger_mt("console");
 
-	g_hEvent = CreateEvent(NULL, true, false, NULL);
-	g_tradehEvent = CreateEvent(NULL, true, false, NULL);
+	//g_hEvent = CreateEvent(NULL, true, false, NULL);
+	//g_tradehEvent = CreateEvent(NULL, true, false, NULL);
 
 	//[Begin]******start md thread*******
 	CThostFtdcMdApi* pMdUserApi = CThostFtdcMdApi::CreateFtdcMdApi();
