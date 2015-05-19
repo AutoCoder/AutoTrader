@@ -5,6 +5,7 @@
 #include <time.h>
 #include "config.h"
 #include "ThostFtdcDepthMDFieldWrapper.h"
+#include "TechVec.h"
 
 bool CThostFtdcDepthMDFieldWrapper::firstlanuch = true;
 
@@ -110,16 +111,14 @@ namespace {
 	}
 }
 
-CThostFtdcDepthMDFieldWrapper::CThostFtdcDepthMDFieldWrapper(CThostFtdcDepthMarketDataField* p):
-	m_k5m(0.0),
-	m_k3m(0.0),
-	recoveryData(false)
+CThostFtdcDepthMDFieldWrapper::CThostFtdcDepthMDFieldWrapper(CThostFtdcDepthMarketDataField* p)
+	: recoveryData(false)
+	, m_techvec(NULL)
 {
-	for (int i =0; i < 5; i++){
-		m_ticktype[i] = TickType::Commom;
-	}
 	assert(p);
 	memcpy(&m_MdData, p, sizeof(CThostFtdcDepthMarketDataField));
+	m_uuid = this->toTimeStamp();
+	//m_techvec = new StrategyTechVec(m_uuid, p->InstrumentID);
 }
 
 CThostFtdcDepthMDFieldWrapper::~CThostFtdcDepthMDFieldWrapper()
@@ -186,13 +185,7 @@ void CThostFtdcDepthMDFieldWrapper::serializeToDB(DBWrapper& db) const {
 	sql << "AskVolume5" << "`,`";
 	sql << "AveragePrice" << "`,`";
 	sql << "ActionDay" << "`,`";
-	sql << "k3m" << "`,`";
-	sql << "k5m" << "`,`";
-	sql << "Strategy1" << "`,`";
-	sql << "Strategy2" << "`,`";
-	sql << "Strategy3" << "`,`";
-	sql << "Strategy4" << "`,`";
-	sql << "Strategy5" << "`";
+	sql << "uuid" << "`";
 	sql << ") VALUES(\"";
 	sql << m_MdData.TradingDay << "\", \"";//m_MdData.TradingDay
 	sql <<  m_MdData.InstrumentID << "\", \"";
@@ -238,13 +231,7 @@ void CThostFtdcDepthMDFieldWrapper::serializeToDB(DBWrapper& db) const {
 	sql <<  m_MdData.AskVolume5 << ", ";
 	sql <<  m_MdData.AveragePrice << ", \"";
 	sql <<  m_MdData.ActionDay << "\", "; // m_MdData.ActionDay
-	sql <<  m_k3m << ", ";
-	sql << m_k5m << ", ";
-	sql << (int)m_ticktype[0] << ", ";
-	sql << (int)m_ticktype[1] << ", ";
-	sql << (int)m_ticktype[2] << ", ";
-	sql << (int)m_ticktype[3] << ", ";
-	sql << (int)m_ticktype[4] << ")";
+	sql <<  m_uuid << ")";
 	//"INSERT INTO `test` (`name`) VALUES (1234) 
 	//std::cerr << sql.str() << std::endl;
 	db.ExecuteNoResult(sql.str());
@@ -300,13 +287,6 @@ CThostFtdcDepthMDFieldWrapper CThostFtdcDepthMDFieldWrapper::RecoverFromDB(const
 	mdStuct.AveragePrice = StringtoDouble(vec[43]);
 	strcpy_s(mdStuct.ActionDay, ConvertTime(vec[44]).c_str());
 	CThostFtdcDepthMDFieldWrapper mdObject(&mdStuct);
-	mdObject.setK3(StringtoDouble(vec[45]));
-	mdObject.setK5(StringtoDouble(vec[46]));
-	mdObject.SetTickType((TickType)StringtoInt(vec[47]), 0);
-	mdObject.SetTickType((TickType)StringtoInt(vec[48]), 1);
-	mdObject.SetTickType((TickType)StringtoInt(vec[49]), 2);
-	mdObject.SetTickType((TickType)StringtoInt(vec[50]), 3);
-	mdObject.SetTickType((TickType)StringtoInt(vec[51]), 4);
 	mdObject.recoveryData = true;
 	return mdObject;
 }

@@ -24,6 +24,10 @@ class DBUtils
 public:
 	static int CreateTickTableIfNotExists(const std::string& dbname, const std::string& tableName);
 
+	static int CreateTechVecTableIfNotExists(const std::string& dbname, const std::string& tableName);
+
+	static int CreateK3K5StrategyTableIfNotExists(const std::string& dbname, const std::string& tableName);
+
 private:
 	static std::map<std::string, bool> m_dict;
 };

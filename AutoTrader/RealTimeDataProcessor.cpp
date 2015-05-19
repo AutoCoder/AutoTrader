@@ -25,6 +25,21 @@ RealTimeDataProcessor::~RealTimeDataProcessor()
 	//store all item in memory into db
 	for (auto iter = m_DataSeq.rbegin(); iter != m_DataSeq.rend(); iter++){
 		iter->serializeToDB(*(m_dbptr.get()));
+
+		iter->GetTechVec()->serializeToDB(*(m_dbptr.get()));
+	}
+
+	m_DataSeq.clear();
+}
+
+void RealTimeDataProcessor::StoreDataToDB()
+{
+	//store all item in memory into db
+	for (auto iter = m_DataSeq.rbegin(); iter != m_DataSeq.rend(); iter++){
+		iter->serializeToDB(*(m_dbptr.get()));
+
+		if (iter->GetTechVec())
+			iter->GetTechVec()->serializeToDB(*(m_dbptr.get()));
 	}
 
 	m_DataSeq.clear();

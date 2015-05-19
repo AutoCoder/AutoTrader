@@ -18,6 +18,7 @@ public:
 	~RealTimeDataProcessor();
 
 	void AppendRealTimeData(CThostFtdcDepthMDFieldWrapper& info);
+	void StoreDataToDB();
 
 private:
 	void recoverHistoryData(int beforeSeconds);

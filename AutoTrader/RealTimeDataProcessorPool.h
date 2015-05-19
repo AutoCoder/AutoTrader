@@ -15,6 +15,7 @@ public:
 
 public:
 	std::shared_ptr<RealTimeDataProcessor> GenRealTimeDataProcessor(const std::string& instrumentID);
+	void FreeProcessors();
 
 private:
 	RealTimeDataProcessorPool();

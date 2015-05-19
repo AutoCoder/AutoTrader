@@ -78,6 +78,9 @@
     <ClInclude Include="AccountManger.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="TechVec.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -114,6 +117,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="mysqlwrapper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TechVec.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

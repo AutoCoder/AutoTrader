@@ -3,12 +3,9 @@
 
 #include "ThostFtdcUserApiStruct.h"
 #include <vector>
-
-enum class TickType{
-	Commom = 0x0,
-	BuyPoint = 0x1,
-	SellPoint = 0x2,
-};
+#include <string>
+#include <memory>
+#include "TechVec.h"
 
 typedef std::vector<std::string> CThostFtdcDepthMDFieldDBStruct;
 class DBWrapper;
@@ -31,22 +28,6 @@ public:
 		return m_MdData.Volume;
 	}
 
-	inline void setK3(double input){
-		m_k3m = input;
-	}
-
-	inline double K3() const {
-		return m_k3m;
-	}
-
-	inline void setK5(double input){
-		m_k5m = input;
-	}
-
-	inline double K5() const {
-		return m_k5m;
-	}
-
 	inline double LastPrice() {
 		return m_MdData.LastPrice;
 	}
@@ -55,19 +36,27 @@ public:
 		return std::string(m_MdData.InstrumentID);
 	}
 
-	inline void SetTickType(TickType type, int strategy_idx){
-		m_ticktype[strategy_idx] = type;
+	StrategyTechVec* GetTechVec() const{
+		return m_techvec;
+	}
+
+	void SetTechVec(StrategyTechVec* p){
+		m_techvec = p;
+	}
+
+	long long UUID() const {
+		return m_uuid;
 	}
 
 	static CThostFtdcDepthMDFieldWrapper RecoverFromDB(const CThostFtdcDepthMDFieldDBStruct& vec);
 
 private:
 	CThostFtdcDepthMarketDataField m_MdData;
-	double m_k5m;
-	double m_k3m;
+	long long m_uuid;
 	static bool firstlanuch;
 	bool recoveryData;
-	TickType m_ticktype[5];
+	//std::shared_ptr<TechVec> m_techvec;
+	StrategyTechVec* m_techvec;
 };
 
 #endif

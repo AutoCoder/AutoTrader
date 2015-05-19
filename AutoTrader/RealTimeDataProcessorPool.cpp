@@ -51,3 +51,11 @@ std::shared_ptr<RealTimeDataProcessor> RealTimeDataProcessorPool::GenRealTimeDat
 		return m_processorDict[instrumentID];
 	}
 }
+
+
+void RealTimeDataProcessorPool::FreeProcessors()
+{
+	for (auto item : m_processorDict){
+		item.second->StoreDataToDB();
+	}
+}

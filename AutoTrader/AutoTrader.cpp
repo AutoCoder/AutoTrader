@@ -39,11 +39,16 @@ void StartLoginThread(CtpMdSpi* pMdUserSpi, AccountMangerSpi* pTradeUserSpi){
 		else if (pMdUserSpi->IsLogin() && !pMdUserSpi->IsSubscribed()){
 			pMdUserSpi->SubscribeMarketData(const_cast<char*>(Config::Instance()->CtpInstrumentIDs().c_str()));
 		}
-		else if (pTradeUserSpi->IsFrontConnected() && !pTradeUserSpi->IsLogin()){
+
+		if (pTradeUserSpi->IsFrontConnected() && !pTradeUserSpi->IsLogin()){
 			pTradeUserSpi->ReqUserLogin();
 		}
 		else if (pTradeUserSpi->IsLogin() && !pTradeUserSpi->IsConfirmedSettlementInfo()){
 			pTradeUserSpi->ReqSettlementInfoConfirm();
+		}
+		else if (pTradeUserSpi->IsConfirmedSettlementInfo()){
+			pTradeUserSpi->ReqQryTradingAccount();
+			pTradeUserSpi->ReqQryInvestorPosition("rb1510");
 		}
 	}
 }
@@ -51,8 +56,7 @@ void StartLoginThread(CtpMdSpi* pMdUserSpi, AccountMangerSpi* pTradeUserSpi){
 void ExcuteOrderQueue(AccountMangerSpi* pUserSpi){
 	spdlog::get("console")->info() << "Start to trade";
 	spdlog::get("console")->info() << "Start to loop order queue";
-	pUserSpi->ReqQryTradingAccount();
-	pUserSpi->ReqQryInvestorPosition("rb1510");
+
 	while (true){
 		Order ord;
 		if (!order_queue.empty() && order_queue.try_pop(ord)){ // if pop success
@@ -135,7 +139,9 @@ int main(int argc, const char* argv[]){
 	console->info() << "Quit ... ";
 #endif
 
-	//todo: write to db
-	
+	//write to db
+	auto pool = RealTimeDataProcessorPool::getInstance();
+	pool->FreeProcessors();
+
 	return 0;
 }
