@@ -82,38 +82,12 @@ int DBUtils::CreateK3K5StrategyTableIfNotExists(const std::string& dbname, const
 	{
 		DBUtils::m_dict[tableName] = true;
 		const char* sqltempl = "CREATE TABLE IF NOT EXISTS `%s`.`%s` (\
+							   	`id` INT NOT NULL AUTO_INCREMENT, \
 								`uuid` BIGINT NOT NULL, \
 								`k5m` Double(20,5) NULL, \
 								`k3m` Double(20,5) NULL, \
 								`Ticktype` int NULL, \
-								PRIMARY KEY(`uuid`));";
-		char sqlbuf[2046];
-		sprintf_s(sqlbuf, sqltempl, dbname.c_str(), tableName.c_str());
-		DBWrapper db;
-		return db.ExecuteNoResult(sqlbuf);
-	}
-}
-
-int DBUtils::CreateTechVecTableIfNotExists(const std::string& dbname, const std::string& tableName){
-	if (DBUtils::m_dict.find(tableName) != m_dict.end()){
-		return 0;
-	}
-	else
-	{
-		DBUtils::m_dict[tableName] = true;
-		const char* sqltempl = "CREATE TABLE IF NOT EXISTS `%s`.`%s` (\
-		`uuid` BIGINT NOT NULL, \
-		`k5m` Double(20,5) NULL, \
-		`k3m` Double(20,5) NULL, \
-		`Strategy1` int NULL, \
-		`Strategy2` int NULL, \
-		`Strategy3` int NULL, \
-		`Strategy4` int NULL, \
-		`Strategy5` int NULL, \
-		`Strategy6` int NULL, \
-		`Strategy7` int NULL, \
-		`Strategy8` int NULL, \
-		PRIMARY KEY(`uuid`));";
+								PRIMARY KEY(`id`));";
 		char sqlbuf[2046];
 		sprintf_s(sqlbuf, sqltempl, dbname.c_str(), tableName.c_str());
 		DBWrapper db;

@@ -72,6 +72,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -164,6 +165,7 @@
     <ClInclude Include="config.h" />
     <ClInclude Include="DBWrapper.h" />
     <ClInclude Include="ini_parser.h" />
+    <ClInclude Include="k3UpThroughK5.h" />
     <ClInclude Include="mdspi.h" />
     <ClInclude Include="mysqlwrapper.h" />
     <ClInclude Include="Order.h" />
@@ -182,6 +184,7 @@
     <ClCompile Include="AutoTrader.cpp" />
     <ClCompile Include="config.cpp" />
     <ClCompile Include="DBWrapper.cpp" />
+    <ClCompile Include="k3UpThroughK5.cpp" />
     <ClCompile Include="mdspi.cpp" />
     <ClCompile Include="mysqlwrapper.cpp" />
     <ClCompile Include="Order.cpp" />
@@ -193,8 +196,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Strategy.cpp" />
-    <ClCompile Include="TechVec.cpp" />
     <ClCompile Include="ThostFtdcDepthMDFieldWrapper.cpp" />
   </ItemGroup>
   <ItemGroup>

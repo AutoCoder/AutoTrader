@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "Strategy.h"
+#include "k3UpThroughK5.h"
 #include "RealTimeDataProcessorPool.h"
 #include "config.h"
 #include "DBWrapper.h"

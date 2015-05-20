@@ -81,6 +81,9 @@
     <ClInclude Include="TechVec.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="k3UpThroughK5.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -93,9 +96,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Order.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Strategy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ThostFtdcDepthMDFieldWrapper.cpp">
@@ -119,7 +119,7 @@
     <ClCompile Include="mysqlwrapper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TechVec.cpp">
+    <ClCompile Include="k3UpThroughK5.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

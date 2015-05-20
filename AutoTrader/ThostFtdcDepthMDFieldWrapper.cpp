@@ -123,6 +123,7 @@ CThostFtdcDepthMDFieldWrapper::CThostFtdcDepthMDFieldWrapper(CThostFtdcDepthMark
 
 CThostFtdcDepthMDFieldWrapper::~CThostFtdcDepthMDFieldWrapper()
 {
+	delete m_techvec;
 }
 
 long long CThostFtdcDepthMDFieldWrapper::toTimeStamp() const{
