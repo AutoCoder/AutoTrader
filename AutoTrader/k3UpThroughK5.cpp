@@ -54,8 +54,8 @@ bool k3UpThroughK5::TryInvoke(const std::list<CThostFtdcDepthMDFieldWrapper>& da
 	if (!data.empty())
 	{
 		auto preNode = data.begin();
-
-		k3UpThroughK5TechVec* prePtr = dynamic_cast<k3UpThroughK5TechVec*>(preNode->GetTechVec());
+		
+		k3UpThroughK5TechVec* prePtr = static_cast<k3UpThroughK5TechVec*>(preNode->GetTechVec());
 		if (prePtr){
 			if (prePtr->K5m() > prePtr->K3m())
 			{
@@ -90,7 +90,8 @@ bool k3UpThroughK5::TryInvoke(const std::list<CThostFtdcDepthMDFieldWrapper>& da
 
 	}
 
-	info.SetTechVec((StrategyTechVec*)curPtr);
+	//info.SetTechVec((StrategyTechVec*)curPtr);
+	info.m_techvec = curPtr;
 	return orderSingal;
 }
 
@@ -100,8 +101,9 @@ Order k3UpThroughK5::generateOrder(){
 
 
 k3UpThroughK5TechVec::k3UpThroughK5TechVec(long long uuid, const std::string& instrumentID)
-: StrategyTechVec(uuid, instrumentID)
-, m_ticktype(TickType::Commom)
+	: m_id(uuid)
+	, m_instrumentId(instrumentID)
+	, m_ticktype(TickType::Commom)
 {
 }
 

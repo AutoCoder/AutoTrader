@@ -15,7 +15,7 @@ extern std::atomic<bool> g_quit;
 
 namespace {
 	void TryTerminate(const char * time){
-		if (0 == strcmp(time, "11:30:00") || 0 == strcmp(time, "14:30:00") || 0 == strcmp(time, "01:00:10")){
+		if (0 == strcmp(time, "11:30:00") || 0 == strcmp(time, "14:58:10") || 0 == strcmp(time, "01:00:10")){
 			g_quit = true;
 			cv.notify_all();
 		}
@@ -125,34 +125,34 @@ void CtpMdSpi::OnRspUnSubMarketData(
 void CtpMdSpi::OnRtnDepthMarketData(
              CThostFtdcDepthMarketDataField *pDepthMarketData)
 {
-	spdlog::get("console")->info()
-	<< "\n TradingDay: " << pDepthMarketData->TradingDay
-	<< "\n InstrumentID: " << pDepthMarketData->InstrumentID
-	<< "\n ExchangeID: " << pDepthMarketData->ExchangeID
-	<< "\n ExchangeInstID: " << pDepthMarketData->ExchangeInstID
-	<< "\n LastPrice: " << pDepthMarketData->LastPrice
-	<< "\n PreSettlementPrice: " << pDepthMarketData->PreSettlementPrice
-	<< "\n PreClosePrice: " << pDepthMarketData->PreClosePrice
-	<< "\n PreOpenInterest: " << pDepthMarketData->PreOpenInterest
-	<< "\n OpenPrice: " << pDepthMarketData->OpenPrice
-	<< "\n HighestPrice: " << pDepthMarketData->HighestPrice
-	<< "\n LowestPrice: " << pDepthMarketData->LowestPrice
-	<< "\n Volume: " << pDepthMarketData->Volume
-	<< "\n Turnover: " << pDepthMarketData->Turnover
-	<< "\n OpenInterest: " << pDepthMarketData->OpenInterest
-	<< "\n ClosePrice: " << pDepthMarketData->ClosePrice
-	<< "\n SettlementPrice: " << pDepthMarketData->SettlementPrice
-	<< "\n UpperLimitPrice: " << pDepthMarketData->UpperLimitPrice
-	<< "\n LowerLimitPrice:" << pDepthMarketData->LowerLimitPrice
-	<< "\n PreDelta: " << pDepthMarketData->PreDelta
-	<< "\n CurrDelta: " << pDepthMarketData->CurrDelta
-	<< "\n UpdateTime: " << pDepthMarketData->UpdateTime
-	<< "\n UpdateMillisec: " << pDepthMarketData->UpdateMillisec
-	<< "\n BidPrice1: " << pDepthMarketData->BidPrice1
-	<< "\n BidVolume1: " << pDepthMarketData->BidVolume1
-	<< "\n AskVolume5: " << pDepthMarketData->AskVolume5
-	<< "\n AveragePrice: " << pDepthMarketData->AveragePrice
-	<< "\n ActionDay: " << pDepthMarketData->ActionDay;
+	//spdlog::get("console")->info()
+	//<< "\n TradingDay: " << pDepthMarketData->TradingDay
+	//<< "\n InstrumentID: " << pDepthMarketData->InstrumentID
+	//<< "\n ExchangeID: " << pDepthMarketData->ExchangeID
+	//<< "\n ExchangeInstID: " << pDepthMarketData->ExchangeInstID
+	//<< "\n LastPrice: " << pDepthMarketData->LastPrice
+	//<< "\n PreSettlementPrice: " << pDepthMarketData->PreSettlementPrice
+	//<< "\n PreClosePrice: " << pDepthMarketData->PreClosePrice
+	//<< "\n PreOpenInterest: " << pDepthMarketData->PreOpenInterest
+	//<< "\n OpenPrice: " << pDepthMarketData->OpenPrice
+	//<< "\n HighestPrice: " << pDepthMarketData->HighestPrice
+	//<< "\n LowestPrice: " << pDepthMarketData->LowestPrice
+	//<< "\n Volume: " << pDepthMarketData->Volume
+	//<< "\n Turnover: " << pDepthMarketData->Turnover
+	//<< "\n OpenInterest: " << pDepthMarketData->OpenInterest
+	//<< "\n ClosePrice: " << pDepthMarketData->ClosePrice
+	//<< "\n SettlementPrice: " << pDepthMarketData->SettlementPrice
+	//<< "\n UpperLimitPrice: " << pDepthMarketData->UpperLimitPrice
+	//<< "\n LowerLimitPrice:" << pDepthMarketData->LowerLimitPrice
+	//<< "\n PreDelta: " << pDepthMarketData->PreDelta
+	//<< "\n CurrDelta: " << pDepthMarketData->CurrDelta
+	//<< "\n UpdateTime: " << pDepthMarketData->UpdateTime
+	//<< "\n UpdateMillisec: " << pDepthMarketData->UpdateMillisec
+	//<< "\n BidPrice1: " << pDepthMarketData->BidPrice1
+	//<< "\n BidVolume1: " << pDepthMarketData->BidVolume1
+	//<< "\n AskVolume5: " << pDepthMarketData->AskVolume5
+	//<< "\n AveragePrice: " << pDepthMarketData->AveragePrice
+	//<< "\n ActionDay: " << pDepthMarketData->ActionDay;
 
 	//Important Node:
 	//1) must create the local variable "pool" here, otherwise it will not call destruction fucntion when exit(0)

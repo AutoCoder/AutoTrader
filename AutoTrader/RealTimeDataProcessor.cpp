@@ -38,8 +38,11 @@ void RealTimeDataProcessor::StoreDataToDB()
 	for (auto iter = m_DataSeq.rbegin(); iter != m_DataSeq.rend(); iter++){
 		iter->serializeToDB(*(m_dbptr.get()));
 
-		if (iter->GetTechVec())
-			iter->GetTechVec()->serializeToDB(*(m_dbptr.get()));
+		//StrategyTechVec* tem = iter->GetTechVec();
+		//if (tem)
+		//	tem->serializeToDB(*(m_dbptr.get()));
+		if (iter->m_techvec != nullptr)
+			iter->m_techvec->serializeToDB(*(m_dbptr.get()));
 	}
 
 	m_DataSeq.clear();

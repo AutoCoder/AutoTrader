@@ -113,7 +113,7 @@ namespace {
 
 CThostFtdcDepthMDFieldWrapper::CThostFtdcDepthMDFieldWrapper(CThostFtdcDepthMarketDataField* p)
 	: recoveryData(false)
-	, m_techvec(NULL)
+	, m_techvec(nullptr)
 {
 	assert(p);
 	memcpy(&m_MdData, p, sizeof(CThostFtdcDepthMarketDataField));
@@ -124,6 +124,52 @@ CThostFtdcDepthMDFieldWrapper::CThostFtdcDepthMDFieldWrapper(CThostFtdcDepthMark
 CThostFtdcDepthMDFieldWrapper::~CThostFtdcDepthMDFieldWrapper()
 {
 	delete m_techvec;
+}
+
+CThostFtdcDepthMDFieldWrapper::CThostFtdcDepthMDFieldWrapper(const CThostFtdcDepthMDFieldWrapper& obj)
+{
+	m_MdData = obj.m_MdData;
+	m_uuid = obj.m_uuid;
+	recoveryData = obj.recoveryData;
+
+	if (obj.m_techvec){
+		size_t size = obj.m_techvec->ObjSize();
+		m_techvec = (StrategyTechVec*)malloc(size);
+		memcpy(m_techvec, obj.m_techvec, size);
+	}
+	else{
+		m_techvec = nullptr;
+	}
+}
+
+CThostFtdcDepthMDFieldWrapper& CThostFtdcDepthMDFieldWrapper::operator = (const CThostFtdcDepthMDFieldWrapper& obj)
+{
+	if (this == &obj)
+		return *this;
+
+	m_MdData = obj.m_MdData;
+	m_uuid = obj.m_uuid;
+	recoveryData = obj.recoveryData;
+
+	delete m_techvec;
+
+	if (obj.m_techvec){
+		size_t size = obj.m_techvec->ObjSize();
+		m_techvec = (StrategyTechVec*)malloc(size);
+		memcpy(m_techvec, obj.m_techvec, size);
+	}
+	else{
+		m_techvec = nullptr;
+	}
+}
+
+CThostFtdcDepthMDFieldWrapper::CThostFtdcDepthMDFieldWrapper(CThostFtdcDepthMDFieldWrapper && obj)
+	: m_MdData(obj.m_MdData)
+	, m_uuid(obj.m_uuid)
+	, recoveryData(obj.recoveryData)
+{
+	m_techvec = obj.m_techvec;
+	obj.m_techvec = nullptr;
 }
 
 long long CThostFtdcDepthMDFieldWrapper::toTimeStamp() const{

@@ -13,6 +13,10 @@ class CThostFtdcDepthMDFieldWrapper
 {
 public:
 	CThostFtdcDepthMDFieldWrapper(CThostFtdcDepthMarketDataField* p);
+	CThostFtdcDepthMDFieldWrapper(const CThostFtdcDepthMDFieldWrapper& obj);
+	CThostFtdcDepthMDFieldWrapper& operator = (const CThostFtdcDepthMDFieldWrapper& obj);
+	CThostFtdcDepthMDFieldWrapper(CThostFtdcDepthMDFieldWrapper && obj);
+
 	~CThostFtdcDepthMDFieldWrapper();
 
 	void serializeToDB(DBWrapper& db) const;
@@ -56,6 +60,7 @@ private:
 	static bool firstlanuch;
 	bool recoveryData;
 	//std::shared_ptr<TechVec> m_techvec;
+public:
 	StrategyTechVec* m_techvec;
 };
 

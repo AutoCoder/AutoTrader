@@ -28,6 +28,10 @@ public:
 	k3UpThroughK5TechVec(long long uuid, const std::string& instrumentID);
 	~k3UpThroughK5TechVec(){}
 
+	virtual size_t ObjSize(){
+		return sizeof(*this);
+	}
+
 	inline void setK3m(double input){
 		m_k3m = input;
 	}
@@ -54,6 +58,9 @@ private:
 	double m_k5m; //average line for 5 minutes
 	double m_k3m; //average line for 3 minutes
 	TickType m_ticktype;
+
+	std::string m_instrumentId;
+	long long m_id; //time_stamp * 2  (unit : 500ms)
 };
 
 #endif

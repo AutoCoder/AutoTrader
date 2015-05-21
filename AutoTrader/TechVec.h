@@ -13,15 +13,12 @@ class DBWrapper;
 
 class StrategyTechVec{
 public:
-	explicit StrategyTechVec(long long uuid, const std::string& instrumentID)
-		:m_id(uuid), m_instrumentId(instrumentID)
-	{}
+	StrategyTechVec(){}
 	virtual ~StrategyTechVec(){}
+
 	virtual	void serializeToDB(DBWrapper& db) = 0;
 	virtual void SetTickType(TickType type) = 0;
-protected:
-	std::string m_instrumentId;
-	long long m_id; //time_stamp * 2  (unit : 500ms)
+	virtual size_t ObjSize() = 0;
 };
 
 #endif
