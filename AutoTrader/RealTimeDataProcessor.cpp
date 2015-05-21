@@ -38,9 +38,6 @@ void RealTimeDataProcessor::StoreDataToDB()
 	for (auto iter = m_DataSeq.rbegin(); iter != m_DataSeq.rend(); iter++){
 		iter->serializeToDB(*(m_dbptr.get()));
 
-		//StrategyTechVec* tem = iter->GetTechVec();
-		//if (tem)
-		//	tem->serializeToDB(*(m_dbptr.get()));
 		if (iter->m_techvec != nullptr)
 			iter->m_techvec->serializeToDB(*(m_dbptr.get()));
 	}
@@ -50,15 +47,18 @@ void RealTimeDataProcessor::StoreDataToDB()
 
 void RealTimeDataProcessor::AppendRealTimeData(CThostFtdcDepthMDFieldWrapper& info){
 	//(in)front-------------back(out)
-	assert(m_strategy!=NULL);
-	bool triggered = m_strategy->TryInvoke(m_DataSeq, info);
+	// if m_strategy == nullptr, that means RealTimeDataProcessor is in data-recording mode
+	if (m_strategy){
+		bool triggered = m_strategy->TryInvoke(m_DataSeq, info);
+
+		if (triggered)
+			order_queue.push(m_strategy->generateOrder());
+	}
 	m_DataSeq.push_front(info);
+
 #ifdef _DEBUG
 	spdlog::get("console")->info() << "> Data queue size :" << m_DataSeq.size();
 #endif
-	if (triggered){
-		order_queue.push(m_strategy->generateOrder());
-	}
 }
 
 void RealTimeDataProcessor::recoverHistoryData(int beforeSeconds)

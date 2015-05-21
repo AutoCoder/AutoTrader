@@ -45,6 +45,8 @@
 	 std::string DBUser();
 	 std::string DBPassword();
 
+	 bool RecordModeOn();
+
  private:
 	 Config(const std::string& pathName);
 

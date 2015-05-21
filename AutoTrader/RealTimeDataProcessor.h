@@ -14,6 +14,7 @@ class DBWrapper;
 class RealTimeDataProcessor
 {
 public:
+	//if strag == nullptr, that mean RealTimeDataProcessor is in data-recording mode. 
 	RealTimeDataProcessor(Strategy* strag, const std::string& InstrumentName);
 	~RealTimeDataProcessor();
 

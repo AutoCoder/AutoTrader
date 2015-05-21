@@ -24,8 +24,16 @@ RealTimeDataProcessorPool::RealTimeDataProcessorPool()
 	m_dict["k3UpThroughK5"] = std::shared_ptr<Strategy>(new k3UpThroughK5());
 
 	m_processorDict.clear();
-	m_processorDict["rb1510"] = std::shared_ptr<RealTimeDataProcessor>(new RealTimeDataProcessor(m_dict["k3UpThroughK5"].get(), "rb1510"));
-	m_processorDict["rb1511"] = std::shared_ptr<RealTimeDataProcessor>(new RealTimeDataProcessor(m_dict["k3UpThroughK5"].get(), "rb1511"));
+
+	if (Config::Instance()->RecordModeOn()){
+		m_processorDict["rb1510"] = std::shared_ptr<RealTimeDataProcessor>(new RealTimeDataProcessor(nullptr, "rb1510"));
+		m_processorDict["rb1511"] = std::shared_ptr<RealTimeDataProcessor>(new RealTimeDataProcessor(nullptr, "rb1511"));
+	}
+	else{
+		m_processorDict["rb1510"] = std::shared_ptr<RealTimeDataProcessor>(new RealTimeDataProcessor(m_dict["k3UpThroughK5"].get(), "rb1510"));
+		m_processorDict["rb1511"] = std::shared_ptr<RealTimeDataProcessor>(new RealTimeDataProcessor(m_dict["k3UpThroughK5"].get(), "rb1511"));
+	}
+
 }
 
 void RealTimeDataProcessorPool::recoverHistoryData(int beforeSeconds, const std::string& instrumentId)

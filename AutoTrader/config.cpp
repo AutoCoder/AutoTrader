@@ -70,3 +70,7 @@ std::string Config::DBUser(){
 std::string Config::DBPassword(){
 	return parser_instance->get_string("Password", "DataBase");
 }
+
+bool Config::RecordModeOn(){
+	return parser_instance->get_bool("RecordMode", "Arguments");
+}

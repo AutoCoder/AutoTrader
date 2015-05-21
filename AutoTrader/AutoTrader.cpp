@@ -79,9 +79,6 @@ int main(int argc, const char* argv[]){
 	
 	auto console = spdlog::stdout_logger_mt("console");
 
-	//g_hEvent = CreateEvent(NULL, true, false, NULL);
-	//g_tradehEvent = CreateEvent(NULL, true, false, NULL);
-
 	//[Begin]******start md thread*******
 	CThostFtdcMdApi* pMdUserApi = CThostFtdcMdApi::CreateFtdcMdApi();
 	CtpMdSpi* pMdUserSpi = new CtpMdSpi(pMdUserApi);
