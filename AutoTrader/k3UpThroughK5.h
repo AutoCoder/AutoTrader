@@ -26,7 +26,7 @@ private:
 class k3UpThroughK5TechVec : public StrategyTechVec{
 public:
 	k3UpThroughK5TechVec(long long uuid, const std::string& instrumentID);
-	~k3UpThroughK5TechVec(){}
+	virtual ~k3UpThroughK5TechVec(){}
 
 	virtual size_t ObjSize(){
 		return sizeof(*this);
@@ -52,7 +52,7 @@ public:
 		m_ticktype = type;
 	}
 
-	virtual void serializeToDB(DBWrapper& db);
+	virtual void serializeToDB(DBWrapper& db, const std::string& mark);
 
 private:
 	double m_k5m; //average line for 5 minutes

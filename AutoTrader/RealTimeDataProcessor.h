@@ -20,6 +20,7 @@ public:
 
 	void AppendRealTimeData(CThostFtdcDepthMDFieldWrapper& info);
 	void StoreDataToDB();
+	void StoreStrategySequenceToDB(const std::string& suggestTableName = "");
 
 private:
 	void recoverHistoryData(int beforeSeconds);

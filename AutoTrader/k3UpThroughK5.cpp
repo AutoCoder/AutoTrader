@@ -107,9 +107,9 @@ k3UpThroughK5TechVec::k3UpThroughK5TechVec(long long uuid, const std::string& in
 {
 }
 
-void k3UpThroughK5TechVec::serializeToDB(DBWrapper& db)
+void k3UpThroughK5TechVec::serializeToDB(DBWrapper& db, const std::string& mark)
 {
-	std::string&& tableName = m_instrumentId + "_k3UpThroughK5";
+	std::string&& tableName = m_instrumentId + "_k3UpThroughK5_" + mark;
 
 	DBUtils::CreateK3K5StrategyTableIfNotExists(Config::Instance()->DBName(), tableName);
 

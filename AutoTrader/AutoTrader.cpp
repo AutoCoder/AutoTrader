@@ -14,12 +14,14 @@
 #include "OrderQueue.h"
 #include <atomic>
 #include "spdlog/spdlog.h"
+#include "ThostFtdcDepthMDFieldWrapper.h"
 
 int requestId = 0;
 
 std::mutex mtx;
 std::condition_variable cv;
 std::atomic<bool> g_quit = false;
+std::atomic<bool> g_reply = false;
 threadsafe_queue<Order> order_queue;
 
 void StartLoginThread(CtpMdSpi* pMdUserSpi, AccountMangerSpi* pTradeUserSpi){
@@ -75,70 +77,102 @@ void ExcuteOrderQueue(AccountMangerSpi* pUserSpi){
 	spdlog::get("console")->info() << "End to loop order queue";
 }
 
+void ReplayTickDataFromDB(const std::string& instrumentID, const std::string& mark)
+{
+	DBWrapper dbwrapper;
+	g_reply = true;
+	auto pool = RealTimeDataProcessorPool::getInstance();
+	//TODO: Get 2000 dataItem from db per 
+	
+	const char * sqlselect = "select * from %s.%s order by id;";
+
+	char sqlbuf[512];
+	sprintf_s(sqlbuf, sqlselect, Config::Instance()->DBName().c_str(), instrumentID.c_str());
+
+	std::map<int, std::vector<std::string>> map_results;
+	dbwrapper.Query(sqlbuf, map_results);
+
+	for (auto item : map_results){
+		auto dataItem = CThostFtdcDepthMDFieldWrapper::RecoverFromDB(item.second);
+		pool->GenRealTimeDataProcessor(instrumentID)->AppendRealTimeData(dataItem);
+	}
+
+	pool->GenRealTimeDataProcessor(instrumentID)->StoreStrategySequenceToDB(mark);
+}
+
+/*
+Usage: 
+   AutoTrade.exe
+   AutoTrade.exe replay rb1510 table_mark
+*/
 int main(int argc, const char* argv[]){
 	
 	auto console = spdlog::stdout_logger_mt("console");
 
-	//[Begin]******start md thread*******
-	CThostFtdcMdApi* pMdUserApi = CThostFtdcMdApi::CreateFtdcMdApi();
-	CtpMdSpi* pMdUserSpi = new CtpMdSpi(pMdUserApi);
-	pMdUserApi->RegisterSpi(pMdUserSpi);
-	pMdUserApi->RegisterFront(const_cast<char*>(Config::Instance()->CtpMdFront().c_str()));
-	pMdUserApi->Init();
-	//[End]******start md thread******
-
-	//[Begin]*******start trade thread********
-	CThostFtdcTraderApi* pTradeUserApi = CThostFtdcTraderApi::CreateFtdcTraderApi();
-	AccountMangerSpi* pTradeUserSpi = new AccountMangerSpi(pTradeUserApi, \
-		Config::Instance()->CtpBrokerID().c_str(), \
-		Config::Instance()->CtpUserID().c_str(), \
-		Config::Instance()->CtpPassword().c_str());
-	pTradeUserApi->RegisterSpi((CThostFtdcTraderSpi*)pTradeUserSpi);
-	pTradeUserApi->SubscribePublicTopic(THOST_TERT_RESTART);
-	pTradeUserApi->SubscribePrivateTopic(THOST_TERT_RESTART);
-	pTradeUserApi->RegisterFront(const_cast<char*>(Config::Instance()->CtpTradeFront().c_str()));
-	pTradeUserApi->Init();
-	//[End]******start trade thread******
-
-	//Create a thread, Once FrontDisconnect ,try to reconnect and subscribeMD again if needed.
-	std::thread loginthread(StartLoginThread, pMdUserSpi, pTradeUserSpi);
-	//[Excute Order Thread] Excute the Order in Queue one by one looply.
-	std::thread tradeThread(ExcuteOrderQueue, pTradeUserSpi);
-
-	loginthread.join();
-	tradeThread.join();
-
-#if 1
-	//[Main Thread]Release the resource and pointer.
-	console->info() << "Start to release resource...";
-	if (pMdUserApi)
-	{
-		pMdUserApi->RegisterSpi(NULL);
-		pMdUserApi->Release();
-		pMdUserApi = NULL;
+	if (argc == 4 && strcmp(argv[1], "replay") == 0){
+		ReplayTickDataFromDB(argv[2], argv[3]);
 	}
-	if (pMdUserSpi)
-	{
-		delete pMdUserSpi;
-		pMdUserSpi = NULL;
-	}
-	if (pTradeUserApi)
-	{
-		pTradeUserApi->RegisterSpi(NULL);
-		pTradeUserApi->Release();
-		pTradeUserApi = NULL;
-	}
-	if (pTradeUserSpi)
-	{
-		delete pTradeUserSpi;
-		pTradeUserSpi = NULL;
-	}
-	console->info() << "Quit ... ";
-#endif
+	else{
+		auto pool = RealTimeDataProcessorPool::getInstance();
 
-	//write to db
-	auto pool = RealTimeDataProcessorPool::getInstance();
-	pool->FreeProcessors();
+		//[Begin]******start md thread*******
+		CThostFtdcMdApi* pMdUserApi = CThostFtdcMdApi::CreateFtdcMdApi();
+		CtpMdSpi* pMdUserSpi = new CtpMdSpi(pMdUserApi);
+		pMdUserApi->RegisterSpi(pMdUserSpi);
+		pMdUserApi->RegisterFront(const_cast<char*>(Config::Instance()->CtpMdFront().c_str()));
+		pMdUserApi->Init();
+		//[End]******start md thread******
+
+		//[Begin]*******start trade thread********
+		CThostFtdcTraderApi* pTradeUserApi = CThostFtdcTraderApi::CreateFtdcTraderApi();
+		AccountMangerSpi* pTradeUserSpi = new AccountMangerSpi(pTradeUserApi, \
+			Config::Instance()->CtpBrokerID().c_str(), \
+			Config::Instance()->CtpUserID().c_str(), \
+			Config::Instance()->CtpPassword().c_str());
+		pTradeUserApi->RegisterSpi((CThostFtdcTraderSpi*)pTradeUserSpi);
+		pTradeUserApi->SubscribePublicTopic(THOST_TERT_RESTART);
+		pTradeUserApi->SubscribePrivateTopic(THOST_TERT_RESTART);
+		pTradeUserApi->RegisterFront(const_cast<char*>(Config::Instance()->CtpTradeFront().c_str()));
+		pTradeUserApi->Init();
+		//[End]******start trade thread******
+
+		//Create a thread, Once FrontDisconnect ,try to reconnect and subscribeMD again if needed.
+		std::thread loginthread(StartLoginThread, pMdUserSpi, pTradeUserSpi);
+		//[Excute Order Thread] Excute the Order in Queue one by one looply.
+		std::thread tradeThread(ExcuteOrderQueue, pTradeUserSpi);
+
+		loginthread.join();
+		tradeThread.join();
+
+		//[Main Thread]Release the resource and pointer.
+		console->info() << "Start to release resource...";
+		if (pMdUserApi)
+		{
+			pMdUserApi->RegisterSpi(NULL);
+			pMdUserApi->Release();
+			pMdUserApi = NULL;
+		}
+		if (pMdUserSpi)
+		{
+			delete pMdUserSpi;
+			pMdUserSpi = NULL;
+		}
+		if (pTradeUserApi)
+		{
+			pTradeUserApi->RegisterSpi(NULL);
+			pTradeUserApi->Release();
+			pTradeUserApi = NULL;
+		}
+		if (pTradeUserSpi)
+		{
+			delete pTradeUserSpi;
+			pTradeUserSpi = NULL;
+		}
+		console->info() << "Quit ... ";
+
+		//write to db
+		pool->FreeProcessors();
+	}
 
 	return 0;
 }

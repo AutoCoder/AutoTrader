@@ -16,7 +16,7 @@ public:
 	StrategyTechVec(){}
 	virtual ~StrategyTechVec(){}
 
-	virtual	void serializeToDB(DBWrapper& db) = 0;
+	virtual	void serializeToDB(DBWrapper& db, const std::string& mark) = 0;
 	virtual void SetTickType(TickType type) = 0;
 	virtual size_t ObjSize() = 0;
 };

@@ -10,6 +10,7 @@
 #include "DBWrapper.h"
 #include "spdlog/spdlog.h"
 
+extern std::atomic<bool> g_reply;
 extern threadsafe_queue<Order> order_queue;
 
 RealTimeDataProcessor::RealTimeDataProcessor(Strategy* strag, const std::string& InstrumentName)
@@ -17,32 +18,30 @@ RealTimeDataProcessor::RealTimeDataProcessor(Strategy* strag, const std::string&
 	, m_Name(InstrumentName)
 	, m_dbptr(new DBWrapper)
 {
-	recoverHistoryData(600);
+	if (!g_reply)
+		recoverHistoryData(600);
 }
   
 RealTimeDataProcessor::~RealTimeDataProcessor()
 {
-	//store all item in memory into db
-	for (auto iter = m_DataSeq.rbegin(); iter != m_DataSeq.rend(); iter++){
-		iter->serializeToDB(*(m_dbptr.get()));
-
-		iter->GetTechVec()->serializeToDB(*(m_dbptr.get()));
-	}
-
 	m_DataSeq.clear();
 }
 
 void RealTimeDataProcessor::StoreDataToDB()
 {
-	//store all item in memory into db
+	//store Tick data in memory into db
 	for (auto iter = m_DataSeq.rbegin(); iter != m_DataSeq.rend(); iter++){
 		iter->serializeToDB(*(m_dbptr.get()));
-
-		if (iter->m_techvec != nullptr)
-			iter->m_techvec->serializeToDB(*(m_dbptr.get()));
 	}
+}
 
-	m_DataSeq.clear();
+void RealTimeDataProcessor::StoreStrategySequenceToDB(const std::string& mark)
+{
+	//store Strategy data in memory into db
+	for (auto iter = m_DataSeq.rbegin(); iter != m_DataSeq.rend(); iter++){
+		if (iter->m_techvec != nullptr)
+			iter->m_techvec->serializeToDB(*(m_dbptr.get()), mark);
+	}
 }
 
 void RealTimeDataProcessor::AppendRealTimeData(CThostFtdcDepthMDFieldWrapper& info){

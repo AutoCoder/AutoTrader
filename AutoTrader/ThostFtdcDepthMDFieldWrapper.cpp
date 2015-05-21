@@ -123,7 +123,11 @@ CThostFtdcDepthMDFieldWrapper::CThostFtdcDepthMDFieldWrapper(CThostFtdcDepthMark
 
 CThostFtdcDepthMDFieldWrapper::~CThostFtdcDepthMDFieldWrapper()
 {
-	delete m_techvec;
+	if (m_techvec)
+	{
+		delete m_techvec;
+		m_techvec = nullptr;
+	}
 }
 
 CThostFtdcDepthMDFieldWrapper::CThostFtdcDepthMDFieldWrapper(const CThostFtdcDepthMDFieldWrapper& obj)
