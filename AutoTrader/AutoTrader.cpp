@@ -15,6 +15,7 @@
 #include <atomic>
 #include "spdlog/spdlog.h"
 #include "ThostFtdcDepthMDFieldWrapper.h"
+#include "unittest.h"
 
 int requestId = 0;
 
@@ -79,6 +80,7 @@ void ExcuteOrderQueue(AccountMangerSpi* pUserSpi){
 
 void ReplayTickDataFromDB(const std::string& instrumentID, const std::string& mark)
 {
+	spdlog::get("console")->info() << "Reply " << instrumentID << " data from db";
 	DBWrapper dbwrapper;
 	g_reply = true;
 	auto pool = RealTimeDataProcessorPool::getInstance();
@@ -107,6 +109,9 @@ Usage:
 */
 int main(int argc, const char* argv[]){
 	
+	//Test
+	RunUnitTest();
+
 	auto console = spdlog::stdout_logger_mt("console");
 
 	if (argc == 4 && strcmp(argv[1], "replay") == 0){

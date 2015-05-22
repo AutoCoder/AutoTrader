@@ -162,6 +162,7 @@
     <ClInclude Include="..\include\ThostFtdcUserApiDataType.h" />
     <ClInclude Include="..\include\ThostFtdcUserApiStruct.h" />
     <ClInclude Include="AccountManger.h" />
+    <ClInclude Include="CommonUtils.h" />
     <ClInclude Include="config.h" />
     <ClInclude Include="DBWrapper.h" />
     <ClInclude Include="ini_parser.h" />
@@ -178,10 +179,12 @@
     <ClInclude Include="targetver.h" />
     <ClInclude Include="TechVec.h" />
     <ClInclude Include="ThostFtdcDepthMDFieldWrapper.h" />
+    <ClInclude Include="unittest.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AccountManger.cpp" />
     <ClCompile Include="AutoTrader.cpp" />
+    <ClCompile Include="CommonUtils.cpp" />
     <ClCompile Include="config.cpp" />
     <ClCompile Include="DBWrapper.cpp" />
     <ClCompile Include="k3UpThroughK5.cpp" />

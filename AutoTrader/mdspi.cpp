@@ -6,6 +6,7 @@
 #include <condition_variable>
 #include <atomic>
 #include "spdlog/spdlog.h"
+#include "CommonUtils.h"
 
 #pragma warning(disable : 4996)
 
@@ -14,8 +15,10 @@ extern std::condition_variable cv;
 extern std::atomic<bool> g_quit;
 
 namespace {
+
+
 	void TryTerminate(const char * time){
-		if (!g_quit && (0 == strcmp(time, "11:30:00") || 0 == strcmp(time, "15:00:00") || 0 == strcmp(time, "01:00:00"))){
+		if (!g_quit && CommonUtils::IsMarketingTime(time) == false){
 			g_quit = true;
 			cv.notify_all();
 		}
