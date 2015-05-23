@@ -11,6 +11,62 @@ CommonUtils::~CommonUtils()
 {
 }
 
+/*
+Usage: "20150430" to 1430382950
+*/
+long long CommonUtils::DateTimeToTimestamp(const char* date_src, const char* time_src){
+	char szYear[5], szMonth[3], szDay[3], szHour[3], szMin[3], szSec[3];
+
+	szYear[0] = *date_src++;
+	szYear[1] = *date_src++;
+	szYear[2] = *date_src++;
+	szYear[3] = *date_src++;
+	szYear[4] = 0x0;
+
+	szMonth[0] = *date_src++;
+	szMonth[1] = *date_src++;
+	szMonth[2] = 0x0;
+
+	szDay[0] = *date_src++;
+	szDay[1] = *date_src++;
+	szDay[2] = 0x0;
+
+	szHour[0] = *time_src++;
+	szHour[1] = *time_src++;
+	szHour[2] = 0x0;
+	time_src++;
+
+	szMin[0] = *time_src++;
+	szMin[1] = *time_src++;
+	szMin[2] = 0x0;
+	time_src++;
+
+	szSec[0] = *time_src++;
+	szSec[1] = *time_src++;
+	szSec[2] = 0x0;
+
+	tm tmObj;
+
+	tmObj.tm_year = atoi(szYear) - 1900;
+	tmObj.tm_mon = atoi(szMonth) - 1;
+	tmObj.tm_mday = atoi(szDay);
+	tmObj.tm_hour = atoi(szHour);
+	tmObj.tm_min = atoi(szMin);
+	tmObj.tm_sec = atoi(szSec);
+	tmObj.tm_isdst = -1;
+
+	return mktime(&tmObj);
+}
+
+double CommonUtils::StringtoDouble(const std::string& str)
+{
+	std::stringstream ss;
+	double ret;
+	ss << str;
+	ss >> ret;
+	return ret;
+}
+
 int CommonUtils::StringtoInt(const std::string& str)
 {
 	std::stringstream ss;
@@ -20,7 +76,42 @@ int CommonUtils::StringtoInt(const std::string& str)
 	return ret;
 }
 
-seconds CommonUtils::FromString(const char* time_src){
+long long CommonUtils::Stringtolong(const std::string& str)
+{
+	std::stringstream ss;
+	long long ret;
+	ss << str;
+	ss >> ret;
+	return ret;
+}
+
+std::string CommonUtils::ConvertTime(const std::string& src){
+	//from "2015-04-30 00:00:00" to "20150430"
+	//assert(src.length() > 10);
+	char ret[9];
+	const char* _src = src.c_str();
+
+	//year
+	ret[0] = *_src++;
+	ret[1] = *_src++;
+	ret[2] = *_src++;
+	ret[3] = *_src++;
+	_src++;//skip '-'
+
+	//month
+	ret[4] = *_src++;
+	ret[5] = *_src++;
+	_src++;
+
+	//day
+	ret[6] = *_src++;
+	ret[7] = *_src++;
+	ret[8] = 0x0;
+
+	return std::string(ret);
+}
+
+seconds CommonUtils::TimeToSenconds(const char* time_src){
 	assert(strlen(time_src) == 8);
 
 	char szHour[3], szMin[3], szSec[3];
@@ -55,11 +146,10 @@ seconds CommonUtils::FromString(const char* time_src){
 	return ret;
 }
 
-
 bool CommonUtils::TimeInRange(const char* begin, bool bopen, const char* end, bool eopen, const char* input_time){
-	seconds begin_s = FromString(begin);
-	seconds end_s = FromString(end);
-	seconds input_time_s = FromString(input_time);
+	seconds begin_s = TimeToSenconds(begin);
+	seconds end_s = TimeToSenconds(end);
+	seconds input_time_s = TimeToSenconds(input_time);
 	bool leftIn = false;
 	bool RightIn = false;
 
@@ -78,7 +168,6 @@ bool CommonUtils::TimeInRange(const char* begin, bool bopen, const char* end, bo
 
 	return RightIn;
 }
-
 
 bool CommonUtils::IsMarketingTime(const char * time){
 	// time belongTo [00:00:00, 01:00:00) & [09:00:00, 11:30:00) & [13:30:00, 15:00:00) & [21:00:00, 24:00:00]

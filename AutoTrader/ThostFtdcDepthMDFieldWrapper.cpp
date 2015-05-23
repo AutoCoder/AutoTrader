@@ -6,110 +6,9 @@
 #include "config.h"
 #include "ThostFtdcDepthMDFieldWrapper.h"
 #include "TechVec.h"
+#include "CommonUtils.h"
 
 bool CThostFtdcDepthMDFieldWrapper::firstlanuch = true;
-
-namespace {
-	/*
-	Usage: "20150430" to 1430382950
-	*/
-	long long DateTimeToTimestamp(const char* date_src, const char* time_src){
-		char szYear[5], szMonth[3], szDay[3], szHour[3], szMin[3], szSec[3];
-
-		szYear[0] = *date_src++;
-		szYear[1] = *date_src++;
-		szYear[2] = *date_src++;
-		szYear[3] = *date_src++;
-		szYear[4] = 0x0;
-
-		szMonth[0] = *date_src++;
-		szMonth[1] = *date_src++;
-		szMonth[2] = 0x0;
-
-		szDay[0] = *date_src++;
-		szDay[1] = *date_src++;
-		szDay[2] = 0x0;
-
-		szHour[0] = *time_src++;
-		szHour[1] = *time_src++;
-		szHour[2] = 0x0;
-		time_src++;
-
-		szMin[0] = *time_src++;
-		szMin[1] = *time_src++;
-		szMin[2] = 0x0;
-		time_src++;
-
-		szSec[0] = *time_src++;
-		szSec[1] = *time_src++;
-		szSec[2] = 0x0; 
-
-		tm tmObj;
-
-		tmObj.tm_year = atoi(szYear) - 1900;
-		tmObj.tm_mon = atoi(szMonth) - 1;
-		tmObj.tm_mday = atoi(szDay);
-		tmObj.tm_hour = atoi(szHour);
-		tmObj.tm_min = atoi(szMin);
-		tmObj.tm_sec = atoi(szSec);
-		tmObj.tm_isdst = -1;
-
-		return mktime(&tmObj);
-	}
-
-	double StringtoDouble(const std::string& str)
-	{
-		std::stringstream ss;
-		double ret;
-		ss << str;
-		ss >> ret;
-		return ret;
-	}
-
-	int StringtoInt(const std::string& str)
-	{
-		std::stringstream ss;
-		int ret;
-		ss << str;
-		ss >> ret;
-		return ret;
-	}
-
-	long long Stringtolong(const std::string& str)
-	{
-		std::stringstream ss;
-		long long ret;
-		ss << str;
-		ss >> ret;
-		return ret;
-	}
-
-	std::string ConvertTime(const std::string& src){
-		//from "2015-04-30 00:00:00" to "20150430"
-		//assert(src.length() > 10);
-		char ret[9];
-		const char* _src = src.c_str();
-
-		//year
-		ret[0] = *_src++;
-		ret[1] = *_src++;
-		ret[2] = *_src++;
-		ret[3] = *_src++;
-		_src++;//skip '-'
-
-		//month
-		ret[4] = *_src++;
-		ret[5] = *_src++;
-		_src++;
-
-		//day
-		ret[6] = *_src++;
-		ret[7] = *_src++;
-		ret[8] = 0x0;
-
-		return std::string(ret);
-	}
-}
 
 CThostFtdcDepthMDFieldWrapper::CThostFtdcDepthMDFieldWrapper(CThostFtdcDepthMarketDataField* p)
 	: recoveryData(false)
@@ -177,7 +76,7 @@ CThostFtdcDepthMDFieldWrapper::CThostFtdcDepthMDFieldWrapper(CThostFtdcDepthMDFi
 }
 
 long long CThostFtdcDepthMDFieldWrapper::toTimeStamp() const{
-	long long ret = DateTimeToTimestamp(m_MdData.TradingDay, m_MdData.UpdateTime) * 2 + m_MdData.UpdateMillisec / 500;
+	long long ret = CommonUtils::DateTimeToTimestamp(m_MdData.TradingDay, m_MdData.UpdateTime) * 2 + m_MdData.UpdateMillisec / 500;
 	return ret;
 }
 
@@ -292,51 +191,51 @@ CThostFtdcDepthMDFieldWrapper CThostFtdcDepthMDFieldWrapper::RecoverFromDB(const
 {
 	CThostFtdcDepthMarketDataField mdStuct;
 	memset(&mdStuct, 0, sizeof(mdStuct));
-	strcpy_s(mdStuct.TradingDay, ConvertTime(vec[1]).c_str());// todo: from "2015-04-30 00:00:00" to "20150430"
+	strcpy_s(mdStuct.TradingDay, CommonUtils::ConvertTime(vec[1]).c_str());// todo: from "2015-04-30 00:00:00" to "20150430"
 	strcpy_s(mdStuct.InstrumentID, vec[2].c_str());
 	strcpy_s(mdStuct.ExchangeID, vec[3].c_str());
 	strcpy_s(mdStuct.ExchangeInstID, vec[4].c_str());
-	mdStuct.LastPrice = StringtoDouble(vec[5]);
-	mdStuct.PreSettlementPrice = StringtoDouble(vec[6]);
-	mdStuct.PreClosePrice = StringtoDouble(vec[7]);
-	mdStuct.PreOpenInterest = StringtoDouble(vec[8]);
-	mdStuct.OpenPrice = StringtoDouble(vec[9]);
-	mdStuct.HighestPrice = StringtoDouble(vec[10]);
-	mdStuct.LowestPrice = StringtoDouble(vec[11]);
-	mdStuct.Volume = Stringtolong(vec[12]);
-	mdStuct.Turnover = StringtoDouble(vec[13]);
-	mdStuct.OpenInterest = StringtoDouble(vec[14]);
-	mdStuct.ClosePrice = StringtoDouble(vec[15]);
-	mdStuct.SettlementPrice = StringtoDouble(vec[16]);
+	mdStuct.LastPrice = CommonUtils::StringtoDouble(vec[5]);
+	mdStuct.PreSettlementPrice = CommonUtils::StringtoDouble(vec[6]);
+	mdStuct.PreClosePrice = CommonUtils::StringtoDouble(vec[7]);
+	mdStuct.PreOpenInterest = CommonUtils::StringtoDouble(vec[8]);
+	mdStuct.OpenPrice = CommonUtils::StringtoDouble(vec[9]);
+	mdStuct.HighestPrice = CommonUtils::StringtoDouble(vec[10]);
+	mdStuct.LowestPrice = CommonUtils::StringtoDouble(vec[11]);
+	mdStuct.Volume = CommonUtils::Stringtolong(vec[12]);
+	mdStuct.Turnover = CommonUtils::StringtoDouble(vec[13]);
+	mdStuct.OpenInterest = CommonUtils::StringtoDouble(vec[14]);
+	mdStuct.ClosePrice = CommonUtils::StringtoDouble(vec[15]);
+	mdStuct.SettlementPrice = CommonUtils::StringtoDouble(vec[16]);
 
-	mdStuct.UpperLimitPrice = StringtoDouble(vec[17]);
-	mdStuct.LowerLimitPrice = StringtoDouble(vec[18]);
-	mdStuct.PreDelta = StringtoDouble(vec[19]);
-	mdStuct.CurrDelta = StringtoDouble(vec[20]);
+	mdStuct.UpperLimitPrice = CommonUtils::StringtoDouble(vec[17]);
+	mdStuct.LowerLimitPrice = CommonUtils::StringtoDouble(vec[18]);
+	mdStuct.PreDelta = CommonUtils::StringtoDouble(vec[19]);
+	mdStuct.CurrDelta = CommonUtils::StringtoDouble(vec[20]);
 	strcpy_s(mdStuct.UpdateTime, vec[21].c_str());// todo: from "00:00:00" to "150430" // enhance :specify the size of str
-	mdStuct.UpdateMillisec = StringtoInt(vec[22]);
-	mdStuct.BidPrice1 = StringtoDouble(vec[23]);
-	mdStuct.BidVolume1 = Stringtolong(vec[24]);
-	mdStuct.AskPrice1 = StringtoDouble(vec[25]);
-	mdStuct.AskVolume1 = Stringtolong(vec[26]);
-	mdStuct.BidPrice2 = StringtoDouble(vec[27]);
-	mdStuct.BidVolume2 = Stringtolong(vec[28]);
-	mdStuct.AskPrice2 = StringtoDouble(vec[29]);
-	mdStuct.AskVolume2 = Stringtolong(vec[30]);
-	mdStuct.BidPrice3 = StringtoDouble(vec[31]);
-	mdStuct.BidVolume3 = Stringtolong(vec[32]);
-	mdStuct.AskPrice3 = StringtoDouble(vec[33]);
-	mdStuct.AskVolume3 = Stringtolong(vec[34]);
-	mdStuct.BidPrice4 = StringtoDouble(vec[35]);
-	mdStuct.BidVolume4 = Stringtolong(vec[36]);
-	mdStuct.AskPrice4 = StringtoDouble(vec[37]);
-	mdStuct.AskVolume4 = Stringtolong(vec[38]);
-	mdStuct.BidPrice5 = StringtoDouble(vec[39]);
-	mdStuct.BidVolume5 = Stringtolong(vec[40]);
-	mdStuct.AskPrice5 = StringtoDouble(vec[41]);
-	mdStuct.AskVolume5 = Stringtolong(vec[42]);
-	mdStuct.AveragePrice = StringtoDouble(vec[43]);
-	strcpy_s(mdStuct.ActionDay, ConvertTime(vec[44]).c_str());
+	mdStuct.UpdateMillisec = CommonUtils::StringtoInt(vec[22]);
+	mdStuct.BidPrice1 = CommonUtils::StringtoDouble(vec[23]);
+	mdStuct.BidVolume1 = CommonUtils::Stringtolong(vec[24]);
+	mdStuct.AskPrice1 = CommonUtils::StringtoDouble(vec[25]);
+	mdStuct.AskVolume1 = CommonUtils::Stringtolong(vec[26]);
+	mdStuct.BidPrice2 = CommonUtils::StringtoDouble(vec[27]);
+	mdStuct.BidVolume2 = CommonUtils::Stringtolong(vec[28]);
+	mdStuct.AskPrice2 = CommonUtils::StringtoDouble(vec[29]);
+	mdStuct.AskVolume2 = CommonUtils::Stringtolong(vec[30]);
+	mdStuct.BidPrice3 = CommonUtils::StringtoDouble(vec[31]);
+	mdStuct.BidVolume3 = CommonUtils::Stringtolong(vec[32]);
+	mdStuct.AskPrice3 = CommonUtils::StringtoDouble(vec[33]);
+	mdStuct.AskVolume3 = CommonUtils::Stringtolong(vec[34]);
+	mdStuct.BidPrice4 = CommonUtils::StringtoDouble(vec[35]);
+	mdStuct.BidVolume4 = CommonUtils::Stringtolong(vec[36]);
+	mdStuct.AskPrice4 = CommonUtils::StringtoDouble(vec[37]);
+	mdStuct.AskVolume4 = CommonUtils::Stringtolong(vec[38]);
+	mdStuct.BidPrice5 = CommonUtils::StringtoDouble(vec[39]);
+	mdStuct.BidVolume5 = CommonUtils::Stringtolong(vec[40]);
+	mdStuct.AskPrice5 = CommonUtils::StringtoDouble(vec[41]);
+	mdStuct.AskVolume5 = CommonUtils::Stringtolong(vec[42]);
+	mdStuct.AveragePrice = CommonUtils::StringtoDouble(vec[43]);
+	strcpy_s(mdStuct.ActionDay, CommonUtils::ConvertTime(vec[44]).c_str());
 	CThostFtdcDepthMDFieldWrapper mdObject(&mdStuct);
 	mdObject.recoveryData = true;
 	return mdObject;
