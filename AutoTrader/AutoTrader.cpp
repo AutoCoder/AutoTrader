@@ -16,6 +16,7 @@
 #include "spdlog/spdlog.h"
 #include "ThostFtdcDepthMDFieldWrapper.h"
 #include "unittest.h"
+#include "CommonUtils.h"
 
 int requestId = 0;
 
@@ -85,20 +86,34 @@ void ReplayTickDataFromDB(const std::string& instrumentID, const std::string& ma
 	g_reply = true;
 	auto pool = RealTimeDataProcessorPool::getInstance();
 	//TODO: Get 2000 dataItem from db per 
-	
-	const char * sqlselect = "select * from %s.%s order by id;";
 
-	char sqlbuf[512];
-	sprintf_s(sqlbuf, sqlselect, Config::Instance()->DBName().c_str(), instrumentID.c_str());
+	//Get the total count of table
+	char countquerybuf[512];
+	const char* countquery = "select count(*) from %s.%s order by id;";
+	sprintf_s(countquerybuf, countquery, Config::Instance()->DBName().c_str(), instrumentID.c_str());
+	std::map<int, std::vector<std::string>> countResult;
+	dbwrapper.Query(countquerybuf, countResult);
 
-	std::map<int, std::vector<std::string>> map_results;
-	dbwrapper.Query(sqlbuf, map_results);
+	long long totalCount = CommonUtils::StringtoInt(countResult[0][0]);
 
-	for (auto item : map_results){
-		auto dataItem = CThostFtdcDepthMDFieldWrapper::RecoverFromDB(item.second);
-		pool->GenRealTimeDataProcessor(instrumentID)->AppendRealTimeData(dataItem);
+	//PageSize = 100;
+	int pagesize = 100; 
+	for (int i = 0; i < (totalCount / pagesize + 1); i++){
+		const char * sqlselect = "select * from %s.%s order by id limit %ld,%d;";
+
+		char sqlbuf[512];
+		sprintf_s(sqlbuf, sqlselect, Config::Instance()->DBName().c_str(), instrumentID.c_str(), i*pagesize, pagesize);
+
+		std::map<int, std::vector<std::string>> map_results;
+		dbwrapper.Query(sqlbuf, map_results);
+
+		for (auto item : map_results){
+			auto dataItem = CThostFtdcDepthMDFieldWrapper::RecoverFromDB(item.second);
+			pool->GenRealTimeDataProcessor(instrumentID)->AppendRealTimeData(dataItem);
+		}
 	}
 
+	//Store to db
 	pool->GenRealTimeDataProcessor(instrumentID)->StoreStrategySequenceToDB(mark);
 }
 
