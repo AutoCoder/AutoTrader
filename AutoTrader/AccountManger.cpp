@@ -19,7 +19,7 @@ std::vector<CThostFtdcTradeField*> tradeList;
 char MapDirection(char src, bool toOrig);
 char MapOffset(char src, bool toOrig);
 
-AccountMangerSpi::AccountMangerSpi(CThostFtdcTraderApi* p, const char * brokerID, const char* userID, const char* password)
+AccountMangerSpi::AccountMangerSpi(CThostFtdcTraderApi* p, const char * brokerID, const char* userID, const char* password, const char* prodname)
 	: pUserApi(p)
 	, m_frontID(-1)
 	, m_sessionID(-1)
@@ -30,6 +30,7 @@ AccountMangerSpi::AccountMangerSpi(CThostFtdcTraderApi* p, const char * brokerID
 	strcpy_s(m_brokerID, brokerID);
 	strcpy_s(m_userID, userID);
 	strcpy_s(m_password, password);
+	strcpy_s(m_productName, prodname);
 }
 
 AccountMangerSpi::~AccountMangerSpi()
@@ -60,6 +61,7 @@ void AccountMangerSpi::ReqUserLogin()
 	strcpy_s(req.BrokerID, m_brokerID);
 	strcpy_s(req.UserID, m_userID);
 	strcpy_s(req.Password, m_password);
+	strcpy_s(req.UserProductInfo, m_productName);
 	int ret = pUserApi->ReqUserLogin(&req, ++requestId);
 	spdlog::get("console")->info() << " Request | send logging ..." << ((ret == 0) ? "success" : "fail");
 }

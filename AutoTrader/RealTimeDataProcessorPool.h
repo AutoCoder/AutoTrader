@@ -23,18 +23,18 @@ private:
 	RealTimeDataProcessorPool& operator=(const RealTimeDataProcessorPool &){};
 	static RealTimeDataProcessorPool *_instance;
 
-	class clearer
-	{
-	public:
-		clearer(){}
-		~clearer()
-		{
-			if (RealTimeDataProcessorPool::getInstance())
-			{
-				delete RealTimeDataProcessorPool::getInstance();
-			}
-		}
-	};
+	//class clearer
+	//{
+	//public:
+	//	clearer(){}
+	//	~clearer()
+	//	{
+	//		if (RealTimeDataProcessorPool::getInstance())
+	//		{
+	//			delete RealTimeDataProcessorPool::getInstance();
+	//		}
+	//	}
+	//};
 
 private:
 	void recoverHistoryData(int beforeSeconds, const std::string& instrumentId);

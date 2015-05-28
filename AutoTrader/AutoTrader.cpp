@@ -125,7 +125,7 @@ Usage:
 int main(int argc, const char* argv[]){
 	
 	//Test
-	RunUnitTest();
+	//RunUnitTest();
 
 	auto console = spdlog::stdout_logger_mt("console");
 
@@ -148,7 +148,8 @@ int main(int argc, const char* argv[]){
 		AccountMangerSpi* pTradeUserSpi = new AccountMangerSpi(pTradeUserApi, \
 			Config::Instance()->CtpBrokerID().c_str(), \
 			Config::Instance()->CtpUserID().c_str(), \
-			Config::Instance()->CtpPassword().c_str());
+			Config::Instance()->CtpPassword().c_str(), \
+			Config::Instance()->ProductName().c_str());
 		pTradeUserApi->RegisterSpi((CThostFtdcTraderSpi*)pTradeUserSpi);
 		pTradeUserApi->SubscribePublicTopic(THOST_TERT_RESTART);
 		pTradeUserApi->SubscribePrivateTopic(THOST_TERT_RESTART);

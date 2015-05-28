@@ -9,7 +9,8 @@ public:
 	AccountMangerSpi(CThostFtdcTraderApi* pUserApi, \
 		const char * brokerID, \
 		const char* userID, \
-		const char* password);
+		const char* password, \
+		const char* prodName);
 	~AccountMangerSpi();
 
 	virtual void OnFrontConnected();
@@ -79,6 +80,7 @@ private:
 	TThostFtdcBrokerIDType m_brokerID;
 	TThostFtdcUserIDType m_userID;
 	TThostFtdcPasswordType m_password;
+	TThostFtdcProductInfoType m_productName;
 	TThostFtdcFrontIDType m_frontID;
 	TThostFtdcSessionIDType m_sessionID;
 	char m_orderRef[13];

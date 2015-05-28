@@ -173,9 +173,9 @@ bool CommonUtils::IsMarketingTime(const char * time){
 	// time belongTo [00:00:00, 01:00:00) & [09:00:00, 11:30:00) & [13:30:00, 15:00:00) & [21:00:00, 24:00:00]
 
 	bool ret = (CommonUtils::TimeInRange("00:00:00", false, "01:00:00", true, time) \
-		|| CommonUtils::TimeInRange("09:00:00", false, "11:30:00", true, time) \
-		|| CommonUtils::TimeInRange("13:30:00", false, "15:00:00", true, time) \
-		|| CommonUtils::TimeInRange("21:00:00", false, "23:59:59", false, time));
+		|| CommonUtils::TimeInRange("08:55:00", false, "11:30:00", true, time) \
+		|| CommonUtils::TimeInRange("13:25:00", false, "15:00:00", true, time) \
+		|| CommonUtils::TimeInRange("20:55:00", false, "23:59:59", false, time));
 
 	return ret;
 }

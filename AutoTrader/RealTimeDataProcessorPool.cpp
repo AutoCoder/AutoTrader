@@ -10,7 +10,7 @@ RealTimeDataProcessorPool* RealTimeDataProcessorPool::getInstance()
 {
 	if (_instance == NULL)
 	{
-		static clearer clr;
+		//static clearer clr;
 		_instance = new RealTimeDataProcessorPool();
 	}
 	return _instance;

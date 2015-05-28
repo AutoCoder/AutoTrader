@@ -74,3 +74,8 @@ std::string Config::DBPassword(){
 bool Config::RecordModeOn(){
 	return parser_instance->get_bool("RecordMode", "Arguments");
 }
+
+std::string Config::ProductName()
+{
+	return parser_instance->get_string("Name", "ProductInfo");
+}

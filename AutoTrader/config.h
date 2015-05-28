@@ -45,6 +45,8 @@
 	 std::string DBUser();
 	 std::string DBPassword();
 
+	 std::string ProductName();
+
 	 bool RecordModeOn();
 
  private:
