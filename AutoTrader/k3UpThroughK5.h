@@ -52,6 +52,10 @@ public:
 		m_ticktype = type;
 	}
 
+	virtual TickType GetTickType(){
+		return m_ticktype;
+	}
+
 	virtual void serializeToDB(DBWrapper& db, const std::string& mark);
 
 private:

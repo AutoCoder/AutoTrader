@@ -40,7 +40,7 @@ void RealTimeDataProcessor::StoreStrategySequenceToDB(const std::string& mark)
 	spdlog::get("console")->info() << "Start to store db...";
 	//store Strategy data in memory into db
 	for (auto iter = m_DataSeq.rbegin(); iter != m_DataSeq.rend(); iter++){
-		if (iter->m_techvec != nullptr)
+		if (iter->m_techvec != nullptr && iter->m_techvec->GetTickType() != TickType::Commom)
 			iter->m_techvec->serializeToDB(*(m_dbptr.get()), mark);
 	}
 	spdlog::get("console")->info() << "End to store db.";
