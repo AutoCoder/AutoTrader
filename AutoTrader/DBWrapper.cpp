@@ -74,27 +74,6 @@ int DBUtils::CreateTickTableIfNotExists(const std::string& dbname, const std::st
 	}
 }
 
-int DBUtils::CreateK3K5StrategyTableIfNotExists(const std::string& dbname, const std::string& tableName){
-	if (DBUtils::m_dict.find(tableName) != m_dict.end()){
-		return 0;
-	}
-	else
-	{
-		DBUtils::m_dict[tableName] = true;
-		const char* sqltempl = "CREATE TABLE IF NOT EXISTS `%s`.`%s` (\
-							   	`id` INT NOT NULL AUTO_INCREMENT, \
-								`uuid` BIGINT NOT NULL, \
-								`k5m` Double(20,5) NULL, \
-								`k3m` Double(20,5) NULL, \
-								`Ticktype` int NULL, \
-								PRIMARY KEY(`id`));";
-		char sqlbuf[2046];
-		sprintf_s(sqlbuf, sqltempl, dbname.c_str(), tableName.c_str());
-		DBWrapper db;
-		return db.ExecuteNoResult(sqlbuf);
-	}
-}
-
 DBWrapper::DBWrapper()
 	:m_MysqlImpl(new mysql_db())
 {

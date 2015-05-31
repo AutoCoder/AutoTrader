@@ -1,17 +1,15 @@
-#ifndef K3_UPTHROUGH_K5_H
-#define K3_UPTHROUGH_K5_H
+#ifndef K3AVETHOUGH5AVE_H
+#define K3AVETHOUGH5AVE_H
+
 
 #include "Strategy.h"
 #include "TechVec.h"
 
-class Order;
-
-class k3UpThroughK5 : public Strategy
+class K3AVEThoughK5AVE : public Strategy
 {
 public:
-	k3UpThroughK5();
-	~k3UpThroughK5();
-
+	K3AVEThoughK5AVE();
+	~K3AVEThoughK5AVE();
 	virtual bool TryInvoke(const std::list<CThostFtdcDepthMDFieldWrapper>& data, CThostFtdcDepthMDFieldWrapper& info);
 
 	virtual Order generateOrder();
@@ -23,29 +21,30 @@ private:
 	Order* m_curOrder;
 };
 
-class k3UpThroughK5TechVec : public StrategyTechVec{
+
+class K3AVEThoughK5AVETechVec: public StrategyTechVec{
 public:
-	k3UpThroughK5TechVec(long long uuid, const std::string& instrumentID);
-	virtual ~k3UpThroughK5TechVec(){}
+	K3AVEThoughK5AVETechVec(long long uuid, const std::string& instrumentID);
+	virtual ~K3AVEThoughK5AVETechVec(){}
 
 	virtual size_t ObjSize(){
 		return sizeof(*this);
 	}
 
 	inline void setK3m(double input){
-		m_k3m = input;
+		m_k3closepriceave = input;
 	}
 
 	inline double K3m() const {
-		return m_k3m;
+		return m_k3closepriceave;
 	}
 
 	inline void setK5m(double input){
-		m_k5m = input;
+		m_k5closepriceave = input;
 	}
 
 	inline double K5m() const {
-		return m_k5m;
+		return m_k5closepriceave;
 	}
 
 	virtual void SetTickType(TickType type){
@@ -61,14 +60,14 @@ public:
 protected:
 	virtual int CreateTableIfNotExists(const std::string& dbname, const std::string& tableName);
 	static bool IsTableCreated;
-
 private:
-	double m_k5m; //average line for 5 minutes
-	double m_k3m; //average line for 3 minutes
+	double m_k5closepriceave; //average line for 5 minutes
+	double m_k3closepriceave; //average line for 3 minutes
 	TickType m_ticktype;
 
 	std::string m_instrumentId;
 	long long m_id; //time_stamp * 2  (unit : 500ms)
+
 };
 
 #endif

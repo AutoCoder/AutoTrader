@@ -90,6 +90,9 @@
     <ClInclude Include="unittest.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="K3AVEThoughK5AVE.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -129,6 +132,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CommonUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="K3AVEThoughK5AVE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

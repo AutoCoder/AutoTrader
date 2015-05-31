@@ -32,11 +32,11 @@ public:
 		return m_MdData.Volume;
 	}
 
-	inline double LastPrice() {
+	inline double LastPrice() const{
 		return m_MdData.LastPrice;
 	}
 
-	inline std::string InstrumentId(){
+	inline std::string InstrumentId() const{
 		return std::string(m_MdData.InstrumentID);
 	}
 

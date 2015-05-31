@@ -166,6 +166,7 @@
     <ClInclude Include="config.h" />
     <ClInclude Include="DBWrapper.h" />
     <ClInclude Include="ini_parser.h" />
+    <ClInclude Include="K3AVEThoughK5AVE.h" />
     <ClInclude Include="k3UpThroughK5.h" />
     <ClInclude Include="mdspi.h" />
     <ClInclude Include="mysqlwrapper.h" />
@@ -187,6 +188,7 @@
     <ClCompile Include="CommonUtils.cpp" />
     <ClCompile Include="config.cpp" />
     <ClCompile Include="DBWrapper.cpp" />
+    <ClCompile Include="K3AVEThoughK5AVE.cpp" />
     <ClCompile Include="k3UpThroughK5.cpp" />
     <ClCompile Include="mdspi.cpp" />
     <ClCompile Include="mysqlwrapper.cpp" />

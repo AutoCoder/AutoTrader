@@ -1,34 +1,36 @@
 #include "stdafx.h"
+#include "stdafx.h"
 #include "config.h"
 #include "DBWrapper.h"
 #include "TechVec.h"
-#include "k3UpThroughK5.h"
 #include "Order.h"
+#include "K3AVEThoughK5AVE.h"
 
 #include <sstream>
 
 
-k3UpThroughK5::k3UpThroughK5()
+
+K3AVEThoughK5AVE::K3AVEThoughK5AVE()
 :m_curOrder(new Order())
 {
 }
 
-k3UpThroughK5::~k3UpThroughK5()
+K3AVEThoughK5AVE::~K3AVEThoughK5AVE()
 {
 }
 
-double k3UpThroughK5::calculateK(const std::list<CThostFtdcDepthMDFieldWrapper>& data, const CThostFtdcDepthMDFieldWrapper& current, int seconds) const
+double K3AVEThoughK5AVE::calculateK(const std::list<CThostFtdcDepthMDFieldWrapper>& data, const CThostFtdcDepthMDFieldWrapper& current, int seconds) const
 {
 	//datetime to timestamp
-	double totalExchangePrice = current.TurnOver();
-	long long totalVolume = current.Volume();
+	double totalExchangeLastPrice = current.LastPrice();
+	long long count = 1;
 
 	long long leftedge = current.toTimeStamp() - seconds * 2;
 	for (auto it = data.begin(); it != data.end(); it++)
 	{
 		if (it->toTimeStamp() > leftedge){
-			totalExchangePrice += it->TurnOver();
-			totalVolume += it->Volume();
+			totalExchangeLastPrice += it->LastPrice();
+			++count;
 		}
 		else{
 			break;
@@ -38,12 +40,12 @@ double k3UpThroughK5::calculateK(const std::list<CThostFtdcDepthMDFieldWrapper>&
 	//assert(totalVolume != 0);
 	//assert(totalExchangePrice >= 0.0);
 
-	return totalExchangePrice / totalVolume;
+	return totalExchangeLastPrice / count;
 }
 
-bool k3UpThroughK5::TryInvoke(const std::list<CThostFtdcDepthMDFieldWrapper>& data, CThostFtdcDepthMDFieldWrapper& info)
+bool K3AVEThoughK5AVE::TryInvoke(const std::list<CThostFtdcDepthMDFieldWrapper>& data, CThostFtdcDepthMDFieldWrapper& info)
 {
-	k3UpThroughK5TechVec* curPtr = new k3UpThroughK5TechVec(info.UUID(), info.InstrumentId());
+	K3AVEThoughK5AVETechVec* curPtr = new K3AVEThoughK5AVETechVec(info.UUID(), info.InstrumentId());
 	bool orderSingal = false;
 	double k3 = calculateK(data, info, 3 * 60);
 	double k5 = calculateK(data, info, 5 * 60);
@@ -54,8 +56,8 @@ bool k3UpThroughK5::TryInvoke(const std::list<CThostFtdcDepthMDFieldWrapper>& da
 	if (!data.empty())
 	{
 		auto preNode = data.begin();
-		
-		k3UpThroughK5TechVec* prePtr = static_cast<k3UpThroughK5TechVec*>(preNode->GetTechVec());
+
+		K3AVEThoughK5AVETechVec* prePtr = static_cast<K3AVEThoughK5AVETechVec*>(preNode->GetTechVec());
 		if (prePtr){
 			if (prePtr->K5m() > prePtr->K3m())
 			{
@@ -95,34 +97,33 @@ bool k3UpThroughK5::TryInvoke(const std::list<CThostFtdcDepthMDFieldWrapper>& da
 	return orderSingal;
 }
 
-Order k3UpThroughK5::generateOrder(){
+Order K3AVEThoughK5AVE::generateOrder(){
 	return *m_curOrder;
 }
 
-bool k3UpThroughK5TechVec::IsTableCreated = false;
+bool K3AVEThoughK5AVETechVec::IsTableCreated = false;
 
-k3UpThroughK5TechVec::k3UpThroughK5TechVec(long long uuid, const std::string& instrumentID)
-	: m_id(uuid)
-	, m_instrumentId(instrumentID)
-	, m_ticktype(TickType::Commom)
+K3AVEThoughK5AVETechVec::K3AVEThoughK5AVETechVec(long long uuid, const std::string& instrumentID)
+: m_id(uuid)
+, m_instrumentId(instrumentID)
+, m_ticktype(TickType::Commom)
 {
 }
 
-int k3UpThroughK5TechVec::CreateTableIfNotExists(const std::string& dbname, const std::string& tableName)
-{
-	if (k3UpThroughK5TechVec::IsTableCreated == true){
+int K3AVEThoughK5AVETechVec::CreateTableIfNotExists(const std::string& dbname, const std::string& tableName){
+	if (K3AVEThoughK5AVETechVec::IsTableCreated == true){
 		return 0;
 	}
 	else
 	{
-		k3UpThroughK5TechVec::IsTableCreated = true;
+		K3AVEThoughK5AVETechVec::IsTableCreated = true;
 		const char* sqltempl = "CREATE TABLE IF NOT EXISTS `%s`.`%s` (\
-			`id` INT NOT NULL AUTO_INCREMENT, \
-			`uuid` BIGINT NOT NULL, \
-			`k5m` Double(20,5) NULL, \
-			`k3m` Double(20,5) NULL, \
-			`Ticktype` int NULL, \
-			PRIMARY KEY(`id`));";
+				`id` INT NOT NULL AUTO_INCREMENT, \
+				`uuid` BIGINT NOT NULL, \
+				`m_k5closepriceave` Double(20,5) NULL, \
+				`m_k3closepriceave` Double(20,5) NULL, \
+				`Ticktype` int NULL, \
+				PRIMARY KEY(`id`));";
 		char sqlbuf[2046];
 		sprintf_s(sqlbuf, sqltempl, dbname.c_str(), tableName.c_str());
 		DBWrapper db;
@@ -130,22 +131,22 @@ int k3UpThroughK5TechVec::CreateTableIfNotExists(const std::string& dbname, cons
 	}
 }
 
-void k3UpThroughK5TechVec::serializeToDB(DBWrapper& db, const std::string& mark)
+void K3AVEThoughK5AVETechVec::serializeToDB(DBWrapper& db, const std::string& mark)
 {
-	std::string&& tableName = m_instrumentId + "_k3UpThroughK5_" + mark;
+	std::string&& tableName = m_instrumentId + "_K3AVEThoughK5AVE_" + mark;
 
-	k3UpThroughK5TechVec::CreateTableIfNotExists(Config::Instance()->DBName(), tableName);
+	K3AVEThoughK5AVETechVec::CreateTableIfNotExists(Config::Instance()->DBName(), tableName);
 
 	std::stringstream sql;
 	sql << "INSERT INTO `" << tableName << "` (`";
 	sql << "uuid" << "`,`";
-	sql << "k5m" << "`,`";
-	sql << "k3m" << "`,`";
+	sql << "m_k5closepriceave" << "`,`";
+	sql << "m_k3closepriceave" << "`,`";
 	sql << "Ticktype" << "`";
 	sql << ") VALUES(";
 	sql << m_id << ", ";
-	sql << m_k5m << ", ";
-	sql << m_k3m << ", ";
+	sql << m_k5closepriceave << ", ";
+	sql << m_k3closepriceave << ", ";
 	sql << (int)m_ticktype << ")";
 
 	//std::cerr << sql.str() << std::endl;
