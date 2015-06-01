@@ -66,6 +66,7 @@ void ExcuteOrderQueue(AccountMangerSpi* pUserSpi){
 		if (!order_queue.empty() && order_queue.try_pop(ord)){ // if pop success
 			spdlog::get("console")->info() << "Excute Order regarding instrumentID:" << ord.GetInstrumentId();
 			//Todo: according ord to insert order
+			pUserSpi->ExecuteOrder(ord);
 		}
 
 		if (g_quit && order_queue.empty())
@@ -96,8 +97,7 @@ void ReplayTickDataFromDB(const std::string& instrumentID, const std::string& ma
 
 	long long totalCount = CommonUtils::StringtoInt(countResult[0][0]);
 
-	//PageSize = 100;
-	int pagesize = 100; 
+	int pagesize = 1000; 
 	for (int i = 0; i < (totalCount / pagesize + 1); i++){
 		const char * sqlselect = "select * from %s.%s order by id limit %ld,%d;";
 

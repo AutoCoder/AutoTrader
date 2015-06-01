@@ -3,6 +3,8 @@
 
 #include "ThostFtdcTraderApi.h"
 
+class Order;
+
 class AccountMangerSpi : public CThostFtdcTraderSpi
 {
 public:
@@ -71,6 +73,8 @@ public:
 	bool IsConfirmedSettlementInfo() const {
 		return m_isConfirmSettlementInfo;
 	}
+	
+	bool ExecuteOrder(const Order& ord);
 
 private:
 	double m_available; //可用资金

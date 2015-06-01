@@ -138,6 +138,7 @@ void K3AVEThoughK5AVETechVec::serializeToDB(DBWrapper& db, const std::string& ma
 	K3AVEThoughK5AVETechVec::CreateTableIfNotExists(Config::Instance()->DBName(), tableName);
 
 	std::stringstream sql;
+	sql.precision(12);
 	sql << "INSERT INTO `" << tableName << "` (`";
 	sql << "uuid" << "`,`";
 	sql << "m_k5closepriceave" << "`,`";

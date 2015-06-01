@@ -137,6 +137,7 @@ void k3UpThroughK5TechVec::serializeToDB(DBWrapper& db, const std::string& mark)
 	k3UpThroughK5TechVec::CreateTableIfNotExists(Config::Instance()->DBName(), tableName);
 
 	std::stringstream sql;
+	sql.precision(12);
 	sql << "INSERT INTO `" << tableName << "` (`";
 	sql << "uuid" << "`,`";
 	sql << "k5m" << "`,`";

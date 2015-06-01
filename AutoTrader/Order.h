@@ -25,6 +25,14 @@ public:
 		m_refExchangePrice = price;
 	}
 
+	double GetRefExchangePrice() const{
+		return m_refExchangePrice;
+	}
+
+	ExchangeDirection GetExchangeDirection() const {
+		return m_direction;
+	}
+
 	void SetExchangeDirection(ExchangeDirection in){
 		m_direction = in;
 	}

@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "k3UpThroughK5.h"
+#include "K3AVEThoughK5AVE.h"
 #include "RealTimeDataProcessorPool.h"
 #include "config.h"
 #include "DBWrapper.h"
@@ -22,6 +23,7 @@ RealTimeDataProcessorPool::RealTimeDataProcessorPool()
 	//construct the Strategy dict 
 	m_dict.clear();
 	m_dict["k3UpThroughK5"] = std::shared_ptr<Strategy>(new k3UpThroughK5());
+	m_dict["K3AVEThoughK5AVE"] = std::shared_ptr<Strategy>(new K3AVEThoughK5AVE());
 
 	m_processorDict.clear();
 
@@ -30,8 +32,11 @@ RealTimeDataProcessorPool::RealTimeDataProcessorPool()
 		m_processorDict["rb1511"] = std::shared_ptr<RealTimeDataProcessor>(new RealTimeDataProcessor(nullptr, "rb1511"));
 	}
 	else{
-		m_processorDict["rb1510"] = std::shared_ptr<RealTimeDataProcessor>(new RealTimeDataProcessor(m_dict["k3UpThroughK5"].get(), "rb1510"));
-		m_processorDict["rb1511"] = std::shared_ptr<RealTimeDataProcessor>(new RealTimeDataProcessor(m_dict["k3UpThroughK5"].get(), "rb1511"));
+		//m_processorDict["rb1510"] = std::shared_ptr<RealTimeDataProcessor>(new RealTimeDataProcessor(m_dict["k3UpThroughK5"].get(), "rb1510"));
+		std::string st1 = Config::Instance()->CtpStrategy("rb1510");
+		std::string st2 = Config::Instance()->CtpStrategy("rb1511");
+		m_processorDict["rb1510"] = std::shared_ptr<RealTimeDataProcessor>(new RealTimeDataProcessor(m_dict[st1].get(), "rb1510"));
+		m_processorDict["rb1511"] = std::shared_ptr<RealTimeDataProcessor>(new RealTimeDataProcessor(m_dict[st2].get(), "rb1511"));
 	}
 
 }

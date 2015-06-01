@@ -16,8 +16,8 @@ extern std::condition_variable cv;
 std::vector<CThostFtdcOrderField*> orderList;
 std::vector<CThostFtdcTradeField*> tradeList;
 
-char MapDirection(char src, bool toOrig);
-char MapOffset(char src, bool toOrig);
+//char MapDirection(char src, bool toOrig);
+//char MapOffset(char src, bool toOrig);
 
 AccountMangerSpi::AccountMangerSpi(CThostFtdcTraderApi* p, const char * brokerID, const char* userID, const char* password, const char* prodname)
 	: pUserApi(p)
@@ -177,7 +177,7 @@ void AccountMangerSpi::OnRspQryInvestorPosition(
 {
 	if (!IsErrorRspInfo(pRspInfo) && pInvestorPosition){
 		spdlog::get("console")->info() << " Response| Instrument:" << pInvestorPosition->InstrumentID
-			<< " PosiDirection:" << MapDirection(pInvestorPosition->PosiDirection - 2, false)
+			<< " PosiDirection:" << pInvestorPosition->PosiDirection
 			<< " Position:" << pInvestorPosition->Position
 			<< " Yesterday Position:" << pInvestorPosition->YdPosition
 			<< " Today Position:" << pInvestorPosition->TodayPosition
@@ -201,12 +201,13 @@ void AccountMangerSpi::ReqOrderInsert(TThostFtdcInstrumentIDType instId,
 	sprintf_s(m_orderRef, "%d", ++nextOrderRef);
 
 	req.OrderPriceType = THOST_FTDC_OPT_LimitPrice;
-	req.Direction = MapDirection(dir, true); 
-	req.CombOffsetFlag[0] = MapOffset(kpp[0], true); 
+	req.Direction = dir; 
+	req.CombOffsetFlag[0] = kpp[0];
 	req.CombHedgeFlag[0] = THOST_FTDC_HF_Speculation;
 	req.LimitPrice = price;	
 	req.VolumeTotalOriginal = vol;	
-	req.TimeCondition = THOST_FTDC_TC_GFD;  
+	//FAK 立即成交剩余指令自动撤销指令 (THOST_FTDC_TC_IOC + THOST_FTDC_VC_AV)
+	req.TimeCondition = THOST_FTDC_TC_IOC;
 	req.VolumeCondition = THOST_FTDC_VC_AV; 
 	req.MinVolume = 1;	
 	req.ContingentCondition = THOST_FTDC_CC_Immediately;  
@@ -316,28 +317,99 @@ bool AccountMangerSpi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo)
 	}
 	return ret;
 }
+//
+//char MapDirection(char src, bool toOrig = true){
+//	if (toOrig){
+//		if ('b' == src || 'B' == src){ src = '0'; }
+//		else if ('s' == src || 'S' == src){ src = '1'; }
+//	}
+//	else{
+//		if ('0' == src){ src = 'B'; }
+//		else if ('1' == src){ src = 'S'; }
+//	}
+//	return src;
+//}
+//char MapOffset(char src, bool toOrig = true){
+//	if (toOrig){
+//		if ('o' == src || 'O' == src){ src = '0'; }
+//		else if ('c' == src || 'C' == src){ src = '1'; }
+//		else if ('j' == src || 'J' == src){ src = '3'; }
+//	}
+//	else{
+//		if ('0' == src){ src = 'O'; }
+//		else if ('1' == src){ src = 'C'; }
+//		else if ('3' == src){ src = 'J'; }
+//	}
+//	return src;
+//}
 
-char MapDirection(char src, bool toOrig = true){
-	if (toOrig){
-		if ('b' == src || 'B' == src){ src = '0'; }
-		else if ('s' == src || 'S' == src){ src = '1'; }
+bool AccountMangerSpi::ExecuteOrder(const Order& ord){
+	double purchaseMoney = m_accountInfo.Available - (m_accountInfo.Balance * 0.8);
+	//Get price == ord.GetInstrumentId()
+	if (purchaseMoney > 0){
+		int vol = purchaseMoney / ord.GetRefExchangePrice();
+
+		TThostFtdcCombOffsetFlagType kpp;
+		
+		kpp[0] = (vol == 0) ? THOST_FTDC_OF_CloseToday : THOST_FTDC_OF_Open;
+		std::string inst = ord.GetInstrumentId();
+
+		char direction = (ord.GetExchangeDirection() == ExchangeDirection::Buy) ? THOST_FTDC_D_Buy : THOST_FTDC_D_Sell;
+		ReqOrderInsert(const_cast<char*>(inst.c_str()), direction, kpp, ord.GetRefExchangePrice(), vol);
 	}
-	else{
-		if ('0' == src){ src = 'B'; }
-		else if ('1' == src){ src = 'S'; }
-	}
-	return src;
+
+	return true;
 }
-char MapOffset(char src, bool toOrig = true){
-	if (toOrig){
-		if ('o' == src || 'O' == src){ src = '0'; }
-		else if ('c' == src || 'C' == src){ src = '1'; }
-		else if ('j' == src || 'J' == src){ src = '3'; }
-	}
-	else{
-		if ('0' == src){ src = 'O'; }
-		else if ('1' == src){ src = 'C'; }
-		else if ('3' == src){ src = 'J'; }
-	}
-	return src;
-}
+//
+/////TFtdcTimeConditionType是一个有效期类型类型
+///////////////////////////////////////////////////////////////////////////
+/////立即完成，否则撤销
+//#define THOST_FTDC_TC_IOC '1'
+/////本节有效
+//#define THOST_FTDC_TC_GFS '2'
+/////当日有效
+//#define THOST_FTDC_TC_GFD '3'
+/////指定日期前有效
+//#define THOST_FTDC_TC_GTD '4'
+/////撤销前有效
+//#define THOST_FTDC_TC_GTC '5'
+/////集合竞价有效
+//#define THOST_FTDC_TC_GFA '6'
+//
+/////TFtdcVolumeConditionType是一个成交量类型类型
+///////////////////////////////////////////////////////////////////////////
+/////任何数量
+//#define THOST_FTDC_VC_AV '1'
+/////最小数量
+//#define THOST_FTDC_VC_MV '2'
+/////全部数量
+//#define THOST_FTDC_VC_CV '3'
+
+//立即全部成交否则自动撤销指令(FOK指令)，指在限定价位下达指令，如果该指令下所有申报手数未能全部成交，该指令下所有申报手数自动被系统撤销。
+//
+//立即成交剩余指令自动撤销指令(FAK指令)
+
+//
+//#define THOST_FTDC_D_Buy '0'
+//	///卖
+//#define THOST_FTDC_D_Sell '1
+//
+///////////////////////////////////////////////////////////////////////////
+/////TFtdcOffsetFlagType是一个开平标志类型
+///////////////////////////////////////////////////////////////////////////
+/////开仓
+//#define THOST_FTDC_OF_Open '0'
+/////平仓
+//#define THOST_FTDC_OF_Close '1'
+/////强平
+//#define THOST_FTDC_OF_ForceClose '2'
+/////平今
+//#define THOST_FTDC_OF_CloseToday '3'
+/////平昨
+//#define THOST_FTDC_OF_CloseYesterday '4'
+/////强减
+//#define THOST_FTDC_OF_ForceOff '5'
+/////本地强平
+//#define THOST_FTDC_OF_LocalForceClose '6'
+//
+//typedef char TThostFtdcOffsetFlagType;
