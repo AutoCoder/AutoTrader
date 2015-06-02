@@ -21,21 +21,18 @@
 int requestId = 0;
 
 std::mutex mtx;
-std::condition_variable cv;
+std::condition_variable cv_md;
+std::condition_variable cv_trade;
 std::atomic<bool> g_quit = false;
 std::atomic<bool> g_reply = false;
 threadsafe_queue<Order> order_queue;
 
-void StartLoginThread(CtpMdSpi* pMdUserSpi, AccountMangerSpi* pTradeUserSpi){
+void MdManageThread(CtpMdSpi* pMdUserSpi){
 
 	std::unique_lock <std::mutex> lck(mtx);
 	while (!g_quit){
-		cv.wait(lck);
+		cv_md.wait(lck);
 		if (pMdUserSpi->IsFrontConnected() && !pMdUserSpi->IsLogin()){
-			spdlog::get("console")->info() << "Login...";
-			spdlog::get("console")->info() << "\n> BrokerID > " << Config::Instance()->CtpBrokerID();
-			spdlog::get("console")->info() << "\n> UserID > " << Config::Instance()->CtpUserID();
-			spdlog::get("console")->info() << "\n> Password > " << Config::Instance()->CtpPassword();
 			pMdUserSpi->ReqUserLogin(const_cast<char*>(Config::Instance()->CtpBrokerID().c_str()) \
 				, const_cast<char*>(Config::Instance()->CtpUserID().c_str())\
 				, const_cast<char*>(Config::Instance()->CtpPassword().c_str()));
@@ -43,6 +40,13 @@ void StartLoginThread(CtpMdSpi* pMdUserSpi, AccountMangerSpi* pTradeUserSpi){
 		else if (pMdUserSpi->IsLogin() && !pMdUserSpi->IsSubscribed()){
 			pMdUserSpi->SubscribeMarketData(const_cast<char*>(Config::Instance()->CtpInstrumentIDs().c_str()));
 		}
+	}
+}
+
+void TradeManageThread(AccountMangerSpi* pTradeUserSpi){
+	std::unique_lock <std::mutex> lck(mtx);
+	while (!g_quit){
+		cv_trade.wait(lck);
 
 		if (pTradeUserSpi->IsFrontConnected() && !pTradeUserSpi->IsLogin()){
 			pTradeUserSpi->ReqUserLogin();
@@ -52,7 +56,6 @@ void StartLoginThread(CtpMdSpi* pMdUserSpi, AccountMangerSpi* pTradeUserSpi){
 		}
 		else if (pTradeUserSpi->IsConfirmedSettlementInfo() && !pTradeUserSpi->IsAccoutRefreshed()){
 			pTradeUserSpi->ReqQryTradingAccount();
-			//pTradeUserSpi->ReqQryInvestorPosition("rb1510");
 		}
 	}
 }
@@ -135,15 +138,13 @@ int main(int argc, const char* argv[]){
 	else{
 		auto pool = RealTimeDataProcessorPool::getInstance();
 
-		//[Begin]******start md thread*******
+		//******Init md thread*******
 		CThostFtdcMdApi* pMdUserApi = CThostFtdcMdApi::CreateFtdcMdApi();
 		CtpMdSpi* pMdUserSpi = new CtpMdSpi(pMdUserApi);
 		pMdUserApi->RegisterSpi(pMdUserSpi);
 		pMdUserApi->RegisterFront(const_cast<char*>(Config::Instance()->CtpMdFront().c_str()));
-		pMdUserApi->Init();
-		//[End]******start md thread******
 
-		//[Begin]*******start trade thread********
+		//*******Init trade thread********
 		CThostFtdcTraderApi* pTradeUserApi = CThostFtdcTraderApi::CreateFtdcTraderApi();
 		AccountMangerSpi* pTradeUserSpi = new AccountMangerSpi(pTradeUserApi, \
 			Config::Instance()->CtpBrokerID().c_str(), \
@@ -154,20 +155,23 @@ int main(int argc, const char* argv[]){
 		pTradeUserApi->SubscribePublicTopic(THOST_TERT_RESTART);
 		pTradeUserApi->SubscribePrivateTopic(THOST_TERT_RESTART);
 		pTradeUserApi->RegisterFront(const_cast<char*>(Config::Instance()->CtpTradeFront().c_str()));
-		pTradeUserApi->Init();
-
-
-		//[End]******start trade thread******
 
 		//Create a thread, Once FrontDisconnect ,try to reconnect and subscribeMD again if needed.
-		std::thread loginthread(StartLoginThread, pMdUserSpi, pTradeUserSpi);
+		std::thread mdManagethread(MdManageThread, pMdUserSpi);
+		std::thread tradeManagethread(TradeManageThread, pTradeUserSpi);
 		//[Excute Order Thread] Excute the Order in Queue one by one looply.
 		std::thread tradeThread(ExcuteOrderQueue, pTradeUserSpi);
 
-		Order ord("rb1510", 2367, ExchangeDirection::Buy);
-		//pTradeUserSpi->ExecuteOrder(ord);
+		//******start md thread******
+		pMdUserApi->Init();
+		//******start trade thread******
+		pTradeUserApi->Init();
 
-		loginthread.join();
+		Order ord("rb1510", 2367, ExchangeDirection::Buy);
+		pTradeUserSpi->ExecuteOrder(ord);
+
+		mdManagethread.join();
+		tradeManagethread.join();
 		tradeThread.join();
 
 		//[Main Thread]Release the resource and pointer.
