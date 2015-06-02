@@ -50,9 +50,9 @@ void StartLoginThread(CtpMdSpi* pMdUserSpi, AccountMangerSpi* pTradeUserSpi){
 		else if (pTradeUserSpi->IsLogin() && !pTradeUserSpi->IsConfirmedSettlementInfo()){
 			pTradeUserSpi->ReqSettlementInfoConfirm();
 		}
-		else if (pTradeUserSpi->IsConfirmedSettlementInfo()){
+		else if (pTradeUserSpi->IsConfirmedSettlementInfo() && !pTradeUserSpi->IsAccoutRefreshed()){
 			pTradeUserSpi->ReqQryTradingAccount();
-			pTradeUserSpi->ReqQryInvestorPosition("rb1510");
+			//pTradeUserSpi->ReqQryInvestorPosition("rb1510");
 		}
 	}
 }
@@ -155,12 +155,17 @@ int main(int argc, const char* argv[]){
 		pTradeUserApi->SubscribePrivateTopic(THOST_TERT_RESTART);
 		pTradeUserApi->RegisterFront(const_cast<char*>(Config::Instance()->CtpTradeFront().c_str()));
 		pTradeUserApi->Init();
+
+
 		//[End]******start trade thread******
 
 		//Create a thread, Once FrontDisconnect ,try to reconnect and subscribeMD again if needed.
 		std::thread loginthread(StartLoginThread, pMdUserSpi, pTradeUserSpi);
 		//[Excute Order Thread] Excute the Order in Queue one by one looply.
 		std::thread tradeThread(ExcuteOrderQueue, pTradeUserSpi);
+
+		Order ord("rb1510", 2367, ExchangeDirection::Buy);
+		//pTradeUserSpi->ExecuteOrder(ord);
 
 		loginthread.join();
 		tradeThread.join();

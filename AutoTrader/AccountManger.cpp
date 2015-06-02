@@ -26,6 +26,7 @@ AccountMangerSpi::AccountMangerSpi(CThostFtdcTraderApi* p, const char * brokerID
 	, m_isFrontConnected(false)
 	, m_islogin(false)
 	, m_isConfirmSettlementInfo(false)
+	, m_isAccountFreshed(false)
 {
 	strcpy_s(m_brokerID, brokerID);
 	strcpy_s(m_userID, userID);
@@ -155,6 +156,7 @@ void AccountMangerSpi::OnRspQryTradingAccount(
 			<< " PositionProfit:" << pTradingAccount->PositionProfit
 			<< " Commission:" << pTradingAccount->Commission
 			<< " FrozenMargin:" << pTradingAccount->FrozenMargin;
+		m_isAccountFreshed = true;
 	}
 
 	//if (bIsLast) SetEvent(g_tradehEvent);
@@ -344,6 +346,11 @@ bool AccountMangerSpi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo)
 //}
 
 bool AccountMangerSpi::ExecuteOrder(const Order& ord){
+	// if account is not refreshed, wait to refresh
+	while (!m_isAccountFreshed){
+		Sleep(50);
+		spdlog::get("console")->info() << "Account is not fresh, sleep(100)...";
+	}
 	double purchaseMoney = m_accountInfo.Available - (m_accountInfo.Balance * 0.8);
 	//Get price == ord.GetInstrumentId()
 	if (purchaseMoney > 0){
@@ -357,6 +364,11 @@ bool AccountMangerSpi::ExecuteOrder(const Order& ord){
 		char direction = (ord.GetExchangeDirection() == ExchangeDirection::Buy) ? THOST_FTDC_D_Buy : THOST_FTDC_D_Sell;
 		ReqOrderInsert(const_cast<char*>(inst.c_str()), direction, kpp, ord.GetRefExchangePrice(), vol);
 	}
+	m_isAccountFreshed = false;
+
+	//fresh accout
+	spdlog::get("console")->info() << "Order executed. begin to refresh Account info...";
+	ReqQryTradingAccount();
 
 	return true;
 }

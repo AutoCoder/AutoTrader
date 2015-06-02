@@ -73,6 +73,10 @@ public:
 	bool IsConfirmedSettlementInfo() const {
 		return m_isConfirmSettlementInfo;
 	}
+
+	bool IsAccoutRefreshed() const {
+		return m_isAccountFreshed;
+	}
 	
 	bool ExecuteOrder(const Order& ord);
 
@@ -95,6 +99,7 @@ private:
 	bool m_isFrontConnected;
 	bool m_islogin;
 	bool m_isConfirmSettlementInfo;
+	bool m_isAccountFreshed;
 };
 
 #endif 
