@@ -6,6 +6,7 @@
 #include "Order.h"
 
 #include <sstream>
+#include <assert.h>
 
 
 k3UpThroughK5::k3UpThroughK5()
@@ -41,8 +42,15 @@ double k3UpThroughK5::calculateK(const std::list<CThostFtdcDepthMDFieldWrapper>&
 	return totalExchangePrice / totalVolume;
 }
 
+bool isUpThough(k3UpThroughK5TechVec* vec){
+	assert(vec);
+	return vec->K3m() > vec->K5m();
+}
+
+
 bool k3UpThroughK5::TryInvoke(const std::list<CThostFtdcDepthMDFieldWrapper>& data, CThostFtdcDepthMDFieldWrapper& info)
 {
+	const size_t breakthrough_confirm_duration = 100; //50ms
 	k3UpThroughK5TechVec* curPtr = new k3UpThroughK5TechVec(info.UUID(), info.InstrumentId());
 	bool orderSingal = false;
 	double k3 = calculateK(data, info, 3 * 60);
@@ -50,45 +58,88 @@ bool k3UpThroughK5::TryInvoke(const std::list<CThostFtdcDepthMDFieldWrapper>& da
 	curPtr->setK3m(k3);
 	curPtr->setK5m(k5);
 
-	//assert(!data.empty());
-	if (!data.empty())
-	{
-		auto preNode = data.begin();
-		
-		k3UpThroughK5TechVec* prePtr = static_cast<k3UpThroughK5TechVec*>(preNode->GetTechVec());
-		if (prePtr){
-			if (prePtr->K5m() > prePtr->K3m())
-			{
-				if (curPtr->K3m() > curPtr->K5m()){
-					// Buy Singal
-					// construct Buy Order ptr
-					//std::cout << "[Buy Signal]" << std::endl;
-					//std::cout << "LastPrice: " << info.LastPrice() << std::endl;
-					//Order ord(info.InstrumentId(), info.LastPrice(), ExchangeDirection::Buy);
-					m_curOrder->SetInstrumentId(info.InstrumentId());
-					m_curOrder->SetRefExchangePrice(info.LastPrice());
-					m_curOrder->SetExchangeDirection(ExchangeDirection::Buy);
-					curPtr->SetTickType(TickType::BuyPoint);
-					orderSingal = true;
+	if (isUpThough(curPtr)){ // up
+		if (!data.empty() && data.size() > 500){
+			std::list<CThostFtdcDepthMDFieldWrapper>::const_iterator stoper = data.begin();
+			std::advance(stoper, breakthrough_confirm_duration);
+			for (auto it = data.begin(); it != stoper; it++){
+				k3UpThroughK5TechVec* prePtr = static_cast<k3UpThroughK5TechVec*>(it->GetTechVec());
+				if (!isUpThough(prePtr))
+				{ 
+					// not special point
+					orderSingal = false;
+					break;
 				}
-			}
-			else{
-				if (curPtr->K3m() < curPtr->K5m()){
-					//Sell Singal
-					// construct Sell Order ptr
-					//std::cout << "[Sell Signal]" << std::endl;
-					//std::cout << "LastPrice: " << info.LastPrice() << std::endl;
-					//Order ord(info.InstrumentId(), info.LastPrice(), ExchangeDirection::Sell);
-					m_curOrder->SetInstrumentId(info.InstrumentId());
-					m_curOrder->SetRefExchangePrice(info.LastPrice());
-					m_curOrder->SetExchangeDirection(ExchangeDirection::Sell);
-					curPtr->SetTickType(TickType::SellPoint);
-					orderSingal = true;
-				}
+				//special point
+				m_curOrder->SetInstrumentId(info.InstrumentId());
+				m_curOrder->SetRefExchangePrice(info.LastPrice());
+				m_curOrder->SetExchangeDirection(ExchangeDirection::Buy);
+				curPtr->SetTickType(TickType::BuyPoint);
+				orderSingal = true;
 			}
 		}
-
 	}
+	else{ // down
+		if (!data.empty() && data.size() > 500){
+			std::list<CThostFtdcDepthMDFieldWrapper>::const_iterator stoper = data.begin();
+			std::advance(stoper, breakthrough_confirm_duration);
+			for (auto it = data.begin(); it != stoper; it++){
+				k3UpThroughK5TechVec* prePtr = static_cast<k3UpThroughK5TechVec*>(it->GetTechVec());
+				if (isUpThough(prePtr))
+				{
+					// not special point
+					orderSingal = false;
+					break;
+				}
+				//special point
+				m_curOrder->SetInstrumentId(info.InstrumentId());
+				m_curOrder->SetRefExchangePrice(info.LastPrice());
+				m_curOrder->SetExchangeDirection(ExchangeDirection::Sell);
+				curPtr->SetTickType(TickType::SellPoint);
+				orderSingal = true;
+			}
+		}
+	}
+
+	////assert(!data.empty());
+	//if (!data.empty())
+	//{
+	//	auto preNode = data.begin();
+	//	
+	//	k3UpThroughK5TechVec* prePtr = static_cast<k3UpThroughK5TechVec*>(preNode->GetTechVec());
+	//	if (prePtr){
+	//		if (prePtr->K5m() > prePtr->K3m())
+	//		{
+	//			if (curPtr->K3m() > curPtr->K5m()){
+	//				// Buy Singal
+	//				// construct Buy Order ptr
+	//				//std::cout << "[Buy Signal]" << std::endl;
+	//				//std::cout << "LastPrice: " << info.LastPrice() << std::endl;
+	//				//Order ord(info.InstrumentId(), info.LastPrice(), ExchangeDirection::Buy);
+	//				m_curOrder->SetInstrumentId(info.InstrumentId());
+	//				m_curOrder->SetRefExchangePrice(info.LastPrice());
+	//				m_curOrder->SetExchangeDirection(ExchangeDirection::Buy);
+	//				curPtr->SetTickType(TickType::BuyPoint);
+	//				orderSingal = true;
+	//			}
+	//		}
+	//		else{
+	//			if (curPtr->K3m() < curPtr->K5m()){
+	//				//Sell Singal
+	//				// construct Sell Order ptr
+	//				//std::cout << "[Sell Signal]" << std::endl;
+	//				//std::cout << "LastPrice: " << info.LastPrice() << std::endl;
+	//				//Order ord(info.InstrumentId(), info.LastPrice(), ExchangeDirection::Sell);
+	//				m_curOrder->SetInstrumentId(info.InstrumentId());
+	//				m_curOrder->SetRefExchangePrice(info.LastPrice());
+	//				m_curOrder->SetExchangeDirection(ExchangeDirection::Sell);
+	//				curPtr->SetTickType(TickType::SellPoint);
+	//				orderSingal = true;
+	//			}
+	//		}
+	//	}
+
+	//}
 
 	//info.SetTechVec((StrategyTechVec*)curPtr);
 	info.m_techvec = curPtr;
