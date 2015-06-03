@@ -179,3 +179,51 @@ bool CommonUtils::IsMarketingTime(const char * time){
 
 	return ret;
 }
+
+std::string CommonUtils::InterpretOrderStatusCode(TThostFtdcOrderStatusType type)
+{
+	switch (type){
+	case THOST_FTDC_OST_AllTraded:
+		return "Order is totally traded.";
+	case THOST_FTDC_OST_PartTradedQueueing:
+		return "Order is partly traded. Other is in queue.";
+	case THOST_FTDC_OST_PartTradedNotQueueing:
+		return "Order is partly traded. Other is abandoned.";
+	case THOST_FTDC_OST_NoTradeQueueing:
+		return "Order is not traded and is in queue.";
+	case THOST_FTDC_OST_NoTradeNotQueueing:
+		return "Order is not traded and is not in queue.";
+	case THOST_FTDC_OST_Canceled:
+		return "Order is cancelled.";
+	case THOST_FTDC_OST_Unknown:
+		return "Unknown status.";
+	case THOST_FTDC_OST_NotTouched:
+		return "Not triggered.";
+	case THOST_FTDC_OST_Touched:
+		return "triggered.";
+	default:
+		return "Wrong TThostFtdcOrderStatusType passed.";
+	}
+}
+
+std::string CommonUtils::InterpretOrderSubmitStatusCode(TThostFtdcOrderSubmitStatusType type)
+{
+	switch (type){
+	case THOST_FTDC_OSS_InsertSubmitted:
+		return "Insert Order Submitted.";
+	case THOST_FTDC_OSS_CancelSubmitted:
+		return "Cancel Order Submitted.";
+	case THOST_FTDC_OSS_ModifySubmitted:
+		return "Modify Order Submitted.";
+	case THOST_FTDC_OSS_Accepted:
+		return "Order accepted.";
+	case THOST_FTDC_OSS_InsertRejected:
+		return "Order Insert rejected.";
+	case THOST_FTDC_OSS_CancelRejected:
+		return "Order Cancel rejected.";
+	case THOST_FTDC_OSS_ModifyRejected:
+		return "Order Modify rejected.";
+	default:
+		return "Wrong TThostFtdcOrderSubmitStatusType passed.";
+	}
+}

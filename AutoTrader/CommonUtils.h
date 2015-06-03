@@ -2,7 +2,7 @@
 
 #include <time.h>
 #include <string>
-
+#include "ThostFtdcUserApiDataType.h"
 
 typedef int seconds;
 
@@ -23,5 +23,8 @@ public:
 	static double StringtoDouble(const std::string& str);
 	static long long Stringtolong(const std::string& str);
 	static std::string ConvertTime(const std::string& src);
+
+	static std::string InterpretOrderStatusCode(TThostFtdcOrderStatusType type);
+	static std::string InterpretOrderSubmitStatusCode(TThostFtdcOrderSubmitStatusType type);
 };
 

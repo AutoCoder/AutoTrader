@@ -64,18 +64,21 @@ bool k3UpThroughK5::TryInvoke(const std::list<CThostFtdcDepthMDFieldWrapper>& da
 			std::advance(stoper, breakthrough_confirm_duration);
 			for (auto it = data.begin(); it != stoper; it++){
 				k3UpThroughK5TechVec* prePtr = static_cast<k3UpThroughK5TechVec*>(it->GetTechVec());
-				if (!isUpThough(prePtr))
+				// if prePtr == NULL, mean it's recovered from db, so that md is not continuous. so it's should not be singal point.
+				if (prePtr == NULL || !isUpThough(prePtr))
 				{ 
 					// not special point
 					orderSingal = false;
 					break;
 				}
-				//special point
+				orderSingal = true;
+			}
+			//special point
+			if (orderSingal){
 				m_curOrder->SetInstrumentId(info.InstrumentId());
 				m_curOrder->SetRefExchangePrice(info.LastPrice());
 				m_curOrder->SetExchangeDirection(ExchangeDirection::Buy);
 				curPtr->SetTickType(TickType::BuyPoint);
-				orderSingal = true;
 			}
 		}
 	}
@@ -85,18 +88,20 @@ bool k3UpThroughK5::TryInvoke(const std::list<CThostFtdcDepthMDFieldWrapper>& da
 			std::advance(stoper, breakthrough_confirm_duration);
 			for (auto it = data.begin(); it != stoper; it++){
 				k3UpThroughK5TechVec* prePtr = static_cast<k3UpThroughK5TechVec*>(it->GetTechVec());
-				if (isUpThough(prePtr))
+				if (prePtr == NULL || isUpThough(prePtr))
 				{
 					// not special point
 					orderSingal = false;
 					break;
 				}
+				orderSingal = true;
+			}
+			if (orderSingal){
 				//special point
 				m_curOrder->SetInstrumentId(info.InstrumentId());
 				m_curOrder->SetRefExchangePrice(info.LastPrice());
 				m_curOrder->SetExchangeDirection(ExchangeDirection::Sell);
 				curPtr->SetTickType(TickType::SellPoint);
-				orderSingal = true;
 			}
 		}
 	}

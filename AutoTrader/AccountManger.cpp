@@ -8,7 +8,7 @@
 #include "config.h"
 #include <condition_variable>
 #include "spdlog/spdlog.h"
-
+#include "CommonUtils.h"
 extern int requestId;
 
 extern std::condition_variable cv_trade;
@@ -40,7 +40,7 @@ AccountMangerSpi::~AccountMangerSpi()
 
 void AccountMangerSpi::OnFrontConnected()
 {
-	std::cout << __FUNCTION__ << std::endl;
+	spdlog::get("console")->info() << "[Trade Thread] Response | connected...";
 	//SetEvent(g_tradehEvent);
 	m_isFrontConnected = true;
 	cv_trade.notify_all();
@@ -279,7 +279,10 @@ void AccountMangerSpi::OnRtnOrder(CThostFtdcOrderField *pOrder)
 	}
 	if (founded) orderList[i] = order;
 	else  orderList.push_back(order);
-	spdlog::get("console")->info() << "[Trade Thread] Response | order submitted...ID:" << order->BrokerOrderSeq;
+	
+	spdlog::get("console")->info() << "[Trade Thread] Response | order submitted...ID:" << order->BrokerOrderSeq << ";Order submit Status:" << CommonUtils::InterpretOrderSubmitStatusCode(order->OrderSubmitStatus);
+	spdlog::get("console")->info() << "[Trade Thread] Response | order submitted...ID:" << order->BrokerOrderSeq << ";Order Status:" << CommonUtils::InterpretOrderStatusCode(order->OrderStatus);
+	spdlog::get("console")->info() << "[Trade Thread] Response | order submitted...ID:" << order->BrokerOrderSeq << ";StatusMsg:" << order->StatusMsg;
 	//SetEvent(g_tradehEvent);
 }
 
@@ -352,7 +355,9 @@ bool AccountMangerSpi::ExecuteOrder(const Order& ord){
 		Sleep(50);
 		//spdlog::get("console")->info() << "Account is not fresh, sleep(100)...";
 	}
-	spdlog::get("console")->info() << ("begin to execute order");
+	spdlog::get("console")->info() << ("Execute Order (") << ord.GetInstrumentId() << ", " \
+		<< ord.GetRefExchangePrice() << ", " \
+		<< (ord.GetExchangeDirection() == ExchangeDirection::Buy ? "Buy)" : "Sell)");
 	double purchaseMoney = m_accountInfo.Available - (m_accountInfo.Balance * 0.8);
 	//Get price == ord.GetInstrumentId()
 	if (purchaseMoney > 0){

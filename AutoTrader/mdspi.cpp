@@ -58,7 +58,7 @@ void CtpMdSpi::OnHeartBeatWarning(int nTimeLapse)
 
 void CtpMdSpi::OnFrontConnected()
 {
-	spdlog::get("console")->info() << __FUNCTION__ ;
+	spdlog::get("console")->info() << "[MD Thread] Response | connected...";
 	m_isFrontConnected = true;
 	cv_md.notify_all();
 }
