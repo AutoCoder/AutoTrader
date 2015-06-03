@@ -167,7 +167,7 @@ int main(int argc, const char* argv[]){
 		//******start trade thread******
 		pTradeUserApi->Init();
 
-		Order ord("rb1510", 2367, ExchangeDirection::Buy);
+		Order ord("rb1510", 2342, ExchangeDirection::Buy);
 		pTradeUserSpi->ExecuteOrder(ord);
 
 		mdManagethread.join();

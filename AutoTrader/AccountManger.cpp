@@ -198,17 +198,18 @@ void AccountMangerSpi::ReqOrderInsert(TThostFtdcInstrumentIDType instId,
 	strcpy_s(req.BrokerID, m_brokerID);
 	strcpy_s(req.InvestorID, m_userID);
 	strcpy_s(req.InstrumentID, instId);
+	strcpy_s(req.UserID, m_userID);
 	strcpy_s(req.OrderRef, m_orderRef);
 	int nextOrderRef = atoi(m_orderRef);
 	sprintf_s(m_orderRef, "%d", ++nextOrderRef);
 
-	req.OrderPriceType = THOST_FTDC_OPT_AnyPrice;
+	req.OrderPriceType = THOST_FTDC_OPT_LimitPrice;// THOST_FTDC_OPT_AnyPrice;
 	req.Direction = dir; 
-	req.CombOffsetFlag[0] = kpp[0];
+	req.CombOffsetFlag[0] = THOST_FTDC_OF_Open;//kpp[0];
 	req.CombHedgeFlag[0] = THOST_FTDC_HF_Speculation;
-	req.LimitPrice = price;	
+	req.LimitPrice = price;
 	req.VolumeTotalOriginal = vol;	
-	//FAK 立即成交剩余指令自动撤销指令 (THOST_FTDC_TC_IOC + THOST_FTDC_VC_AV)
+	//FAK 立即成交剩余指令自动撤销指令 (THOST_FTDC_OPT_LimitPrice + THOST_FTDC_TC_IOC + THOST_FTDC_VC_AV)
 	req.TimeCondition = THOST_FTDC_TC_IOC;
 	req.VolumeCondition = THOST_FTDC_VC_AV; 
 	req.MinVolume = 1;	
@@ -216,7 +217,7 @@ void AccountMangerSpi::ReqOrderInsert(TThostFtdcInstrumentIDType instId,
 
 	//TThostFtdcPriceType	StopPrice;  
 	req.ForceCloseReason = THOST_FTDC_FCC_NotForceClose;	
-	req.IsAutoSuspend = 0;  
+	req.IsAutoSuspend = 1;  
 	req.UserForceClose = 0; 
 
 	int ret = pUserApi->ReqOrderInsert(&req, ++requestId);
@@ -318,7 +319,7 @@ bool AccountMangerSpi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo)
 {
 	bool ret = ((pRspInfo) && (pRspInfo->ErrorID != 0));
 	if (ret){
-		spdlog::get("console")->info() << " [Trade Thread] Response | " << pRspInfo->ErrorMsg;
+		spdlog::get("console")->info() << "[Trade Thread] Response | " << pRspInfo->ErrorMsg;
 	}
 	return ret;
 }
