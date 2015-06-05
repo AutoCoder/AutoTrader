@@ -33,7 +33,7 @@ def getK3K5Data(date, instrumentID):
 		
 		conn.select_db('qihuo')
 
-		sql = "select `k3m`,`k5m`,`UpdateTime`,`UpdateMillisec` from %s where `Date` = '%s' limit 10000" % (instrumentID, date)
+		sql = "select `k3m`,`k5m`,`UpdateTime`,`UpdateMillisec` from %s where `Date` = '%s' and `TickType` != 0" % (instrumentID, date)
 
 		print sql
 
@@ -164,7 +164,7 @@ def k3k5Data():
 							type : 'value',
 							scale : true,
 							axisLabel : {
-								formatter: '{value}k RMB'
+								formatter: '{value} RMB'
 							}
 						}
 					],
@@ -180,7 +180,7 @@ def k3k5Data():
 							data: [ %s ],
 						}
 					]
-				};""" % getK3K5Data(date=date(2015,5,13), instrumentID='rb1510')
+				};""" % getK3K5Data(date=date(2015,5,14), instrumentID='rb1510')
 
 
 def renderktempl():
@@ -421,7 +421,7 @@ def testMoko():
 	from mako.template import Template
 	mytemplate = Template(filename='./template/templ.html')
 	f = open('kchart.html', 'w')
-	f.write(mytemplate.render(option1=k3k5Data(), option2=renderktempl(), option3=renderbartempl()))
+	f.write(mytemplate.render(option1=k3k5Data())) #, option2=renderktempl(), option3=renderbartempl())
 	f.close()	
 
 #usage:  cmd instrumentId date	   --- cmd "rb1510" "20150510"

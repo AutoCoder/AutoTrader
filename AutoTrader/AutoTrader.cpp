@@ -69,7 +69,7 @@ void ExcuteOrderQueue(AccountMangerSpi* pUserSpi){
 		if (!order_queue.empty() && order_queue.try_pop(ord)){ // if pop success
 			spdlog::get("console")->info() << "Excute Order regarding instrumentID:" << ord.GetInstrumentId();
 			//Todo: according ord to insert order
-			pUserSpi->ExecuteOrder(ord);
+			pUserSpi->ReqOrderInsert(ord);
 		}
 
 		if (g_quit && order_queue.empty())
@@ -167,8 +167,8 @@ int main(int argc, const char* argv[]){
 		//******start trade thread******
 		pTradeUserApi->Init();
 
-		Order ord("rb1510", 2342, ExchangeDirection::Buy);
-		pTradeUserSpi->ExecuteOrder(ord);
+		Order ord("rb1510", 2340, ExchangeDirection::Buy, Order::FAK);
+		pTradeUserSpi->ReqOrderInsert(ord);
 
 		mdManagethread.join();
 		tradeManagethread.join();

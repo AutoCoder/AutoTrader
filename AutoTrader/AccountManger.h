@@ -54,9 +54,7 @@ public:
 
 	void ReqQryInvestorPosition(TThostFtdcInstrumentIDType instId);
 
-	void ReqOrderInsert(TThostFtdcInstrumentIDType instId,
-		TThostFtdcDirectionType dir, TThostFtdcCombOffsetFlagType kpp,
-		TThostFtdcPriceType price, TThostFtdcVolumeType vol);
+	void ReqOrderInsert(Order ord);
 
 	void ReqOrderAction(TThostFtdcSequenceNoType orderSeq);
 
@@ -77,8 +75,6 @@ public:
 	bool IsAccoutRefreshed() const {
 		return m_isAccountFreshed;
 	}
-	
-	bool ExecuteOrder(const Order& ord);
 
 private:
 	double m_available; //可用资金

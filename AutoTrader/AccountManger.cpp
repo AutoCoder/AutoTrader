@@ -189,41 +189,6 @@ void AccountMangerSpi::OnRspQryInvestorPosition(
 	//if (bIsLast) SetEvent(g_tradehEvent);
 }
 
-void AccountMangerSpi::ReqOrderInsert(TThostFtdcInstrumentIDType instId,
-	TThostFtdcDirectionType dir, TThostFtdcCombOffsetFlagType kpp,
-	TThostFtdcPriceType price, TThostFtdcVolumeType vol)
-{
-	CThostFtdcInputOrderField req;
-	memset(&req, 0, sizeof(req));
-	strcpy_s(req.BrokerID, m_brokerID);
-	strcpy_s(req.InvestorID, m_userID);
-	strcpy_s(req.InstrumentID, instId);
-	strcpy_s(req.UserID, m_userID);
-	strcpy_s(req.OrderRef, m_orderRef);
-	int nextOrderRef = atoi(m_orderRef);
-	sprintf_s(m_orderRef, "%d", ++nextOrderRef);
-
-	req.OrderPriceType = THOST_FTDC_OPT_LimitPrice;// THOST_FTDC_OPT_AnyPrice;
-	req.Direction = dir; 
-	req.CombOffsetFlag[0] = THOST_FTDC_OF_Open;//kpp[0];
-	req.CombHedgeFlag[0] = THOST_FTDC_HF_Speculation;
-	req.LimitPrice = price;
-	req.VolumeTotalOriginal = vol;	
-	//FAK 立即成交剩余指令自动撤销指令 (THOST_FTDC_OPT_LimitPrice + THOST_FTDC_TC_IOC + THOST_FTDC_VC_AV)
-	req.TimeCondition = THOST_FTDC_TC_IOC;
-	req.VolumeCondition = THOST_FTDC_VC_AV; 
-	req.MinVolume = 1;	
-	req.ContingentCondition = THOST_FTDC_CC_Immediately;  
-
-	//TThostFtdcPriceType	StopPrice;  
-	req.ForceCloseReason = THOST_FTDC_FCC_NotForceClose;	
-	req.IsAutoSuspend = 1;  
-	req.UserForceClose = 0; 
-
-	int ret = pUserApi->ReqOrderInsert(&req, ++requestId);
-	spdlog::get("console")->info() << "[Trade Thread] Request | insert order..." << ((ret == 0) ? "success" : "fail");
-}
-
 void AccountMangerSpi::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder,
 	CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
@@ -349,7 +314,7 @@ bool AccountMangerSpi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo)
 //	return src;
 //}
 
-bool AccountMangerSpi::ExecuteOrder(const Order& ord){
+void AccountMangerSpi::ReqOrderInsert(Order ord){
 	spdlog::get("console")->info() << (!m_isAccountFreshed ? "Account is not fresh..." : "Account is freshed");
 	// if account is not refreshed, wait to refresh
 	while (!m_isAccountFreshed){
@@ -364,21 +329,33 @@ bool AccountMangerSpi::ExecuteOrder(const Order& ord){
 	if (purchaseMoney > 0){
 		int vol = purchaseMoney / ord.GetRefExchangePrice();
 
-		TThostFtdcCombOffsetFlagType kpp;
+		//TThostFtdcCombOffsetFlagType kpp;
 		
-		kpp[0] = (vol == 0) ? THOST_FTDC_OF_CloseToday : THOST_FTDC_OF_Open;
-		std::string inst = ord.GetInstrumentId();
+		char flag = (vol == 0) ? THOST_FTDC_OF_CloseToday : THOST_FTDC_OF_Open;
+		ord.SetCombOffsetFlagType(flag);
+		//std::string inst = ord.GetInstrumentId();
 
-		char direction = (ord.GetExchangeDirection() == ExchangeDirection::Buy) ? THOST_FTDC_D_Buy : THOST_FTDC_D_Sell;
-		ReqOrderInsert(const_cast<char*>(inst.c_str()), direction, kpp, ord.GetRefExchangePrice(), vol);
+		ord.SetIdentityInfo(m_brokerID, m_userID, m_userID, m_orderRef);
+		int nextOrderRef = atoi(m_orderRef);
+		sprintf_s(m_orderRef, "%d", ++nextOrderRef);
+
+		ord.SetVolume(vol);
+
+		CThostFtdcInputOrderField ordstruct;
+		bool success = ord.GetOrderOriginStruct(ordstruct);
+		if (success){
+			int ret = pUserApi->ReqOrderInsert(&ordstruct, ++requestId);
+			spdlog::get("console")->info() << "[Trade Thread] Request | insert order..." << ((ret == 0) ? "success" : "fail");
+		}
+		else{
+			spdlog::get("console")->info() << "[Trade Thread] Invalid OrderField construct";
+		}
 	}
 	m_isAccountFreshed = false;
 
 	//fresh accout
 	spdlog::get("console")->info() << "[Trade Thread] Order executed. begin to refresh Account info...";
 	ReqQryTradingAccount();
-
-	return true;
 }
 //
 /////TFtdcTimeConditionType是一个有效期类型类型

@@ -75,9 +75,10 @@ bool k3UpThroughK5::TryInvoke(const std::list<CThostFtdcDepthMDFieldWrapper>& da
 			}
 			//special point
 			if (orderSingal){
-				m_curOrder->SetInstrumentId(info.InstrumentId());
-				m_curOrder->SetRefExchangePrice(info.LastPrice());
-				m_curOrder->SetExchangeDirection(ExchangeDirection::Buy);
+				//m_curOrder->SetInstrumentId(info.InstrumentId());
+				//m_curOrder->SetRefExchangePrice(info.LastPrice());
+				//m_curOrder->SetExchangeDirection(ExchangeDirection::Buy);
+				m_curOrder = new Order(info.InstrumentId(), info.LastPrice(), ExchangeDirection::Buy, Order::FAK);
 				curPtr->SetTickType(TickType::BuyPoint);
 			}
 		}
@@ -98,9 +99,10 @@ bool k3UpThroughK5::TryInvoke(const std::list<CThostFtdcDepthMDFieldWrapper>& da
 			}
 			if (orderSingal){
 				//special point
-				m_curOrder->SetInstrumentId(info.InstrumentId());
-				m_curOrder->SetRefExchangePrice(info.LastPrice());
-				m_curOrder->SetExchangeDirection(ExchangeDirection::Sell);
+				//m_curOrder->SetInstrumentId(info.InstrumentId());
+				//m_curOrder->SetRefExchangePrice(info.LastPrice());
+				//m_curOrder->SetExchangeDirection(ExchangeDirection::Sell);
+				m_curOrder = new Order(info.InstrumentId(), info.LastPrice(), ExchangeDirection::Sell, Order::FAK);
 				curPtr->SetTickType(TickType::SellPoint);
 			}
 		}
@@ -152,6 +154,7 @@ bool k3UpThroughK5::TryInvoke(const std::list<CThostFtdcDepthMDFieldWrapper>& da
 }
 
 Order k3UpThroughK5::generateOrder(){
+	assert(m_curOrder);
 	return *m_curOrder;
 }
 

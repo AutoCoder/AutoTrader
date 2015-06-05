@@ -1,51 +1,151 @@
-#pragma once
+#ifndef ORDER_H
+#define ORDER_H
 #include <string>
+#include "ThostFtdcUserApiStruct.h"
 
-enum class ExchangeDirection{
-	Buy = 0x0,
-	Sell = 0x1,
+enum ExchangeDirection{
+	Buy = '0',
+	Sell = '1',
 };
+
+enum ExchangePriceType{
+	AnyPrice = 0x0,
+	LimitPrice = 0x1,
+	LastPrice = 0x2,
+};
+
+enum TimeCondition{
+	///立即完成，否则撤销
+	IOC = '1',
+	///本节有效
+	GFS = '2',
+	///当日有效
+    GFD = '3',
+	///指定日期前有效
+	GTD = '4',
+	///撤销前有效
+	GTC = '5',
+	///集合竞价有效
+	GFA = '6',
+};
+
+enum VolumeCondition{
+	///任何数量
+	AnyVolume = '1',
+	///最小数量
+	MinVolume = '2',
+	///全部数量
+	WholeVolume = '3',
+};
+
+enum ContingentCondition{
+	Immediately = '1',
+	///止损
+	Touch = '2',
+	///止赢
+	TouchProfit = '3',
+	///预埋单
+	ParkedOrder = '4',
+	///最新价大于条件价
+	LastPriceGreaterThanStopPrice = '5',
+	///最新价大于等于条件价
+	LastPriceGreaterEqualStopPrice = '6',
+	///最新价小于条件价
+	LastPriceLesserThanStopPrice = '7',
+	///最新价小于等于条件价
+	LastPriceLesserEqualStopPrice = '8',
+	///卖一价大于条件价
+	AskPriceGreaterThanStopPrice = '9',
+	///卖一价大于等于条件价
+	AskPriceGreaterEqualStopPrice = 'A',
+	///卖一价小于条件价
+	AskPriceLesserThanStopPrice = 'B',
+	///卖一价小于等于条件价
+	AskPriceLesserEqualStopPrice = 'C',
+	///买一价大于条件价
+	BidPriceGreaterThanStopPrice = 'D',
+	///买一价大于等于条件价
+	BidPriceGreaterEqualStopPrice = 'E',
+	///买一价小于条件价
+	BidPriceLesserThanStopPrice = 'F',
+	///买一价小于等于条件价
+	BidPriceLesserEqualStopPrice = 'H',
+};
+
+
 
 class Order
 {
 public:
+	enum OrderType{
+		FAK = 0x0,
+		FOK = 0x1,
+	};
+
 	Order();
-	Order(const std::string& instrument, double refprice, ExchangeDirection direction);
+	Order(const std::string& instrument, double refprice, \
+		ExchangeDirection direction, \
+		ExchangePriceType priceType, \
+		TimeCondition timeCondition, \
+		VolumeCondition vCondition, \
+		ContingentCondition ctCondition);
+	Order(const std::string& instrument, double refprice, ExchangeDirection direction, OrderType type);
 	~Order();
 
 	std::string GetInstrumentId() const{
-		return m_instrumentId;
+		return m_innerStruct.InstrumentID;
 	}
 
 	void SetInstrumentId(const std::string& in){
-		m_instrumentId = in;
+		strcpy_s(m_innerStruct.InstrumentID, sizeof(m_innerStruct.InstrumentID), in.c_str());
 	}
 
 	void SetRefExchangePrice(double price){
-		m_refExchangePrice = price;
+		m_innerStruct.LimitPrice = price;
 	}
 
 	double GetRefExchangePrice() const{
-		return m_refExchangePrice;
+		return m_innerStruct.LimitPrice;
 	}
 
 	ExchangeDirection GetExchangeDirection() const {
-		return m_direction;
+		return (ExchangeDirection)m_innerStruct.Direction;
 	}
 
 	void SetExchangeDirection(ExchangeDirection in){
-		m_direction = in;
+		m_innerStruct.Direction = in;
 	}
 
+	void SetCombOffsetFlagType(char flag){
+		// todo: now only set the first byte
+		m_innerStruct.CombOffsetFlag[0] = flag;
+	}
+
+	char GetCombOffsetFlagType() const {
+		return m_innerStruct.CombOffsetFlag[0];
+	}
+
+	void SetVolume(int shou){
+		m_innerStruct.VolumeTotalOriginal = shou;
+	}
+
+	int GetVolume() const{
+		return m_innerStruct.VolumeTotalOriginal;
+	}
+
+	void SetIdentityInfo(const std::string& brokerId, const std::string& userId, const std::string& investorId, const std::string& ordRef);
+
+	bool IsValid();
+
+	bool GetOrderOriginStruct(CThostFtdcInputOrderField& ord){
+		if (IsValid()){
+			ord = m_innerStruct;
+			return true;
+		}
+		return false;
+	}
 private:
-
-	enum class OrderType{
-		LimitPrice = 0x0, 
-		AnyPrice = 0x1, //Current Market Price
-	};
-
-	std::string m_instrumentId;
-	double m_refExchangePrice;
-	ExchangeDirection m_direction;
+	CThostFtdcInputOrderField m_innerStruct;
 };
 
+#endif
