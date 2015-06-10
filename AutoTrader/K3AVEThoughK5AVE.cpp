@@ -7,7 +7,7 @@
 #include "K3AVEThoughK5AVE.h"
 
 #include <sstream>
-
+#include <assert.h>
 
 
 K3AVEThoughK5AVE::K3AVEThoughK5AVE()
@@ -43,8 +43,17 @@ double K3AVEThoughK5AVE::calculateK(const std::list<CThostFtdcDepthMDFieldWrappe
 	return totalExchangeLastPrice / count;
 }
 
+bool isUpThough(K3AVEThoughK5AVETechVec* vec){
+	assert(vec);
+	return vec->K3m() > vec->K5m();
+}
+
+
 bool K3AVEThoughK5AVE::TryInvoke(const std::list<CThostFtdcDepthMDFieldWrapper>& data, CThostFtdcDepthMDFieldWrapper& info)
 {
+	TickType direction = TickType::Commom;
+	const size_t breakthrough_confirm_duration = 100; //50ms
+
 	K3AVEThoughK5AVETechVec* curPtr = new K3AVEThoughK5AVETechVec(info.UUID(), info.InstrumentId());
 	bool orderSingal = false;
 	double k3 = calculateK(data, info, 3 * 60);
@@ -55,41 +64,55 @@ bool K3AVEThoughK5AVE::TryInvoke(const std::list<CThostFtdcDepthMDFieldWrapper>&
 	//assert(!data.empty());
 	if (!data.empty())
 	{
-		auto preNode = data.begin();
-
-		K3AVEThoughK5AVETechVec* prePtr = static_cast<K3AVEThoughK5AVETechVec*>(preNode->GetTechVec());
-		if (prePtr){
-			if (prePtr->K5m() > prePtr->K3m())
-			{
-				if (curPtr->K3m() > curPtr->K5m()){
-					// Buy Singal
-					// construct Buy Order ptr
-					//std::cout << "[Buy Signal]" << std::endl;
-					//std::cout << "LastPrice: " << info.LastPrice() << std::endl;
-					//Order ord(info.InstrumentId(), info.LastPrice(), ExchangeDirection::Buy);
-					m_curOrder->SetInstrumentId(info.InstrumentId());
-					m_curOrder->SetRefExchangePrice(info.LastPrice());
-					m_curOrder->SetExchangeDirection(ExchangeDirection::Buy);
-					curPtr->SetTickType(TickType::BuyPoint);
+		if (isUpThough(curPtr)){ // up
+			if (!data.empty() && data.size() > 500){
+				std::list<CThostFtdcDepthMDFieldWrapper>::const_iterator stoper = data.begin();
+				std::advance(stoper, breakthrough_confirm_duration);
+				for (auto it = data.begin(); it != stoper; it++){
+					K3AVEThoughK5AVETechVec* prePtr = static_cast<K3AVEThoughK5AVETechVec*>(it->GetTechVec());
+					// if prePtr == NULL, mean it's recovered from db, so that md is not continuous. so it's should not be singal point.
+					if (prePtr == NULL || !isUpThough(prePtr))
+					{
+						// not special point
+						orderSingal = false;
+						break;
+					}
 					orderSingal = true;
 				}
-			}
-			else{
-				if (curPtr->K3m() < curPtr->K5m()){
-					//Sell Singal
-					// construct Sell Order ptr
-					//std::cout << "[Sell Signal]" << std::endl;
-					//std::cout << "LastPrice: " << info.LastPrice() << std::endl;
-					//Order ord(info.InstrumentId(), info.LastPrice(), ExchangeDirection::Sell);
-					m_curOrder->SetInstrumentId(info.InstrumentId());
-					m_curOrder->SetRefExchangePrice(info.LastPrice());
-					m_curOrder->SetExchangeDirection(ExchangeDirection::Sell);
-					curPtr->SetTickType(TickType::SellPoint);
-					orderSingal = true;
+				//special point
+				if (orderSingal){
+					//m_curOrder->SetInstrumentId(info.InstrumentId());
+					//m_curOrder->SetRefExchangePrice(info.LastPrice());
+					//m_curOrder->SetExchangeDirection(ExchangeDirection::Buy);
+					m_curOrder = new Order(info.InstrumentId(), info.LastPrice(), ExchangeDirection::Buy, Order::FAK);
+					curPtr->SetTickType(TickType::BuyPoint);
 				}
 			}
 		}
-
+		else{ // down
+			if (!data.empty() && data.size() > 500){
+				std::list<CThostFtdcDepthMDFieldWrapper>::const_iterator stoper = data.begin();
+				std::advance(stoper, breakthrough_confirm_duration);
+				for (auto it = data.begin(); it != stoper; it++){
+					K3AVEThoughK5AVETechVec* prePtr = static_cast<K3AVEThoughK5AVETechVec*>(it->GetTechVec());
+					if (prePtr == NULL || isUpThough(prePtr))
+					{
+						// not special point
+						orderSingal = false;
+						break;
+					}
+					orderSingal = true;
+				}
+				if (orderSingal){
+					//special point
+					//m_curOrder->SetInstrumentId(info.InstrumentId());
+					//m_curOrder->SetRefExchangePrice(info.LastPrice());
+					//m_curOrder->SetExchangeDirection(ExchangeDirection::Sell);
+					m_curOrder = new Order(info.InstrumentId(), info.LastPrice(), ExchangeDirection::Sell, Order::FAK);
+					curPtr->SetTickType(TickType::SellPoint);
+				}
+			}
+		}
 	}
 
 	//info.SetTechVec((StrategyTechVec*)curPtr);

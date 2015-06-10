@@ -59,60 +59,57 @@ bool k3UpThroughK5::TryInvoke(const std::list<CThostFtdcDepthMDFieldWrapper>& da
 	curPtr->setK3m(k3);
 	curPtr->setK5m(k5);
 
-	if (isUpThough(curPtr)){ // up
-		if (!data.empty() && data.size() > 500){
-			std::list<CThostFtdcDepthMDFieldWrapper>::const_iterator stoper = data.begin();
-			std::advance(stoper, breakthrough_confirm_duration);
-			for (auto it = data.begin(); it != stoper; it++){
-				k3UpThroughK5TechVec* prePtr = static_cast<k3UpThroughK5TechVec*>(it->GetTechVec());
-				// if prePtr == NULL, mean it's recovered from db, so that md is not continuous. so it's should not be singal point.
-				if (prePtr == NULL || !isUpThough(prePtr))
-				{ 
-					// not special point
-					orderSingal = false;
-					break;
+	if (!data.empty()){
+		if (isUpThough(curPtr)){ // up
+			if (!data.empty() && data.size() > 500){
+				std::list<CThostFtdcDepthMDFieldWrapper>::const_iterator stoper = data.begin();
+				std::advance(stoper, breakthrough_confirm_duration);
+				for (auto it = data.begin(); it != stoper; it++){
+					k3UpThroughK5TechVec* prePtr = static_cast<k3UpThroughK5TechVec*>(it->GetTechVec());
+					// if prePtr == NULL, mean it's recovered from db, so that md is not continuous. so it's should not be singal point.
+					if (prePtr == NULL || !isUpThough(prePtr))
+					{ 
+						// not special point
+						orderSingal = false;
+						break;
+					}
+					orderSingal = true;
 				}
-				orderSingal = true;
-			}
-			//special point
-			if (orderSingal){
-				//m_curOrder->SetInstrumentId(info.InstrumentId());
-				//m_curOrder->SetRefExchangePrice(info.LastPrice());
-				//m_curOrder->SetExchangeDirection(ExchangeDirection::Buy);
-				m_curOrder = new Order(info.InstrumentId(), info.LastPrice(), ExchangeDirection::Buy, Order::FAK);
-				direction = TickType::BuyPoint;
-			}
-		}
-	}
-	else{ // down
-		if (!data.empty() && data.size() > 500){
-			std::list<CThostFtdcDepthMDFieldWrapper>::const_iterator stoper = data.begin();
-			std::advance(stoper, breakthrough_confirm_duration);
-			for (auto it = data.begin(); it != stoper; it++){
-				k3UpThroughK5TechVec* prePtr = static_cast<k3UpThroughK5TechVec*>(it->GetTechVec());
-				if (prePtr == NULL || isUpThough(prePtr))
-				{
-					// not special point
-					orderSingal = false;
-					break;
-				}
-				orderSingal = true;
-			}
-			if (orderSingal){
 				//special point
-				//m_curOrder->SetInstrumentId(info.InstrumentId());
-				//m_curOrder->SetRefExchangePrice(info.LastPrice());
-				//m_curOrder->SetExchangeDirection(ExchangeDirection::Sell);
-				m_curOrder = new Order(info.InstrumentId(), info.LastPrice(), ExchangeDirection::Sell, Order::FAK);
-				direction = TickType::BuyPoint;
+				if (orderSingal){
+					//m_curOrder->SetInstrumentId(info.InstrumentId());
+					//m_curOrder->SetRefExchangePrice(info.LastPrice());
+					//m_curOrder->SetExchangeDirection(ExchangeDirection::Buy);
+					m_curOrder = new Order(info.InstrumentId(), info.LastPrice(), ExchangeDirection::Buy, Order::FAK);
+					curPtr->SetTickType(TickType::BuyPoint);
+				}
+			}
+		}
+		else{ // down
+			if (!data.empty() && data.size() > 500){
+				std::list<CThostFtdcDepthMDFieldWrapper>::const_iterator stoper = data.begin();
+				std::advance(stoper, breakthrough_confirm_duration);
+				for (auto it = data.begin(); it != stoper; it++){
+					k3UpThroughK5TechVec* prePtr = static_cast<k3UpThroughK5TechVec*>(it->GetTechVec());
+					if (prePtr == NULL || isUpThough(prePtr))
+					{
+						// not special point
+						orderSingal = false;
+						break;
+					}
+					orderSingal = true;
+				}
+				if (orderSingal){
+					//special point
+					//m_curOrder->SetInstrumentId(info.InstrumentId());
+					//m_curOrder->SetRefExchangePrice(info.LastPrice());
+					//m_curOrder->SetExchangeDirection(ExchangeDirection::Sell);
+					m_curOrder = new Order(info.InstrumentId(), info.LastPrice(), ExchangeDirection::Sell, Order::FAK);
+					curPtr->SetTickType(TickType::SellPoint);
+				}
 			}
 		}
 	}
-
-	//If preious node's ticktype != current node's ticktype
-	k3UpThroughK5TechVec* prePtr = static_cast<k3UpThroughK5TechVec*>(data.begin()->GetTechVec());
-	if (prePtr->GetTickType() != direction)
-		curPtr->SetTickType(direction);
 
 	//info.SetTechVec((StrategyTechVec*)curPtr);
 	info.m_techvec = curPtr;

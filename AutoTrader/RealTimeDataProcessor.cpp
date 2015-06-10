@@ -39,9 +39,15 @@ void RealTimeDataProcessor::StoreStrategySequenceToDB(const std::string& mark)
 {
 	spdlog::get("console")->info() << "Start to store db...";
 	//store Strategy data in memory into db
+	long long pre_uuid = 0;
+	TickType pre_type = TickType::Commom;
 	for (auto iter = m_DataSeq.rbegin(); iter != m_DataSeq.rend(); iter++){
-		if (iter->m_techvec != nullptr && iter->m_techvec->GetTickType() != TickType::Commom)
+		if (iter->m_techvec != nullptr && iter->m_techvec->GetTickType() != TickType::Commom && iter->toTimeStamp() != (pre_uuid + 1) && iter->m_techvec->GetTickType() != pre_type){
+			pre_uuid = iter->toTimeStamp();
+			pre_type = iter->m_techvec->GetTickType();
 			iter->m_techvec->serializeToDB(*(m_dbptr.get()), mark);
+		}
+			
 	}
 	spdlog::get("console")->info() << "End to store db.";
 }
