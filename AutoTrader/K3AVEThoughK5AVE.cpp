@@ -122,11 +122,11 @@ bool K3AVEThoughK5AVETechVec::IsTableCreated = false;
 
 K3AVEThoughK5AVETechVec::K3AVEThoughK5AVETechVec(long long uuid, const std::string& instrumentID, const std::string& time, double lastprice)
 : m_id(uuid)
-, m_instrumentId(instrumentID)
 , m_ticktype(TickType::Commom)
-, m_time(time)
 , m_lastprice(lastprice)
 {
+	strcpy_s(m_time, time.c_str());
+	strcpy_s(m_instrumentId, instrumentID.c_str());
 }
 
 bool K3AVEThoughK5AVETechVec::IsUpThough() const {
@@ -158,7 +158,9 @@ int K3AVEThoughK5AVETechVec::CreateTableIfNotExists(const std::string& dbname, c
 
 void K3AVEThoughK5AVETechVec::serializeToDB(DBWrapper& db, const std::string& mark)
 {
-	std::string&& tableName = m_instrumentId + "_K3AVEThoughK5AVE_" + mark;
+	std::string tableName(m_instrumentId);
+	tableName += "_K3AVEThoughK5AVE_";
+	tableName += mark;
 
 	K3AVEThoughK5AVETechVec::CreateTableIfNotExists(Config::Instance()->DBName(), tableName);
 

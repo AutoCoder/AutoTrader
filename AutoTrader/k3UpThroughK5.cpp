@@ -120,11 +120,11 @@ bool k3UpThroughK5TechVec::IsTableCreated = false;
 
 k3UpThroughK5TechVec::k3UpThroughK5TechVec(long long uuid, const std::string& instrumentID, const std::string& time, double lastprice)
 : m_id(uuid)
-, m_instrumentId(instrumentID)
 , m_ticktype(TickType::Commom)
-, m_time(time)
 , m_lastprice(lastprice)
 {
+	strcpy_s(m_time, time.c_str());
+	strcpy_s(m_instrumentId, instrumentID.c_str());
 }
 
 bool k3UpThroughK5TechVec::IsUpThough() const {
@@ -157,7 +157,10 @@ int k3UpThroughK5TechVec::CreateTableIfNotExists(const std::string& dbname, cons
 
 void k3UpThroughK5TechVec::serializeToDB(DBWrapper& db, const std::string& mark)
 {
-	std::string&& tableName = m_instrumentId + "_k3UpThroughK5_" + mark;
+	std::string tableName(m_instrumentId);
+
+	tableName += "_k3UpThroughK5_";
+	tableName += mark;
 
 	k3UpThroughK5TechVec::CreateTableIfNotExists(Config::Instance()->DBName(), tableName);
 

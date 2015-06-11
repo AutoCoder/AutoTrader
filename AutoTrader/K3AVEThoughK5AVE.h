@@ -67,10 +67,11 @@ private:
 	double m_k3closepriceave; //average line for 3 minutes
 	TickType m_ticktype;
 
-	std::string m_instrumentId;
+	char m_instrumentId[32];
+
 	long long m_id; //time_stamp * 2  (unit : 500ms)
 
-	std::string m_time; // for check result 
+	char m_time[64];// for check result 
 	double m_lastprice; // for check result
 };
 

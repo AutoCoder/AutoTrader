@@ -68,9 +68,10 @@ private:
 	double m_k5m; //average line for 5 minutes
 	double m_k3m; //average line for 3 minutes
 	TickType m_ticktype;
-
-	std::string m_instrumentId;
-	std::string m_time; // for check result 
+	char m_instrumentId[32];
+	char m_time[64];// for check result 
+	//std::string m_instrumentId;
+	//std::string m_time; // for check result 
 	double m_lastprice; // for check result
 	long long m_id; //time_stamp * 2  (unit : 500ms)
 };
