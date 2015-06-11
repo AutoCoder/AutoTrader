@@ -127,10 +127,10 @@ Usage:
 */
 int main(int argc, const char* argv[]){
 	
+	auto console = spdlog::stdout_logger_mt("console");
+
 	//Test
 	//RunUnitTest();
-
-	auto console = spdlog::stdout_logger_mt("console");
 
 	if (argc == 4 && strcmp(argv[1], "replay") == 0){
 		ReplayTickDataFromDB(argv[2], argv[3]);

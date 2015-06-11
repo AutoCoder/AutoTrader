@@ -42,17 +42,12 @@ double k3UpThroughK5::calculateK(const std::list<CThostFtdcDepthMDFieldWrapper>&
 	return totalExchangePrice / totalVolume;
 }
 
-bool isUpThough(k3UpThroughK5TechVec* vec){
-	assert(vec);
-	return vec->K3m() > vec->K5m();
-}
-
 
 bool k3UpThroughK5::TryInvoke(const std::list<CThostFtdcDepthMDFieldWrapper>& data, CThostFtdcDepthMDFieldWrapper& info)
 {
 	TickType direction = TickType::Commom;
 	const size_t breakthrough_confirm_duration = 100; //50ms
-	k3UpThroughK5TechVec* curPtr = new k3UpThroughK5TechVec(info.UUID(), info.InstrumentId());
+	k3UpThroughK5TechVec* curPtr = new k3UpThroughK5TechVec(info.UUID(), info.InstrumentId(), info.Time(), info.LastPrice());
 	bool orderSingal = false;
 	double k3 = calculateK(data, info, 3 * 60);
 	double k5 = calculateK(data, info, 5 * 60);
@@ -60,14 +55,14 @@ bool k3UpThroughK5::TryInvoke(const std::list<CThostFtdcDepthMDFieldWrapper>& da
 	curPtr->setK5m(k5);
 
 	if (!data.empty()){
-		if (isUpThough(curPtr)){ // up
+		if (curPtr->IsUpThough()){ // up
 			if (!data.empty() && data.size() > 500){
 				std::list<CThostFtdcDepthMDFieldWrapper>::const_iterator stoper = data.begin();
 				std::advance(stoper, breakthrough_confirm_duration);
 				for (auto it = data.begin(); it != stoper; it++){
-					k3UpThroughK5TechVec* prePtr = static_cast<k3UpThroughK5TechVec*>(it->GetTechVec());
+					StrategyTechVec* prePtr = it->GetTechVec();
 					// if prePtr == NULL, mean it's recovered from db, so that md is not continuous. so it's should not be singal point.
-					if (prePtr == NULL || !isUpThough(prePtr))
+					if (prePtr == NULL || !prePtr->IsUpThough())
 					{ 
 						// not special point
 						orderSingal = false;
@@ -90,8 +85,8 @@ bool k3UpThroughK5::TryInvoke(const std::list<CThostFtdcDepthMDFieldWrapper>& da
 				std::list<CThostFtdcDepthMDFieldWrapper>::const_iterator stoper = data.begin();
 				std::advance(stoper, breakthrough_confirm_duration);
 				for (auto it = data.begin(); it != stoper; it++){
-					k3UpThroughK5TechVec* prePtr = static_cast<k3UpThroughK5TechVec*>(it->GetTechVec());
-					if (prePtr == NULL || isUpThough(prePtr))
+					StrategyTechVec* prePtr = it->GetTechVec();
+					if (prePtr == NULL || prePtr->IsUpThough())
 					{
 						// not special point
 						orderSingal = false;
@@ -123,11 +118,17 @@ Order k3UpThroughK5::generateOrder(){
 
 bool k3UpThroughK5TechVec::IsTableCreated = false;
 
-k3UpThroughK5TechVec::k3UpThroughK5TechVec(long long uuid, const std::string& instrumentID)
-	: m_id(uuid)
-	, m_instrumentId(instrumentID)
-	, m_ticktype(TickType::Commom)
+k3UpThroughK5TechVec::k3UpThroughK5TechVec(long long uuid, const std::string& instrumentID, const std::string& time, double lastprice)
+: m_id(uuid)
+, m_instrumentId(instrumentID)
+, m_ticktype(TickType::Commom)
+, m_time(time)
+, m_lastprice(lastprice)
 {
+}
+
+bool k3UpThroughK5TechVec::IsUpThough() const {
+	return m_k3m > m_k5m;
 }
 
 int k3UpThroughK5TechVec::CreateTableIfNotExists(const std::string& dbname, const std::string& tableName)
@@ -144,6 +145,8 @@ int k3UpThroughK5TechVec::CreateTableIfNotExists(const std::string& dbname, cons
 			`k5m` Double(20,5) NULL, \
 			`k3m` Double(20,5) NULL, \
 			`Ticktype` int NULL, \
+			`Time` VARCHAR(64) NULL, \
+			`LastPrice` Double NULL, \
 			PRIMARY KEY(`id`));";
 		char sqlbuf[2046];
 		sprintf_s(sqlbuf, sqltempl, dbname.c_str(), tableName.c_str());
@@ -164,12 +167,16 @@ void k3UpThroughK5TechVec::serializeToDB(DBWrapper& db, const std::string& mark)
 	sql << "uuid" << "`,`";
 	sql << "k5m" << "`,`";
 	sql << "k3m" << "`,`";
-	sql << "Ticktype" << "`";
+	sql << "Ticktype" << "`,`";
+	sql << "Time" << "`,`";
+	sql << "LastPrice" << "`";
 	sql << ") VALUES(";
 	sql << m_id << ", ";
 	sql << m_k5m << ", ";
 	sql << m_k3m << ", ";
-	sql << (int)m_ticktype << ")";
+	sql << (int)m_ticktype << ", \"";
+	sql << m_time << "\", ";
+	sql << m_lastprice << ")";
 
 	//std::cerr << sql.str() << std::endl;
 	db.ExecuteNoResult(sql.str());

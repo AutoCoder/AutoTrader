@@ -25,7 +25,7 @@ private:
 
 class k3UpThroughK5TechVec : public StrategyTechVec{
 public:
-	k3UpThroughK5TechVec(long long uuid, const std::string& instrumentID);
+	k3UpThroughK5TechVec(long long uuid, const std::string& instrumentID, const std::string& time="", double lastprice=0);
 	virtual ~k3UpThroughK5TechVec(){}
 
 	virtual size_t ObjSize(){
@@ -56,6 +56,8 @@ public:
 		return m_ticktype;
 	}
 
+	virtual bool IsUpThough() const;
+
 	virtual void serializeToDB(DBWrapper& db, const std::string& mark);
 
 protected:
@@ -68,6 +70,8 @@ private:
 	TickType m_ticktype;
 
 	std::string m_instrumentId;
+	std::string m_time; // for check result 
+	double m_lastprice; // for check result
 	long long m_id; //time_stamp * 2  (unit : 500ms)
 };
 

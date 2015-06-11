@@ -3,6 +3,7 @@
 
 #include <assert.h>
 #include "CommonUtils.h"
+#include "k3UpThroughK5.h"
 
 void TestIsMarketingTime(){
 	//[00:00:00, 01:00:00) & [09:00:00, 11:30:00) & [13:30:00, 15:00:00) & [21:00:00, 24:00:00]
@@ -24,8 +25,17 @@ void TestIsMarketingTime(){
 	const char* t17 = "23:59:59"; assert(true==CommonUtils::IsMarketingTime(t17));
 }
 
+void TestCreateVecTable(){
+	//k3UpThroughK5TechVec vec1(123, "", "", 2333);
+	//vec1.CreateTableIfNotExists("qihuo", "123543535");
+}
+
 void RunUnitTest(){
 	TestIsMarketingTime();
 }
+
+
+
+
 
 #endif

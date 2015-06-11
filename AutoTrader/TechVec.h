@@ -21,6 +21,7 @@ public:
 
 	virtual TickType GetTickType() = 0;
 	virtual size_t ObjSize() = 0;
+	virtual bool IsUpThough() const = 0;
 protected:
 	virtual int CreateTableIfNotExists(const std::string& dbname, const std::string& tableName) = 0;
 };

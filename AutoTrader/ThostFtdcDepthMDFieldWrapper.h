@@ -52,6 +52,13 @@ public:
 		return m_uuid;
 	}
 
+	std::string Time() const {
+		std::string ret = m_MdData.TradingDay;
+		ret += " ";
+		ret += m_MdData.UpdateTime;
+		return ret;
+	}
+
 	static CThostFtdcDepthMDFieldWrapper RecoverFromDB(const CThostFtdcDepthMDFieldDBStruct& vec);
 
 private:

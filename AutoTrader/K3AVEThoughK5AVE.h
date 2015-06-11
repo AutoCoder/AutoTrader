@@ -24,7 +24,7 @@ private:
 
 class K3AVEThoughK5AVETechVec: public StrategyTechVec{
 public:
-	K3AVEThoughK5AVETechVec(long long uuid, const std::string& instrumentID);
+	K3AVEThoughK5AVETechVec(long long uuid, const std::string& instrumentID, const std::string& time = "", double lastprice = 0);
 	virtual ~K3AVEThoughK5AVETechVec(){}
 
 	virtual size_t ObjSize(){
@@ -57,6 +57,8 @@ public:
 
 	virtual void serializeToDB(DBWrapper& db, const std::string& mark);
 
+	virtual bool IsUpThough() const;
+
 protected:
 	virtual int CreateTableIfNotExists(const std::string& dbname, const std::string& tableName);
 	static bool IsTableCreated;
@@ -68,6 +70,8 @@ private:
 	std::string m_instrumentId;
 	long long m_id; //time_stamp * 2  (unit : 500ms)
 
+	std::string m_time; // for check result 
+	double m_lastprice; // for check result
 };
 
 #endif
