@@ -1,36 +1,37 @@
 #include "stdafx.h"
 #include "config.h"
 #include "DBWrapper.h"
-#include "TechVec.h"
-#include "k3UpThroughK5.h"
 #include "Order.h"
+#include "MACrossStratgy.h"
 #include "ThostFtdcDepthMDFieldWrapper.h"
-
 #include <sstream>
 #include <assert.h>
 
-
-k3UpThroughK5::k3UpThroughK5()
-:m_curOrder(new Order())
+MACrossStratgy::MACrossStratgy()
+:m_curOrder(new Order())//m_order is a pointer so that it will only update so, create it at constructor.
 {
 }
 
-k3UpThroughK5::~k3UpThroughK5()
+
+MACrossStratgy::~MACrossStratgy()
 {
+	delete m_curOrder;
+	m_curOrder = nullptr;
 }
 
-double k3UpThroughK5::calculateK(const std::list<CThostFtdcDepthMDFieldWrapper>& data, const CThostFtdcDepthMDFieldWrapper& current, int seconds) const
+// common MA 
+double MACrossStratgy::calculateK(const std::list<CThostFtdcDepthMDFieldWrapper>& data, const CThostFtdcDepthMDFieldWrapper& current, int seconds) const
 {
 	//datetime to timestamp
-	double totalExchangePrice = current.TurnOver();
-	long long totalVolume = current.Volume();
+	double totalExchangeLastPrice = current.LastPrice();
+	long long count = 1;
 
 	long long leftedge = current.toTimeStamp() - seconds * 2;
 	for (auto it = data.begin(); it != data.end(); it++)
 	{
 		if (it->toTimeStamp() > leftedge){
-			totalExchangePrice += it->TurnOver();
-			totalVolume += it->Volume();
+			totalExchangeLastPrice += it->LastPrice();
+			++count;
 		}
 		else{
 			break;
@@ -40,15 +41,18 @@ double k3UpThroughK5::calculateK(const std::list<CThostFtdcDepthMDFieldWrapper>&
 	//assert(totalVolume != 0);
 	//assert(totalExchangePrice >= 0.0);
 
-	return totalExchangePrice / totalVolume;
+	return totalExchangeLastPrice / count;
 }
 
+MACrossStratgyTechVec* MACrossStratgy::generateTechVec(const CThostFtdcDepthMDFieldWrapper& info) const{
+	return (new MACrossStratgyTechVec(CrossStratgyType::MA, info.UUID(), info.InstrumentId(), info.Time(), info.LastPrice()));
+}
 
-bool k3UpThroughK5::tryInvoke(const std::list<CThostFtdcDepthMDFieldWrapper>& data, CThostFtdcDepthMDFieldWrapper& info)
+bool MACrossStratgy::tryInvoke(const std::list<CThostFtdcDepthMDFieldWrapper>& data, CThostFtdcDepthMDFieldWrapper& info)
 {
 	TickType direction = TickType::Commom;
 	const size_t breakthrough_confirm_duration = 100; //50ms
-	k3UpThroughK5TechVec* curPtr = new k3UpThroughK5TechVec(info.UUID(), info.InstrumentId(), info.Time(), info.LastPrice());
+	MACrossStratgyTechVec* curPtr = generateTechVec(info);
 	bool orderSingal = false;
 	double k3 = calculateK(data, info, 3 * 60);
 	double k5 = calculateK(data, info, 5 * 60);
@@ -64,7 +68,7 @@ bool k3UpThroughK5::tryInvoke(const std::list<CThostFtdcDepthMDFieldWrapper>& da
 					StrategyTechVec* prePtr = it->GetTechVec();
 					// if prePtr == NULL, mean it's recovered from db, so that md is not continuous. so it's should not be singal point.
 					if (prePtr == NULL || !prePtr->IsUpThough())
-					{ 
+					{
 						// not special point
 						orderSingal = false;
 						break;
@@ -73,10 +77,11 @@ bool k3UpThroughK5::tryInvoke(const std::list<CThostFtdcDepthMDFieldWrapper>& da
 				}
 				//special point
 				if (orderSingal){
-					//m_curOrder->SetInstrumentId(info.InstrumentId());
-					//m_curOrder->SetRefExchangePrice(info.LastPrice());
-					//m_curOrder->SetExchangeDirection(ExchangeDirection::Buy);
-					m_curOrder = new Order(info.InstrumentId(), info.LastPrice(), ExchangeDirection::Buy, Order::FAK);
+					//update m_curOrder
+					m_curOrder->SetInstrumentId(info.InstrumentId());
+					m_curOrder->SetRefExchangePrice(info.LastPrice());
+					m_curOrder->SetExchangeDirection(ExchangeDirection::Buy);
+					m_curOrder->SetCombOffsetFlagType(Order::FAK);
 					curPtr->SetTickType(TickType::BuyPoint);
 				}
 			}
@@ -97,10 +102,10 @@ bool k3UpThroughK5::tryInvoke(const std::list<CThostFtdcDepthMDFieldWrapper>& da
 				}
 				if (orderSingal){
 					//special point
-					//m_curOrder->SetInstrumentId(info.InstrumentId());
-					//m_curOrder->SetRefExchangePrice(info.LastPrice());
-					//m_curOrder->SetExchangeDirection(ExchangeDirection::Sell);
-					m_curOrder = new Order(info.InstrumentId(), info.LastPrice(), ExchangeDirection::Sell, Order::FAK);
+					m_curOrder->SetInstrumentId(info.InstrumentId());
+					m_curOrder->SetRefExchangePrice(info.LastPrice());
+					m_curOrder->SetExchangeDirection(ExchangeDirection::Sell);
+					m_curOrder->SetCombOffsetFlagType(Order::FAK);
 					curPtr->SetTickType(TickType::SellPoint);
 				}
 			}
@@ -112,15 +117,17 @@ bool k3UpThroughK5::tryInvoke(const std::list<CThostFtdcDepthMDFieldWrapper>& da
 	return orderSingal;
 }
 
-Order k3UpThroughK5::generateOrder(){
+Order MACrossStratgy::generateOrder(){
 	assert(m_curOrder);
 	return *m_curOrder;
 }
 
-bool k3UpThroughK5TechVec::IsTableCreated = false;
 
-k3UpThroughK5TechVec::k3UpThroughK5TechVec(long long uuid, const std::string& instrumentID, const std::string& time, double lastprice)
-: m_id(uuid)
+bool MACrossStratgyTechVec::IsTableCreated = false;
+
+MACrossStratgyTechVec::MACrossStratgyTechVec(CrossStratgyType type, long long uuid, const std::string& instrumentID, const std::string& time, double lastprice)
+: m_type(type)
+, m_id(uuid)
 , m_ticktype(TickType::Commom)
 , m_lastprice(lastprice)
 {
@@ -128,27 +135,27 @@ k3UpThroughK5TechVec::k3UpThroughK5TechVec(long long uuid, const std::string& in
 	strcpy_s(m_instrumentId, instrumentID.c_str());
 }
 
-bool k3UpThroughK5TechVec::IsUpThough() const {
+bool MACrossStratgyTechVec::IsUpThough() const {
 	return m_k3m > m_k5m;
 }
 
-int k3UpThroughK5TechVec::CreateTableIfNotExists(const std::string& dbname, const std::string& tableName)
+int MACrossStratgyTechVec::CreateTableIfNotExists(const std::string& dbname, const std::string& tableName)
 {
-	if (k3UpThroughK5TechVec::IsTableCreated == true){
+	if (MACrossStratgyTechVec::IsTableCreated == true){
 		return 0;
 	}
 	else
 	{
-		k3UpThroughK5TechVec::IsTableCreated = true;
+		MACrossStratgyTechVec::IsTableCreated = true;
 		const char* sqltempl = "CREATE TABLE IF NOT EXISTS `%s`.`%s` (\
-			`id` INT NOT NULL AUTO_INCREMENT, \
-			`uuid` BIGINT NOT NULL, \
-			`k5m` Double(20,5) NULL, \
-			`k3m` Double(20,5) NULL, \
-			`Ticktype` int NULL, \
-			`Time` VARCHAR(64) NULL, \
-			`LastPrice` Double NULL, \
-			PRIMARY KEY(`id`));";
+								`id` INT NOT NULL AUTO_INCREMENT, \
+								`uuid` BIGINT NOT NULL, \
+								`k5m` Double(20,5) NULL, \
+								`k3m` Double(20,5) NULL, \
+								`Ticktype` int NULL, \
+								`Time` VARCHAR(64) NULL, \
+								`LastPrice` Double NULL, \
+								PRIMARY KEY(`id`));";
 		char sqlbuf[2046];
 		sprintf_s(sqlbuf, sqltempl, dbname.c_str(), tableName.c_str());
 		DBWrapper db;
@@ -156,14 +163,11 @@ int k3UpThroughK5TechVec::CreateTableIfNotExists(const std::string& dbname, cons
 	}
 }
 
-void k3UpThroughK5TechVec::serializeToDB(DBWrapper& db, const std::string& mark)
+void MACrossStratgyTechVec::serializeToDB(DBWrapper& db, const std::string& mark)
 {
-	std::string tableName(m_instrumentId);
+	std::string&& tableName = std::string(m_instrumentId) + "_" + StratgyType::toString(this->m_type) + "_CrossK3K5_" + mark;
 
-	tableName += "_k3UpThroughK5_";
-	tableName += mark;
-
-	k3UpThroughK5TechVec::CreateTableIfNotExists(Config::Instance()->DBName(), tableName);
+	MACrossStratgyTechVec::CreateTableIfNotExists(Config::Instance()->DBName(), tableName);
 
 	std::stringstream sql;
 	sql.precision(12);

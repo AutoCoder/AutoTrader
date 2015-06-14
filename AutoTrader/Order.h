@@ -133,6 +133,12 @@ public:
 		return m_innerStruct.VolumeTotalOriginal;
 	}
 
+	void SetOrderType(OrderType type);
+
+	OrderType GetOrderType() const {
+		return m_type;
+	}
+
 	void SetIdentityInfo(const std::string& brokerId, const std::string& userId, const std::string& investorId, const std::string& ordRef);
 
 	bool IsValid();
@@ -146,6 +152,7 @@ public:
 	}
 private:
 	CThostFtdcInputOrderField m_innerStruct;
+	OrderType m_type;
 };
 
 #endif

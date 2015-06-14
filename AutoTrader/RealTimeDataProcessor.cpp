@@ -56,7 +56,7 @@ void RealTimeDataProcessor::AppendRealTimeData(CThostFtdcDepthMDFieldWrapper& in
 	//(in)front-------------back(out)
 	// if m_strategy == nullptr, that means RealTimeDataProcessor is in data-recording mode
 	if (m_strategy){
-		bool triggered = m_strategy->TryInvoke(m_DataSeq, info);
+		bool triggered = m_strategy->tryInvoke(m_DataSeq, info);
 
 		if (triggered)
 			order_queue.push(m_strategy->generateOrder());

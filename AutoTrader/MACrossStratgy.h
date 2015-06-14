@@ -1,32 +1,32 @@
-#ifndef K3_UPTHROUGH_K5_H
-#define K3_UPTHROUGH_K5_H
+#ifndef MACROSS_STRATEGY_H
+#define MACROSS_STRATEGY_H
 
 #include "Strategy.h"
 #include "TechVec.h"
 
-class Order;
-
-class k3UpThroughK5 : public Strategy
+class MACrossStratgyTechVec;
+class MACrossStratgy : public Strategy
 {
 public:
-	k3UpThroughK5();
-	~k3UpThroughK5();
+	MACrossStratgy();
+	virtual ~MACrossStratgy();
 
 	virtual bool tryInvoke(const std::list<CThostFtdcDepthMDFieldWrapper>& data, CThostFtdcDepthMDFieldWrapper& info);
-
 	virtual Order generateOrder();
 
-private:
-	double calculateK(const std::list<CThostFtdcDepthMDFieldWrapper>& data, const CThostFtdcDepthMDFieldWrapper& current, int seconds) const;
-
+protected:
+	virtual double calculateK(const std::list<CThostFtdcDepthMDFieldWrapper>& data, const CThostFtdcDepthMDFieldWrapper& current, int seconds) const;
+	virtual MACrossStratgyTechVec* generateTechVec(const CThostFtdcDepthMDFieldWrapper& info) const;
 private:
 	Order* m_curOrder;
 };
 
-class k3UpThroughK5TechVec : public StrategyTechVec{
+typedef StratgyType::MACrossStratgyType CrossStratgyType;
+
+class MACrossStratgyTechVec : public StrategyTechVec{
 public:
-	k3UpThroughK5TechVec(long long uuid, const std::string& instrumentID, const std::string& time="", double lastprice=0);
-	virtual ~k3UpThroughK5TechVec(){}
+	MACrossStratgyTechVec(CrossStratgyType type, long long uuid, const std::string& instrumentID, const std::string& time = "", double lastprice = 0);
+	virtual ~MACrossStratgyTechVec(){}
 
 	virtual size_t ObjSize(){
 		return sizeof(*this);
@@ -70,10 +70,10 @@ private:
 	TickType m_ticktype;
 	char m_instrumentId[32];
 	char m_time[64];// for check result 
-	//std::string m_instrumentId;
-	//std::string m_time; // for check result 
+
 	double m_lastprice; // for check result
 	long long m_id; //time_stamp * 2  (unit : 500ms)
+	StratgyType::MACrossStratgyType m_type;
 };
 
 #endif

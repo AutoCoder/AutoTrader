@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "Order.h"
-
+#include <assert.h>
 
 Order::Order()
 {
@@ -99,4 +99,39 @@ void Order::SetIdentityInfo(const std::string& brokerId, const std::string& user
 
 	strcpy_s(m_innerStruct.UserID, sizeof(m_innerStruct.UserID), userId.c_str());
 	strcpy_s(m_innerStruct.OrderRef, sizeof(m_innerStruct.OrderRef), ordRef.c_str());
+}
+
+void Order::SetOrderType(OrderType type){
+	m_type = type;
+	assert(m_type == OrderType::FAK || OrderType::FOK == m_type);
+	if (type == FAK){
+		m_innerStruct.OrderPriceType = THOST_FTDC_OPT_LimitPrice;
+		m_innerStruct.CombHedgeFlag[0] = THOST_FTDC_HF_Speculation;
+
+		m_innerStruct.TimeCondition = THOST_FTDC_TC_IOC;
+		m_innerStruct.VolumeCondition = THOST_FTDC_VC_AV;
+		m_innerStruct.MinVolume = 1;
+		m_innerStruct.ContingentCondition = THOST_FTDC_CC_Immediately;
+
+		//TThostFtdcPriceType	StopPrice;  
+		m_innerStruct.ForceCloseReason = THOST_FTDC_FCC_NotForceClose;
+		m_innerStruct.IsAutoSuspend = 0;
+		m_innerStruct.UserForceClose = 0;
+	}
+	//FAK 立即全部成交否则自动撤销指令 (THOST_FTDC_OPT_LimitPrice THOST_FTDC_TC_IOC + THOST_FTDC_VC_CV)
+	else if (type == OrderType::FOK){
+		m_innerStruct.OrderPriceType = THOST_FTDC_OPT_LimitPrice;
+	
+		m_innerStruct.CombHedgeFlag[0] = THOST_FTDC_HF_Speculation;
+	
+		m_innerStruct.TimeCondition = THOST_FTDC_TC_IOC;
+		m_innerStruct.VolumeCondition = THOST_FTDC_VC_CV;
+		m_innerStruct.MinVolume = 1;
+		m_innerStruct.ContingentCondition = THOST_FTDC_CC_Immediately;
+
+		//TThostFtdcPriceType	StopPrice;  
+		m_innerStruct.ForceCloseReason = THOST_FTDC_FCC_NotForceClose;
+		m_innerStruct.IsAutoSuspend = 0;
+		m_innerStruct.UserForceClose = 0;
+	}
 }

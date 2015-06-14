@@ -168,6 +168,7 @@
     <ClInclude Include="ini_parser.h" />
     <ClInclude Include="K3AVEThoughK5AVE.h" />
     <ClInclude Include="k3UpThroughK5.h" />
+    <ClInclude Include="MACrossStratgy.h" />
     <ClInclude Include="mdspi.h" />
     <ClInclude Include="mysqlwrapper.h" />
     <ClInclude Include="Order.h" />
@@ -181,6 +182,7 @@
     <ClInclude Include="TechVec.h" />
     <ClInclude Include="ThostFtdcDepthMDFieldWrapper.h" />
     <ClInclude Include="unittest.h" />
+    <ClInclude Include="WMACrossStratgy.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AccountManger.cpp" />
@@ -190,6 +192,7 @@
     <ClCompile Include="DBWrapper.cpp" />
     <ClCompile Include="K3AVEThoughK5AVE.cpp" />
     <ClCompile Include="k3UpThroughK5.cpp" />
+    <ClCompile Include="MACrossStratgy.cpp" />
     <ClCompile Include="mdspi.cpp" />
     <ClCompile Include="mysqlwrapper.cpp" />
     <ClCompile Include="Order.cpp" />
@@ -202,6 +205,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="ThostFtdcDepthMDFieldWrapper.cpp" />
+    <ClCompile Include="WMACrossStratgy.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="AutoTrader.rc" />

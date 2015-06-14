@@ -93,6 +93,12 @@
     <ClInclude Include="K3AVEThoughK5AVE.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MACrossStratgy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WMACrossStratgy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -135,6 +141,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="K3AVEThoughK5AVE.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MACrossStratgy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WMACrossStratgy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

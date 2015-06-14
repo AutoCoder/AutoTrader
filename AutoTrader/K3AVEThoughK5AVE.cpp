@@ -5,6 +5,7 @@
 #include "TechVec.h"
 #include "Order.h"
 #include "K3AVEThoughK5AVE.h"
+#include "ThostFtdcDepthMDFieldWrapper.h"
 
 #include <sstream>
 #include <assert.h>
@@ -43,7 +44,7 @@ double K3AVEThoughK5AVE::calculateK(const std::list<CThostFtdcDepthMDFieldWrappe
 	return totalExchangeLastPrice / count;
 }
 
-bool K3AVEThoughK5AVE::TryInvoke(const std::list<CThostFtdcDepthMDFieldWrapper>& data, CThostFtdcDepthMDFieldWrapper& info)
+bool K3AVEThoughK5AVE::tryInvoke(const std::list<CThostFtdcDepthMDFieldWrapper>& data, CThostFtdcDepthMDFieldWrapper& info)
 {
 	TickType direction = TickType::Commom;
 	const size_t breakthrough_confirm_duration = 100; //50ms

@@ -10,7 +10,7 @@ class K3AVEThoughK5AVE : public Strategy
 public:
 	K3AVEThoughK5AVE();
 	~K3AVEThoughK5AVE();
-	virtual bool TryInvoke(const std::list<CThostFtdcDepthMDFieldWrapper>& data, CThostFtdcDepthMDFieldWrapper& info);
+	virtual bool tryInvoke(const std::list<CThostFtdcDepthMDFieldWrapper>& data, CThostFtdcDepthMDFieldWrapper& info);
 
 	virtual Order generateOrder();
 
