@@ -81,22 +81,19 @@
     <ClInclude Include="TechVec.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="k3UpThroughK5.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="CommonUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="unittest.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="K3AVEThoughK5AVE.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="MACrossStratgy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="WMACrossStratgy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AMACrossStratgy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -134,19 +131,16 @@
     <ClCompile Include="mysqlwrapper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="k3UpThroughK5.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="CommonUtils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="K3AVEThoughK5AVE.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MACrossStratgy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="WMACrossStratgy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AMACrossStratgy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

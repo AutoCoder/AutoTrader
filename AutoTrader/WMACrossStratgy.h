@@ -3,7 +3,7 @@
 
 #include "MACrossStratgy.h"
 
-class WMACrossStratgy : MACrossStratgy
+class WMACrossStratgy : public MACrossStratgy
 {
 public:
 	WMACrossStratgy();

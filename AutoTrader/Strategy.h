@@ -27,6 +27,7 @@ public:
 		DMA = 0x3,
 		TMA = 0x4,
 		WMA = 0x5,
+		AMA = 0X6,
 	};
 
 	static std::string toString(MACrossStratgyType type){

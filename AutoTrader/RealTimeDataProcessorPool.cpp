@@ -1,6 +1,7 @@
 #include "stdafx.h"
-#include "k3UpThroughK5.h"
-#include "K3AVEThoughK5AVE.h"
+#include "MACrossStratgy.h"
+#include "WMACrossStratgy.h"
+#include "AMACrossStratgy.h"
 #include "RealTimeDataProcessorPool.h"
 #include "config.h"
 #include "DBWrapper.h"
@@ -22,8 +23,9 @@ RealTimeDataProcessorPool::RealTimeDataProcessorPool()
 {
 	//construct the Strategy dict 
 	m_dict.clear();
-	m_dict["k3UpThroughK5"] = std::shared_ptr<Strategy>(new k3UpThroughK5());
-	m_dict["K3AVEThoughK5AVE"] = std::shared_ptr<Strategy>(new K3AVEThoughK5AVE());
+	m_dict["MACrossK3K5"] = std::shared_ptr<Strategy>(new MACrossStratgy());
+	m_dict["WMACrossK3K5"] = std::shared_ptr<Strategy>(new WMACrossStratgy());
+	m_dict["AMACrossK3K5"] = std::shared_ptr<Strategy>(new AMACrossStratgy());
 
 	m_processorDict.clear();
 

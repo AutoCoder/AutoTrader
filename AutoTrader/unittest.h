@@ -3,7 +3,6 @@
 
 #include <assert.h>
 #include "CommonUtils.h"
-#include "k3UpThroughK5.h"
 
 void TestIsMarketingTime(){
 	//[00:00:00, 01:00:00) & [09:00:00, 11:30:00) & [13:30:00, 15:00:00) & [21:00:00, 24:00:00]
