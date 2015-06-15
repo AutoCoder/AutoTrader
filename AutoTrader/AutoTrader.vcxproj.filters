@@ -16,6 +16,12 @@
     <Filter Include="include">
       <UniqueIdentifier>{2be6b69d-9721-4337-a577-cc2ef8ecdbbe}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\MACrossStratgy">
+      <UniqueIdentifier>{55f5bfed-66a6-4801-b4cd-d95b2927b3d6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\MACrossStratgy">
+      <UniqueIdentifier>{d6b2ef8d-e86d-43ee-a545-4cd9d2d38667}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -87,13 +93,16 @@
     <ClInclude Include="unittest.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="AMACrossStratgy.h">
+      <Filter>Header Files\MACrossStratgy</Filter>
+    </ClInclude>
     <ClInclude Include="MACrossStratgy.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\MACrossStratgy</Filter>
     </ClInclude>
     <ClInclude Include="WMACrossStratgy.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\MACrossStratgy</Filter>
     </ClInclude>
-    <ClInclude Include="AMACrossStratgy.h">
+    <ClInclude Include="EMACrossStratgy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -134,13 +143,16 @@
     <ClCompile Include="CommonUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="AMACrossStratgy.cpp">
+      <Filter>Source Files\MACrossStratgy</Filter>
+    </ClCompile>
     <ClCompile Include="MACrossStratgy.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\MACrossStratgy</Filter>
     </ClCompile>
     <ClCompile Include="WMACrossStratgy.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\MACrossStratgy</Filter>
     </ClCompile>
-    <ClCompile Include="AMACrossStratgy.cpp">
+    <ClCompile Include="EMACrossStratgy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

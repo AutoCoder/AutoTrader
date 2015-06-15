@@ -166,6 +166,7 @@
     <ClInclude Include="CommonUtils.h" />
     <ClInclude Include="config.h" />
     <ClInclude Include="DBWrapper.h" />
+    <ClInclude Include="EMACrossStratgy.h" />
     <ClInclude Include="ini_parser.h" />
     <ClInclude Include="MACrossStratgy.h" />
     <ClInclude Include="mdspi.h" />
@@ -190,6 +191,7 @@
     <ClCompile Include="CommonUtils.cpp" />
     <ClCompile Include="config.cpp" />
     <ClCompile Include="DBWrapper.cpp" />
+    <ClCompile Include="EMACrossStratgy.cpp" />
     <ClCompile Include="MACrossStratgy.cpp" />
     <ClCompile Include="mdspi.cpp" />
     <ClCompile Include="mysqlwrapper.cpp" />

@@ -44,6 +44,8 @@ public:
 			return "TMA";
 		case MACrossStratgyType::WMA:
 			return "WMA";
+		case MACrossStratgyType::AMA:
+			return "AMA";
 		default:
 			return "Unknown";
 		}

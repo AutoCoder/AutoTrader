@@ -1,14 +1,14 @@
-#ifndef WMACROSS_STRATEGY_H
-#define WMACROSS_STRATEGY_H
+#ifndef EMACROSS_STRATEGY_H
+#define EMACROSS_STRATEGY_H
 
 #include "MACrossStratgy.h"
 
-class WMACrossStratgy : public MACrossStratgy
+class EMACrossStratgy : public MACrossStratgy
 {
 public:
-	WMACrossStratgy();
-	virtual ~WMACrossStratgy();
-	 
+	EMACrossStratgy();
+	virtual ~EMACrossStratgy();
+
 protected:
 	virtual double calculateK(const std::list<CThostFtdcDepthMDFieldWrapper>& data, const CThostFtdcDepthMDFieldWrapper& current, int seconds) const;
 	virtual MACrossStratgyTechVec* generateTechVec(const CThostFtdcDepthMDFieldWrapper& info) const;
