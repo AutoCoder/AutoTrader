@@ -6,7 +6,7 @@
 class AMACrossStratgy : public MACrossStratgy
 {
 public:
-	AMACrossStratgy();
+	AMACrossStratgy(size_t short_ma, size_t long_ma);
 	virtual ~AMACrossStratgy();
 
 protected:

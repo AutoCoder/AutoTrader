@@ -2,8 +2,8 @@
 #include "AMACrossStratgy.h"
 #include "ThostFtdcDepthMDFieldWrapper.h"
 
-AMACrossStratgy::AMACrossStratgy()
-:MACrossStratgy()
+AMACrossStratgy::AMACrossStratgy(size_t short_ma, size_t long_ma)
+:MACrossStratgy(short_ma, long_ma)
 {
 }
 
@@ -13,7 +13,7 @@ AMACrossStratgy::~AMACrossStratgy()
 }
 
 MACrossStratgyTechVec* AMACrossStratgy::generateTechVec(const CThostFtdcDepthMDFieldWrapper& info) const{
-	return (new MACrossStratgyTechVec(CrossStratgyType::AMA, info.UUID(), info.InstrumentId(), info.Time(), info.LastPrice()));
+	return (new MACrossStratgyTechVec(CrossStratgyType::AMA, m_shortMA, m_longMA, info.UUID(), info.InstrumentId(), info.Time(), info.LastPrice()));
 }
 
 // AMA

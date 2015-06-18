@@ -6,7 +6,7 @@
 class WMACrossStratgy : public MACrossStratgy
 {
 public:
-	WMACrossStratgy();
+	WMACrossStratgy(size_t short_ma, size_t long_ma);
 	virtual ~WMACrossStratgy();
 	 
 protected:

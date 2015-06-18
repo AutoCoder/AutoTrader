@@ -6,7 +6,7 @@
 class EMACrossStratgy : public MACrossStratgy
 {
 public:
-	EMACrossStratgy();
+	EMACrossStratgy(size_t short_ma, size_t long_ma);
 	virtual ~EMACrossStratgy();
 
 protected:

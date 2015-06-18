@@ -2,6 +2,7 @@
 #include "MACrossStratgy.h"
 #include "WMACrossStratgy.h"
 #include "AMACrossStratgy.h"
+#include "EMACrossStratgy.h"
 #include "RealTimeDataProcessorPool.h"
 #include "config.h"
 #include "DBWrapper.h"
@@ -23,9 +24,10 @@ RealTimeDataProcessorPool::RealTimeDataProcessorPool()
 {
 	//construct the Strategy dict 
 	m_dict.clear();
-	m_dict["MACrossK3K5"] = std::shared_ptr<Strategy>(new MACrossStratgy());
-	m_dict["WMACrossK3K5"] = std::shared_ptr<Strategy>(new WMACrossStratgy());
-	m_dict["AMACrossK3K5"] = std::shared_ptr<Strategy>(new AMACrossStratgy());
+	m_dict["MACross"] = std::shared_ptr<Strategy>(new MACrossStratgy(3, 5));
+	m_dict["WMACross"] = std::shared_ptr<Strategy>(new WMACrossStratgy(3, 5));
+	m_dict["AMACross"] = std::shared_ptr<Strategy>(new AMACrossStratgy(3, 5));
+	m_dict["EMACross"] = std::shared_ptr<Strategy>(new EMACrossStratgy(3, 5));
 
 	m_processorDict.clear();
 

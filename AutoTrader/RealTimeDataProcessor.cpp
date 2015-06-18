@@ -47,7 +47,6 @@ void RealTimeDataProcessor::StoreStrategySequenceToDB(const std::string& mark)
 			pre_type = iter->m_techvec->GetTickType();
 			iter->m_techvec->serializeToDB(*(m_dbptr.get()), mark);
 		}
-			
 	}
 	spdlog::get("console")->info() << "End to store db.";
 }

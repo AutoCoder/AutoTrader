@@ -2,8 +2,8 @@
 #include "WMACrossStratgy.h"
 #include "ThostFtdcDepthMDFieldWrapper.h"
 
-WMACrossStratgy::WMACrossStratgy()
-: MACrossStratgy()
+WMACrossStratgy::WMACrossStratgy(size_t short_ma, size_t long_ma)
+: MACrossStratgy(short_ma, long_ma)
 {
 }
 
@@ -12,7 +12,7 @@ WMACrossStratgy::~WMACrossStratgy()
 }
 
 MACrossStratgyTechVec* WMACrossStratgy::generateTechVec(const CThostFtdcDepthMDFieldWrapper& info) const{
-	return (new MACrossStratgyTechVec(CrossStratgyType::WMA, info.UUID(), info.InstrumentId(), info.Time(), info.LastPrice()));
+	return (new MACrossStratgyTechVec(CrossStratgyType::WMA, m_shortMA, m_longMA, info.UUID(), info.InstrumentId(), info.Time(), info.LastPrice()));
 }
 
 // WMA
