@@ -18,6 +18,12 @@ public:
 
 };
 
+struct StrategyMetaData{
+	std::string name;
+	size_t short_ma;
+	size_t long_ma;
+};
+
 class StratgyType{
 public:
 	enum class MACrossStratgyType{

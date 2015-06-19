@@ -64,6 +64,7 @@ CThostFtdcDepthMDFieldWrapper& CThostFtdcDepthMDFieldWrapper::operator = (const 
 	else{
 		m_techvec = nullptr;
 	}
+	return *this;
 }
 
 CThostFtdcDepthMDFieldWrapper::CThostFtdcDepthMDFieldWrapper(CThostFtdcDepthMDFieldWrapper && obj)

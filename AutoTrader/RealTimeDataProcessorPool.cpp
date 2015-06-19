@@ -3,6 +3,7 @@
 #include "WMACrossStratgy.h"
 #include "AMACrossStratgy.h"
 #include "EMACrossStratgy.h"
+#include "Strategy.h"
 #include "RealTimeDataProcessorPool.h"
 #include "config.h"
 #include "DBWrapper.h"
@@ -23,11 +24,23 @@ RealTimeDataProcessorPool::RealTimeDataProcessorPool()
 	:m_dbptr(new DBWrapper)
 {
 	//construct the Strategy dict 
+	Config::Instance()->CtpBrokerID();
+	std::vector<StrategyMetaData> stgySet = Config::Instance()->StrategySet();
 	m_dict.clear();
-	m_dict["MACross"] = std::shared_ptr<Strategy>(new MACrossStratgy(3, 5));
-	m_dict["WMACross"] = std::shared_ptr<Strategy>(new WMACrossStratgy(3, 5));
-	m_dict["AMACross"] = std::shared_ptr<Strategy>(new AMACrossStratgy(3, 5));
-	m_dict["EMACross"] = std::shared_ptr<Strategy>(new EMACrossStratgy(3, 5));
+	for (StrategyMetaData it : stgySet){
+		if (it.name == "MACross"){
+			m_dict["MACross"] = std::shared_ptr<Strategy>(new MACrossStratgy(it.short_ma, it.long_ma));
+		}
+		else if (it.name == "WMACross"){
+			m_dict["WMACross"] = std::shared_ptr<Strategy>(new WMACrossStratgy(it.short_ma, it.long_ma));
+		}
+		else if (it.name == "AMACross"){
+			m_dict["AMACross"] = std::shared_ptr<Strategy>(new AMACrossStratgy(it.short_ma, it.long_ma));
+		}
+		else if (it.name == "AMACross"){
+			m_dict["EMACross"] = std::shared_ptr<Strategy>(new EMACrossStratgy(it.short_ma, it.long_ma));
+		}
+	}
 
 	m_processorDict.clear();
 
