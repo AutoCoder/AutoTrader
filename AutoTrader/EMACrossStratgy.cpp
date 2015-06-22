@@ -38,6 +38,7 @@ double EMACrossStratgy::calculateK(const std::list<CThostFtdcDepthMDFieldWrapper
 		}
 		else{
 			assert(false);
+			return -1;
 		}
 	}
 	else{

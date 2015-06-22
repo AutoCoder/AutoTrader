@@ -229,6 +229,6 @@ std::string Config::ProductName()
 	return m_db_productName;
 }
 
-std::vector<StrategyMetaData> Config::StrategySet(void){
+std::vector<StrategyMetaData> Config::StrategySet(){
 	return m_strategies;
 }

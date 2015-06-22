@@ -28,7 +28,7 @@
 #ifdef CONF_INI
  class ini_parser;
 #endif
-class StrategyMetaData;
+struct StrategyMetaData;
 
 class Config {
 public:
@@ -49,7 +49,7 @@ public:
 	std::string DBPassword();
 
 	std::string ProductName();
-	std::vector<StrategyMetaData> StrategySet(void);
+	std::vector<StrategyMetaData> StrategySet();
 	bool RecordModeOn();
 private:
 	Config(const std::string& pathName);
