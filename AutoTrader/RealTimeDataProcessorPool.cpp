@@ -37,7 +37,7 @@ RealTimeDataProcessorPool::RealTimeDataProcessorPool()
 		else if (it.name == "AMACross"){
 			m_dict["AMACross"] = std::shared_ptr<Strategy>(new AMACrossStratgy(it.short_ma, it.long_ma));
 		}
-		else if (it.name == "AMACross"){
+		else if (it.name == "EMACross"){
 			m_dict["EMACross"] = std::shared_ptr<Strategy>(new EMACrossStratgy(it.short_ma, it.long_ma));
 		}
 	}

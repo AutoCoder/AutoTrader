@@ -98,6 +98,11 @@ void ReplayTickDataFromDB(const std::string& instrumentID, const std::string& ma
 	std::map<int, std::vector<std::string>> countResult;
 	dbwrapper.Query(countquerybuf, countResult);
 
+	if (countResult.empty()){
+		spdlog::get("console")->info() << "Get 0 md record from db, please check db connection configuration";
+		return;
+	}
+
 	long long totalCount = CommonUtils::StringtoInt(countResult[0][0]);
 
 	int pagesize = 1000; 
