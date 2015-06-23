@@ -163,11 +163,13 @@
     <ClInclude Include="..\include\ThostFtdcUserApiStruct.h" />
     <ClInclude Include="AccountManger.h" />
     <ClInclude Include="AMACrossStratgy.h" />
+    <ClInclude Include="BOLLTech.h" />
     <ClInclude Include="CommonUtils.h" />
     <ClInclude Include="config.h" />
     <ClInclude Include="DBWrapper.h" />
     <ClInclude Include="EMACrossStratgy.h" />
     <ClInclude Include="ini_parser.h" />
+    <ClInclude Include="MACrossBOLLTech.h" />
     <ClInclude Include="MACrossStratgy.h" />
     <ClInclude Include="mdspi.h" />
     <ClInclude Include="mysqlwrapper.h" />
@@ -188,10 +190,12 @@
     <ClCompile Include="AccountManger.cpp" />
     <ClCompile Include="AMACrossStratgy.cpp" />
     <ClCompile Include="AutoTrader.cpp" />
+    <ClCompile Include="BOLLTech.cpp" />
     <ClCompile Include="CommonUtils.cpp" />
     <ClCompile Include="config.cpp" />
     <ClCompile Include="DBWrapper.cpp" />
     <ClCompile Include="EMACrossStratgy.cpp" />
+    <ClCompile Include="MACrossBOLLTech.cpp" />
     <ClCompile Include="MACrossStratgy.cpp" />
     <ClCompile Include="mdspi.cpp" />
     <ClCompile Include="mysqlwrapper.cpp" />

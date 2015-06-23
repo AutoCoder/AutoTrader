@@ -17,7 +17,7 @@ CThostFtdcDepthMDFieldWrapper::CThostFtdcDepthMDFieldWrapper(CThostFtdcDepthMark
 	assert(p);
 	memcpy(&m_MdData, p, sizeof(CThostFtdcDepthMarketDataField));
 	m_uuid = this->toTimeStamp();
-	//m_techvec = new StrategyTechVec(m_uuid, p->InstrumentID);
+	//m_techvec = new StrategyTech(m_uuid, p->InstrumentID);
 }
 
 CThostFtdcDepthMDFieldWrapper::~CThostFtdcDepthMDFieldWrapper()
@@ -37,7 +37,7 @@ CThostFtdcDepthMDFieldWrapper::CThostFtdcDepthMDFieldWrapper(const CThostFtdcDep
 
 	if (obj.m_techvec){
 		size_t size = obj.m_techvec->ObjSize();
-		m_techvec = (StrategyTechVec*)malloc(size);
+		m_techvec = (StrategyTech*)malloc(size);
 		memcpy(m_techvec, obj.m_techvec, size);
 	}
 	else{
@@ -58,7 +58,7 @@ CThostFtdcDepthMDFieldWrapper& CThostFtdcDepthMDFieldWrapper::operator = (const 
 
 	if (obj.m_techvec){
 		size_t size = obj.m_techvec->ObjSize();
-		m_techvec = (StrategyTechVec*)malloc(size);
+		m_techvec = (StrategyTech*)malloc(size);
 		memcpy(m_techvec, obj.m_techvec, size);
 	}
 	else{

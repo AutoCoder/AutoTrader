@@ -12,8 +12,8 @@ AMACrossStratgy::~AMACrossStratgy()
 {
 }
 
-MACrossStratgyTechVec* AMACrossStratgy::generateTechVec(const CThostFtdcDepthMDFieldWrapper& info) const{
-	return (new MACrossStratgyTechVec(CrossStratgyType::AMA, m_shortMA, m_longMA, info.UUID(), info.InstrumentId(), info.Time(), info.LastPrice()));
+MACrossTech* AMACrossStratgy::generateTechVec(const CThostFtdcDepthMDFieldWrapper& info) const{
+	return (new MACrossTech(CrossStratgyType::AMA, m_shortMA, m_longMA, info.UUID(), info.InstrumentId(), info.Time(), info.LastPrice()));
 }
 
 // AMA

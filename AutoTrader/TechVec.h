@@ -11,19 +11,17 @@ enum class TickType{
 
 class DBWrapper;
 
-class StrategyTechVec{
+class StrategyTech{
 public:
-	StrategyTechVec(){}
-	virtual ~StrategyTechVec(){}
+	StrategyTech(){}
+	virtual ~StrategyTech(){}
 
 	virtual	void serializeToDB(DBWrapper& db, const std::string& mark) = 0;
 	virtual void SetTickType(TickType type) = 0;
 
 	virtual TickType GetTickType() = 0;
 	virtual size_t ObjSize() = 0;
-	virtual bool IsUpThough() const = 0;
-protected:
-	virtual int CreateTableIfNotExists(const std::string& dbname, const std::string& tableName) = 0;
+	virtual bool IsTriggerPoint() const = 0;
 };
 
 #endif

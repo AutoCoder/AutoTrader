@@ -11,7 +11,7 @@ public:
 	 
 protected:
 	virtual double calculateK(const std::list<CThostFtdcDepthMDFieldWrapper>& data, const CThostFtdcDepthMDFieldWrapper& current, int seconds) const;
-	virtual MACrossStratgyTechVec* generateTechVec(const CThostFtdcDepthMDFieldWrapper& info) const;
+	virtual MACrossTech* generateTechVec(const CThostFtdcDepthMDFieldWrapper& info) const;
 };
 
 #endif

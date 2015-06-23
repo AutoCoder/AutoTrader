@@ -105,6 +105,12 @@
     <ClInclude Include="EMACrossStratgy.h">
       <Filter>Header Files\MACrossStratgy</Filter>
     </ClInclude>
+    <ClInclude Include="BOLLTech.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MACrossBOLLTech.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -154,6 +160,12 @@
     </ClCompile>
     <ClCompile Include="EMACrossStratgy.cpp">
       <Filter>Source Files\MACrossStratgy</Filter>
+    </ClCompile>
+    <ClCompile Include="BOLLTech.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MACrossBOLLTech.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

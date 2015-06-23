@@ -4,7 +4,7 @@
 #include "Strategy.h"
 #include "TechVec.h"
 
-class MACrossStratgyTechVec;
+class MACrossTech;
 class MACrossStratgy : public Strategy
 {
 public:
@@ -16,7 +16,7 @@ public:
 
 protected:
 	virtual double calculateK(const std::list<CThostFtdcDepthMDFieldWrapper>& data, const CThostFtdcDepthMDFieldWrapper& current, int seconds) const;
-	virtual MACrossStratgyTechVec* generateTechVec(const CThostFtdcDepthMDFieldWrapper& info) const;
+	virtual MACrossTech* generateTechVec(const CThostFtdcDepthMDFieldWrapper& info) const;
 
 protected:
 	size_t m_shortMA;
@@ -29,10 +29,11 @@ private:
 
 typedef StratgyType::MACrossStratgyType CrossStratgyType;
 
-class MACrossStratgyTechVec : public StrategyTechVec{
+class MACrossTech : public StrategyTech{
 public:
-	MACrossStratgyTechVec(CrossStratgyType type, size_t shortMA, size_t longMA, long long uuid, const std::string& instrumentID, const std::string& time = "", double lastprice = 0);
-	virtual ~MACrossStratgyTechVec(){}
+	MACrossTech(){};
+	MACrossTech(CrossStratgyType type, size_t shortMA, size_t longMA, long long uuid, const std::string& instrumentID, const std::string& time = "", double lastprice = 0);
+	virtual ~MACrossTech(){}
 
 	virtual size_t ObjSize(){
 		return sizeof(*this);
@@ -62,12 +63,12 @@ public:
 		return m_ticktype;
 	}
 
-	virtual bool IsUpThough() const;
+	virtual bool IsTriggerPoint() const;
 
 	virtual void serializeToDB(DBWrapper& db, const std::string& mark);
 
 protected:
-	virtual int CreateTableIfNotExists(const std::string& dbname, const std::string& tableName);
+	static int CreateTableIfNotExists(const std::string& dbname, const std::string& tableName);
 	static bool IsTableCreated;
 
 private:

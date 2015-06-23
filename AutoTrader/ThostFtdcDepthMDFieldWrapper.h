@@ -40,11 +40,11 @@ public:
 		return std::string(m_MdData.InstrumentID);
 	}
 
-	StrategyTechVec* GetTechVec() const{
+	StrategyTech* GetTechVec() const{
 		return m_techvec;
 	}
 
-	void SetTechVec(StrategyTechVec* p){
+	void SetTechVec(StrategyTech* p){
 		m_techvec = p;
 	}
 
@@ -68,7 +68,7 @@ private:
 	bool recoveryData;
 	//std::shared_ptr<TechVec> m_techvec;
 public:
-	StrategyTechVec* m_techvec;
+	StrategyTech* m_techvec;
 };
 
 #endif

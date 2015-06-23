@@ -46,15 +46,15 @@ double MACrossStratgy::calculateK(const std::list<CThostFtdcDepthMDFieldWrapper>
 	return totalExchangeLastPrice / count;
 }
 
-MACrossStratgyTechVec* MACrossStratgy::generateTechVec(const CThostFtdcDepthMDFieldWrapper& info) const{
-	return (new MACrossStratgyTechVec(CrossStratgyType::MA, m_shortMA, m_longMA, info.UUID(), info.InstrumentId(), info.Time(), info.LastPrice()));
+MACrossTech* MACrossStratgy::generateTechVec(const CThostFtdcDepthMDFieldWrapper& info) const{
+	return (new MACrossTech(CrossStratgyType::MA, m_shortMA, m_longMA, info.UUID(), info.InstrumentId(), info.Time(), info.LastPrice()));
 }
 
 bool MACrossStratgy::tryInvoke(const std::list<CThostFtdcDepthMDFieldWrapper>& data, CThostFtdcDepthMDFieldWrapper& info)
 {
 	TickType direction = TickType::Commom;
 	const size_t breakthrough_confirm_duration = 100; //50ms
-	MACrossStratgyTechVec* curPtr = generateTechVec(info);
+	MACrossTech* curPtr = generateTechVec(info);
 	bool orderSingal = false;
 	double short_ma = calculateK(data, info, m_shortMA * 60);
 	double long_ma = calculateK(data, info, m_longMA * 60);
@@ -62,14 +62,14 @@ bool MACrossStratgy::tryInvoke(const std::list<CThostFtdcDepthMDFieldWrapper>& d
 	curPtr->setLongMA(long_ma);
 
 	if (!data.empty()){
-		if (curPtr->IsUpThough()){ // up
+		if (curPtr->IsTriggerPoint()){ // up
 			if (!data.empty() && data.size() > 500){
 				std::list<CThostFtdcDepthMDFieldWrapper>::const_iterator stoper = data.begin();
 				std::advance(stoper, breakthrough_confirm_duration);
 				for (auto it = data.begin(); it != stoper; it++){
-					StrategyTechVec* prePtr = it->GetTechVec();
+					StrategyTech* prePtr = it->GetTechVec();
 					// if prePtr == NULL, mean it's recovered from db, so that md is not continuous. so it's should not be singal point.
-					if (prePtr == NULL || !prePtr->IsUpThough())
+					if (prePtr == NULL || !prePtr->IsTriggerPoint())
 					{
 						// not special point
 						orderSingal = false;
@@ -93,8 +93,8 @@ bool MACrossStratgy::tryInvoke(const std::list<CThostFtdcDepthMDFieldWrapper>& d
 				std::list<CThostFtdcDepthMDFieldWrapper>::const_iterator stoper = data.begin();
 				std::advance(stoper, breakthrough_confirm_duration);
 				for (auto it = data.begin(); it != stoper; it++){
-					StrategyTechVec* prePtr = it->GetTechVec();
-					if (prePtr == NULL || prePtr->IsUpThough())
+					StrategyTech* prePtr = it->GetTechVec();
+					if (prePtr == NULL || prePtr->IsTriggerPoint())
 					{
 						// not special point
 						orderSingal = false;
@@ -114,7 +114,7 @@ bool MACrossStratgy::tryInvoke(const std::list<CThostFtdcDepthMDFieldWrapper>& d
 		}
 	}
 
-	//info.SetTechVec((StrategyTechVec*)curPtr);
+	//info.SetTechVec((StrategyTech*)curPtr);
 	info.m_techvec = curPtr;
 	return orderSingal;
 }
@@ -125,9 +125,9 @@ Order MACrossStratgy::generateOrder(){
 }
 
 
-bool MACrossStratgyTechVec::IsTableCreated = false;
+bool MACrossTech::IsTableCreated = false;
 
-MACrossStratgyTechVec::MACrossStratgyTechVec(CrossStratgyType type, size_t shortMA, size_t longMA, long long uuid, const std::string& instrumentID, const std::string& time, double lastprice)
+MACrossTech::MACrossTech(CrossStratgyType type, size_t shortMA, size_t longMA, long long uuid, const std::string& instrumentID, const std::string& time, double lastprice)
 : m_type(type)
 , m_id(uuid)
 , m_ticktype(TickType::Commom)
@@ -139,18 +139,18 @@ MACrossStratgyTechVec::MACrossStratgyTechVec(CrossStratgyType type, size_t short
 	strcpy_s(m_instrumentId, instrumentID.c_str());
 }
 
-bool MACrossStratgyTechVec::IsUpThough() const {
+bool MACrossTech::IsTriggerPoint() const {
 	return m_shortMAVal > m_longMAVal;
 }
 
-int MACrossStratgyTechVec::CreateTableIfNotExists(const std::string& dbname, const std::string& tableName)
+int MACrossTech::CreateTableIfNotExists(const std::string& dbname, const std::string& tableName)
 {
-	if (MACrossStratgyTechVec::IsTableCreated == true){
+	if (MACrossTech::IsTableCreated == true){
 		return 0;
 	}
 	else
 	{
-		MACrossStratgyTechVec::IsTableCreated = true;
+		MACrossTech::IsTableCreated = true;
 		const char* sqltempl = "CREATE TABLE IF NOT EXISTS `%s`.`%s` (\
 								`id` INT NOT NULL AUTO_INCREMENT, \
 								`uuid` BIGINT NOT NULL, \
@@ -167,7 +167,7 @@ int MACrossStratgyTechVec::CreateTableIfNotExists(const std::string& dbname, con
 	}
 }
 
-void MACrossStratgyTechVec::serializeToDB(DBWrapper& db, const std::string& mark)
+void MACrossTech::serializeToDB(DBWrapper& db, const std::string& mark)
 {
 	std::stringstream tableName;
 	tableName << std::string(m_instrumentId);
@@ -177,7 +177,7 @@ void MACrossStratgyTechVec::serializeToDB(DBWrapper& db, const std::string& mark
 	tableName << mark;
 	
 
-	MACrossStratgyTechVec::CreateTableIfNotExists(Config::Instance()->DBName(), tableName.str());
+	MACrossTech::CreateTableIfNotExists(Config::Instance()->DBName(), tableName.str());
 
 	std::stringstream sql;
 	sql.precision(12);

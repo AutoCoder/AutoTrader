@@ -26,7 +26,7 @@ double EMACrossStratgy::calculateK(const std::list<CThostFtdcDepthMDFieldWrapper
 	int N = seconds * 2;
 
 	CThostFtdcDepthMDFieldWrapper preNode = data.front();
-	MACrossStratgyTechVec* preTechVec = dynamic_cast<MACrossStratgyTechVec*>(preNode.m_techvec);
+	MACrossTech* preTechVec = dynamic_cast<MACrossTech*>(preNode.m_techvec);
 	if (preTechVec){
 		if (seconds == 60 * m_shortMA ){
 			double ret = (2 * current.LastPrice() + (N - 1)* preTechVec->ShortMA()) / (N + 1);
@@ -46,7 +46,7 @@ double EMACrossStratgy::calculateK(const std::list<CThostFtdcDepthMDFieldWrapper
 	}
 }
 
-MACrossStratgyTechVec* EMACrossStratgy::generateTechVec(const CThostFtdcDepthMDFieldWrapper& info) const
+MACrossTech* EMACrossStratgy::generateTechVec(const CThostFtdcDepthMDFieldWrapper& info) const
 {
-	return (new MACrossStratgyTechVec(CrossStratgyType::EMA, m_shortMA, m_longMA, info.UUID(), info.InstrumentId(), info.Time(), info.LastPrice()));
+	return (new MACrossTech(CrossStratgyType::EMA, m_shortMA, m_longMA, info.UUID(), info.InstrumentId(), info.Time(), info.LastPrice()));
 }
