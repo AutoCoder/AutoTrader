@@ -169,8 +169,10 @@
     <ClInclude Include="DBWrapper.h" />
     <ClInclude Include="EMACrossStratgy.h" />
     <ClInclude Include="ini_parser.h" />
+    <ClInclude Include="MACrossBOLLStrategy.h" />
     <ClInclude Include="MACrossBOLLTech.h" />
     <ClInclude Include="MACrossStratgy.h" />
+    <ClInclude Include="MATech.h" />
     <ClInclude Include="mdspi.h" />
     <ClInclude Include="mysqlwrapper.h" />
     <ClInclude Include="Order.h" />
@@ -195,8 +197,10 @@
     <ClCompile Include="config.cpp" />
     <ClCompile Include="DBWrapper.cpp" />
     <ClCompile Include="EMACrossStratgy.cpp" />
+    <ClCompile Include="MACrossBOLLStrategy.cpp" />
     <ClCompile Include="MACrossBOLLTech.cpp" />
     <ClCompile Include="MACrossStratgy.cpp" />
+    <ClCompile Include="MATech.cpp" />
     <ClCompile Include="mdspi.cpp" />
     <ClCompile Include="mysqlwrapper.cpp" />
     <ClCompile Include="Order.cpp" />

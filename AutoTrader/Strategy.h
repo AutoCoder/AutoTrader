@@ -58,4 +58,6 @@ public:
 	};
 };
 
+typedef StratgyType::MACrossStratgyType CrossStratgyType;
+
 #endif

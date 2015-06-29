@@ -22,6 +22,12 @@
     <Filter Include="Source Files\MACrossStratgy">
       <UniqueIdentifier>{d6b2ef8d-e86d-43ee-a545-4cd9d2d38667}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Tech">
+      <UniqueIdentifier>{5367d900-c2c1-46b0-8715-be11b731e6a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Tech">
+      <UniqueIdentifier>{1c5ac626-fc0a-48c9-b46e-21f0911d6965}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -105,11 +111,17 @@
     <ClInclude Include="EMACrossStratgy.h">
       <Filter>Header Files\MACrossStratgy</Filter>
     </ClInclude>
-    <ClInclude Include="BOLLTech.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="MACrossBOLLTech.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MACrossBOLLStrategy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MATech.h">
+      <Filter>Header Files\Tech</Filter>
+    </ClInclude>
+    <ClInclude Include="BOLLTech.h">
+      <Filter>Header Files\Tech</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -161,11 +173,17 @@
     <ClCompile Include="EMACrossStratgy.cpp">
       <Filter>Source Files\MACrossStratgy</Filter>
     </ClCompile>
-    <ClCompile Include="BOLLTech.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="MACrossBOLLTech.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MACrossBOLLStrategy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MATech.cpp">
+      <Filter>Source Files\Tech</Filter>
+    </ClCompile>
+    <ClCompile Include="BOLLTech.cpp">
+      <Filter>Source Files\Tech</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

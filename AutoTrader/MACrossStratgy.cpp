@@ -126,6 +126,80 @@ Order MACrossStratgy::generateOrder(){
 
 
 bool MACrossTech::IsTableCreated = false;
+//
+//MACrossTech::MACrossTech(CrossStratgyType type, size_t shortMA, size_t longMA, long long uuid, const std::string& instrumentID, const std::string& time, double lastprice)
+//: m_type(type)
+//, m_id(uuid)
+//, m_ticktype(TickType::Commom)
+//, m_lastprice(lastprice)
+//, m_shortMA(shortMA)
+//, m_longMA(longMA)
+//{
+//	strcpy_s(m_time, time.c_str());
+//	strcpy_s(m_instrumentId, instrumentID.c_str());
+//}
+//
+//bool MACrossTech::IsTriggerPoint() const {
+//	return m_shortMAVal > m_longMAVal;
+//}
+//
+//int MACrossTech::CreateTableIfNotExists(const std::string& dbname, const std::string& tableName)
+//{
+//	if (MACrossTech::IsTableCreated == true){
+//		return 0;
+//	}
+//	else
+//	{
+//		MACrossTech::IsTableCreated = true;
+//		const char* sqltempl = "CREATE TABLE IF NOT EXISTS `%s`.`%s` (\
+//								`id` INT NOT NULL AUTO_INCREMENT, \
+//								`uuid` BIGINT NOT NULL, \
+//								`LongMA` Double(20,5) NULL, \
+//								`ShortMA` Double(20,5) NULL, \
+//								`Ticktype` int NULL, \
+//								`Time` VARCHAR(64) NULL, \
+//								`LastPrice` Double NULL, \
+//								PRIMARY KEY(`id`));";
+//		char sqlbuf[2046];
+//		sprintf_s(sqlbuf, sqltempl, dbname.c_str(), tableName.c_str());
+//		DBWrapper db;
+//		return db.ExecuteNoResult(sqlbuf);
+//	}
+//}
+//
+//void MACrossTech::serializeToDB(DBWrapper& db, const std::string& mark)
+//{
+//	std::stringstream tableName;
+//	tableName << std::string(m_instrumentId);
+//	tableName << "_";
+//	tableName << StratgyType::toString(this->m_type);
+//	tableName << "_MA" << m_shortMA << "_Cross_MA" << m_longMA << "_";
+//	tableName << mark;
+//	
+//
+//	MACrossTech::CreateTableIfNotExists(Config::Instance()->DBName(), tableName.str());
+//
+//	std::stringstream sql;
+//	sql.precision(12);
+//	sql << "INSERT INTO `" << tableName.str() << "` (`";
+//	sql << "uuid" << "`,`";
+//	sql << "LongMA" << "`,`";
+//	sql << "ShortMA" << "`,`";
+//	sql << "Ticktype" << "`,`";
+//	sql << "Time" << "`,`";
+//	sql << "LastPrice" << "`";
+//	sql << ") VALUES(";
+//	sql << m_id << ", ";
+//	sql << m_longMAVal << ", ";
+//	sql << m_shortMAVal << ", ";
+//	sql << (int)m_ticktype << ", \"";
+//	sql << m_time << "\", ";
+//	sql << m_lastprice << ")";
+//
+//	//std::cerr << sql.str() << std::endl;
+//	db.ExecuteNoResult(sql.str());
+//}
+
 
 MACrossTech::MACrossTech(CrossStratgyType type, size_t shortMA, size_t longMA, long long uuid, const std::string& instrumentID, const std::string& time, double lastprice)
 : m_type(type)
@@ -134,13 +208,14 @@ MACrossTech::MACrossTech(CrossStratgyType type, size_t shortMA, size_t longMA, l
 , m_lastprice(lastprice)
 , m_shortMA(shortMA)
 , m_longMA(longMA)
+, m_ma_tech()
 {
 	strcpy_s(m_time, time.c_str());
 	strcpy_s(m_instrumentId, instrumentID.c_str());
 }
 
 bool MACrossTech::IsTriggerPoint() const {
-	return m_shortMAVal > m_longMAVal;
+	return m_ma_tech.IsTriggerPoint();
 }
 
 int MACrossTech::CreateTableIfNotExists(const std::string& dbname, const std::string& tableName)
@@ -152,14 +227,14 @@ int MACrossTech::CreateTableIfNotExists(const std::string& dbname, const std::st
 	{
 		MACrossTech::IsTableCreated = true;
 		const char* sqltempl = "CREATE TABLE IF NOT EXISTS `%s`.`%s` (\
-								`id` INT NOT NULL AUTO_INCREMENT, \
-								`uuid` BIGINT NOT NULL, \
-								`LongMA` Double(20,5) NULL, \
-								`ShortMA` Double(20,5) NULL, \
-								`Ticktype` int NULL, \
-								`Time` VARCHAR(64) NULL, \
-								`LastPrice` Double NULL, \
-								PRIMARY KEY(`id`));";
+		`id` INT NOT NULL AUTO_INCREMENT, \
+		`uuid` BIGINT NOT NULL, \
+		`LongMA` Double(20,5) NULL, \
+		`ShortMA` Double(20,5) NULL, \
+		`Ticktype` int NULL, \
+		`Time` VARCHAR(64) NULL, \
+		`LastPrice` Double NULL, \
+		PRIMARY KEY(`id`));";
 		char sqlbuf[2046];
 		sprintf_s(sqlbuf, sqltempl, dbname.c_str(), tableName.c_str());
 		DBWrapper db;
@@ -175,7 +250,7 @@ void MACrossTech::serializeToDB(DBWrapper& db, const std::string& mark)
 	tableName << StratgyType::toString(this->m_type);
 	tableName << "_MA" << m_shortMA << "_Cross_MA" << m_longMA << "_";
 	tableName << mark;
-	
+
 
 	MACrossTech::CreateTableIfNotExists(Config::Instance()->DBName(), tableName.str());
 
@@ -190,8 +265,8 @@ void MACrossTech::serializeToDB(DBWrapper& db, const std::string& mark)
 	sql << "LastPrice" << "`";
 	sql << ") VALUES(";
 	sql << m_id << ", ";
-	sql << m_longMAVal << ", ";
-	sql << m_shortMAVal << ", ";
+	sql << m_ma_tech.mLongMAVal << ", ";
+	sql << m_ma_tech.mShortMAVal << ", ";
 	sql << (int)m_ticktype << ", \"";
 	sql << m_time << "\", ";
 	sql << m_lastprice << ")";
