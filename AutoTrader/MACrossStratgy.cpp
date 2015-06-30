@@ -4,11 +4,13 @@
 #include "Order.h"
 #include "MACrossStratgy.h"
 #include "ThostFtdcDepthMDFieldWrapper.h"
+#include "TechUtils.h"
 #include <sstream>
 #include <assert.h>
 
+
 MACrossStratgy::MACrossStratgy(size_t short_ma, size_t long_ma)
-:m_curOrder(new Order())//m_order is a pointer so that it will only update so, create it at constructor.
+: m_curOrder(new Order())//m_order is a pointer so that it will only update so, create it at constructor.
 , m_shortMA(short_ma)
 , m_longMA(long_ma)
 {
@@ -24,26 +26,7 @@ MACrossStratgy::~MACrossStratgy()
 // common MA 
 double MACrossStratgy::calculateK(const std::list<CThostFtdcDepthMDFieldWrapper>& data, const CThostFtdcDepthMDFieldWrapper& current, int seconds) const
 {
-	//datetime to timestamp
-	double totalExchangeLastPrice = current.LastPrice();
-	long long count = 1;
-
-	long long leftedge = current.toTimeStamp() - seconds * 2;
-	for (auto it = data.begin(); it != data.end(); it++)
-	{
-		if (it->toTimeStamp() > leftedge){
-			totalExchangeLastPrice += it->LastPrice();
-			++count;
-		}
-		else{
-			break;
-		}
-	}
-
-	//assert(totalVolume != 0);
-	//assert(totalExchangePrice >= 0.0);
-
-	return totalExchangeLastPrice / count;
+	TechUtils::CalulateMA(data, current, seconds);
 }
 
 MACrossTech* MACrossStratgy::generateTechVec(const CThostFtdcDepthMDFieldWrapper& info) const{

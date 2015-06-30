@@ -123,6 +123,9 @@
     <ClInclude Include="BOLLTech.h">
       <Filter>Header Files\Tech</Filter>
     </ClInclude>
+    <ClInclude Include="TechUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -184,6 +187,9 @@
     </ClCompile>
     <ClCompile Include="BOLLTech.cpp">
       <Filter>Source Files\Tech</Filter>
+    </ClCompile>
+    <ClCompile Include="TechUtils.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

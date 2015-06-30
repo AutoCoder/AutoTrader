@@ -24,6 +24,30 @@ public:
 		return sizeof(*this);
 	}
 
+	void setBollTech(const BOLLTech& bt){
+		m_bollTech = bt;
+	}
+
+	BOLLTech BollTech() const {
+		return m_bollTech;
+	}
+
+	void setShortMA(double input){
+		m_maTech.mShortMAVal = input;
+	}
+
+	double ShortMA() const {
+		return m_maTech.mShortMAVal;
+	}
+
+	void setLongMA(double input){
+		m_maTech.mLongMAVal = input;
+	}
+
+	inline double LongMA() const {
+		return m_maTech.mLongMAVal;
+	}
+
 	virtual	void serializeToDB(DBWrapper& db, const std::string& mark);
 	virtual bool IsTriggerPoint() const;
 

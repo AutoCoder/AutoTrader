@@ -15,7 +15,7 @@ public:
 	virtual Order generateOrder();
 
 protected:
-	virtual BOLLTech calculateBoll(const std::list<CThostFtdcDepthMDFieldWrapper>& data, const CThostFtdcDepthMDFieldWrapper& current, int seconds) const;
+	virtual BOLLTech calculateBoll(const std::list<CThostFtdcDepthMDFieldWrapper>& data, const CThostFtdcDepthMDFieldWrapper& current, int seconds, double ma_val) const;
 	virtual double calculateK(const std::list<CThostFtdcDepthMDFieldWrapper>& data, const CThostFtdcDepthMDFieldWrapper& current, int seconds) const;
 	//virtual MACrossBOLLTech* generateTechVec(const CThostFtdcDepthMDFieldWrapper& info) const;
 

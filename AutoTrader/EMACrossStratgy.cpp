@@ -2,6 +2,7 @@
 #include "EMACrossStratgy.h"
 #include "ThostFtdcDepthMDFieldWrapper.h"
 #include <assert.h>
+#include "TechUtils.h"
 
 EMACrossStratgy::EMACrossStratgy(size_t short_ma, size_t long_ma)
 :MACrossStratgy(short_ma, long_ma)
@@ -19,31 +20,7 @@ EMA(X, N) = [ 2*X + (N-1)*Y'] / (N+1)
 */
 double EMACrossStratgy::calculateK(const std::list<CThostFtdcDepthMDFieldWrapper>& data, const CThostFtdcDepthMDFieldWrapper& current, int seconds) const
 {
-	if (data.empty()){
-		return current.LastPrice();
-	}
-
-	int N = seconds * 2;
-
-	CThostFtdcDepthMDFieldWrapper preNode = data.front();
-	MACrossTech* preTechVec = dynamic_cast<MACrossTech*>(preNode.m_techvec);
-	if (preTechVec){
-		if (seconds == 60 * m_shortMA ){
-			double ret = (2 * current.LastPrice() + (N - 1)* preTechVec->ShortMA()) / (N + 1);
-			return ret;
-		}
-		else if (seconds == 60 * m_longMA){
-			double ret = (2 * current.LastPrice() + (N - 1)* preTechVec->LongMA()) / (N + 1);
-			return ret;
-		}
-		else{
-			assert(false);
-			return -1;
-		}
-	}
-	else{
-		return current.LastPrice();
-	}
+	return TechUtils::CalulateEMA(data, current, seconds);
 }
 
 MACrossTech* EMACrossStratgy::generateTechVec(const CThostFtdcDepthMDFieldWrapper& info) const
