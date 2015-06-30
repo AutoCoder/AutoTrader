@@ -40,7 +40,7 @@ Order MACrossBOLLStrategy::generateOrder(){
 	return *m_curOrder;
 }
 
-BOLLTech MACrossBOLLStrategy::calculateBoll(const std::list<CThostFtdcDepthMDFieldWrapper>& data, const CThostFtdcDepthMDFieldWrapper& current, int seconds, double ma_val) const{
+BOLLTech MACrossBOLLStrategy::calculateBoll(const std::list<CThostFtdcDepthMDFieldWrapper>& data, const CThostFtdcDepthMDFieldWrapper& current, int seconds) const{
 	double ma = TechUtils::CalulateMA(data, current, seconds);
 	int tickCount = 2 * seconds;
 

@@ -26,7 +26,7 @@ MACrossStratgy::~MACrossStratgy()
 // common MA 
 double MACrossStratgy::calculateK(const std::list<CThostFtdcDepthMDFieldWrapper>& data, const CThostFtdcDepthMDFieldWrapper& current, int seconds) const
 {
-	TechUtils::CalulateMA(data, current, seconds);
+	return TechUtils::CalulateMA(data, current, seconds);
 }
 
 MACrossTech* MACrossStratgy::generateTechVec(const CThostFtdcDepthMDFieldWrapper& info) const{
