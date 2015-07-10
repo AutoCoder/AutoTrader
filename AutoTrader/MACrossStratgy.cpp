@@ -3,7 +3,7 @@
 #include "DBWrapper.h"
 #include "Order.h"
 #include "MACrossStratgy.h"
-#include "ThostFtdcDepthMDFieldWrapper.h"
+#include "TickWrapper.h"
 #include "TechUtils.h"
 #include <sstream>
 #include <assert.h>
@@ -24,16 +24,16 @@ MACrossStratgy::~MACrossStratgy()
 }
 
 // common MA 
-double MACrossStratgy::calculateK(const std::list<CThostFtdcDepthMDFieldWrapper>& data, const CThostFtdcDepthMDFieldWrapper& current, int seconds) const
+double MACrossStratgy::calculateK(const std::list<TickWrapper>& data, const TickWrapper& current, int seconds) const
 {
 	return TechUtils::CalulateMA(data, current, seconds);
 }
 
-MACrossTech* MACrossStratgy::generateTechVec(const CThostFtdcDepthMDFieldWrapper& info) const{
+MACrossTech* MACrossStratgy::generateTechVec(const TickWrapper& info) const{
 	return (new MACrossTech(CrossStratgyType::MA, m_shortMA, m_longMA, info.UUID(), info.InstrumentId(), info.Time(), info.LastPrice()));
 }
 
-bool MACrossStratgy::tryInvoke(const std::list<CThostFtdcDepthMDFieldWrapper>& data, CThostFtdcDepthMDFieldWrapper& info)
+bool MACrossStratgy::tryInvoke(const std::list<TickWrapper>& data, TickWrapper& info)
 {
 	TickType direction = TickType::Commom;
 	const size_t breakthrough_confirm_duration = 100; //50ms
@@ -47,7 +47,7 @@ bool MACrossStratgy::tryInvoke(const std::list<CThostFtdcDepthMDFieldWrapper>& d
 	if (!data.empty()){
 		if (curPtr->IsTriggerPoint()){ // up
 			if (!data.empty() && data.size() > 500){
-				std::list<CThostFtdcDepthMDFieldWrapper>::const_iterator stoper = data.begin();
+				std::list<TickWrapper>::const_iterator stoper = data.begin();
 				std::advance(stoper, breakthrough_confirm_duration);
 				for (auto it = data.begin(); it != stoper; it++){
 					StrategyTech* prePtr = it->GetTechVec();
@@ -73,7 +73,7 @@ bool MACrossStratgy::tryInvoke(const std::list<CThostFtdcDepthMDFieldWrapper>& d
 		}
 		else{ // down
 			if (!data.empty() && data.size() > 500){
-				std::list<CThostFtdcDepthMDFieldWrapper>::const_iterator stoper = data.begin();
+				std::list<TickWrapper>::const_iterator stoper = data.begin();
 				std::advance(stoper, breakthrough_confirm_duration);
 				for (auto it = data.begin(); it != stoper; it++){
 					StrategyTech* prePtr = it->GetTechVec();

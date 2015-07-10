@@ -9,15 +9,15 @@
 
 typedef std::vector<std::string> CThostFtdcDepthMDFieldDBStruct;
 class DBWrapper;
-class CThostFtdcDepthMDFieldWrapper
+class TickWrapper
 {
 public:
-	CThostFtdcDepthMDFieldWrapper(CThostFtdcDepthMarketDataField* p);
-	CThostFtdcDepthMDFieldWrapper(const CThostFtdcDepthMDFieldWrapper& obj);
-	CThostFtdcDepthMDFieldWrapper& operator = (const CThostFtdcDepthMDFieldWrapper& obj);
-	CThostFtdcDepthMDFieldWrapper(CThostFtdcDepthMDFieldWrapper && obj);
+	TickWrapper(CThostFtdcDepthMarketDataField* p);
+	TickWrapper(const TickWrapper& obj);
+	TickWrapper& operator = (const TickWrapper& obj);
+	TickWrapper(TickWrapper && obj);
 
-	~CThostFtdcDepthMDFieldWrapper();
+	~TickWrapper();
 
 	void serializeToDB(DBWrapper& db) const;
 
@@ -59,7 +59,7 @@ public:
 		return ret;
 	}
 
-	static CThostFtdcDepthMDFieldWrapper RecoverFromDB(const CThostFtdcDepthMDFieldDBStruct& vec);
+	static TickWrapper RecoverFromDB(const CThostFtdcDepthMDFieldDBStruct& vec);
 
 private:
 	CThostFtdcDepthMarketDataField m_MdData;

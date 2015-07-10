@@ -14,7 +14,7 @@
 #include "OrderQueue.h"
 #include <atomic>
 #include "spdlog/spdlog.h"
-#include "ThostFtdcDepthMDFieldWrapper.h"
+#include "TickWrapper.h"
 #include "unittest.h"
 #include "CommonUtils.h"
 
@@ -116,7 +116,7 @@ void ReplayTickDataFromDB(const std::string& instrumentID, const std::string& ma
 		dbwrapper.Query(sqlbuf, map_results);
 
 		for (auto item : map_results){
-			auto dataItem = CThostFtdcDepthMDFieldWrapper::RecoverFromDB(item.second);
+			auto dataItem = TickWrapper::RecoverFromDB(item.second);
 			pool->GenRealTimeDataProcessor(instrumentID)->AppendRealTimeData(dataItem);
 		}
 	}

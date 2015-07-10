@@ -66,9 +66,6 @@
     <ClInclude Include="Strategy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ThostFtdcDepthMDFieldWrapper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="mysqlwrapper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -126,6 +123,12 @@
     <ClInclude Include="TechUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="TickWrapper.h">
+      <Filter>Header Files\Tech</Filter>
+    </ClInclude>
+    <ClInclude Include="KData.h">
+      <Filter>Header Files\Tech</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -138,9 +141,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Order.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ThostFtdcDepthMDFieldWrapper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DBWrapper.cpp">
@@ -190,6 +190,12 @@
     </ClCompile>
     <ClCompile Include="TechUtils.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TickWrapper.cpp">
+      <Filter>Source Files\Tech</Filter>
+    </ClCompile>
+    <ClCompile Include="KData.cpp">
+      <Filter>Source Files\Tech</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

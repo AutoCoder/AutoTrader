@@ -169,6 +169,7 @@
     <ClInclude Include="DBWrapper.h" />
     <ClInclude Include="EMACrossStratgy.h" />
     <ClInclude Include="ini_parser.h" />
+    <ClInclude Include="KData.h" />
     <ClInclude Include="MACrossBOLLStrategy.h" />
     <ClInclude Include="MACrossBOLLTech.h" />
     <ClInclude Include="MACrossStratgy.h" />
@@ -185,7 +186,7 @@
     <ClInclude Include="targetver.h" />
     <ClInclude Include="TechUtils.h" />
     <ClInclude Include="TechVec.h" />
-    <ClInclude Include="ThostFtdcDepthMDFieldWrapper.h" />
+    <ClInclude Include="TickWrapper.h" />
     <ClInclude Include="unittest.h" />
     <ClInclude Include="WMACrossStratgy.h" />
   </ItemGroup>
@@ -198,6 +199,7 @@
     <ClCompile Include="config.cpp" />
     <ClCompile Include="DBWrapper.cpp" />
     <ClCompile Include="EMACrossStratgy.cpp" />
+    <ClCompile Include="KData.cpp" />
     <ClCompile Include="MACrossBOLLStrategy.cpp" />
     <ClCompile Include="MACrossBOLLTech.cpp" />
     <ClCompile Include="MACrossStratgy.cpp" />
@@ -214,7 +216,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="TechUtils.cpp" />
-    <ClCompile Include="ThostFtdcDepthMDFieldWrapper.cpp" />
+    <ClCompile Include="TickWrapper.cpp" />
     <ClCompile Include="WMACrossStratgy.cpp" />
   </ItemGroup>
   <ItemGroup>

@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "mdspi.h"
 #include <iostream>
-#include "ThostFtdcDepthMDFieldWrapper.h"
+#include "TickWrapper.h"
 #include "RealTimeDataProcessorPool.h"
 #include <condition_variable>
 #include <atomic>
@@ -163,7 +163,7 @@ void CtpMdSpi::OnRtnDepthMarketData(
 	//1) must create the local variable "pool" here, otherwise it will not call destruction fucntion when exit(0)
 	//2) can't define a local RealTimeDataProcessor variable here, otherwise it will plus the ref-count, so that it will not call destruction fucntion when exit(0)
 	auto pool = RealTimeDataProcessorPool::getInstance();
-	pool->GenRealTimeDataProcessor(pDepthMarketData->InstrumentID)->AppendRealTimeData(CThostFtdcDepthMDFieldWrapper(pDepthMarketData));
+	pool->GenRealTimeDataProcessor(pDepthMarketData->InstrumentID)->AppendRealTimeData(TickWrapper(pDepthMarketData));
 
 	TryTerminate(pDepthMarketData->UpdateTime);
 }

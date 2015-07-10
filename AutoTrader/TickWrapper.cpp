@@ -4,13 +4,13 @@
 #include <assert.h>
 #include <time.h>
 #include "config.h"
-#include "ThostFtdcDepthMDFieldWrapper.h"
+#include "TickWrapper.h"
 #include "TechVec.h"
 #include "CommonUtils.h"
 
-bool CThostFtdcDepthMDFieldWrapper::firstlanuch = true;
+bool TickWrapper::firstlanuch = true;
 
-CThostFtdcDepthMDFieldWrapper::CThostFtdcDepthMDFieldWrapper(CThostFtdcDepthMarketDataField* p)
+TickWrapper::TickWrapper(CThostFtdcDepthMarketDataField* p)
 	: recoveryData(false)
 	, m_techvec(nullptr)
 {
@@ -20,7 +20,7 @@ CThostFtdcDepthMDFieldWrapper::CThostFtdcDepthMDFieldWrapper(CThostFtdcDepthMark
 	//m_techvec = new StrategyTech(m_uuid, p->InstrumentID);
 }
 
-CThostFtdcDepthMDFieldWrapper::~CThostFtdcDepthMDFieldWrapper()
+TickWrapper::~TickWrapper()
 {
 	if (m_techvec)
 	{
@@ -29,7 +29,7 @@ CThostFtdcDepthMDFieldWrapper::~CThostFtdcDepthMDFieldWrapper()
 	}
 }
 
-CThostFtdcDepthMDFieldWrapper::CThostFtdcDepthMDFieldWrapper(const CThostFtdcDepthMDFieldWrapper& obj)
+TickWrapper::TickWrapper(const TickWrapper& obj)
 {
 	m_MdData = obj.m_MdData;
 	m_uuid = obj.m_uuid;
@@ -45,7 +45,7 @@ CThostFtdcDepthMDFieldWrapper::CThostFtdcDepthMDFieldWrapper(const CThostFtdcDep
 	}
 }
 
-CThostFtdcDepthMDFieldWrapper& CThostFtdcDepthMDFieldWrapper::operator = (const CThostFtdcDepthMDFieldWrapper& obj)
+TickWrapper& TickWrapper::operator = (const TickWrapper& obj)
 {
 	if (this == &obj)
 		return *this;
@@ -67,7 +67,7 @@ CThostFtdcDepthMDFieldWrapper& CThostFtdcDepthMDFieldWrapper::operator = (const 
 	return *this;
 }
 
-CThostFtdcDepthMDFieldWrapper::CThostFtdcDepthMDFieldWrapper(CThostFtdcDepthMDFieldWrapper && obj)
+TickWrapper::TickWrapper(TickWrapper && obj)
 	: m_MdData(obj.m_MdData)
 	, m_uuid(obj.m_uuid)
 	, recoveryData(obj.recoveryData)
@@ -76,12 +76,12 @@ CThostFtdcDepthMDFieldWrapper::CThostFtdcDepthMDFieldWrapper(CThostFtdcDepthMDFi
 	obj.m_techvec = nullptr;
 }
 
-long long CThostFtdcDepthMDFieldWrapper::toTimeStamp() const{
+long long TickWrapper::toTimeStamp() const{
 	long long ret = CommonUtils::DateTimeToTimestamp(m_MdData.TradingDay, m_MdData.UpdateTime) * 2 + m_MdData.UpdateMillisec / 500;
 	return ret;
 }
 
-void CThostFtdcDepthMDFieldWrapper::serializeToDB(DBWrapper& db) const {
+void TickWrapper::serializeToDB(DBWrapper& db) const {
 	// if this item is recovered from db, so that we don't need serialize it to db again. 
 	if (recoveryData)
 		return;
@@ -188,7 +188,7 @@ void CThostFtdcDepthMDFieldWrapper::serializeToDB(DBWrapper& db) const {
 	db.ExecuteNoResult(sql.str());
 }
 
-CThostFtdcDepthMDFieldWrapper CThostFtdcDepthMDFieldWrapper::RecoverFromDB(const CThostFtdcDepthMDFieldDBStruct& vec)
+TickWrapper TickWrapper::RecoverFromDB(const CThostFtdcDepthMDFieldDBStruct& vec)
 {
 	CThostFtdcDepthMarketDataField mdStuct;
 	memset(&mdStuct, 0, sizeof(mdStuct));
@@ -237,7 +237,7 @@ CThostFtdcDepthMDFieldWrapper CThostFtdcDepthMDFieldWrapper::RecoverFromDB(const
 	mdStuct.AskVolume5 = CommonUtils::Stringtolong(vec[42]);
 	mdStuct.AveragePrice = CommonUtils::StringtoDouble(vec[43]);
 	strcpy_s(mdStuct.ActionDay, CommonUtils::ConvertTime(vec[44]).c_str());
-	CThostFtdcDepthMDFieldWrapper mdObject(&mdStuct);
+	TickWrapper mdObject(&mdStuct);
 	mdObject.recoveryData = true;
 	return mdObject;
 }

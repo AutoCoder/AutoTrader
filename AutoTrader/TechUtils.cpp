@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "TechUtils.h"
-#include "ThostFtdcDepthMDFieldWrapper.h"
+#include "TickWrapper.h"
 #include "MACrossStratgy.h"
 #include <assert.h>
 
@@ -14,7 +14,7 @@ TechUtils::~TechUtils()
 }
 
 
-double TechUtils::CalulateMA(const std::list<CThostFtdcDepthMDFieldWrapper>& data, const CThostFtdcDepthMDFieldWrapper& current, int seconds)
+double TechUtils::CalulateMA(const std::list<TickWrapper>& data, const TickWrapper& current, int seconds)
 {
 	//datetime to timestamp
 	double totalExchangeLastPrice = current.LastPrice();
@@ -38,7 +38,7 @@ double TechUtils::CalulateMA(const std::list<CThostFtdcDepthMDFieldWrapper>& dat
 	return totalExchangeLastPrice / count;
 }
 
-double TechUtils::CalulateEMA(const std::list<CThostFtdcDepthMDFieldWrapper>& data, const CThostFtdcDepthMDFieldWrapper& current, int seconds)
+double TechUtils::CalulateEMA(const std::list<TickWrapper>& data, const TickWrapper& current, int seconds)
 {
 	if (data.empty()){
 		return current.LastPrice();
@@ -46,7 +46,7 @@ double TechUtils::CalulateEMA(const std::list<CThostFtdcDepthMDFieldWrapper>& da
 
 	int N = seconds * 2;
 
-	CThostFtdcDepthMDFieldWrapper preNode = data.front();
+	TickWrapper preNode = data.front();
 	MACrossTech* preTechVec = dynamic_cast<MACrossTech*>(preNode.m_techvec);
 	if (preTechVec){
 		if (seconds == 60 * preTechVec->ShortMA()){
@@ -67,7 +67,7 @@ double TechUtils::CalulateEMA(const std::list<CThostFtdcDepthMDFieldWrapper>& da
 	}
 }
 
-double TechUtils::CalulateWMA(const std::list<CThostFtdcDepthMDFieldWrapper>& data, const CThostFtdcDepthMDFieldWrapper& current, int seconds)
+double TechUtils::CalulateWMA(const std::list<TickWrapper>& data, const TickWrapper& current, int seconds)
 {
 	//datetime to timestamp
 	int n = seconds * 2;
@@ -94,7 +94,7 @@ double TechUtils::CalulateWMA(const std::list<CThostFtdcDepthMDFieldWrapper>& da
 	return totalExchangeLastPrice / count;
 }
 
-double TechUtils::CalulateAMA(const std::list<CThostFtdcDepthMDFieldWrapper>& data, const CThostFtdcDepthMDFieldWrapper& current, int seconds)
+double TechUtils::CalulateAMA(const std::list<TickWrapper>& data, const TickWrapper& current, int seconds)
 {
 	double totalExchangePrice = current.TurnOver();
 	long long totalVolume = current.Volume();

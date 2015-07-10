@@ -7,6 +7,7 @@
 #include "RealTimeDataProcessorPool.h"
 #include "config.h"
 #include "DBWrapper.h"
+#include "MACrossBOLLStrategy.h"
 
 RealTimeDataProcessorPool* RealTimeDataProcessorPool::_instance = NULL;
 
@@ -39,6 +40,9 @@ RealTimeDataProcessorPool::RealTimeDataProcessorPool()
 		}
 		else if (it.name == "EMACross"){
 			m_dict["EMACross"] = std::shared_ptr<Strategy>(new EMACrossStratgy(it.short_ma, it.long_ma));
+		}
+		else if (it.name == "MACrossBOLL"){
+			m_dict["MACrossBOLL"] = std::shared_ptr<Strategy>(new MACrossBOLLStrategy(it.short_ma, it.long_ma, 26));
 		}
 	}
 

@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "RealTimeDataProcessor.h"
-#include "ThostFtdcDepthMDFieldWrapper.h"
+#include "TickWrapper.h"
 #include "Strategy.h"
 #include "Order.h"
 #include "OrderQueue.h"
@@ -8,6 +8,7 @@
 #include <assert.h>
 #include "config.h"
 #include "DBWrapper.h"
+#include "CommonUtils.h"
 #include "spdlog/spdlog.h"
 
 extern std::atomic<bool> g_reply;
@@ -29,9 +30,26 @@ RealTimeDataProcessor::~RealTimeDataProcessor()
 
 void RealTimeDataProcessor::StoreDataToDB()
 {
+	std::vector<TickWrapper> oneMinuteVec;
 	//store Tick data in memory into db
 	for (auto iter = m_DataSeq.rbegin(); iter != m_DataSeq.rend(); iter++){
 		iter->serializeToDB(*(m_dbptr.get()));
+
+		//construct 1-minutes k-line intermediate data
+		if (oneMinuteVec.empty()){
+			oneMinuteVec.push_back(*iter);
+		}
+		else{
+			if (CommonUtils::InSameMinute(iter->Time(), oneMinuteVec.front().Time())){
+				oneMinuteVec.push_back(*iter);
+			}
+			else{ // the comming tick data is in next minutes
+				//Todo: calculate the 1-minutes kLine and then store it
+
+				
+				oneMinuteVec.clear();
+			}
+		}
 	}
 }
 
@@ -51,7 +69,7 @@ void RealTimeDataProcessor::StoreStrategySequenceToDB(const std::string& mark)
 	spdlog::get("console")->info() << "End to store db.";
 }
 
-void RealTimeDataProcessor::AppendRealTimeData(CThostFtdcDepthMDFieldWrapper& info){
+void RealTimeDataProcessor::AppendRealTimeData(TickWrapper& info){
 	//(in)front-------------back(out)
 	// if m_strategy == nullptr, that means RealTimeDataProcessor is in data-recording mode
 	if (m_strategy){
@@ -79,7 +97,7 @@ void RealTimeDataProcessor::recoverHistoryData(int beforeSeconds)
 	m_dbptr->Query(sqlbuf, map_results);
 	
 	for (auto item : map_results){
-		m_DataSeq.push_front(CThostFtdcDepthMDFieldWrapper::RecoverFromDB(item.second));
+		m_DataSeq.push_front(TickWrapper::RecoverFromDB(item.second));
 	}
 
 }

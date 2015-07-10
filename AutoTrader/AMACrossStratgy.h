@@ -10,8 +10,8 @@ public:
 	virtual ~AMACrossStratgy();
 
 protected:
-	virtual double calculateK(const std::list<CThostFtdcDepthMDFieldWrapper>& data, const CThostFtdcDepthMDFieldWrapper& current, int seconds) const;
-	virtual MACrossTech* generateTechVec(const CThostFtdcDepthMDFieldWrapper& info) const;
+	virtual double calculateK(const std::list<TickWrapper>& data, const TickWrapper& current, int seconds) const;
+	virtual MACrossTech* generateTechVec(const TickWrapper& info) const;
 };
 
 #endif

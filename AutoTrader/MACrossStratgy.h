@@ -12,12 +12,12 @@ public:
 	MACrossStratgy(size_t short_ma, size_t long_ma);
 	virtual ~MACrossStratgy();
 
-	virtual bool tryInvoke(const std::list<CThostFtdcDepthMDFieldWrapper>& data, CThostFtdcDepthMDFieldWrapper& info);
+	virtual bool tryInvoke(const std::list<TickWrapper>& data, TickWrapper& info);
 	virtual Order generateOrder();
 
 protected:
-	virtual double calculateK(const std::list<CThostFtdcDepthMDFieldWrapper>& data, const CThostFtdcDepthMDFieldWrapper& current, int seconds) const;
-	virtual MACrossTech* generateTechVec(const CThostFtdcDepthMDFieldWrapper& info) const;
+	virtual double calculateK(const std::list<TickWrapper>& data, const TickWrapper& current, int seconds) const;
+	virtual MACrossTech* generateTechVec(const TickWrapper& info) const;
 
 protected:
 	size_t m_shortMA;

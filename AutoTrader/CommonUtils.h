@@ -26,5 +26,7 @@ public:
 
 	static std::string InterpretOrderStatusCode(TThostFtdcOrderStatusType type);
 	static std::string InterpretOrderSubmitStatusCode(TThostFtdcOrderSubmitStatusType type);
+
+	static bool InSameMinute(const std::string& time1, const std::string& time2);
 };
 

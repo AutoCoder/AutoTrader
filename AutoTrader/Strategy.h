@@ -4,7 +4,7 @@
 #include <list>
 
 class Order;
-class CThostFtdcDepthMDFieldWrapper;
+class TickWrapper;
 
 class Strategy
 {
@@ -12,7 +12,7 @@ public:
 	Strategy(){}
 	~Strategy(){}
 
-	virtual bool tryInvoke(const std::list<CThostFtdcDepthMDFieldWrapper>& data, CThostFtdcDepthMDFieldWrapper& info) = 0;
+	virtual bool tryInvoke(const std::list<TickWrapper>& data, TickWrapper& info) = 0;
 
 	virtual Order generateOrder() = 0;
 

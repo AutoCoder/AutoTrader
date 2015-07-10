@@ -227,3 +227,10 @@ std::string CommonUtils::InterpretOrderSubmitStatusCode(TThostFtdcOrderSubmitSta
 		return "Wrong TThostFtdcOrderSubmitStatusType passed.";
 	}
 }
+
+bool CommonUtils::InSameMinute(const std::string& time1, const std::string& time2){
+	size_t len = time1.length();
+	std::string nt1 = time1.substr(0, len - 2);
+	std::string nt2 = time2.substr(0, len - 2);
+	return nt1 == nt2;
+}

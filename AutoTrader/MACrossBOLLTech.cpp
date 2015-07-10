@@ -14,6 +14,8 @@ MACrossBOLLTech::MACrossBOLLTech(CrossStratgyType type, size_t shortMA, size_t l
 , m_maTech()
 , m_bollTech()
 {
+	strcpy_s(m_time, time.c_str());
+	strcpy_s(m_instrumentId, instrumentID.c_str());
 }
 
 
@@ -24,7 +26,7 @@ MACrossBOLLTech::~MACrossBOLLTech()
 
 bool MACrossBOLLTech::IsTriggerPoint() const
 {
-	return m_bollTech.IsTriggerPoint() && m_maTech.IsTriggerPoint();
+	return /*m_bollTech.IsTriggerPoint() &&*/ m_maTech.IsTriggerPoint();
 }
 
 bool MACrossBOLLTech::IsTableCreated = false;

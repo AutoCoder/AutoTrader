@@ -6,6 +6,7 @@ struct BOLLTech{
 	BOLLTech(double ma, double var, double curVal = 0)
 	: mMAValue(ma)
 	, mVariance(var)
+	, mCurValue(curVal)
 	{};
 	~BOLLTech(){};
 

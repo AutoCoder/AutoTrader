@@ -5,7 +5,7 @@
 #include <vector>
 #include <memory>
 
-class CThostFtdcDepthMDFieldWrapper;
+class TickWrapper;
 class Strategy;
 class DBWrapper;
 
@@ -18,7 +18,7 @@ public:
 	RealTimeDataProcessor(Strategy* strag, const std::string& InstrumentName);
 	~RealTimeDataProcessor();
 
-	void AppendRealTimeData(CThostFtdcDepthMDFieldWrapper& info);
+	void AppendRealTimeData(TickWrapper& info);
 	void StoreDataToDB();
 	void StoreStrategySequenceToDB(const std::string& suggestTableName = "");
 
@@ -26,7 +26,7 @@ private:
 	void recoverHistoryData(int beforeSeconds);
 
 private:
-	std::list<CThostFtdcDepthMDFieldWrapper> m_DataSeq;
+	std::list<TickWrapper> m_DataSeq;
 	std::string m_Name;
 	Strategy* m_strategy;
 	std::shared_ptr<DBWrapper> m_dbptr;
