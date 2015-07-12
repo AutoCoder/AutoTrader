@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "RealTimeDataProcessor.h"
 #include "TickWrapper.h"
+#include "KData.h"
 #include "Strategy.h"
 #include "Order.h"
 #include "OrderQueue.h"
@@ -34,22 +35,11 @@ void RealTimeDataProcessor::StoreDataToDB()
 	//store Tick data in memory into db
 	for (auto iter = m_DataSeq.rbegin(); iter != m_DataSeq.rend(); iter++){
 		iter->serializeToDB(*(m_dbptr.get()));
+	}
 
-		//construct 1-minutes k-line intermediate data
-		if (oneMinuteVec.empty()){
-			oneMinuteVec.push_back(*iter);
-		}
-		else{
-			if (CommonUtils::InSameMinute(iter->Time(), oneMinuteVec.front().Time())){
-				oneMinuteVec.push_back(*iter);
-			}
-			else{ // the comming tick data is in next minutes
-				//Todo: calculate the 1-minutes kLine and then store it
-
-				
-				oneMinuteVec.clear();
-			}
-		}
+	//store 1-Min K-data in memory into db
+	for (auto iter = m_KDataVec.begin(); iter != m_KDataVec.end(); iter++){
+		iter->serializeToDB(*(m_dbptr.get()));
 	}
 }
 
@@ -80,6 +70,22 @@ void RealTimeDataProcessor::AppendRealTimeData(TickWrapper& info){
 	}
 	m_DataSeq.push_front(info);
 
+	//construct 1-minutes k-line intermediate data
+	if (m_TickSet60.empty()){
+		m_TickSet60.push_back(info);
+	}
+	else{
+		if (CommonUtils::InSameMinute(info.Time(), m_TickSet60.front().Time())){
+			m_TickSet60.push_back(info);
+		}
+		else{ // the comming tick data is in next minutes
+			
+			KData k1m(m_TickSet60, 60);
+			m_KDataVec.push_back(k1m);
+
+			m_TickSet60.clear();
+		}
+	}
 #ifdef SHOW_PROGRESS
 	spdlog::get("console")->info() << "> Data queue size :" << m_DataSeq.size();
 #endif

@@ -81,6 +81,14 @@ long long TickWrapper::toTimeStamp() const{
 	return ret;
 }
 
+long long TickWrapper::FirstSecondsTimeStamp() const{
+	std::string firstseconds(m_MdData.UpdateTime);
+	firstseconds[6] = '0';
+	firstseconds[7] = '0';
+	long long ret = CommonUtils::DateTimeToTimestamp(m_MdData.TradingDay, firstseconds.c_str());
+	return ret;
+}
+
 void TickWrapper::serializeToDB(DBWrapper& db) const {
 	// if this item is recovered from db, so that we don't need serialize it to db again. 
 	if (recoveryData)

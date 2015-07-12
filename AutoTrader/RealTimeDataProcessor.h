@@ -8,6 +8,7 @@
 class TickWrapper;
 class Strategy;
 class DBWrapper;
+class KData;
 
 #define QueueSize 10
 
@@ -27,6 +28,8 @@ private:
 
 private:
 	std::list<TickWrapper> m_DataSeq;
+	std::vector<TickWrapper> m_TickSet60;
+	std::vector<KData> m_KDataVec;
 	std::string m_Name;
 	Strategy* m_strategy;
 	std::shared_ptr<DBWrapper> m_dbptr;

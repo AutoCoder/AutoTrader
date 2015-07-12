@@ -24,12 +24,58 @@ public:
 	// return value:(unit: half second = 500ms, time to 19700101 00:00:00 + UTC8)
 	long long toTimeStamp() const;
 
+	long long FirstSecondsTimeStamp() const;
+
 	double TurnOver() const{
 		return m_MdData.Turnover;
 	}
 
 	long long Volume() const{
 		return m_MdData.Volume;
+	}
+
+	double BidPrice1() const{
+		return m_MdData.BidPrice1;
+	}
+
+	double AskPrice1() const {
+		return m_MdData.AskPrice1;
+	}
+
+	double LowestPrice() const{
+		return m_MdData.LowestPrice;
+	}
+
+	double HighestPrice() const {
+		return m_MdData.HighestPrice;
+	}
+
+	double OpenPrice() const{
+		return m_MdData.OpenPrice;
+	}
+
+	double ClosePrice() const {
+		return m_MdData.ClosePrice;
+	}
+
+	double PreSettlementPrice() const {
+		return m_MdData.PreSettlementPrice;
+	}
+
+	double SettlementPrice() const {
+		return m_MdData.SettlementPrice;
+	}
+
+	double PreClosePrice() const {
+		return m_MdData.PreClosePrice;
+	}
+
+	double UpperLimitPrice() const {
+		return m_MdData.UpperLimitPrice;
+	}
+
+	double LowerLimitPrice() const{
+		return m_MdData.LowerLimitPrice;
 	}
 
 	inline double LastPrice() const{
