@@ -38,8 +38,16 @@ public:
 		return m_MdData.BidPrice1;
 	}
 
+	double BidVolume1() const{
+		return m_MdData.BidVolume1;
+	}
+
 	double AskPrice1() const {
 		return m_MdData.AskPrice1;
+	}
+
+	double AskVolume1() const {
+		return m_MdData.AskVolume1;
 	}
 
 	double LowestPrice() const{
