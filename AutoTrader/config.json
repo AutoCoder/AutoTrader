@@ -10,7 +10,7 @@
       "RiskFront":""
    },
    "Arguments":{
-      "RecordMode":false
+      "RecordMode":true
    },
    
    "Instruments": "rb1510,rb1511",

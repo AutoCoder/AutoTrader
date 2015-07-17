@@ -15,6 +15,8 @@
 extern std::atomic<bool> g_reply;
 extern threadsafe_queue<Order> order_queue;
 
+#define UseKDataToInvoke 1
+
 RealTimeDataProcessor::RealTimeDataProcessor(Strategy* strag, const std::string& InstrumentName)
 	: m_strategy(strag)
 	, m_Name(InstrumentName)
@@ -63,8 +65,11 @@ void RealTimeDataProcessor::AppendRealTimeData(TickWrapper& info){
 	//(in)front-------------back(out)
 	// if m_strategy == nullptr, that means RealTimeDataProcessor is in data-recording mode
 	if (m_strategy){
+#ifdef UseKDataToInvoke
+		bool triggered = m_strategy->tryInvoke(m_DataSeq, m_KDataVec, m_TickSet60, info);
+#else
 		bool triggered = m_strategy->tryInvoke(m_DataSeq, info);
-
+#endif
 		if (triggered)
 			order_queue.push(m_strategy->generateOrder());
 	}
@@ -79,7 +84,6 @@ void RealTimeDataProcessor::AppendRealTimeData(TickWrapper& info){
 			m_TickSet60.push_back(info);
 		}
 		else{ // the comming tick data is in next minutes
-			
 			KData k1m(m_TickSet60, 60);
 			m_KDataVec.push_back(k1m);
 

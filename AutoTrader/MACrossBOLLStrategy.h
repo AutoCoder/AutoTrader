@@ -1,4 +1,6 @@
-#pragma once
+#ifndef MACROSSBOLL_STRATEGY_H
+#define MACROSSBOLL_STRATEGY_H
+
 #include "Strategy.h"
 #include "MACrossBOLLTech.h"
 #include "TechVec.h"
@@ -12,11 +14,14 @@ public:
 	virtual ~MACrossBOLLStrategy();
 
 	virtual bool tryInvoke(const std::list<TickWrapper>& data, TickWrapper& info);
+	virtual bool tryInvoke(const std::list<TickWrapper>& tickdata, const std::vector<KData>& data, std::vector<TickWrapper> curmindata, TickWrapper& info);
 	virtual Order generateOrder();
 
 protected:
 	virtual BOLLTech calculateBoll(const std::list<TickWrapper>& data, const TickWrapper& current, int seconds) const;
+	virtual BOLLTech calculateBoll(const std::vector<KData>& data, const KData& current, int mins) const;
 	virtual double calculateK(const std::list<TickWrapper>& data, const TickWrapper& current, int seconds) const;
+	virtual double calculateK(const std::vector<KData>& data, const KData& current, int mins) const;
 	//virtual MACrossBOLLTech* generateTechVec(const TickWrapper& info) const;
 
 protected:
@@ -30,3 +35,4 @@ private:
 
 };
 
+#endif

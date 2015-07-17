@@ -19,7 +19,7 @@ namespace {
 
 
 	void TryTerminate(const char * time){
-		if (!g_quit && CommonUtils::IsMarketingTime(time) == false){
+		if (!g_quit && strcmp(time, "10:55:00") == 0){ //CommonUtils::IsMarketingTime(time) == false){
 			g_quit = true;
 			cv_md.notify_all();
 			cv_trade.notify_all();

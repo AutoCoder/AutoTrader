@@ -14,6 +14,22 @@ public:
 
 	void serializeToDB(DBWrapper& db);
 
+	double TurnOver() const{
+		return m_Turnover;
+	}
+
+	long long Volume() const{
+		return m_volume;
+	}
+
+	double LastPrice() const{
+		return m_LastPrice;
+	}
+
+	long long Timestamp() const{
+		return m_timestamp;
+	}
+
 private:
 	static bool IsTableCreated;
 	static int CreateKDataTableIfNotExists(const std::string& dbname, const std::string& tableName);

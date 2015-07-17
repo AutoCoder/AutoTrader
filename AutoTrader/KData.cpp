@@ -17,8 +17,8 @@ KData::KData(const TickSet& tickset, size_t duration)
 	for (auto item : tickset){
 		m_volume += item.Volume();
 		m_Turnover += item.TurnOver();
-		m_LowestPrice = m_LowestPrice > item.LowestPrice() ? item.LowestPrice() : m_LowestPrice;
-		m_HighestPrice = m_HighestPrice < item.HighestPrice() ? item.HighestPrice() : m_HighestPrice;
+		m_LowestPrice = m_LowestPrice > item.LastPrice() ? item.LastPrice() : m_LowestPrice;
+		m_HighestPrice = m_HighestPrice < item.LastPrice() ? item.LastPrice() : m_HighestPrice;
 	}
 	m_averagePrice = m_Turnover / m_volume;
 	m_timestamp = tickset.front().FirstSecondsTimeStamp();

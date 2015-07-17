@@ -2,9 +2,11 @@
 #define STRATEGY_H
 
 #include <list>
+#include <vector>
 
 class Order;
 class TickWrapper;
+class KData;
 
 class Strategy
 {
@@ -13,6 +15,7 @@ public:
 	~Strategy(){}
 
 	virtual bool tryInvoke(const std::list<TickWrapper>& data, TickWrapper& info) = 0;
+	virtual bool tryInvoke(const std::list<TickWrapper>& tickdata, const std::vector<KData>& data, std::vector<TickWrapper> curmindata, TickWrapper& info) = 0;
 
 	virtual Order generateOrder() = 0;
 
