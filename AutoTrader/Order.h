@@ -119,6 +119,9 @@ public:
 	void SetCombOffsetFlagType(char flag){
 		// todo: now only set the first byte
 		m_innerStruct.CombOffsetFlag[0] = flag;
+		for (int i = 1; i < 5; i++){
+			m_innerStruct.CombOffsetFlag[i] = 0;
+		}
 	}
 
 	char GetCombOffsetFlagType() const {

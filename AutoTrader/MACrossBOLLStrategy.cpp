@@ -59,7 +59,7 @@ bool MACrossBOLLStrategy::tryInvoke(const std::list<TickWrapper>& data, TickWrap
 					m_curOrder->SetInstrumentId(info.InstrumentId());
 					m_curOrder->SetRefExchangePrice(info.LastPrice());
 					m_curOrder->SetExchangeDirection(ExchangeDirection::Buy);
-					m_curOrder->SetCombOffsetFlagType(Order::FAK);
+					m_curOrder->SetOrderType(Order::FAK);
 					curPtr->SetTickType(TickType::BuyPoint);
 				}
 			}
@@ -83,7 +83,7 @@ bool MACrossBOLLStrategy::tryInvoke(const std::list<TickWrapper>& data, TickWrap
 					m_curOrder->SetInstrumentId(info.InstrumentId());
 					m_curOrder->SetRefExchangePrice(info.LastPrice());
 					m_curOrder->SetExchangeDirection(ExchangeDirection::Sell);
-					m_curOrder->SetCombOffsetFlagType(Order::FAK);
+					m_curOrder->SetOrderType(Order::FAK);
 					curPtr->SetTickType(TickType::SellPoint);
 				}
 			}
@@ -112,7 +112,7 @@ bool MACrossBOLLStrategy::tryInvoke(const std::list<TickWrapper>& tickdata, cons
 	if (!tickdata.empty()){
 		if (curPtr->IsTriggerPoint())
 		{ // up
-			if (!data.empty() && data.size() > 500){
+			if (!tickdata.empty() && tickdata.size() > 500){
 				std::list<TickWrapper>::const_iterator stoper = tickdata.begin();
 				std::advance(stoper, breakthrough_confirm_duration);
 				for (auto it = tickdata.begin(); it != stoper; it++){
@@ -132,14 +132,14 @@ bool MACrossBOLLStrategy::tryInvoke(const std::list<TickWrapper>& tickdata, cons
 					m_curOrder->SetInstrumentId(info.InstrumentId());
 					m_curOrder->SetRefExchangePrice(info.LastPrice());
 					m_curOrder->SetExchangeDirection(ExchangeDirection::Buy);
-					m_curOrder->SetCombOffsetFlagType(Order::FAK);
+					m_curOrder->SetOrderType(Order::FAK);
 					curPtr->SetTickType(TickType::BuyPoint);
 				}
 			}
 		}
 		else
 		{ // down
-			if (!data.empty() && data.size() > 500){
+			if (!tickdata.empty() && tickdata.size() > 500){
 				std::list<TickWrapper>::const_iterator stoper = tickdata.begin();
 				std::advance(stoper, breakthrough_confirm_duration);
 				for (auto it = tickdata.begin(); it != stoper; it++){
@@ -157,7 +157,7 @@ bool MACrossBOLLStrategy::tryInvoke(const std::list<TickWrapper>& tickdata, cons
 					m_curOrder->SetInstrumentId(info.InstrumentId());
 					m_curOrder->SetRefExchangePrice(info.LastPrice());
 					m_curOrder->SetExchangeDirection(ExchangeDirection::Sell);
-					m_curOrder->SetCombOffsetFlagType(Order::FAK);
+					m_curOrder->SetOrderType(Order::FAK);
 					curPtr->SetTickType(TickType::SellPoint);
 				}
 			}
