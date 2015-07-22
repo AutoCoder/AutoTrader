@@ -120,7 +120,7 @@ void ReplayTickDataFromDB(const std::string& instrumentID, const std::string& ma
 			pool->GenRealTimeDataProcessor(instrumentID)->AppendRealTimeData(dataItem);
 		}
 	}
-
+	spdlog::get("console")->info() << "Reply " << instrumentID << " finished.";
 	//Store to db
 	pool->GenRealTimeDataProcessor(instrumentID)->StoreStrategySequenceToDB(mark);
 }
