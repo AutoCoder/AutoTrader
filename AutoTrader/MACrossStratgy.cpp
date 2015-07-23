@@ -69,9 +69,9 @@ bool MACrossStratgy::tryInvoke(const std::list<TickWrapper>& data, TickWrapper& 
 				if (orderSingal){
 					//update m_curOrder
 					m_curOrder->SetInstrumentId(info.InstrumentId());
+					m_curOrder->SetOrderType(Order::LimitPriceFOKOrder);
 					m_curOrder->SetRefExchangePrice(info.LastPrice());
 					m_curOrder->SetExchangeDirection(ExchangeDirection::Buy);
-					m_curOrder->SetCombOffsetFlagType(Order::FAK);
 					curPtr->SetTickType(TickType::BuyPoint);
 				}
 			}
@@ -93,9 +93,9 @@ bool MACrossStratgy::tryInvoke(const std::list<TickWrapper>& data, TickWrapper& 
 				if (orderSingal){
 					//special point
 					m_curOrder->SetInstrumentId(info.InstrumentId());
+					m_curOrder->SetOrderType(Order::LimitPriceFOKOrder);
 					m_curOrder->SetRefExchangePrice(info.LastPrice());
 					m_curOrder->SetExchangeDirection(ExchangeDirection::Sell);
-					m_curOrder->SetCombOffsetFlagType(Order::FAK);
 					curPtr->SetTickType(TickType::SellPoint);
 				}
 			}
@@ -140,9 +140,9 @@ bool MACrossStratgy::tryInvoke(const std::list<TickWrapper>& tickdata, const std
 				if (orderSingal){
 					//update m_curOrder
 					m_curOrder->SetInstrumentId(info.InstrumentId());
+					m_curOrder->SetOrderType(Order::LimitPriceFOKOrder);
 					m_curOrder->SetRefExchangePrice(info.LastPrice());
 					m_curOrder->SetExchangeDirection(ExchangeDirection::Buy);
-					m_curOrder->SetCombOffsetFlagType(Order::FAK);
 					curPtr->SetTickType(TickType::BuyPoint);
 				}
 			}
@@ -165,9 +165,9 @@ bool MACrossStratgy::tryInvoke(const std::list<TickWrapper>& tickdata, const std
 				if (orderSingal){
 					//special point
 					m_curOrder->SetInstrumentId(info.InstrumentId());
+					m_curOrder->SetOrderType(Order::LimitPriceFOKOrder);
 					m_curOrder->SetRefExchangePrice(info.LastPrice());
 					m_curOrder->SetExchangeDirection(ExchangeDirection::Sell);
-					m_curOrder->SetCombOffsetFlagType(Order::FAK);
 					curPtr->SetTickType(TickType::SellPoint);
 				}
 			}

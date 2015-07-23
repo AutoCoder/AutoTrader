@@ -78,18 +78,20 @@ class Order
 {
 public:
 	enum OrderType{
-		FAK = 0x0,
-		FOK = 0x1,
+		LimitPriceFOKOrder = 0x0, //FAK: trade total successfully or total failed ; 
+		LimitPriceFAKOrder = 0x1, //FOK: trade partly successfully while the others backout;
+		AnyPriceOrder = 0x2,
+		TriggerOrder = 0x3,
 	};
 
 	Order();
-	Order(const std::string& instrument, double refprice, \
-		ExchangeDirection direction, \
-		ExchangePriceType priceType, \
-		TimeCondition timeCondition, \
-		VolumeCondition vCondition, \
-		ContingentCondition ctCondition);
-	Order(const std::string& instrument, double refprice, ExchangeDirection direction, OrderType type);
+	//Order(const std::string& instrument, double refprice, \
+	//	ExchangeDirection direction, \
+	//	ExchangePriceType priceType, \
+	//	TimeCondition timeCondition, \
+	//	VolumeCondition vCondition, \
+	//	ContingentCondition ctCondition);
+	//Order(const std::string& instrument, double refprice, ExchangeDirection direction, OrderType type);
 	~Order();
 
 	std::string GetInstrumentId() const{
@@ -100,11 +102,10 @@ public:
 		strcpy_s(m_innerStruct.InstrumentID, sizeof(m_innerStruct.InstrumentID), in.c_str());
 	}
 
-	void SetRefExchangePrice(double price){
-		m_innerStruct.LimitPrice = price;
-	}
+	void SetRefExchangePrice(double price);
 
 	double GetRefExchangePrice() const{
+		//todo : distinguish the m_type
 		return m_innerStruct.LimitPrice;
 	}
 
@@ -121,6 +122,13 @@ public:
 		m_innerStruct.CombOffsetFlag[0] = flag;
 		for (int i = 1; i < 5; i++){
 			m_innerStruct.CombOffsetFlag[i] = 0;
+		}
+	}
+
+	void SetCombHedgeFlag(char flag){
+		m_innerStruct.CombHedgeFlag[0] = flag;
+		for (int i = 1; i < 5; i++){
+			m_innerStruct.CombHedgeFlag[i] = 0;
 		}
 	}
 

@@ -288,31 +288,6 @@ bool AccountMangerSpi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo)
 	}
 	return ret;
 }
-//
-//char MapDirection(char src, bool toOrig = true){
-//	if (toOrig){
-//		if ('b' == src || 'B' == src){ src = '0'; }
-//		else if ('s' == src || 'S' == src){ src = '1'; }
-//	}
-//	else{
-//		if ('0' == src){ src = 'B'; }
-//		else if ('1' == src){ src = 'S'; }
-//	}
-//	return src;
-//}
-//char MapOffset(char src, bool toOrig = true){
-//	if (toOrig){
-//		if ('o' == src || 'O' == src){ src = '0'; }
-//		else if ('c' == src || 'C' == src){ src = '1'; }
-//		else if ('j' == src || 'J' == src){ src = '3'; }
-//	}
-//	else{
-//		if ('0' == src){ src = 'O'; }
-//		else if ('1' == src){ src = 'C'; }
-//		else if ('3' == src){ src = 'J'; }
-//	}
-//	return src;
-//}
 
 void AccountMangerSpi::ReqOrderInsert(Order ord){
 	spdlog::get("console")->info() << (!m_isAccountFreshed ? "Account is not fresh..." : "Account is freshed");

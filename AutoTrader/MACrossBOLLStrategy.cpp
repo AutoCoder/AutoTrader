@@ -57,9 +57,9 @@ bool MACrossBOLLStrategy::tryInvoke(const std::list<TickWrapper>& data, TickWrap
 				if (orderSingal){
 					//update m_curOrder
 					m_curOrder->SetInstrumentId(info.InstrumentId());
+					m_curOrder->SetOrderType(Order::LimitPriceFOKOrder);
 					m_curOrder->SetRefExchangePrice(info.LastPrice());
 					m_curOrder->SetExchangeDirection(ExchangeDirection::Buy);
-					m_curOrder->SetOrderType(Order::FAK);
 					curPtr->SetTickType(TickType::BuyPoint);
 				}
 			}
@@ -81,9 +81,10 @@ bool MACrossBOLLStrategy::tryInvoke(const std::list<TickWrapper>& data, TickWrap
 				if (orderSingal){
 					//special point
 					m_curOrder->SetInstrumentId(info.InstrumentId());
+					m_curOrder->SetOrderType(Order::LimitPriceFOKOrder);
 					m_curOrder->SetRefExchangePrice(info.LastPrice());
 					m_curOrder->SetExchangeDirection(ExchangeDirection::Sell);
-					m_curOrder->SetOrderType(Order::FAK);
+					
 					curPtr->SetTickType(TickType::SellPoint);
 				}
 			}
@@ -130,9 +131,9 @@ bool MACrossBOLLStrategy::tryInvoke(const std::list<TickWrapper>& tickdata, cons
 				if (orderSingal){
 					//update m_curOrder
 					m_curOrder->SetInstrumentId(info.InstrumentId());
+					m_curOrder->SetOrderType(Order::LimitPriceFOKOrder);
 					m_curOrder->SetRefExchangePrice(info.LastPrice());
 					m_curOrder->SetExchangeDirection(ExchangeDirection::Buy);
-					m_curOrder->SetOrderType(Order::FAK);
 					curPtr->SetTickType(TickType::BuyPoint);
 				}
 			}
@@ -155,9 +156,9 @@ bool MACrossBOLLStrategy::tryInvoke(const std::list<TickWrapper>& tickdata, cons
 				if (orderSingal){
 					//special point
 					m_curOrder->SetInstrumentId(info.InstrumentId());
+					m_curOrder->SetOrderType(Order::LimitPriceFOKOrder);
 					m_curOrder->SetRefExchangePrice(info.LastPrice());
 					m_curOrder->SetExchangeDirection(ExchangeDirection::Sell);
-					m_curOrder->SetOrderType(Order::FAK);
 					curPtr->SetTickType(TickType::SellPoint);
 				}
 			}
@@ -216,7 +217,7 @@ BOLLTech MACrossBOLLStrategy::calculateBoll(const std::vector<KData>& data, cons
 			break;
 		}
 	}
-	double var = sqrt(total / count);
+	double var = (count == 0 ? 0 : sqrt(total / count));
 
 	return BOLLTech(ma, var, current.LastPrice());
 }
