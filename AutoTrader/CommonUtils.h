@@ -5,6 +5,8 @@
 #include "ThostFtdcUserApiDataType.h"
 
 typedef int seconds;
+struct CThostFtdcInputOrderField;
+
 
 class CommonUtils
 {
@@ -28,5 +30,6 @@ public:
 	static std::string InterpretOrderSubmitStatusCode(TThostFtdcOrderSubmitStatusType type);
 
 	static bool InSameMinute(const std::string& time1, const std::string& time2);
+	static std::string StringFromStruct(const CThostFtdcInputOrderField& innerStruct);
 };
 

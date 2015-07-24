@@ -82,6 +82,7 @@ public:
 		LimitPriceFAKOrder = 0x1, //FOK: trade partly successfully while the others backout;
 		AnyPriceOrder = 0x2,
 		TriggerOrder = 0x3,
+		NoType,
 	};
 
 	Order();
@@ -118,7 +119,6 @@ public:
 	}
 
 	void SetCombOffsetFlagType(char flag){
-		// todo: now only set the first byte
 		m_innerStruct.CombOffsetFlag[0] = flag;
 		for (int i = 1; i < 5; i++){
 			m_innerStruct.CombOffsetFlag[i] = 0;

@@ -54,3 +54,5 @@ Temporary Items
 *.opensdf
 *.con
 /AutoTrader/*.con
+AutoTrader/QueryRsp.con
+AutoTrader/DialogRsp.con

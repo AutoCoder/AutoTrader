@@ -2,6 +2,8 @@
 #include "CommonUtils.h"
 #include <assert.h>
 #include <sstream>
+#include "ThostFtdcUserApiStruct.h"
+
 CommonUtils::CommonUtils()
 {
 }
@@ -233,4 +235,33 @@ bool CommonUtils::InSameMinute(const std::string& time1, const std::string& time
 	std::string nt1 = time1.substr(0, len - 2);
 	std::string nt2 = time2.substr(0, len - 2);
 	return nt1 == nt2;
+}
+
+std::string CommonUtils::StringFromStruct(const CThostFtdcInputOrderField& innerStruct){
+	std::stringstream ss;
+
+	ss << "BrokerID:" << innerStruct.BrokerID;
+	ss << "\nInvestorID:" << innerStruct.InvestorID;
+	ss << "\nInstrumentID:" << innerStruct.InstrumentID;
+	ss << "\nOrderRef:" << innerStruct.OrderRef;
+	ss << "\nUserID:" << innerStruct.UserID;
+	ss << "\nOrderPriceType:" << innerStruct.OrderPriceType;
+	ss << "\nDirection:" << innerStruct.Direction;
+	ss << "\nCombOffsetFlag:" << innerStruct.CombOffsetFlag;
+	ss << "\nCombHedgeFlag:" << innerStruct.CombHedgeFlag;
+	ss << "\nLimitPrice:" << innerStruct.LimitPrice;
+	ss << "\nVolumeTotalOriginal:" << innerStruct.VolumeTotalOriginal;
+	ss << "\nTimeCondition:" << innerStruct.TimeCondition;
+	ss << "\nGTDDate:" << innerStruct.GTDDate;
+	ss << "\nVolumeCondition:" << innerStruct.VolumeCondition;
+	ss << "\nMinVolume:" << innerStruct.MinVolume;
+	ss << "\nContingentCondition:" << innerStruct.ContingentCondition;
+	ss << "\nStopPrice:" << innerStruct.StopPrice;
+	ss << "\nForceCloseReason:" << innerStruct.ForceCloseReason;
+	ss << "\nIsAutoSuspend:" << innerStruct.IsAutoSuspend;
+	ss << "\nBusinessUnit:" << innerStruct.BusinessUnit;
+	ss << "\nRequestID:" << innerStruct.RequestID;
+	ss << "\nUserForceClose:" << innerStruct.UserForceClose;
+	ss << "\nIsSwapOrder:" << innerStruct.IsSwapOrder;
+	return ss.str();
 }

@@ -193,6 +193,7 @@ void AccountMangerSpi::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder,
 	CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
 	if (!IsErrorRspInfo(pRspInfo) && pInputOrder){
+		spdlog::get("console")->info() << "[Back Order]" << CommonUtils::StringFromStruct(*pInputOrder);
 		spdlog::get("console")->info() << "[Trade Thread] Response | Insert order success...Order Reference:" << pInputOrder->OrderRef;
 	}
 	//if (bIsLast) SetEvent(g_tradehEvent);
@@ -319,6 +320,7 @@ void AccountMangerSpi::ReqOrderInsert(Order ord){
 		CThostFtdcInputOrderField ordstruct;
 		bool success = ord.GetOrderOriginStruct(ordstruct);
 		if (success){
+			spdlog::get("console")->info() << "[Send Order]" << CommonUtils::StringFromStruct(ordstruct);
 			int ret = pUserApi->ReqOrderInsert(&ordstruct, ++requestId);
 			spdlog::get("console")->info() << "[Trade Thread] Request | insert order..." << ((ret == 0) ? "success" : "fail");
 		}

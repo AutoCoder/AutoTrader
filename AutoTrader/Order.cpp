@@ -5,6 +5,7 @@
 
 Order::Order()
 {
+	memset(&m_innerStruct, 0, sizeof(m_innerStruct));
 }
 
 
@@ -89,7 +90,7 @@ bool Order::IsValid(){
 		strcmp(m_innerStruct.InstrumentID, "") != 0)
 		return true;
 
-	return false;
+	return false;  
 
 }
 
@@ -107,6 +108,7 @@ void Order::SetOrderType(OrderType type){
 	m_innerStruct.ForceCloseReason = THOST_FTDC_FCC_NotForceClose;
 	m_innerStruct.IsAutoSuspend = 0;
 	m_innerStruct.UserForceClose = 0;
+	m_innerStruct.CombHedgeFlag[0] = THOST_FTDC_BHF_Speculation;
 
 	switch (type){
 		case LimitPriceFOKOrder:
@@ -114,6 +116,7 @@ void Order::SetOrderType(OrderType type){
 			m_innerStruct.OrderPriceType = THOST_FTDC_OPT_LimitPrice;
 			m_innerStruct.TimeCondition = THOST_FTDC_TC_GFD;
 			m_innerStruct.VolumeCondition = THOST_FTDC_VC_AV;
+			m_innerStruct.ContingentCondition = THOST_FTDC_CC_Immediately;
 			break;
 		}
 		case LimitPriceFAKOrder:
@@ -121,6 +124,7 @@ void Order::SetOrderType(OrderType type){
 			m_innerStruct.OrderPriceType = THOST_FTDC_OPT_LimitPrice;
 			m_innerStruct.TimeCondition = THOST_FTDC_TC_GFD;
 			m_innerStruct.VolumeCondition = THOST_FTDC_VC_CV;
+			m_innerStruct.ContingentCondition = THOST_FTDC_CC_Immediately;
 			break;
 		}
 		case AnyPriceOrder:
