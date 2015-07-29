@@ -5,15 +5,15 @@
 
 class Order;
 
-class AccountMangerSpi : public CThostFtdcTraderSpi
+class CtpTradeSpi : public CThostFtdcTraderSpi
 {
 public:
-	AccountMangerSpi(CThostFtdcTraderApi* pUserApi, \
+	CtpTradeSpi(CThostFtdcTraderApi* pUserApi, \
 		const char * brokerID, \
 		const char* userID, \
 		const char* password, \
 		const char* prodName);
-	~AccountMangerSpi();
+	~CtpTradeSpi();
 
 	virtual void OnFrontConnected();
 

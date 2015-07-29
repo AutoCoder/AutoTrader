@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "AccountManger.h"
+#include "tradespi.h"
 #include "OrderQueue.h"
 #include "Order.h"
 #include "ThostFtdcTraderApi.h"
@@ -19,7 +19,7 @@ std::vector<CThostFtdcTradeField*> tradeList;
 //char MapDirection(char src, bool toOrig);
 //char MapOffset(char src, bool toOrig);
 
-AccountMangerSpi::AccountMangerSpi(CThostFtdcTraderApi* p, const char * brokerID, const char* userID, const char* password, const char* prodname)
+CtpTradeSpi::CtpTradeSpi(CThostFtdcTraderApi* p, const char * brokerID, const char* userID, const char* password, const char* prodname)
 	: pUserApi(p)
 	, m_frontID(-1)
 	, m_sessionID(-1)
@@ -34,11 +34,11 @@ AccountMangerSpi::AccountMangerSpi(CThostFtdcTraderApi* p, const char * brokerID
 	strcpy_s(m_productName, prodname);
 }
 
-AccountMangerSpi::~AccountMangerSpi()
+CtpTradeSpi::~CtpTradeSpi()
 {
 }
 
-void AccountMangerSpi::OnFrontConnected()
+void CtpTradeSpi::OnFrontConnected()
 {
 	spdlog::get("console")->info() << "[Trade Thread] Response | connected...";
 	//SetEvent(g_tradehEvent);
@@ -46,7 +46,7 @@ void AccountMangerSpi::OnFrontConnected()
 	cv_trade.notify_all();
 }
 
-void AccountMangerSpi::OnFrontDisconnected(int nReason)
+void CtpTradeSpi::OnFrontDisconnected(int nReason)
 {
 	spdlog::get("console")->info() << "[Trade Thread] Response | Disconnected..."
 		<< " reason=" << nReason;
@@ -55,7 +55,7 @@ void AccountMangerSpi::OnFrontDisconnected(int nReason)
 	m_islogin = false;
 }
 
-void AccountMangerSpi::ReqUserLogin()
+void CtpTradeSpi::ReqUserLogin()
 {
 	CThostFtdcReqUserLoginField req;
 	memset(&req, 0, sizeof(req));
@@ -67,7 +67,7 @@ void AccountMangerSpi::ReqUserLogin()
 	spdlog::get("console")->info() << "[Trade Thread] Request | send logging ..." << ((ret == 0) ? "success" : "fail");
 }
 
-void AccountMangerSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
+void CtpTradeSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
 	CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
 	if (!IsErrorRspInfo(pRspInfo) && pRspUserLogin) {
@@ -85,7 +85,7 @@ void AccountMangerSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin
 	//if (bIsLast) SetEvent(g_tradehEvent);
 }
 
-void AccountMangerSpi::ReqSettlementInfoConfirm()
+void CtpTradeSpi::ReqSettlementInfoConfirm()
 {
 	CThostFtdcSettlementInfoConfirmField req;
 	memset(&req, 0, sizeof(req));
@@ -96,7 +96,7 @@ void AccountMangerSpi::ReqSettlementInfoConfirm()
 
 }
 
-void AccountMangerSpi::OnRspSettlementInfoConfirm(
+void CtpTradeSpi::OnRspSettlementInfoConfirm(
 	CThostFtdcSettlementInfoConfirmField  *pSettlementInfoConfirm,
 	CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
@@ -111,7 +111,7 @@ void AccountMangerSpi::OnRspSettlementInfoConfirm(
 	//if (bIsLast) SetEvent(g_tradehEvent);
 }
 
-void AccountMangerSpi::ReqQryInstrument(TThostFtdcInstrumentIDType instId)
+void CtpTradeSpi::ReqQryInstrument(TThostFtdcInstrumentIDType instId)
 {
 	CThostFtdcQryInstrumentField req;
 	memset(&req, 0, sizeof(req));
@@ -120,7 +120,7 @@ void AccountMangerSpi::ReqQryInstrument(TThostFtdcInstrumentIDType instId)
 	spdlog::get("console")->info() << "[Trade Thread] Request | send Instrument Query..." << ((ret == 0) ? "success" : "fail");
 }
 
-void AccountMangerSpi::OnRspQryInstrument(CThostFtdcInstrumentField *pInstrument,
+void CtpTradeSpi::OnRspQryInstrument(CThostFtdcInstrumentField *pInstrument,
 	CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
 	if (!IsErrorRspInfo(pRspInfo) && pInstrument){
@@ -132,7 +132,7 @@ void AccountMangerSpi::OnRspQryInstrument(CThostFtdcInstrumentField *pInstrument
 	//if (bIsLast) SetEvent(g_tradehEvent);
 }
 
-void AccountMangerSpi::ReqQryTradingAccount()
+void CtpTradeSpi::ReqQryTradingAccount()
 {
 	CThostFtdcQryTradingAccountField req;
 	memset(&req, 0, sizeof(req));
@@ -143,7 +143,7 @@ void AccountMangerSpi::ReqQryTradingAccount()
 
 }
 
-void AccountMangerSpi::OnRspQryTradingAccount(
+void CtpTradeSpi::OnRspQryTradingAccount(
 	CThostFtdcTradingAccountField *pTradingAccount,
 	CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
@@ -162,7 +162,7 @@ void AccountMangerSpi::OnRspQryTradingAccount(
 	//if (bIsLast) SetEvent(g_tradehEvent);
 }
 
-void AccountMangerSpi::ReqQryInvestorPosition(TThostFtdcInstrumentIDType instId)
+void CtpTradeSpi::ReqQryInvestorPosition(TThostFtdcInstrumentIDType instId)
 {
 	CThostFtdcQryInvestorPositionField req;
 	memset(&req, 0, sizeof(req));
@@ -173,7 +173,7 @@ void AccountMangerSpi::ReqQryInvestorPosition(TThostFtdcInstrumentIDType instId)
 	spdlog::get("console")->info() << "[Trade Thread] Request | send InvestorPosition query..." << ((ret == 0) ? "success" : "fail");
 }
 
-void AccountMangerSpi::OnRspQryInvestorPosition(
+void CtpTradeSpi::OnRspQryInvestorPosition(
 	CThostFtdcInvestorPositionField *pInvestorPosition,
 	CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
@@ -189,7 +189,7 @@ void AccountMangerSpi::OnRspQryInvestorPosition(
 	//if (bIsLast) SetEvent(g_tradehEvent);
 }
 
-void AccountMangerSpi::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder,
+void CtpTradeSpi::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder,
 	CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
 	if (!IsErrorRspInfo(pRspInfo) && pInputOrder){
@@ -199,7 +199,7 @@ void AccountMangerSpi::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder,
 	//if (bIsLast) SetEvent(g_tradehEvent);
 }
 
-void AccountMangerSpi::ReqOrderAction(TThostFtdcSequenceNoType orderSeq)
+void CtpTradeSpi::ReqOrderAction(TThostFtdcSequenceNoType orderSeq)
 {
 	bool found = false; unsigned int i = 0;
 	for (i = 0; i<orderList.size(); i++){
@@ -222,7 +222,7 @@ void AccountMangerSpi::ReqOrderAction(TThostFtdcSequenceNoType orderSeq)
 	spdlog::get("console")->info() << "[Trade Thread] Request | backout order..." << ((ret == 0) ? "success" : "fail");
 }
 
-void AccountMangerSpi::OnRspOrderAction(
+void CtpTradeSpi::OnRspOrderAction(
 	CThostFtdcInputOrderActionField *pInputOrderAction,
 	CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
@@ -234,7 +234,7 @@ void AccountMangerSpi::OnRspOrderAction(
 	//if (bIsLast) SetEvent(g_tradehEvent);
 }
 
-void AccountMangerSpi::OnRtnOrder(CThostFtdcOrderField *pOrder)
+void CtpTradeSpi::OnRtnOrder(CThostFtdcOrderField *pOrder)
 {
 	CThostFtdcOrderField* order = new CThostFtdcOrderField();
 	memcpy(order, pOrder, sizeof(CThostFtdcOrderField));
@@ -253,7 +253,7 @@ void AccountMangerSpi::OnRtnOrder(CThostFtdcOrderField *pOrder)
 	//SetEvent(g_tradehEvent);
 }
 
-void AccountMangerSpi::OnRtnTrade(CThostFtdcTradeField *pTrade)
+void CtpTradeSpi::OnRtnTrade(CThostFtdcTradeField *pTrade)
 {
 	CThostFtdcTradeField* trade = new CThostFtdcTradeField();
 	memcpy(trade, pTrade, sizeof(CThostFtdcTradeField));
@@ -270,18 +270,18 @@ void AccountMangerSpi::OnRtnTrade(CThostFtdcTradeField *pTrade)
 }
 
 
-void AccountMangerSpi::OnHeartBeatWarning(int nTimeLapse)
+void CtpTradeSpi::OnHeartBeatWarning(int nTimeLapse)
 {
 	spdlog::get("console")->info() << "[Trade Thread] Response | heartbeat is out of time limit..."
 		<< " TimerLapse = " << nTimeLapse ;
 }
 
-void AccountMangerSpi::OnRspError(CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
+void CtpTradeSpi::OnRspError(CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
 	IsErrorRspInfo(pRspInfo);
 }
 
-bool AccountMangerSpi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo)
+bool CtpTradeSpi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo)
 {
 	bool ret = ((pRspInfo) && (pRspInfo->ErrorID != 0));
 	if (ret){
@@ -290,7 +290,7 @@ bool AccountMangerSpi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo)
 	return ret;
 }
 
-void AccountMangerSpi::ReqOrderInsert(Order ord){
+void CtpTradeSpi::ReqOrderInsert(Order ord){
 	spdlog::get("console")->info() << (!m_isAccountFreshed ? "Account is not fresh..." : "Account is freshed");
 	// if account is not refreshed, wait to refresh
 	while (!m_isAccountFreshed){

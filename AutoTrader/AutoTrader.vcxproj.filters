@@ -84,9 +84,6 @@
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="AccountManger.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="TechVec.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -129,6 +126,9 @@
     <ClInclude Include="KData.h">
       <Filter>Header Files\Tech</Filter>
     </ClInclude>
+    <ClInclude Include="tradespi.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -153,9 +153,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="config.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="AccountManger.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="mysqlwrapper.cpp">
@@ -196,6 +193,9 @@
     </ClCompile>
     <ClCompile Include="KData.cpp">
       <Filter>Source Files\Tech</Filter>
+    </ClCompile>
+    <ClCompile Include="tradespi.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

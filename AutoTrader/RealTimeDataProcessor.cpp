@@ -61,6 +61,7 @@ void RealTimeDataProcessor::StoreStrategySequenceToDB(const std::string& mark)
 	spdlog::get("console")->info() << "End to store db.";
 }
 
+//main thread
 void RealTimeDataProcessor::AppendRealTimeData(TickWrapper& info){
 	//(in)front-------------back(out)
 	// if m_strategy == nullptr, that means RealTimeDataProcessor is in data-recording mode

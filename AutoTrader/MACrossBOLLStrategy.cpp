@@ -205,8 +205,8 @@ BOLLTech MACrossBOLLStrategy::calculateBoll(const std::vector<KData>& data, cons
 	double total = 0;
 	long long count = 0;
 
-	long long leftedge = current.Timestamp() - mins - 1;
-	for (auto it = data.begin(); it != data.end(); it++)
+	long long leftedge = current.Timestamp() - mins * 60 - 1;
+	for (auto it = data.rbegin(); it != data.rend(); it++)
 	{
 		if (it->Timestamp() > leftedge){
 			double delta = it->LastPrice() - ma;

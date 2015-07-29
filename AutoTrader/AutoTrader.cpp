@@ -5,7 +5,7 @@
 #include "printer.h"
 #include "DBWrapper.h"
 #include "config.h"
-#include "AccountManger.h"
+#include "tradespi.h"
 #include <thread>
 #include "RealTimeDataProcessorPool.h"
 #include <mutex>
@@ -43,7 +43,7 @@ void MdManageThread(CtpMdSpi* pMdUserSpi){
 	}
 }
 
-void TradeManageThread(AccountMangerSpi* pTradeUserSpi){
+void TradeManageThread(CtpTradeSpi* pTradeUserSpi){
 	std::unique_lock <std::mutex> lck(mtx);
 	while (!g_quit){
 		cv_trade.wait(lck);
@@ -60,7 +60,7 @@ void TradeManageThread(AccountMangerSpi* pTradeUserSpi){
 	}
 }
 
-void ExcuteOrderQueue(AccountMangerSpi* pUserSpi){
+void ExcuteOrderQueue(CtpTradeSpi* pUserSpi){
 	spdlog::get("console")->info() << "Start to trade";
 	spdlog::get("console")->info() << "Start to loop order queue";
 
@@ -151,7 +151,7 @@ int main(int argc, const char* argv[]){
 
 		//*******Init trade thread********
 		CThostFtdcTraderApi* pTradeUserApi = CThostFtdcTraderApi::CreateFtdcTraderApi();
-		AccountMangerSpi* pTradeUserSpi = new AccountMangerSpi(pTradeUserApi, \
+		CtpTradeSpi* pTradeUserSpi = new CtpTradeSpi(pTradeUserApi, \
 			Config::Instance()->CtpBrokerID().c_str(), \
 			Config::Instance()->CtpUserID().c_str(), \
 			Config::Instance()->CtpPassword().c_str(), \
