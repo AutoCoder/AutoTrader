@@ -4,11 +4,11 @@
 #include "Order.h"
 #include "ThostFtdcTraderApi.h"
 #include "traderspi.h"
-//#include "windows.h"
 #include "config.h"
 #include <condition_variable>
 #include "spdlog/spdlog.h"
 #include "CommonUtils.h"
+#include "IAccount.h"
 extern int requestId;
 
 extern std::condition_variable cv_trade;
@@ -21,12 +21,14 @@ std::vector<CThostFtdcTradeField*> tradeList;
 
 CtpTradeSpi::CtpTradeSpi(CThostFtdcTraderApi* p, const char * brokerID, const char* userID, const char* password, const char* prodname)
 	: pUserApi(p)
+	, pAccountMgr(nullptr)
 	, m_frontID(-1)
 	, m_sessionID(-1)
 	, m_isFrontConnected(false)
 	, m_islogin(false)
 	, m_isConfirmSettlementInfo(false)
 	, m_isAccountFreshed(false)
+	
 {
 	strcpy_s(m_brokerID, brokerID);
 	strcpy_s(m_userID, userID);
@@ -148,6 +150,8 @@ void CtpTradeSpi::OnRspQryTradingAccount(
 	CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
 	if (!IsErrorRspInfo(pRspInfo) && pTradingAccount){
+		if (pAccountMgr)
+			pAccountMgr->update(*pTradingAccount);
 		memcpy(&m_accountInfo, pTradingAccount, sizeof(CThostFtdcTradingAccountField));
 		spdlog::get("console")->info() << "[Trade Thread] Response | Balance:" << pTradingAccount->Balance
 			<< " Available:" << pTradingAccount->Available
@@ -294,7 +298,7 @@ void CtpTradeSpi::ReqOrderInsert(Order ord){
 	spdlog::get("console")->info() << (!m_isAccountFreshed ? "Account is not fresh..." : "Account is freshed");
 	// if account is not refreshed, wait to refresh
 	while (!m_isAccountFreshed){
-		Sleep(50);
+		sleep(50);
 		//spdlog::get("console")->info() << "Account is not fresh, sleep(100)...";
 	}
 	spdlog::get("console")->info() << ("Execute Order (") << ord.GetInstrumentId() << ", " \
@@ -333,6 +337,8 @@ void CtpTradeSpi::ReqOrderInsert(Order ord){
 	//fresh accout
 	spdlog::get("console")->info() << "[Trade Thread] Order executed. begin to refresh Account info...";
 	ReqQryTradingAccount();
+	if (pAccountMgr)
+		pAccountMgr->setUpdated(false);
 }
 //
 /////TFtdcTimeConditionType是一个有效期类型类型

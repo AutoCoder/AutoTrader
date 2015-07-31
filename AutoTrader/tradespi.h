@@ -2,7 +2,7 @@
 #define ACCOUNT_MANAGER_H_
 
 #include "ThostFtdcTraderApi.h"
-
+class IAccount;
 class Order;
 
 class CtpTradeSpi : public CThostFtdcTraderSpi
@@ -76,6 +76,10 @@ public:
 		return m_isAccountFreshed;
 	}
 
+	void AddSubscriber(IAccount* pAccount){
+		pAccountMgr = pAccount;
+	}
+
 private:
 	double m_available; //可用资金
 	double m_currMargin; //当前保证金总额
@@ -96,6 +100,7 @@ private:
 	bool m_islogin;
 	bool m_isConfirmSettlementInfo;
 	bool m_isAccountFreshed;
+	IAccount* pAccountMgr;
 };
 
 #endif 
