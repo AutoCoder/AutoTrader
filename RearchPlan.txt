@@ -36,3 +36,9 @@
   价格条件类型 THOST_FTDC_OPT_LimitPrice
   有效期类型 IOCTHOST_FTDC_TC_GFD
   价格 ： 需要
+
+ [2015-8-6]
+
+ 初级 MultiCharts
+
+ 中级 OpenQuant amibroker smartquant 可以用c++或者c#开发插件
