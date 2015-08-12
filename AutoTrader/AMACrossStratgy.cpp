@@ -3,8 +3,8 @@
 #include "TickWrapper.h"
 #include "TechUtils.h"
 
-AMACrossStratgy::AMACrossStratgy(size_t short_ma, size_t long_ma)
-:MACrossStratgy(short_ma, long_ma)
+AMACrossStratgy::AMACrossStratgy(size_t short_ma, size_t long_ma, IAccount* accountMgr)
+:MACrossStratgy(short_ma, long_ma, accountMgr)
 {
 }
 

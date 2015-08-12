@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "crossplatform.h"
 #include "BaseAccountMgr.h"
 #include "Order.h"
 #include <memory>

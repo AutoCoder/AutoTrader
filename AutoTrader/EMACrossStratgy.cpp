@@ -4,8 +4,8 @@
 #include <assert.h>
 #include "TechUtils.h"
 
-EMACrossStratgy::EMACrossStratgy(size_t short_ma, size_t long_ma)
-:MACrossStratgy(short_ma, long_ma)
+EMACrossStratgy::EMACrossStratgy(size_t short_ma, size_t long_ma, IAccount* accountMgr)
+:MACrossStratgy(short_ma, long_ma, accountMgr)
 {
 }
 

@@ -8,12 +8,13 @@
 #include "TechUtils.h"
 #include <sstream>
 #include <assert.h>
+#include "IAccount.h"
 
-
-MACrossStratgy::MACrossStratgy(size_t short_ma, size_t long_ma)
+MACrossStratgy::MACrossStratgy(size_t short_ma, size_t long_ma, IAccount* accountMgr)
 : m_curOrder(new Order())//m_order is a pointer so that it will only update so, create it at constructor.
 , m_shortMA(short_ma)
 , m_longMA(long_ma)
+, m_AccoutMgr(accountMgr)
 {
 }
 
@@ -22,6 +23,10 @@ MACrossStratgy::~MACrossStratgy()
 {
 	delete m_curOrder;
 	m_curOrder = nullptr;
+}
+
+IAccount* MACrossStratgy::getAccountMgr(){
+	return m_AccoutMgr;
 }
 
 // common MA 
@@ -179,9 +184,15 @@ bool MACrossStratgy::tryInvoke(const std::list<TickWrapper>& tickdata, const std
 	return orderSingal;
 }
 
-Order MACrossStratgy::generateOrder(){
+bool MACrossStratgy::generateOrder(Order& out){
 	assert(m_curOrder);
-	return *m_curOrder;
+	if (m_AccoutMgr->completeOrder(*m_curOrder)){
+		out = *m_curOrder;
+		return true;
+	}	
+	else{
+		return false;
+	}
 }
 
 bool MACrossTech::IsTableCreated = false;

@@ -3,10 +3,11 @@
 
 #include "MACrossStratgy.h"
 
+class IAccount;
 class AMACrossStratgy : public MACrossStratgy
 {
 public:
-	AMACrossStratgy(size_t short_ma, size_t long_ma);
+	AMACrossStratgy(size_t short_ma, size_t long_ma, IAccount* accountMgr);
 	virtual ~AMACrossStratgy();
 
 protected:

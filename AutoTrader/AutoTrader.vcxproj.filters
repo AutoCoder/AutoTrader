@@ -129,6 +129,15 @@
     <ClInclude Include="tradespi.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="IAccount.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseAccountMgr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="crossplatform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -195,6 +204,9 @@
       <Filter>Source Files\Tech</Filter>
     </ClCompile>
     <ClCompile Include="tradespi.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseAccountMgr.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -8,6 +8,8 @@
 #include "config.h"
 #include "DBWrapper.h"
 #include "MACrossBOLLStrategy.h"
+#include "tradespi.h"
+#include "BaseAccountMgr.h"
 
 RealTimeDataProcessorPool* RealTimeDataProcessorPool::_instance = NULL;
 
@@ -15,7 +17,6 @@ RealTimeDataProcessorPool* RealTimeDataProcessorPool::getInstance()
 {
 	if (_instance == NULL)
 	{
-		//static clearer clr;
 		_instance = new RealTimeDataProcessorPool();
 	}
 	return _instance;
@@ -28,21 +29,22 @@ RealTimeDataProcessorPool::RealTimeDataProcessorPool()
 	Config::Instance()->CtpBrokerID();
 	std::vector<StrategyMetaData> stgySet = Config::Instance()->StrategySet();
 	m_dict.clear();
+	IAccount* mgr = new BaseAccountMgr();
 	for (StrategyMetaData it : stgySet){
 		if (it.name == "MACross"){
-			m_dict["MACross"] = std::shared_ptr<Strategy>(new MACrossStratgy(it.short_ma, it.long_ma));
+			m_dict["MACross"] = std::shared_ptr<Strategy>(new MACrossStratgy(it.short_ma, it.long_ma, mgr));
 		}
 		else if (it.name == "WMACross"){
-			m_dict["WMACross"] = std::shared_ptr<Strategy>(new WMACrossStratgy(it.short_ma, it.long_ma));
+			m_dict["WMACross"] = std::shared_ptr<Strategy>(new WMACrossStratgy(it.short_ma, it.long_ma, mgr));
 		}
 		else if (it.name == "AMACross"){
-			m_dict["AMACross"] = std::shared_ptr<Strategy>(new AMACrossStratgy(it.short_ma, it.long_ma));
+			m_dict["AMACross"] = std::shared_ptr<Strategy>(new AMACrossStratgy(it.short_ma, it.long_ma, mgr));
 		}
 		else if (it.name == "EMACross"){
-			m_dict["EMACross"] = std::shared_ptr<Strategy>(new EMACrossStratgy(it.short_ma, it.long_ma));
+			m_dict["EMACross"] = std::shared_ptr<Strategy>(new EMACrossStratgy(it.short_ma, it.long_ma, mgr));
 		}
 		else if (it.name == "MACrossBOLL"){
-			m_dict["MACrossBOLL"] = std::shared_ptr<Strategy>(new MACrossBOLLStrategy(it.short_ma, it.long_ma, 26));
+			m_dict["MACrossBOLL"] = std::shared_ptr<Strategy>(new MACrossBOLLStrategy(it.short_ma, it.long_ma, 26, mgr));
 		}
 	}
 
@@ -60,6 +62,13 @@ RealTimeDataProcessorPool::RealTimeDataProcessorPool()
 		m_processorDict["rb1511"] = std::shared_ptr<RealTimeDataProcessor>(new RealTimeDataProcessor(m_dict[st2].get(), "rb1511"));
 	}
 
+}
+
+void RealTimeDataProcessorPool::ListenToTradeSpi(CtpTradeSpi* tradespi){
+	for (auto item : m_dict){
+		//warning: for now, as the accoutMgr is shared by all strategy, so AddSubscriber function can rewrite this pointer.
+		tradespi->AddSubscriber(item.second->getAccountMgr());
+	}
 }
 
 void RealTimeDataProcessorPool::recoverHistoryData(int beforeSeconds, const std::string& instrumentId)

@@ -1,11 +1,13 @@
 #ifndef REALTIME_DATA_PROCESSOR_POOL_H
 #define REALTIME_DATA_PROCESSOR_POOL_H
+
 #include <string>
 #include <map>
 #include <set>
 #include "RealTimeDataProcessor.h"
-class DBWrapper;
 
+class DBWrapper;
+class CtpTradeSpi;
 //not for multi-thread: this singleton should be called on main()
 class RealTimeDataProcessorPool
 {
@@ -16,6 +18,7 @@ public:
 public:
 	std::shared_ptr<RealTimeDataProcessor> GenRealTimeDataProcessor(const std::string& instrumentID);
 	void FreeProcessors();
+	void ListenToTradeSpi(CtpTradeSpi* tradespi);
 
 private:
 	RealTimeDataProcessorPool();

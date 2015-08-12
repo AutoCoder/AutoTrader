@@ -6,15 +6,17 @@
 #include "MATech.h"
 
 class MACrossTech;
+class IAccount;
 class MACrossStratgy : public Strategy
 {
 public:
-	MACrossStratgy(size_t short_ma, size_t long_ma);
+	MACrossStratgy(size_t short_ma, size_t long_ma, IAccount* accountMgr);
 	virtual ~MACrossStratgy();
 
 	virtual bool tryInvoke(const std::list<TickWrapper>& data, TickWrapper& info);
 	virtual bool tryInvoke(const std::list<TickWrapper>& tickdata, const std::vector<KData>& data, std::vector<TickWrapper> curmindata, TickWrapper& info);
-	virtual Order generateOrder();
+	virtual bool generateOrder(Order& out);
+	virtual IAccount* getAccountMgr();
 
 protected:
 	virtual double calculateK(const std::list<TickWrapper>& data, const TickWrapper& current, int seconds) const;
@@ -27,7 +29,7 @@ protected:
 
 private:
 	Order* m_curOrder;
-
+	IAccount* m_AccoutMgr;
 };
 
 class MACrossTech : public StrategyTech{

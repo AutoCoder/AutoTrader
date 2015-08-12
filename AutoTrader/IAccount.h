@@ -6,15 +6,15 @@ class Order;
 class IAccount
 {
 public:
-	IAccount();
-	virtual ~IAccount();
+	IAccount(){};
+	virtual ~IAccount(){};
 
 	virtual void update(const CThostFtdcTradingAccountField& info) = 0;
 
 	//return fail or success
-	virtual bool completeOrder(Order& ord);
+	virtual bool completeOrder(Order& ord) = 0;
 
-	virtual void setUpdated(bool val);
+	virtual void setUpdated(bool val) = 0;
 };
 
 #endif

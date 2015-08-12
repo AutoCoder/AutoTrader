@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "crossplatform.h"
 #include "tradespi.h"
 #include "OrderQueue.h"
 #include "Order.h"
@@ -295,50 +296,27 @@ bool CtpTradeSpi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo)
 }
 
 void CtpTradeSpi::ReqOrderInsert(Order ord){
-	spdlog::get("console")->info() << (!m_isAccountFreshed ? "Account is not fresh..." : "Account is freshed");
-	// if account is not refreshed, wait to refresh
-	while (!m_isAccountFreshed){
-		sleep(50);
-		//spdlog::get("console")->info() << "Account is not fresh, sleep(100)...";
-	}
 	spdlog::get("console")->info() << ("Execute Order (") << ord.GetInstrumentId() << ", " \
 		<< ord.GetRefExchangePrice() << ", " \
 		<< (ord.GetExchangeDirection() == ExchangeDirection::Buy ? "Buy)" : "Sell)");
-	double purchaseMoney = m_accountInfo.Available - (m_accountInfo.Balance * 0.8);
-	//Get price == ord.GetInstrumentId()
-	if (purchaseMoney > 0){
-		int vol = purchaseMoney / ord.GetRefExchangePrice();
 
-		//TThostFtdcCombOffsetFlagType kpp;
-		
-		char flag = (vol == 0) ? THOST_FTDC_OF_CloseToday : THOST_FTDC_OF_Open;
-		ord.SetCombOffsetFlagType(flag);
-		//std::string inst = ord.GetInstrumentId();
-
-		ord.SetIdentityInfo(m_brokerID, m_userID, m_userID, m_orderRef);
-		int nextOrderRef = atoi(m_orderRef);
-		sprintf_s(m_orderRef, "%d", ++nextOrderRef);
-
-		ord.SetVolume(vol);
-
-		CThostFtdcInputOrderField ordstruct;
-		bool success = ord.GetOrderOriginStruct(ordstruct);
-		if (success){
-			spdlog::get("console")->info() << "[Send Order]" << CommonUtils::StringFromStruct(ordstruct);
-			int ret = pUserApi->ReqOrderInsert(&ordstruct, ++requestId);
-			spdlog::get("console")->info() << "[Trade Thread] Request | insert order..." << ((ret == 0) ? "success" : "fail");
-		}
-		else{
-			spdlog::get("console")->info() << "[Trade Thread] Invalid OrderField construct";
-		}
+	CThostFtdcInputOrderField ordstruct;
+	bool success = ord.GetOrderOriginStruct(ordstruct);
+	if (success){
+		spdlog::get("console")->info() << "[Debug] Send Order:" << CommonUtils::StringFromStruct(ordstruct);
+		int ret = pUserApi->ReqOrderInsert(&ordstruct, ++requestId);
+		spdlog::get("console")->info() << "[Trade Thread] Request | insert order..." << ((ret == 0) ? "success" : "fail");
 	}
-	m_isAccountFreshed = false;
+	else{
+		spdlog::get("console")->info() << "[Trade Thread] Invalid OrderField construct";
+	}
+
+	if (pAccountMgr)
+		pAccountMgr->setUpdated(false);
 
 	//fresh accout
 	spdlog::get("console")->info() << "[Trade Thread] Order executed. begin to refresh Account info...";
 	ReqQryTradingAccount();
-	if (pAccountMgr)
-		pAccountMgr->setUpdated(false);
 }
 //
 /////TFtdcTimeConditionType是一个有效期类型类型

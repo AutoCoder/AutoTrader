@@ -72,9 +72,10 @@ void RealTimeDataProcessor::AppendRealTimeData(TickWrapper& info){
 		bool triggered = m_strategy->tryInvoke(m_DataSeq, info);
 #endif
 		if (triggered){
-			Order ord = m_strategy->generateOrder();
-
-			order_queue.push(ord);
+			Order ord;
+			if (m_strategy->generateOrder(ord)){
+				order_queue.push(ord);
+			}
 		}
 			
 	}

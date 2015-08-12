@@ -2,6 +2,7 @@
 //
 
 #include "stdafx.h"
+#include "crossplatform.h"
 #include "printer.h"
 #include "DBWrapper.h"
 #include "config.h"
@@ -70,15 +71,12 @@ void ExcuteOrderQueue(CtpTradeSpi* pUserSpi){
 		Order ord;
 		if (!order_queue.empty() && order_queue.try_pop(ord)){ // if pop success
 			spdlog::get("console")->info() << "Excute Order regarding instrumentID:" << ord.GetInstrumentId();
-			//Todo: according ord to insert order
 			pUserSpi->ReqOrderInsert(ord);
 		}
 
 		if (g_quit && order_queue.empty())
 			break;
 
-		//query accout to refresh the cashed the investor position
-		// todo : sleep 500ms
 		sleep(500);
 	}
 
@@ -144,7 +142,7 @@ int main(int argc, const char* argv[]){
 	}
 	else{
 		auto pool = RealTimeDataProcessorPool::getInstance();
-		IAccount* accountMgr = new BaseAccountMgr();
+		
 		//******Init md thread*******
 		CThostFtdcMdApi* pMdUserApi = CThostFtdcMdApi::CreateFtdcMdApi();
 		CtpMdSpi* pMdUserSpi = new CtpMdSpi(pMdUserApi);
@@ -162,7 +160,10 @@ int main(int argc, const char* argv[]){
 		pTradeUserApi->SubscribePublicTopic(THOST_TERT_RESTART);
 		pTradeUserApi->SubscribePrivateTopic(THOST_TERT_RESTART);
 		pTradeUserApi->RegisterFront(const_cast<char*>(Config::Instance()->CtpTradeFront().c_str()));
-		pTradeUserSpi->AddSubscriber(accountMgr);
+
+		//*******pool's process's stratgy's accountMgr listen to account updation received from pTradeUserSpi.
+		pool->ListenToTradeSpi(pTradeUserSpi);
+
 		//Create a thread, Once FrontDisconnect ,try to reconnect and subscribeMD again if needed.
 		std::thread mdManagethread(MdManageThread, pMdUserSpi);
 		std::thread tradeManagethread(TradeManageThread, pTradeUserSpi);

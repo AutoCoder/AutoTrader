@@ -21,7 +21,7 @@ public:
 
 private:
 	CThostFtdcTradingAccountField m_accountInfo;
-	bool m_isUpdated;
+	volatile bool m_isUpdated;
 };
 
 #endif
