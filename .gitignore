@@ -56,3 +56,4 @@ Temporary Items
 /AutoTrader/*.con
 AutoTrader/QueryRsp.con
 AutoTrader/DialogRsp.con
+*.con

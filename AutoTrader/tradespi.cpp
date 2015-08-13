@@ -300,6 +300,10 @@ void CtpTradeSpi::ReqOrderInsert(Order ord){
 		<< ord.GetRefExchangePrice() << ", " \
 		<< (ord.GetExchangeDirection() == ExchangeDirection::Buy ? "Buy)" : "Sell)");
 
+	ord.SetIdentityInfo(m_brokerID, m_userID, m_userID, m_orderRef);
+	int nextOrderRef = atoi(m_orderRef);
+	sprintf_s(m_orderRef, "%d", ++nextOrderRef);
+
 	CThostFtdcInputOrderField ordstruct;
 	bool success = ord.GetOrderOriginStruct(ordstruct);
 	if (success){
@@ -310,6 +314,8 @@ void CtpTradeSpi::ReqOrderInsert(Order ord){
 	else{
 		spdlog::get("console")->info() << "[Trade Thread] Invalid OrderField construct";
 	}
+
+
 
 	if (pAccountMgr)
 		pAccountMgr->setUpdated(false);
