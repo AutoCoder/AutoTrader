@@ -252,8 +252,8 @@ void CtpTradeSpi::OnRtnOrder(CThostFtdcOrderField *pOrder)
 	if (founded) orderList[i] = order;
 	else  orderList.push_back(order);
 	
-	spdlog::get("console")->info() << "[Trade Thread] Response | order submitted...ID:" << order->BrokerOrderSeq << ";Order submit Status:" << CommonUtils::InterpretOrderSubmitStatusCode(order->OrderSubmitStatus);
-	spdlog::get("console")->info() << "[Trade Thread] Response | order submitted...ID:" << order->BrokerOrderSeq << ";Order Status:" << CommonUtils::InterpretOrderStatusCode(order->OrderStatus);
+	//spdlog::get("console")->info() << "[Trade Thread] Response | order submitted...ID:" << order->BrokerOrderSeq << ";Order submit Status:" << CommonUtils::InterpretOrderSubmitStatusCode(order->OrderSubmitStatus);
+	//spdlog::get("console")->info() << "[Trade Thread] Response | order submitted...ID:" << order->BrokerOrderSeq << ";Order Status:" << CommonUtils::InterpretOrderStatusCode(order->OrderStatus);
 	spdlog::get("console")->info() << "[Trade Thread] Response | order submitted...ID:" << order->BrokerOrderSeq << ";StatusMsg:" << order->StatusMsg;
 	//SetEvent(g_tradehEvent);
 }
@@ -271,7 +271,10 @@ void CtpTradeSpi::OnRtnTrade(CThostFtdcTradeField *pTrade)
 	if (founded) tradeList[i] = trade;
 	else  tradeList.push_back(trade);
 	spdlog::get("console")->info() << "[Trade Thread] Response | order traded...TradeID:" << trade->TradeID;
-	//SetEvent(g_tradehEvent);
+
+	//fresh accout
+	spdlog::get("console")->info() << "[Trade Thread] Order executed. begin to refresh Account info...";
+	ReqQryTradingAccount();
 }
 
 
@@ -315,14 +318,8 @@ void CtpTradeSpi::ReqOrderInsert(Order ord){
 		spdlog::get("console")->info() << "[Trade Thread] Invalid OrderField construct";
 	}
 
-
-
 	if (pAccountMgr)
 		pAccountMgr->setUpdated(false);
-
-	//fresh accout
-	spdlog::get("console")->info() << "[Trade Thread] Order executed. begin to refresh Account info...";
-	ReqQryTradingAccount();
 }
 //
 /////TFtdcTimeConditionType是一个有效期类型类型
