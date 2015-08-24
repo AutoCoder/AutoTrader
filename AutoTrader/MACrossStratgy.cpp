@@ -127,7 +127,7 @@ bool MACrossStratgy::tryInvoke(const std::list<TickWrapper>& tickdata, const std
 	if (!tickdata.empty()){
 		if (curPtr->IsTriggerPoint())
 		{ // up
-			if (!data.empty() && data.size() > 500){
+			if (!tickdata.empty() && tickdata.size() > 500){
 				std::list<TickWrapper>::const_iterator stoper = tickdata.begin();
 				std::advance(stoper, breakthrough_confirm_duration);
 				for (auto it = tickdata.begin(); it != stoper; it++){
@@ -154,7 +154,7 @@ bool MACrossStratgy::tryInvoke(const std::list<TickWrapper>& tickdata, const std
 		}
 		else
 		{ // down
-			if (!data.empty() && data.size() > 500){
+			if (!tickdata.empty() && tickdata.size() > 500){
 				std::list<TickWrapper>::const_iterator stoper = tickdata.begin();
 				std::advance(stoper, breakthrough_confirm_duration);
 				for (auto it = tickdata.begin(); it != stoper; it++){
