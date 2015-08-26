@@ -13,7 +13,7 @@
       "RecordMode":false
    },
    
-   "Instruments": "rb1510,rb1511",
+   "Instruments": "rb1601,rb1602",
 
    "DataBase":{
       "Host":"127.0.0.1",
@@ -26,8 +26,8 @@
       "Name":"LyATTrader"
    },
    "StrategyMap":{
-      "rb1510":"MACrossBOLL",
-      "rb1511":"WMACross"
+      "rb1601":"MACrossBOLL",
+      "rb1602":"WMACross"
    },
    "Strategies":[
       {
