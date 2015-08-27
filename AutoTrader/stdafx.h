@@ -16,3 +16,6 @@
 
 // TODO: reference additional headers your program requires here
 #endif
+
+#define instrument_1 "rb1601"
+#define instrument_2 "rb1602"

@@ -51,15 +51,15 @@ RealTimeDataProcessorPool::RealTimeDataProcessorPool()
 	m_processorDict.clear();
 
 	if (Config::Instance()->RecordModeOn()){
-		m_processorDict["rb1510"] = std::shared_ptr<RealTimeDataProcessor>(new RealTimeDataProcessor(nullptr, "rb1510"));
-		m_processorDict["rb1511"] = std::shared_ptr<RealTimeDataProcessor>(new RealTimeDataProcessor(nullptr, "rb1511"));
+		m_processorDict[instrument_1] = std::shared_ptr<RealTimeDataProcessor>(new RealTimeDataProcessor(nullptr, instrument_1));
+		m_processorDict[instrument_2] = std::shared_ptr<RealTimeDataProcessor>(new RealTimeDataProcessor(nullptr, instrument_2));
 	}
 	else{
 		//m_processorDict["rb1510"] = std::shared_ptr<RealTimeDataProcessor>(new RealTimeDataProcessor(m_dict["k3UpThroughK5"].get(), "rb1510"));
-		std::string st1 = Config::Instance()->CtpStrategy("rb1510");
-		std::string st2 = Config::Instance()->CtpStrategy("rb1511");
-		m_processorDict["rb1510"] = std::shared_ptr<RealTimeDataProcessor>(new RealTimeDataProcessor(m_dict[st1].get(), "rb1510"));
-		m_processorDict["rb1511"] = std::shared_ptr<RealTimeDataProcessor>(new RealTimeDataProcessor(m_dict[st2].get(), "rb1511"));
+		std::string st1 = Config::Instance()->CtpStrategy(instrument_1);
+		std::string st2 = Config::Instance()->CtpStrategy(instrument_2);
+		m_processorDict[instrument_1] = std::shared_ptr<RealTimeDataProcessor>(new RealTimeDataProcessor(m_dict[st1].get(), instrument_2));
+		m_processorDict[instrument_2] = std::shared_ptr<RealTimeDataProcessor>(new RealTimeDataProcessor(m_dict[st2].get(), instrument_2));
 	}
 
 }

@@ -146,8 +146,8 @@ Config::Config(const std::string& pathName)
 		}
 
 		if (!root["StrategyMap"].isNull()){
-			m_strategymap["rb1510"] = root["StrategyMap"]["rb1510"].asString();
-			m_strategymap["rb1511"] = root["StrategyMap"]["rb1511"].asString();
+			m_strategymap[instrument_1] = root["StrategyMap"][instrument_1].asString();
+			m_strategymap[instrument_2] = root["StrategyMap"][instrument_2].asString();
 		}
 	}
 	is.close();
