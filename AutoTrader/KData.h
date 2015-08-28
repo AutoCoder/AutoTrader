@@ -1,6 +1,7 @@
 #ifndef K_DATA_H
 #define K_DATA_H
 #include <vector>
+#include <map>
 #include "TickWrapper.h"
 
 typedef std::vector<TickWrapper> TickSet;
@@ -33,6 +34,7 @@ public:
 private:
 	static bool IsTableCreated;
 	static int CreateKDataTableIfNotExists(const std::string& dbname, const std::string& tableName);
+	static std::map<std::string, bool> TableIsCreatedMap;
 
 private:
 	long long m_volume;

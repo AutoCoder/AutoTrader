@@ -5,7 +5,7 @@
 #include <limits>  
 #include <sstream>
 
-bool KData::IsTableCreated = false;
+std::map<std::string, bool> KData::TableIsCreatedMap = {};
 
 KData::KData(const TickSet& tickset, size_t duration)
 : m_duration(duration)
@@ -105,12 +105,12 @@ void KData::serializeToDB(DBWrapper& db){
 }
 
 int KData::CreateKDataTableIfNotExists(const std::string& dbname, const std::string& tableName){
-	if (KData::IsTableCreated == true){
+	if (TableIsCreatedMap.find(dbname) != TableIsCreatedMap.end() && TableIsCreatedMap[dbname] == true){
 		return 0;
 	}
 	else
 	{
-		KData::IsTableCreated = true;
+		TableIsCreatedMap[dbname] = true;
 		const char* sqltempl = "CREATE TABLE IF NOT EXISTS `%s`.`%s` (\
 			`id` INT NOT NULL AUTO_INCREMENT, \
 			`Time` VARCHAR(32) NULL, \
