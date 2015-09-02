@@ -52,7 +52,7 @@ public:
 
 	void ReqQryTradingAccount();
 
-	void ReqQryInvestorPosition(TThostFtdcInstrumentIDType instId);
+	void ReqQryInvestorPosition();//(TThostFtdcInstrumentIDType instId);
 
 	void ReqOrderInsert(Order ord);
 

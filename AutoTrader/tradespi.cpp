@@ -149,9 +149,10 @@ void CtpTradeSpi::ReqQryTradingAccount()
 			break;
 		}
 		else{
-			spdlog::get("console")->info() << "[Trade Thread] Request | send trading account query... fail";
+			//spdlog::get("console")->info() << "[Trade Thread] Request | send trading account query... fail";
 			if (pAccountMgr->isUpdated())
 				break;
+			sleep(2000);
 		}
 	}
 }
@@ -177,15 +178,28 @@ void CtpTradeSpi::OnRspQryTradingAccount(
 	//if (bIsLast) SetEvent(g_tradehEvent);
 }
 
-void CtpTradeSpi::ReqQryInvestorPosition(TThostFtdcInstrumentIDType instId)
+void CtpTradeSpi::ReqQryInvestorPosition()//(TThostFtdcInstrumentIDType instId)
 {
 	CThostFtdcQryInvestorPositionField req;
 	memset(&req, 0, sizeof(req));
 	strcpy_s(req.BrokerID, m_brokerID);
 	strcpy_s(req.InvestorID, m_userID);
-	strcpy_s(req.InstrumentID, instId);
-	int ret = pUserApi->ReqQryInvestorPosition(&req, ++requestId);
-	spdlog::get("console")->info() << "[Trade Thread] Request | send InvestorPosition query..." << ((ret == 0) ? "success" : "fail");
+	strcpy_s(req.InstrumentID, pAccountMgr->InstrumentID());
+
+	int ret = -1;
+	while (true){
+		ret = pUserApi->ReqQryInvestorPosition(&req, ++requestId);
+		if (ret == 0){
+			spdlog::get("console")->info() << "[Trade Thread] Request | send InvestorPosition query...success";
+			break;
+		}
+		else{
+			//spdlog::get("console")->info() << "[Trade Thread] Request | send InvestorPosition query... fail";
+			if (pAccountMgr->isUpdated())
+				break;
+			sleep(2000);
+		}
+	}
 }
 
 void CtpTradeSpi::OnRspQryInvestorPosition(
@@ -287,7 +301,7 @@ void CtpTradeSpi::OnRtnTrade(CThostFtdcTradeField *pTrade)
 	//fresh accout
 	spdlog::get("console")->info() << "[Trade Thread] Order executed. begin to refresh Account info...";
 	ReqQryTradingAccount();
-	ReqQryInvestorPosition(pTrade->InstrumentID);
+	ReqQryInvestorPosition();
 }
 
 

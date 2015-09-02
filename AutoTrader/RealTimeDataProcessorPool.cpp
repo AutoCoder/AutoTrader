@@ -29,7 +29,7 @@ RealTimeDataProcessorPool::RealTimeDataProcessorPool()
 	Config::Instance()->CtpBrokerID();
 	std::vector<StrategyMetaData> stgySet = Config::Instance()->StrategySet();
 	m_dict.clear();
-	IAccount* mgr = new BaseAccountMgr();
+	IAccount* mgr = new BaseAccountMgr(instrument_1);
 	for (StrategyMetaData it : stgySet){
 		if (it.name == "MACross"){
 			m_dict["MACross"] = std::shared_ptr<Strategy>(new MACrossStratgy(it.short_ma, it.long_ma, mgr));
@@ -58,7 +58,7 @@ RealTimeDataProcessorPool::RealTimeDataProcessorPool()
 		//m_processorDict["rb1510"] = std::shared_ptr<RealTimeDataProcessor>(new RealTimeDataProcessor(m_dict["k3UpThroughK5"].get(), "rb1510"));
 		std::string st1 = Config::Instance()->CtpStrategy(instrument_1);
 		std::string st2 = Config::Instance()->CtpStrategy(instrument_2);
-		m_processorDict[instrument_1] = std::shared_ptr<RealTimeDataProcessor>(new RealTimeDataProcessor(m_dict[st1].get(), instrument_2));
+		m_processorDict[instrument_1] = std::shared_ptr<RealTimeDataProcessor>(new RealTimeDataProcessor(m_dict[st1].get(), instrument_1));
 		m_processorDict[instrument_2] = std::shared_ptr<RealTimeDataProcessor>(new RealTimeDataProcessor(m_dict[st2].get(), instrument_2));
 	}
 

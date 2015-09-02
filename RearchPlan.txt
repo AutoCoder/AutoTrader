@@ -42,3 +42,9 @@
  初级 MultiCharts
 
  中级 OpenQuant amibroker smartquant 可以用c++或者c#开发插件
+
+ [2015-9-1]
+ 问题：
+ 需要同时去查询account 和 position（仓位），但是这两个请求的回调函数很久才返回。
+
+ 目前是在OnRtnTrade()中去调用 这两个查询请求，但是对于已经存在的交易，OnRtnTrade仍然会被调用到

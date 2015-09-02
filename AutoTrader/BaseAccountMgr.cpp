@@ -4,8 +4,11 @@
 #include "Order.h"
 #include <memory>
 
-BaseAccountMgr::BaseAccountMgr()
+BaseAccountMgr::BaseAccountMgr(TThostFtdcInstrumentIDType instr)
+: m_isAccountUpdated(false)
+, m_isPositionUpdated(false)
 {
+	memcpy(&m_instrument, &instr, sizeof(TThostFtdcInstrumentIDType));
 }
 
 

@@ -59,6 +59,7 @@ void TradeManageThread(CtpTradeSpi* pTradeUserSpi){
 		}
 		else if (pTradeUserSpi->IsConfirmedSettlementInfo() && !pTradeUserSpi->IsAccoutRefreshed()){
 			pTradeUserSpi->ReqQryTradingAccount();
+			pTradeUserSpi->ReqQryInvestorPosition();
 		}
 	}
 }
@@ -174,9 +175,6 @@ int main(int argc, const char* argv[]){
 		pMdUserApi->Init();
 		//******start trade thread******
 		pTradeUserApi->Init();
-
-		//Order ord("rb1510", 2340, ExchangeDirection::Buy, Order::FAK);
-		//pTradeUserSpi->ReqOrderInsert(ord);
 
 		mdManagethread.join();
 		tradeManagethread.join();

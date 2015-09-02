@@ -19,6 +19,8 @@ public:
 	virtual void setUpdated(bool val) = 0;
 
 	virtual bool isUpdated() = 0;
+
+	virtual char* InstrumentID() = 0;
 };
 
 #endif

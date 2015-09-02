@@ -8,7 +8,7 @@ class Order;
 class BaseAccountMgr : public IAccount
 {
 public:
-	BaseAccountMgr();
+	BaseAccountMgr(TThostFtdcInstrumentIDType instr);
 	virtual ~BaseAccountMgr();
 
 	virtual void update(const CThostFtdcTradingAccountField& info);
@@ -23,7 +23,9 @@ public:
 
 	virtual bool isUpdated() { return m_isAccountUpdated && m_isPositionUpdated; }
 
+	virtual char* InstrumentID() { return m_instrument; }
 private:
+	TThostFtdcInstrumentIDType m_instrument;
 	CThostFtdcTradingAccountField m_accountInfo;
 	CThostFtdcInvestorPositionField m_positionInfo;
 	volatile bool m_isAccountUpdated;
