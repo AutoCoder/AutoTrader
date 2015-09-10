@@ -10,6 +10,8 @@
 #include "spdlog/spdlog.h"
 #include "CommonUtils.h"
 #include "IAccount.h"
+#include "PositionMgr.h"
+
 extern int requestId;
 
 extern std::condition_variable cv_trade;
@@ -25,11 +27,11 @@ CtpTradeSpi::CtpTradeSpi(CThostFtdcTraderApi* p, const char * brokerID, const ch
 	, pAccountMgr(nullptr)
 	, m_frontID(-1)
 	, m_sessionID(-1)
-	, m_isFrontConnected(false)
-	, m_islogin(false)
-	, m_isConfirmSettlementInfo(false)
-	, m_isAccountFreshed(false)
-	
+	//, m_isFrontConnected(false)
+	//, m_islogin(false)
+	//, m_isConfirmSettlementInfo(false)
+	//, m_isAccountFreshed(false)
+	, m_stateChangeHandler(this)
 {
 	strcpy_s(m_brokerID, brokerID);
 	strcpy_s(m_userID, userID);
@@ -45,8 +47,10 @@ void CtpTradeSpi::OnFrontConnected()
 {
 	spdlog::get("console")->info() << "[Trade Thread] Response | connected...";
 	//SetEvent(g_tradehEvent);
-	m_isFrontConnected = true;
-	cv_trade.notify_all();
+	//m_isFrontConnected = true;
+	//cv_trade.notify_all();
+
+	m_stateChangeHandler.OnFrontConnected();
 }
 
 void CtpTradeSpi::OnFrontDisconnected(int nReason)
@@ -54,8 +58,8 @@ void CtpTradeSpi::OnFrontDisconnected(int nReason)
 	spdlog::get("console")->info() << "[Trade Thread] Response | Disconnected..."
 		<< " reason=" << nReason;
 
-	m_isFrontConnected = false;
-	m_islogin = false;
+	//m_isFrontConnected = false;
+	//m_islogin = false;
 }
 
 void CtpTradeSpi::ReqUserLogin()
@@ -81,9 +85,9 @@ void CtpTradeSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
 		sprintf_s(m_orderRef, "%d", ++nextOrderRef);
 		spdlog::get("console")->info() << "[Trade Thread] Response | login successfully...CurrentDate:"
 			<< pRspUserLogin->TradingDay;
-		m_islogin = true;
-		cv_trade.notify_all();
-
+		//m_islogin = true;
+		//cv_trade.notify_all();
+		m_stateChangeHandler.OnLogined();
 	}
 	//if (bIsLast) SetEvent(g_tradehEvent);
 }
@@ -108,10 +112,12 @@ void CtpTradeSpi::OnRspSettlementInfoConfirm(
 			<< "...<" << pSettlementInfoConfirm->ConfirmDate
 			<< " " << pSettlementInfoConfirm->ConfirmTime << ">...Confirm";
 
-		m_isConfirmSettlementInfo = true;
-		cv_trade.notify_all();
+		//m_isConfirmSettlementInfo = true;
+		//cv_trade.notify_all();
+		
 	}
 	//if (bIsLast) SetEvent(g_tradehEvent);
+	m_stateChangeHandler.OnConfirmedSettlementInfo();
 }
 
 void CtpTradeSpi::ReqQryInstrument(TThostFtdcInstrumentIDType instId)
@@ -172,7 +178,7 @@ void CtpTradeSpi::OnRspQryTradingAccount(
 			<< " PositionProfit:" << pTradingAccount->PositionProfit
 			<< " Commission:" << pTradingAccount->Commission
 			<< " FrozenMargin:" << pTradingAccount->FrozenMargin;
-		m_isAccountFreshed = true;
+		//m_isAccountFreshed = true;
 	}
 
 	//if (bIsLast) SetEvent(g_tradehEvent);
@@ -181,14 +187,16 @@ void CtpTradeSpi::OnRspQryTradingAccount(
 void CtpTradeSpi::ReqQryInvestorPosition()//(TThostFtdcInstrumentIDType instId)
 {
 	CThostFtdcQryInvestorPositionField req;
+	//CThostFtdcQryInvestorPositionDetailField req;
 	memset(&req, 0, sizeof(req));
 	strcpy_s(req.BrokerID, m_brokerID);
 	strcpy_s(req.InvestorID, m_userID);
-	strcpy_s(req.InstrumentID, pAccountMgr->InstrumentID());
+	strcpy_s(req.InstrumentID, "");// pAccountMgr->InstrumentID());
 
 	int ret = -1;
 	while (true){
 		ret = pUserApi->ReqQryInvestorPosition(&req, ++requestId);
+		//ret = pUserApi->ReqQryInvestorPositionDetail(&req, ++requestId);
 		if (ret == 0){
 			spdlog::get("console")->info() << "[Trade Thread] Request | send InvestorPosition query...success";
 			break;
@@ -199,6 +207,20 @@ void CtpTradeSpi::ReqQryInvestorPosition()//(TThostFtdcInstrumentIDType instId)
 				break;
 			sleep(2000);
 		}
+	}
+}
+
+void CtpTradeSpi::OnRspQryInvestorPositionDetail(CThostFtdcInvestorPositionDetailField *pInvestorPositionDetail, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
+	if (!IsErrorRspInfo(pRspInfo) && pInvestorPositionDetail){
+		//if (pAccountMgr)
+		//	pAccountMgr->update(*pInvestorPosition);
+		spdlog::get("console")->info() << "[Trade Thread] Response| Instrument:" << pInvestorPositionDetail->InstrumentID
+			<< " PosiDirection:" << pInvestorPositionDetail->Direction
+			<< " Position:" << pInvestorPositionDetail->Volume
+			<< " Open Price:" << pInvestorPositionDetail->OpenPrice
+			//<< " Today Position:" << pInvestorPositionDetail->TodayPosition
+			//<< " Position Profit:" << pInvestorPositionDetail->PositionProfit
+			<< " Margin:" << pInvestorPositionDetail->Margin;
 	}
 }
 
@@ -300,8 +322,10 @@ void CtpTradeSpi::OnRtnTrade(CThostFtdcTradeField *pTrade)
 
 	//fresh accout
 	spdlog::get("console")->info() << "[Trade Thread] Order executed. begin to refresh Account info...";
+
+	Position::PositionMgr::Instance().PushTradeItem(*pTrade);
 	ReqQryTradingAccount();
-	ReqQryInvestorPosition();
+	//ReqQryInvestorPosition();
 }
 
 
@@ -319,7 +343,7 @@ void CtpTradeSpi::OnRspError(CThostFtdcRspInfoField *pRspInfo, int nRequestID, b
 bool CtpTradeSpi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo)
 {
 	bool ret = ((pRspInfo) && (pRspInfo->ErrorID != 0));
-	if (ret){
+	if (ret && !std::string(pRspInfo->ErrorMsg).empty()){
 		spdlog::get("console")->info() << "[Trade Thread] Response | " << pRspInfo->ErrorMsg;
 	}
 	return ret;

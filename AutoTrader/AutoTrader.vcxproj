@@ -164,6 +164,7 @@
     <ClInclude Include="BaseAccountMgr.h" />
     <ClInclude Include="crossplatform.h" />
     <ClInclude Include="IAccount.h" />
+    <ClInclude Include="PositionMgr.h" />
     <ClInclude Include="tradespi.h" />
     <ClInclude Include="AMACrossStratgy.h" />
     <ClInclude Include="BOLLTech.h" />
@@ -195,6 +196,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BaseAccountMgr.cpp" />
+    <ClCompile Include="PositionMgr.cpp" />
     <ClCompile Include="tradespi.cpp" />
     <ClCompile Include="AMACrossStratgy.cpp" />
     <ClCompile Include="AutoTrader.cpp" />

@@ -5,8 +5,34 @@
 class IAccount;
 class Order;
 
+
+
 class CtpTradeSpi : public CThostFtdcTraderSpi
 {
+	class TradeThreadStateChangedHandler{
+	public:
+		TradeThreadStateChangedHandler(CtpTradeSpi* pTradeUserSpi)
+			:m_TradeUserSpiPtr(pTradeUserSpi)
+		{
+		}
+
+		void OnFrontConnected(){
+			m_TradeUserSpiPtr->ReqUserLogin();
+		}
+
+		void OnLogined(){
+			m_TradeUserSpiPtr->ReqSettlementInfoConfirm();
+		}
+
+		void OnConfirmedSettlementInfo(){
+			m_TradeUserSpiPtr->ReqQryTradingAccount();
+			//m_TradeUserSpiPtr->ReqQryInvestorPosition();
+		}
+
+	private:
+		CtpTradeSpi* m_TradeUserSpiPtr;
+	};
+
 public:
 	CtpTradeSpi(CThostFtdcTraderApi* pUserApi, \
 		const char * brokerID, \
@@ -27,6 +53,8 @@ public:
 
 	virtual void OnRspQryInvestorPosition(CThostFtdcInvestorPositionField *pInvestorPosition, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
+	virtual void OnRspQryInvestorPositionDetail(CThostFtdcInvestorPositionDetailField *pInvestorPositionDetail, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+
 	virtual void OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
 	virtual void OnRspOrderAction(CThostFtdcInputOrderActionField *pInputOrderAction, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
@@ -43,7 +71,6 @@ public:
 	//excute order queue
 
 public:
-
 	void ReqUserLogin();
 
 	void ReqSettlementInfoConfirm();
@@ -60,31 +87,27 @@ public:
 
 	bool IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo);
 
-	bool IsFrontConnected() const{
-		return m_isFrontConnected;
-	}
+	//bool IsFrontConnected() const{
+	//	return m_isFrontConnected;
+	//}
 
-	bool IsLogin() const {
-		return m_islogin;
-	}
+	//bool IsLogin() const {
+	//	return m_islogin;
+	//}
 
-	bool IsConfirmedSettlementInfo() const {
-		return m_isConfirmSettlementInfo;
-	}
+	//bool IsConfirmedSettlementInfo() const {
+	//	return m_isConfirmSettlementInfo;
+	//}
 
-	bool IsAccoutRefreshed() const {
-		return m_isAccountFreshed;
-	}
+	//bool IsAccoutRefreshed() const {
+	//	return m_isAccountFreshed;
+	//}
 
 	void AddSubscriber(IAccount* pAccount){
 		pAccountMgr = pAccount;
 	}
 
 private:
-	double m_available; //可用资金
-	double m_currMargin; //当前保证金总额
-	double m_frozenCommission;//冻结手续费
-	double m_frozenMargin;//冻结保证金
 	TThostFtdcBrokerIDType m_brokerID;
 	TThostFtdcUserIDType m_userID;
 	TThostFtdcPasswordType m_password;
@@ -96,11 +119,12 @@ private:
 	const double ganggan = 0.2;
 private:
 	CThostFtdcTraderApi* pUserApi;
-	bool m_isFrontConnected;
-	bool m_islogin;
-	bool m_isConfirmSettlementInfo;
-	bool m_isAccountFreshed;
+	//bool m_isFrontConnected;
+	//bool m_islogin;
+	//bool m_isConfirmSettlementInfo;
+	//bool m_isAccountFreshed;
 	IAccount* pAccountMgr;
+	TradeThreadStateChangedHandler m_stateChangeHandler;
 };
 
 #endif 

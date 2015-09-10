@@ -28,6 +28,9 @@
     <Filter Include="Source Files\Tech">
       <UniqueIdentifier>{1c5ac626-fc0a-48c9-b46e-21f0911d6965}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\MultiThreadClass">
+      <UniqueIdentifier>{1679c759-104e-4ff9-a9a4-d740702b2a66}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -58,9 +61,6 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="Order.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="OrderQueue.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Strategy.h">
@@ -138,6 +138,12 @@
     <ClInclude Include="crossplatform.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="OrderQueue.h">
+      <Filter>Header Files\MultiThreadClass</Filter>
+    </ClInclude>
+    <ClInclude Include="PositionMgr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -207,6 +213,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="BaseAccountMgr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PositionMgr.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

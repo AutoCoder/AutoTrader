@@ -30,11 +30,11 @@ namespace {
 
 CtpMdSpi::CtpMdSpi(CThostFtdcMdApi* api) 
 	: pUserApi(api)
-	, m_isSubscribed(false)
-	, m_isFrontConnected(false)
-	, m_isLogin(false)
+	//, m_isSubscribed(false)
+	//, m_isFrontConnected(false)
+	//, m_isLogin(false)
+	, m_stateChangeHandler(this)
 {
-	
 }
 
 void CtpMdSpi::OnRspError(CThostFtdcRspInfoField *pRspInfo,
@@ -46,9 +46,9 @@ void CtpMdSpi::OnRspError(CThostFtdcRspInfoField *pRspInfo,
 void CtpMdSpi::OnFrontDisconnected(int nReason)
 {
 	spdlog::get("console")->info() << __FUNCTION__ << " reason=" << nReason;
-	m_isFrontConnected = false;
-	m_isLogin = false;
-	m_isSubscribed = false;
+	//m_isFrontConnected = false;
+	//m_isLogin = false;
+	//m_isSubscribed = false;
 }
 		
 void CtpMdSpi::OnHeartBeatWarning(int nTimeLapse)
@@ -59,8 +59,10 @@ void CtpMdSpi::OnHeartBeatWarning(int nTimeLapse)
 void CtpMdSpi::OnFrontConnected()
 {
 	spdlog::get("console")->info() << "[MD Thread] Response | connected...";
-	m_isFrontConnected = true;
-	cv_md.notify_all();
+	//m_isFrontConnected = true;
+	//cv_md.notify_all();
+
+	m_stateChangeHandler.OnFrontConnected();
 }
 
 bool CtpMdSpi::ReqUserLogin(TThostFtdcBrokerIDType appId, TThostFtdcUserIDType userId, TThostFtdcPasswordType passwd)
@@ -82,8 +84,9 @@ void CtpMdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
 	if (!IsErrorRspInfo(pRspInfo) && pRspUserLogin)
 	{
 		spdlog::get("console")->info() << "[MD Thread] Response | login successfully...CurrentDate:" <<pRspUserLogin->TradingDay;
-		m_isLogin = true;
-		cv_md.notify_all();
+		//m_isLogin = true;
+		//cv_md.notify_all();
+		m_stateChangeHandler.OnLogined();
 	}
 	//if (bIsLast) SetEvent(g_hEvent);
 }
@@ -110,8 +113,9 @@ void CtpMdSpi::OnRspSubMarketData(
 {
 	spdlog::get("console")->info() << "[MD Thread] Response | [OnRspSubMarketData] : " << ((pRspInfo->ErrorID == 0) ? "success" : "fail") << "; DetailInfo : " << pRspInfo->ErrorMsg;
   //if(bIsLast)  SetEvent(g_hEvent);
-	if (pRspInfo->ErrorID == 0){
-		m_isSubscribed = true;
+	if (pRspInfo->ErrorID != 0){
+		//m_isSubscribed = true;
+		m_stateChangeHandler.OnLogined();
 	}
 }
 
@@ -123,7 +127,7 @@ void CtpMdSpi::OnRspUnSubMarketData(
   //if(bIsLast)  SetEvent(g_hEvent);
 	
 	if (pRspInfo->ErrorID == 0){
-		m_isSubscribed = false;
+		//m_isSubscribed = false;
 	}
 }
 

@@ -30,39 +30,39 @@ std::atomic<bool> g_quit = false;
 std::atomic<bool> g_reply = false;
 threadsafe_queue<Order> order_queue;
 
-void MdManageThread(CtpMdSpi* pMdUserSpi){
-
-	std::unique_lock <std::mutex> lck(mtx);
-	while (!g_quit){
-		cv_md.wait(lck);
-		if (pMdUserSpi->IsFrontConnected() && !pMdUserSpi->IsLogin()){
-			pMdUserSpi->ReqUserLogin(const_cast<char*>(Config::Instance()->CtpBrokerID().c_str()) \
-				, const_cast<char*>(Config::Instance()->CtpUserID().c_str())\
-				, const_cast<char*>(Config::Instance()->CtpPassword().c_str()));
-		}
-		else if (pMdUserSpi->IsLogin() && !pMdUserSpi->IsSubscribed()){
-			pMdUserSpi->SubscribeMarketData(const_cast<char*>(Config::Instance()->CtpInstrumentIDs().c_str()));
-		}
-	}
-}
-
-void TradeManageThread(CtpTradeSpi* pTradeUserSpi){
-	std::unique_lock <std::mutex> lck(mtx);
-	while (!g_quit){
-		cv_trade.wait(lck);
-
-		if (pTradeUserSpi->IsFrontConnected() && !pTradeUserSpi->IsLogin()){
-			pTradeUserSpi->ReqUserLogin();
-		}
-		else if (pTradeUserSpi->IsLogin() && !pTradeUserSpi->IsConfirmedSettlementInfo()){
-			pTradeUserSpi->ReqSettlementInfoConfirm();
-		}
-		else if (pTradeUserSpi->IsConfirmedSettlementInfo() && !pTradeUserSpi->IsAccoutRefreshed()){
-			pTradeUserSpi->ReqQryTradingAccount();
-			pTradeUserSpi->ReqQryInvestorPosition();
-		}
-	}
-}
+//void MdManageThread(CtpMdSpi* pMdUserSpi){
+//
+//	std::unique_lock <std::mutex> lck(mtx);
+//	while (!g_quit){
+//		cv_md.wait(lck);
+//		if (pMdUserSpi->IsFrontConnected() && !pMdUserSpi->IsLogin()){
+//			pMdUserSpi->ReqUserLogin(const_cast<char*>(Config::Instance()->CtpBrokerID().c_str()) \
+//				, const_cast<char*>(Config::Instance()->CtpUserID().c_str())\
+//				, const_cast<char*>(Config::Instance()->CtpPassword().c_str()));
+//		}
+//		else if (pMdUserSpi->IsLogin() && !pMdUserSpi->IsSubscribed()){
+//			pMdUserSpi->SubscribeMarketData(const_cast<char*>(Config::Instance()->CtpInstrumentIDs().c_str()));
+//		}
+//	}
+//}
+//
+//void TradeManageThread(CtpTradeSpi* pTradeUserSpi){
+//	std::unique_lock <std::mutex> lck(mtx);
+//	while (!g_quit){
+//		cv_trade.wait(lck);
+//
+//		if (pTradeUserSpi->IsFrontConnected() && !pTradeUserSpi->IsLogin()){
+//			pTradeUserSpi->ReqUserLogin();
+//		}
+//		else if (pTradeUserSpi->IsLogin() && !pTradeUserSpi->IsConfirmedSettlementInfo()){
+//			pTradeUserSpi->ReqSettlementInfoConfirm();
+//		}
+//		else if (pTradeUserSpi->IsConfirmedSettlementInfo() && !pTradeUserSpi->IsAccoutRefreshed()){
+//			pTradeUserSpi->ReqQryTradingAccount();
+//			pTradeUserSpi->ReqQryInvestorPosition();
+//		}
+//	}
+//}
 
 void ExcuteOrderQueue(CtpTradeSpi* pUserSpi){
 	spdlog::get("console")->info() << "Start to trade";
@@ -166,8 +166,8 @@ int main(int argc, const char* argv[]){
 		pool->ListenToTradeSpi(pTradeUserSpi);
 
 		//Create a thread, Once FrontDisconnect ,try to reconnect and subscribeMD again if needed.
-		std::thread mdManagethread(MdManageThread, pMdUserSpi);
-		std::thread tradeManagethread(TradeManageThread, pTradeUserSpi);
+		//std::thread mdManagethread(MdManageThread, pMdUserSpi);
+		//std::thread tradeManagethread(TradeManageThread, pTradeUserSpi);
 		//[Excute Order Thread] Excute the Order in Queue one by one looply.
 		std::thread tradeThread(ExcuteOrderQueue, pTradeUserSpi);
 
@@ -176,8 +176,8 @@ int main(int argc, const char* argv[]){
 		//******start trade thread******
 		pTradeUserApi->Init();
 
-		mdManagethread.join();
-		tradeManagethread.join();
+		//mdManagethread.join();
+		//tradeManagethread.join();
 		tradeThread.join();
 
 		//[Main Thread]Release the resource and pointer.
