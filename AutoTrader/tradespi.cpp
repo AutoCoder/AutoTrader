@@ -323,7 +323,7 @@ void CtpTradeSpi::OnRtnTrade(CThostFtdcTradeField *pTrade)
 	//fresh accout
 	spdlog::get("console")->info() << "[Trade Thread] Order executed. begin to refresh Account info...";
 
-	Position::PositionMgr::Instance().PushTradeItem(*pTrade);
+	Position::GetManager().PushTradeItem(*pTrade);
 	ReqQryTradingAccount();
 	//ReqQryInvestorPosition();
 }

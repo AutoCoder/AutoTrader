@@ -11,13 +11,11 @@ namespace Position{
 		Sell = '1',
 	};
 
+	/*As the PositionMgr will be only called by tradespi thread, so don't supply concurrency support for now*/
 	class PositionMgr
 	{
 	public:
-		static PositionMgr& Instance(){
-			return m_instance;
-		}
-	
+		PositionMgr();
 		~PositionMgr();
 
 		void PushTradeItem(const CThostFtdcTradeField& item);
@@ -27,16 +25,16 @@ namespace Position{
 		*/
 		double GetPosition(double& pos, PositionDirection& direction);
 
-
 	private:
-		PositionMgr();
 		PositionMgr(const PositionMgr& mgr) = delete;
 		PositionMgr& operator = (const PositionMgr& mgr) = delete;
 
 	private:
-		static PositionMgr m_instance;
+		
 		std::vector<CThostFtdcTradeField> m_PositionList;
 	};
+
+	PositionMgr& GetManager();
 
 };
 #endif

@@ -3,7 +3,10 @@
 
 namespace Position{
 
-	PositionMgr PositionMgr::m_instance;
+	PositionMgr& GetManager(){
+		static PositionMgr mgr;
+		return mgr;
+	}
 
 	PositionMgr::PositionMgr()
 	{
@@ -23,5 +26,7 @@ namespace Position{
 		direction = Buy;
 		return pos;
 	}
+
+
 
 }
