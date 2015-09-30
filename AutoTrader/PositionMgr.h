@@ -2,6 +2,7 @@
 #define POSITION_MGR_H
 
 #include <vector>
+#include <mutex>
 #include "ThostFtdcUserApiStruct.h"
 
 namespace Position{
@@ -23,14 +24,14 @@ namespace Position{
 		/*the return value is position volume, it's a ratio from 0.0 ~ 1.0.
 		  To support linked expression, also return position volume as double
 		*/
-		double GetPosition(double& pos, PositionDirection& direction);
+		double GetPosition(double& pos, PositionDirection& direction, int& volume) const;
 
 	private:
 		PositionMgr(const PositionMgr& mgr) = delete;
 		PositionMgr& operator = (const PositionMgr& mgr) = delete;
 
 	private:
-		
+		mutable std::mutex m_mutex;
 		std::vector<CThostFtdcTradeField> m_PositionList;
 	};
 

@@ -2,6 +2,7 @@
 #include "crossplatform.h"
 #include "BaseAccountMgr.h"
 #include "Order.h"
+#include "PositionMgr.h"
 #include <memory>
 
 BaseAccountMgr::BaseAccountMgr(TThostFtdcInstrumentIDType instr)
@@ -32,16 +33,21 @@ bool BaseAccountMgr::completeOrder(Order& ord){
 		sleep(20);
 	}
 
-	double purchaseMoney = m_accountInfo.Available - (m_accountInfo.Balance * 0.8);
-	int vol = purchaseMoney / ord.GetRefExchangePrice();
-
+	Position::PositionMgr& posMgr = Position::GetManager();
+	double posMoney = 0.0;
+	int volume = 0;
+	Position::PositionDirection posDirection = Position::Buy;
+	posMgr.GetPosition(posMoney, posDirection, volume);
 	//如果订单买卖方向与持仓买卖方向一致。
-	if (ord.GetExchangeDirection() == m_positionInfo.PosiDirection){
-		if (vol == 0){
-			//可用资金 == 0， 则放弃该订单
+	if (ord.GetExchangeDirection() == posDirection){
+		if (posMoney > m_accountInfo.Available * 0.2){
+			//仓位已经超过2成， 则放弃该订单
 			return false;
 		}
 		else{
+			double purchaseMoney = m_accountInfo.Available*0.2 - posMoney;
+			int vol = purchaseMoney / ord.GetRefExchangePrice();
+
 			ord.SetCombOffsetFlagType(THOST_FTDC_OF_Open);
 			ord.SetVolume(vol);
 			return true;
@@ -49,7 +55,7 @@ bool BaseAccountMgr::completeOrder(Order& ord){
 	}
 	else{
 		ord.SetCombOffsetFlagType(THOST_FTDC_OF_CloseToday);
-		ord.SetVolume(m_positionInfo.Position);
+		ord.SetVolume(volume);
 		return true;
 	}
 }
