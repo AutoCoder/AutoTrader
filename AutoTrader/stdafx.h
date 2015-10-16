@@ -19,3 +19,5 @@
 
 #define instrument_1 "rb1601"
 #define instrument_2 "rb1602"
+
+#define SYNC_PRINT spdlog::get("console")->info()

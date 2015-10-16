@@ -83,7 +83,7 @@ DBWrapper::DBWrapper()
 		, Config::Instance()->DBName().c_str() \
 		, Config::Instance()->DBPort()))
 	{
-		spdlog::get("console")->info() << m_MysqlImpl->mysql_lasterror();
+		SYNC_PRINT << m_MysqlImpl->mysql_lasterror();
 	}
 		
 	//ExecuteNoResult("ExecuteNoResult")
@@ -97,7 +97,7 @@ DBWrapper::~DBWrapper()
 int DBWrapper::ExecuteNoResult(const std::string& sql){
 	int ret = m_MysqlImpl->mysql_noResult_query(sql.c_str());
 	if (-1 == ret)
-		spdlog::get("console")->info() << m_MysqlImpl->mysql_lasterror();
+		SYNC_PRINT << m_MysqlImpl->mysql_lasterror();
 	return ret;
 }
 
@@ -105,6 +105,6 @@ int DBWrapper::Query(const std::string& sql, std::map<int, std::vector<std::stri
 {
 	int ret = m_MysqlImpl->mysql_select_query(sql.c_str(), map_results);
 	if (-1 == ret)
-		spdlog::get("console")->info() << m_MysqlImpl->mysql_lasterror();
+		SYNC_PRINT << m_MysqlImpl->mysql_lasterror();
 	return ret;
 }

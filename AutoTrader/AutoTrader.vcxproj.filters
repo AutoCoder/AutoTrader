@@ -31,6 +31,12 @@
     <Filter Include="Header Files\MultiThreadClass">
       <UniqueIdentifier>{1679c759-104e-4ff9-a9a4-d740702b2a66}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Position">
+      <UniqueIdentifier>{d911c4d6-8ab5-436f-b168-4f4828fded26}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Position">
+      <UniqueIdentifier>{7954562a-eb4f-4c81-9b3b-4be473b483cf}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -129,12 +135,6 @@
     <ClInclude Include="tradespi.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="IAccount.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="BaseAccountMgr.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="crossplatform.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -143,6 +143,15 @@
     </ClInclude>
     <ClInclude Include="PositionMgr.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="InstrumentInfoMgr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AP_Mgr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IPositionControl.h">
+      <Filter>Header Files\Position</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -212,11 +221,17 @@
     <ClCompile Include="tradespi.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="BaseAccountMgr.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="PositionMgr.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="InstrumentInfoMgr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AP_Mgr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PositionControl.cpp">
+      <Filter>Source Files\Position</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

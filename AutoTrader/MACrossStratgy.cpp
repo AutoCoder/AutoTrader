@@ -8,9 +8,9 @@
 #include "TechUtils.h"
 #include <sstream>
 #include <assert.h>
-#include "IAccount.h"
+#include "IPositionControl.h"
 
-MACrossStratgy::MACrossStratgy(size_t short_ma, size_t long_ma, IAccount* accountMgr)
+MACrossStratgy::MACrossStratgy(size_t short_ma, size_t long_ma, IPositionControl* accountMgr)
 : m_curOrder(new Order())//m_order is a pointer so that it will only update so, create it at constructor.
 , m_shortMA(short_ma)
 , m_longMA(long_ma)
@@ -25,7 +25,7 @@ MACrossStratgy::~MACrossStratgy()
 	m_curOrder = nullptr;
 }
 
-IAccount* MACrossStratgy::getAccountMgr(){
+IPositionControl* MACrossStratgy::getAccountMgr(){
 	return m_AccoutMgr;
 }
 

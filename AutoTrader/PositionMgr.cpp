@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "PositionMgr.h"
+#include "InstrumentInfoMgr.h"
 #include <assert.h>
 
 namespace Position{
@@ -40,12 +41,15 @@ namespace Position{
 
 		std::unique_lock<std::mutex> lk(m_mutex);
 		for (auto item : m_PositionList){
+
+			Instrument::InformationMgr& posMgr = Instrument::GetManager();
+			int multiple = posMgr.GetVolumeMultiple(item.InstrumentID);
 			if (item.Direction == THOST_FTDC_D_Buy){
-				amount_buy += (item.Price * item.Volume);
+				amount_buy += (item.Price * item.Volume * multiple);
 				volume_buy += item.Volume;
 			}
 			else if (item.Direction == THOST_FTDC_D_Sell){
-				amount_sell += (item.Price * item.Volume);
+				amount_sell += (item.Price * item.Volume * multiple);
 				volume_sell += item.Volume;
 			}
 			else{

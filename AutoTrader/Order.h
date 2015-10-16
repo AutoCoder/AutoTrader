@@ -78,8 +78,8 @@ class Order
 {
 public:
 	enum OrderType{
-		LimitPriceFOKOrder = 0x0, //FAK: trade total successfully or total failed ; 
-		LimitPriceFAKOrder = 0x1, //FOK: trade partly successfully while the others backout;
+		LimitPriceFOKOrder = 0x0, //FOK: trade partly successfully while the others backout;
+		LimitPriceFAKOrder = 0x1, //FAK: trade total successfully or total failed ; 
 		AnyPriceOrder = 0x2,
 		TriggerOrder = 0x3,
 		NoType,

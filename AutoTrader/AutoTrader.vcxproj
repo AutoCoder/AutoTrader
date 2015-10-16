@@ -161,9 +161,10 @@
     <ClInclude Include="..\include\ThostFtdcTraderApi.h" />
     <ClInclude Include="..\include\ThostFtdcUserApiDataType.h" />
     <ClInclude Include="..\include\ThostFtdcUserApiStruct.h" />
-    <ClInclude Include="BaseAccountMgr.h" />
+    <ClInclude Include="AP_Mgr.h" />
     <ClInclude Include="crossplatform.h" />
-    <ClInclude Include="IAccount.h" />
+    <ClInclude Include="IPositionControl.h" />
+    <ClInclude Include="InstrumentInfoMgr.h" />
     <ClInclude Include="PositionMgr.h" />
     <ClInclude Include="tradespi.h" />
     <ClInclude Include="AMACrossStratgy.h" />
@@ -195,7 +196,9 @@
     <ClInclude Include="WMACrossStratgy.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="BaseAccountMgr.cpp" />
+    <ClCompile Include="AP_Mgr.cpp" />
+    <ClCompile Include="InstrumentInfoMgr.cpp" />
+    <ClCompile Include="PositionControl.cpp" />
     <ClCompile Include="PositionMgr.cpp" />
     <ClCompile Include="tradespi.cpp" />
     <ClCompile Include="AMACrossStratgy.cpp" />

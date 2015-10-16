@@ -3,7 +3,7 @@
 #include "TickWrapper.h"
 #include "TechUtils.h"
 
-WMACrossStratgy::WMACrossStratgy(size_t short_ma, size_t long_ma, IAccount* accountMgr)
+WMACrossStratgy::WMACrossStratgy(size_t short_ma, size_t long_ma, IPositionControl* accountMgr)
 : MACrossStratgy(short_ma, long_ma, accountMgr)
 {
 }

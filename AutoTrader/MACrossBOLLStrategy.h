@@ -6,17 +6,17 @@
 #include "TechVec.h"
 
 struct BOLLTech;
-class IAccount;
+class IPositionControl;
 class MACrossBOLLStrategy : public Strategy
 {
 public:
-	MACrossBOLLStrategy(size_t short_ma, size_t long_ma, size_t boll_period, IAccount* accountMgr);
+	MACrossBOLLStrategy(size_t short_ma, size_t long_ma, size_t boll_period, IPositionControl* accountMgr);
 	virtual ~MACrossBOLLStrategy();
 
 	virtual bool tryInvoke(const std::list<TickWrapper>& data, TickWrapper& info);
 	virtual bool tryInvoke(const std::list<TickWrapper>& tickdata, const std::vector<KData>& data, std::vector<TickWrapper> curmindata, TickWrapper& info);
 	virtual bool generateOrder(Order& out);
-	virtual IAccount* getAccountMgr();
+	virtual IPositionControl* getAccountMgr();
 
 protected:
 	virtual BOLLTech calculateBoll(const std::list<TickWrapper>& data, const TickWrapper& current, int seconds) const;
@@ -32,7 +32,7 @@ protected:
 
 private:
 	Order* m_curOrder;
-	IAccount* m_AccoutMgr;
+	IPositionControl* m_AccoutMgr;
 
 };
 

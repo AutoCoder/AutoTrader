@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "MACrossBOLLStrategy.h"
 #include "MACrossBOLLTech.h"
-#include "BaseAccountMgr.h"
+#include "AP_Mgr.h"
 #include "Order.h"
 #include <assert.h>
 #include "TickWrapper.h"
@@ -9,10 +9,10 @@
 #include "BOLLTech.h"
 #include "TechUtils.h"
 #include <math.h>
-#include "IAccount.h"
+#include "IPositionControl.h"
 
 
-MACrossBOLLStrategy::MACrossBOLLStrategy(size_t short_ma, size_t long_ma, size_t boll_period, IAccount* accountMgr)
+MACrossBOLLStrategy::MACrossBOLLStrategy(size_t short_ma, size_t long_ma, size_t boll_period, IPositionControl* accountMgr)
 : m_curOrder(new Order())
 , m_shortMA(short_ma)
 , m_longMA(long_ma)
@@ -27,7 +27,7 @@ MACrossBOLLStrategy::~MACrossBOLLStrategy()
 }
 
 
-IAccount* MACrossBOLLStrategy::getAccountMgr(){
+IPositionControl* MACrossBOLLStrategy::getAccountMgr(){
 	return m_AccoutMgr;
 }
 

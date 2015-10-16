@@ -18,8 +18,8 @@
 #include "TickWrapper.h"
 #include "unittest.h"
 #include "CommonUtils.h"
-#include "IAccount.h"
-#include "BaseAccountMgr.h"
+#include "IPositionControl.h"
+#include "AP_Mgr.h"
 
 int requestId = 0;
 
@@ -30,63 +30,35 @@ std::atomic<bool> g_quit = false;
 std::atomic<bool> g_reply = false;
 threadsafe_queue<Order> order_queue;
 
-//void MdManageThread(CtpMdSpi* pMdUserSpi){
-//
-//	std::unique_lock <std::mutex> lck(mtx);
-//	while (!g_quit){
-//		cv_md.wait(lck);
-//		if (pMdUserSpi->IsFrontConnected() && !pMdUserSpi->IsLogin()){
-//			pMdUserSpi->ReqUserLogin(const_cast<char*>(Config::Instance()->CtpBrokerID().c_str()) \
-//				, const_cast<char*>(Config::Instance()->CtpUserID().c_str())\
-//				, const_cast<char*>(Config::Instance()->CtpPassword().c_str()));
-//		}
-//		else if (pMdUserSpi->IsLogin() && !pMdUserSpi->IsSubscribed()){
-//			pMdUserSpi->SubscribeMarketData(const_cast<char*>(Config::Instance()->CtpInstrumentIDs().c_str()));
-//		}
-//	}
-//}
-//
-//void TradeManageThread(CtpTradeSpi* pTradeUserSpi){
-//	std::unique_lock <std::mutex> lck(mtx);
-//	while (!g_quit){
-//		cv_trade.wait(lck);
-//
-//		if (pTradeUserSpi->IsFrontConnected() && !pTradeUserSpi->IsLogin()){
-//			pTradeUserSpi->ReqUserLogin();
-//		}
-//		else if (pTradeUserSpi->IsLogin() && !pTradeUserSpi->IsConfirmedSettlementInfo()){
-//			pTradeUserSpi->ReqSettlementInfoConfirm();
-//		}
-//		else if (pTradeUserSpi->IsConfirmedSettlementInfo() && !pTradeUserSpi->IsAccoutRefreshed()){
-//			pTradeUserSpi->ReqQryTradingAccount();
-//			pTradeUserSpi->ReqQryInvestorPosition();
-//		}
-//	}
-//}
+//std::mutex g_OrderRunMtx;
 
 void ExcuteOrderQueue(CtpTradeSpi* pUserSpi){
-	spdlog::get("console")->info() << "Start to trade";
-	spdlog::get("console")->info() << "Start to loop order queue";
+	SYNC_PRINT << "Start to trade";
+	SYNC_PRINT << "Start to loop order queue";
 
 	while (true){
+		//g_OrderRunMtx.lock();// synchronize the order execute process
 		Order ord;
 		if (!order_queue.empty() && order_queue.try_pop(ord)){ // if pop success
-			spdlog::get("console")->info() << "Excute Order regarding instrumentID:" << ord.GetInstrumentId();
+
+			//todo: check the account and position again, discard order if no free money  
+
+			SYNC_PRINT << "Excute Order regarding instrumentID:" << ord.GetInstrumentId();
 			pUserSpi->ReqOrderInsert(ord);
 		}
 
-		if (g_quit && order_queue.empty())
+		if (g_quit/* && order_queue.empty()*/) //todo : close position
 			break;
 
 		sleep(500);
 	}
 
-	spdlog::get("console")->info() << "End to loop order queue";
+	SYNC_PRINT << "End to loop order queue";
 }
 
 void ReplayTickDataFromDB(const std::string& instrumentID, const std::string& mark)
 {
-	spdlog::get("console")->info() << "Reply " << instrumentID << " data from db";
+	SYNC_PRINT << "Reply " << instrumentID << " data from db";
 	DBWrapper dbwrapper;
 	g_reply = true;
 	auto pool = RealTimeDataProcessorPool::getInstance();
@@ -100,7 +72,7 @@ void ReplayTickDataFromDB(const std::string& instrumentID, const std::string& ma
 	dbwrapper.Query(countquerybuf, countResult);
 
 	if (countResult.empty()){
-		spdlog::get("console")->info() << "Get 0 md record from db, please check db connection configuration";
+		SYNC_PRINT << "Get 0 md record from db, please check db connection configuration";
 		return;
 	}
 
@@ -121,7 +93,7 @@ void ReplayTickDataFromDB(const std::string& instrumentID, const std::string& ma
 			pool->GenRealTimeDataProcessor(instrumentID)->AppendRealTimeData(dataItem);
 		}
 	}
-	spdlog::get("console")->info() << "Reply " << instrumentID << " finished.";
+	SYNC_PRINT << "Reply " << instrumentID << " finished.";
 	//Store to db
 	pool->GenRealTimeDataProcessor(instrumentID)->StoreStrategySequenceToDB(mark);
 }
@@ -165,9 +137,11 @@ int main(int argc, const char* argv[]){
 		//*******pool's process's stratgy's accountMgr listen to account updation received from pTradeUserSpi.
 		pool->ListenToTradeSpi(pTradeUserSpi);
 
+		/*depreted:
 		//Create a thread, Once FrontDisconnect ,try to reconnect and subscribeMD again if needed.
 		//std::thread mdManagethread(MdManageThread, pMdUserSpi);
 		//std::thread tradeManagethread(TradeManageThread, pTradeUserSpi);
+		*/
 		//[Excute Order Thread] Excute the Order in Queue one by one looply.
 		std::thread tradeThread(ExcuteOrderQueue, pTradeUserSpi);
 

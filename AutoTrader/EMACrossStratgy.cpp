@@ -4,7 +4,7 @@
 #include <assert.h>
 #include "TechUtils.h"
 
-EMACrossStratgy::EMACrossStratgy(size_t short_ma, size_t long_ma, IAccount* accountMgr)
+EMACrossStratgy::EMACrossStratgy(size_t short_ma, size_t long_ma, IPositionControl* accountMgr)
 :MACrossStratgy(short_ma, long_ma, accountMgr)
 {
 }

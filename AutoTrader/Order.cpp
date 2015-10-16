@@ -157,7 +157,7 @@ void Order::SetRefExchangePrice(double price){
 			break;
 		case AnyPriceOrder:
 			{
-				spdlog::get("console")->info() << "[Order class]: For AnyPriceOrder, the limitprice should be always 0";
+				SYNC_PRINT << "[Order class]: For AnyPriceOrder, the limitprice should be always 0";
 				assert(false);
 				m_innerStruct.LimitPrice = 0;
 			}
@@ -167,7 +167,7 @@ void Order::SetRefExchangePrice(double price){
 			break;
 		default:
 		{
-			spdlog::get("console")->info() << "[Order class]: Invalid Order type.";
+			SYNC_PRINT << "[Order class]: Invalid Order type.";
 			assert(false);
 		}
 		break;

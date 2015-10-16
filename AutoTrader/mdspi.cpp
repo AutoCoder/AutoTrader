@@ -45,7 +45,7 @@ void CtpMdSpi::OnRspError(CThostFtdcRspInfoField *pRspInfo,
 
 void CtpMdSpi::OnFrontDisconnected(int nReason)
 {
-	spdlog::get("console")->info() << __FUNCTION__ << " reason=" << nReason;
+	SYNC_PRINT << __FUNCTION__ << " reason=" << nReason;
 	//m_isFrontConnected = false;
 	//m_isLogin = false;
 	//m_isSubscribed = false;
@@ -53,15 +53,14 @@ void CtpMdSpi::OnFrontDisconnected(int nReason)
 		
 void CtpMdSpi::OnHeartBeatWarning(int nTimeLapse)
 {
-	spdlog::get("console")->info() << __FUNCTION__ << " TimerLapse = " << nTimeLapse;
+	SYNC_PRINT << __FUNCTION__ << " TimerLapse = " << nTimeLapse;
 }
 
 void CtpMdSpi::OnFrontConnected()
 {
-	spdlog::get("console")->info() << "[MD Thread] Response | connected...";
+	SYNC_PRINT << "[MD Thread] Response | connected...";
 	//m_isFrontConnected = true;
 	//cv_md.notify_all();
-
 	m_stateChangeHandler.OnFrontConnected();
 }
 
@@ -73,7 +72,7 @@ bool CtpMdSpi::ReqUserLogin(TThostFtdcBrokerIDType appId, TThostFtdcUserIDType u
 	strcpy(req.UserID, userId);
 	strcpy(req.Password, passwd);
 	int ret = pUserApi->ReqUserLogin(&req, ++requestId);
-	spdlog::get("console")->info() << "[MD Thread] Request | send login request ..." << ((ret == 0) ? "success" : "fail");
+	SYNC_PRINT << "[MD Thread] Request | send login request ..." << ((ret == 0) ? "success" : "fail");
   return (ret == 0);
   //SetEvent(g_hEvent);
 }
@@ -83,7 +82,7 @@ void CtpMdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
 {
 	if (!IsErrorRspInfo(pRspInfo) && pRspUserLogin)
 	{
-		spdlog::get("console")->info() << "[MD Thread] Response | login successfully...CurrentDate:" <<pRspUserLogin->TradingDay;
+		SYNC_PRINT << "[MD Thread] Response | login successfully...CurrentDate:" <<pRspUserLogin->TradingDay;
 		//m_isLogin = true;
 		//cv_md.notify_all();
 		m_stateChangeHandler.OnLogined();
@@ -104,14 +103,14 @@ void CtpMdSpi::SubscribeMarketData(char* instIdList)
 	for(unsigned int i=0; i<len;i++)  pInstId[i]=list[i]; 
 
 	int ret=pUserApi->SubscribeMarketData(pInstId, len);
-	spdlog::get("console")->info() << "[MD Thread] Request | send md subscribe request... " << ((ret == 0) ? "success" : "fail");
+	SYNC_PRINT << "[MD Thread] Request | send md subscribe request... " << ((ret == 0) ? "success" : "fail");
 }
 
 void CtpMdSpi::OnRspSubMarketData(
          CThostFtdcSpecificInstrumentField *pSpecificInstrument, 
          CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
-	spdlog::get("console")->info() << "[MD Thread] Response | [OnRspSubMarketData] : " << ((pRspInfo->ErrorID == 0) ? "success" : "fail") << "; DetailInfo : " << pRspInfo->ErrorMsg;
+	SYNC_PRINT << "[MD Thread] Response | [OnRspSubMarketData] : " << ((pRspInfo->ErrorID == 0) ? "success" : "fail") << "; DetailInfo : " << pRspInfo->ErrorMsg;
   //if(bIsLast)  SetEvent(g_hEvent);
 	if (pRspInfo->ErrorID != 0){
 		//m_isSubscribed = true;
@@ -123,7 +122,7 @@ void CtpMdSpi::OnRspUnSubMarketData(
              CThostFtdcSpecificInstrumentField *pSpecificInstrument,
              CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
-	spdlog::get("console")->info() << "[MD Thread] Response | [OnRspUnSubMarketData] : " << ((pRspInfo->ErrorID == 0) ? "success" : "fail") << "; DetailInfo : " << pRspInfo->ErrorMsg;
+	SYNC_PRINT << "[MD Thread] Response | [OnRspUnSubMarketData] : " << ((pRspInfo->ErrorID == 0) ? "success" : "fail") << "; DetailInfo : " << pRspInfo->ErrorMsg;
   //if(bIsLast)  SetEvent(g_hEvent);
 	
 	if (pRspInfo->ErrorID == 0){
@@ -134,7 +133,7 @@ void CtpMdSpi::OnRspUnSubMarketData(
 void CtpMdSpi::OnRtnDepthMarketData(
              CThostFtdcDepthMarketDataField *pDepthMarketData)
 {
-	//spdlog::get("console")->info()
+	//SYNC_PRINT
 	//<< "\n TradingDay: " << pDepthMarketData->TradingDay
 	//<< "\n InstrumentID: " << pDepthMarketData->InstrumentID
 	//<< "\n ExchangeID: " << pDepthMarketData->ExchangeID
@@ -176,7 +175,7 @@ bool CtpMdSpi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo)
 {	
   bool ret = ((pRspInfo) && (pRspInfo->ErrorID != 0));
   if (ret){
-	  spdlog::get("console")->info() << "[MD Thread] Response | " << pRspInfo->ErrorMsg;
+	  SYNC_PRINT << "[MD Thread] Response | " << pRspInfo->ErrorMsg;
   }
   return ret;
 }

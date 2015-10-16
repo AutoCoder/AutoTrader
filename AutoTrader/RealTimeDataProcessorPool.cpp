@@ -9,7 +9,7 @@
 #include "DBWrapper.h"
 #include "MACrossBOLLStrategy.h"
 #include "tradespi.h"
-#include "BaseAccountMgr.h"
+#include "IPositionControl.h"
 
 RealTimeDataProcessorPool* RealTimeDataProcessorPool::_instance = NULL;
 
@@ -29,7 +29,7 @@ RealTimeDataProcessorPool::RealTimeDataProcessorPool()
 	Config::Instance()->CtpBrokerID();
 	std::vector<StrategyMetaData> stgySet = Config::Instance()->StrategySet();
 	m_dict.clear();
-	IAccount* mgr = new BaseAccountMgr(instrument_1);
+	IPositionControl* mgr = new Pos20Precent();
 	for (StrategyMetaData it : stgySet){
 		if (it.name == "MACross"){
 			m_dict["MACross"] = std::shared_ptr<Strategy>(new MACrossStratgy(it.short_ma, it.long_ma, mgr));
@@ -67,7 +67,7 @@ RealTimeDataProcessorPool::RealTimeDataProcessorPool()
 void RealTimeDataProcessorPool::ListenToTradeSpi(CtpTradeSpi* tradespi){
 	for (auto item : m_dict){
 		//warning: for now, as the accoutMgr is shared by all strategy, so AddSubscriber function can rewrite this pointer.
-		tradespi->AddSubscriber(item.second->getAccountMgr());
+		//tradespi->AddSubscriber(item.second->getAccountMgr());
 	}
 }
 

@@ -47,7 +47,7 @@ void RealTimeDataProcessor::StoreDataToDB()
 
 void RealTimeDataProcessor::StoreStrategySequenceToDB(const std::string& mark)
 {
-	spdlog::get("console")->info() << "Start to store db...";
+	SYNC_PRINT << "Start to store db...";
 	//store Strategy data in memory into db
 	long long pre_uuid = 0;
 	TickType pre_type = TickType::Commom;
@@ -58,7 +58,7 @@ void RealTimeDataProcessor::StoreStrategySequenceToDB(const std::string& mark)
 			iter->m_techvec->serializeToDB(*(m_dbptr.get()), mark);
 		}
 	}
-	spdlog::get("console")->info() << "End to store db.";
+	SYNC_PRINT << "End to store db.";
 }
 
 //main thread
@@ -98,7 +98,7 @@ void RealTimeDataProcessor::AppendRealTimeData(TickWrapper& info){
 		}
 	}
 #ifdef SHOW_PROGRESS
-	spdlog::get("console")->info() << "> Data queue size :" << m_DataSeq.size();
+	SYNC_PRINT << "> Data queue size :" << m_DataSeq.size();
 #endif
 }
 
