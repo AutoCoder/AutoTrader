@@ -5,10 +5,52 @@
 //#include "IPositionControl.h"
 #include <mutex>
 #include <vector>
+#include <map>
 
 class Order;
 
 namespace AP{
+
+	struct TradeMessage
+	{
+		TradeMessage()
+		{
+			InstId = "";
+			LastPrice = 0.0;
+			PreSettlementPrice = 0.0;
+			Holding_long = 0;
+			Holding_short = 0;
+			TodayPosition_long = 0;
+			YdPosition_long = 0;
+			TodayPosition_short = 0;
+			YdPosition_short = 0;
+
+			closeProfit_long = 0.0;
+			OpenProfit_long = 0.0;
+			closeProfit_short = 0.0;
+			OpenProfit_short = 0.0;
+		}
+
+
+		std::string InstId;//合约代码
+		double LastPrice;//最新价，时刻保存合约的最新价，平仓用
+		double PreSettlementPrice;//上次结算价，对隔夜仓有时候要用，快期有用
+		int Holding_long;//多单持仓量
+		int Holding_short;//空单持仓量
+
+		int TodayPosition_long;//多单今日持仓
+		int YdPosition_long;//多单上日持仓
+
+		int TodayPosition_short;//空单今日持仓
+		int YdPosition_short;//空单上日持仓
+
+		double closeProfit_long;//多单平仓盈亏
+		double OpenProfit_long;//多单浮动盈亏
+
+		double closeProfit_short;//空单平仓盈亏
+		double OpenProfit_short;//空单浮动盈亏
+
+	};
 
 	enum Direction{
 		Buy = '0',
@@ -21,33 +63,43 @@ namespace AP{
 		static std::string ConvertTradeListToString(const std::vector< CThostFtdcTradeField >& list);
 	};
 
-	class AccountAndPositionMgr //: public IPositionControl
+	class AccountAndPositionMgr
 	{
 	public:
 		AccountAndPositionMgr();
 		virtual ~AccountAndPositionMgr();
 
-		virtual void update(const CThostFtdcTradingAccountField& info);
+		virtual void setAccountStatus(const CThostFtdcTradingAccountField& info);
 
 		void pushTodayNewTrade(const CThostFtdcTradeField& tradeField);
 
 		void pushTodayOrder(const CThostFtdcOrderField& orderField);
 
-		std::string TodayOrderToString() const;
+		std::string todayOrderToString() const;
 
-		size_t TodayOrderCount() const { return m_orderlist.size();  }
+		size_t todayOrderCount() const { return m_orderlist.size();  }
 
 		void pushTodayTrade(const CThostFtdcTradeField& tradeField);
 
-		size_t TodayTradeCount() const { return m_tradelist.size(); }
+		size_t todayTradeCount() const { return m_tradelist.size(); }
 
-		std::string TodayTradeToString() const;
+		std::string todayTradeToString() const;
 
 		void pushYesterdayUnClosedTrade(const CThostFtdcTradeField& tradeField, Direction direction);
 
-		std::string YesterdayUnClosedTradeToString(Direction direction);
+		std::string yesterdayUnClosedTradeToString(Direction direction);
 
 		long yesterdayUnClosedTradeCount(Direction direction){ return direction == AP::Buy ? m_tradeList_nonClosed_account_long.size() : m_tradeList_notClosed_account_short.size(); };
+
+		void pushTradeMessage(const CThostFtdcInvestorPositionField& originalTradeStruct);
+
+		double getCloseProfit();//平仓盈亏，所有合约一起算后的值，另外在m_trade_message_map有单独计算每个合约的平仓盈亏值
+
+		double getOpenProfit();//浮动盈亏，所有合约一起算后的值，另外在m_trade_message_map有单独计算每个合约的浮动盈亏值
+
+		void pushInstrumentStruct(const CThostFtdcInstrumentField& instru);
+
+		std::string getInstrumentList() const;
 
 		double GetPosition(double& pos, Direction& direction, int& volume, double& available) const;
 
@@ -63,16 +115,18 @@ namespace AP{
 		CThostFtdcTradingAccountField m_accountInfo;
 		CThostFtdcInvestorPositionField m_positionInfo;
 
-
-		//以下这些字段全部是在程序启动时获得。 也就是 isReady() == true 以前
 		std::vector< CThostFtdcOrderField > m_orderlist; //委托记录，全部合约
 		std::vector< CThostFtdcTradeField > m_tradelist; //成交记录，全部合约
 		std::vector< CThostFtdcTradeField > m_tradeList_nonClosed_account_long;//未平仓的多单成交记录,整个账户，全部合约
 		std::vector< CThostFtdcTradeField > m_tradeList_notClosed_account_short;//未平仓的空单成交记录,整个账户，全部合约
 		volatile bool m_isReady;
 
-		//以下这些字段是 在isReady() == true 之后获得。
+		std::map<std::string, TradeMessage> m_tradeMessage_dict;
+		std::map<std::string, CThostFtdcInstrumentField> m_instrument_dict;
+
 		std::vector< CThostFtdcTradeField > m_newTrades; //委托记录，全部合约
+
+
 	};
 
 	AccountAndPositionMgr& GetManager();

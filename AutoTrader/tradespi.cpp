@@ -120,8 +120,8 @@ void CtpTradeSpi::OnRspQryOrder(CThostFtdcOrderField *pOrder, CThostFtdcRspInfoF
 			if (bIsLast)
 			{
 				m_firstquery_order = false;
-				SYNC_PRINT << "所有合约报单次数：" << AP::GetManager().TodayOrderCount();
-				SYNC_PRINT << AP::GetManager().TodayOrderToString();
+				SYNC_PRINT << "所有合约报单次数：" << AP::GetManager().todayOrderCount();
+				SYNC_PRINT << AP::GetManager().todayOrderToString();
 			}
 			m_stateChangeHandler.OnRspQryOrder();
 		}
@@ -163,8 +163,8 @@ void CtpTradeSpi::OnRspQryTrade(CThostFtdcTradeField *pTrade, CThostFtdcRspInfoF
 			if (bIsLast)
 			{
 				m_firstquery_trade = false;
-				SYNC_PRINT << "成交次数：" << AP::GetManager().TodayTradeCount();
-				SYNC_PRINT << AP::GetManager().TodayTradeToString();
+				SYNC_PRINT << "成交次数：" << AP::GetManager().todayTradeCount();
+				SYNC_PRINT << AP::GetManager().todayTradeToString();
 				m_stateChangeHandler.OnRspQryTrade();
 			}
 		}
@@ -232,8 +232,8 @@ void CtpTradeSpi::OnRspQryInvestorPositionDetail(CThostFtdcInvestorPositionDetai
 				SYNC_PRINT << "账户所有合约未平仓单笔数(不是手数,一笔可对应多手):多单" << AP::GetManager().yesterdayUnClosedTradeCount(AP::Buy) << " 空单" << AP::GetManager().yesterdayUnClosedTradeCount(AP::Sell);
 				SYNC_PRINT << "--------先多后空-------";
 
-				SYNC_PRINT << AP::GetManager().YesterdayUnClosedTradeToString(AP::Buy);
-				SYNC_PRINT << AP::GetManager().YesterdayUnClosedTradeToString(AP::Sell);
+				SYNC_PRINT << AP::GetManager().yesterdayUnClosedTradeToString(AP::Buy);
+				SYNC_PRINT << AP::GetManager().yesterdayUnClosedTradeToString(AP::Sell);
 
 				SYNC_PRINT << "--------结束-------";
 
@@ -254,27 +254,6 @@ void CtpTradeSpi::OnRspQryInvestorPositionDetail(CThostFtdcInvestorPositionDetai
 	}
 }
 
-void CtpTradeSpi::ReqQryInstrument(TThostFtdcInstrumentIDType instId)
-{
-	CThostFtdcQryInstrumentField req;
-	memset(&req, 0, sizeof(req));
-	strcpy_s(req.InstrumentID, instId);
-	int ret = pUserApi->ReqQryInstrument(&req, ++requestId);
-	SYNC_PRINT << "[Trade Thread] Request | send Instrument Query..." << ((ret == 0) ? "success" : "fail");
-}
-
-void CtpTradeSpi::OnRspQryInstrument(CThostFtdcInstrumentField *pInstrument,
-	CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
-{
-	if (!IsErrorRspInfo(pRspInfo) && pInstrument){
-		SYNC_PRINT << "[Trade Thread] Response | Instrument:" << pInstrument->InstrumentID
-			<< " DeliveryMonth:" << pInstrument->DeliveryMonth
-			<< " LongMarginRatio:" << pInstrument->LongMarginRatio
-			<< " ShortMarginRatio:" << pInstrument->ShortMarginRatio;
-	}
-	//if (bIsLast) SetEvent(g_tradehEvent);
-}
-
 void CtpTradeSpi::ReqQryTradingAccount()
 {
 	CThostFtdcQryTradingAccountField req;
@@ -288,12 +267,7 @@ void CtpTradeSpi::ReqQryTradingAccount()
 			SYNC_PRINT << "[Trade Thread] Request | send trading account query...success";
 			break;
 		}
-		else{
-			//SYNC_PRINT << "[Trade Thread] Request | send trading account query... fail";
-			if (AP::GetManager().isReady())
-				break;
-			sleep(2000);
-		}
+		SYNC_PRINT << "[Trade Thread] Request | send trading account query... fail";
 	}
 }
 
@@ -302,7 +276,7 @@ void CtpTradeSpi::OnRspQryTradingAccount(
 	CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
 	if (!IsErrorRspInfo(pRspInfo) && pTradingAccount){
-		AP::GetManager().update(*pTradingAccount);
+		AP::GetManager().setAccountStatus(*pTradingAccount);
 
 		memcpy(&m_accountInfo, pTradingAccount, sizeof(CThostFtdcTradingAccountField));
 		SYNC_PRINT << "[Trade Thread] Response | Balance:" << pTradingAccount->Balance
@@ -312,46 +286,74 @@ void CtpTradeSpi::OnRspQryTradingAccount(
 			<< " PositionProfit:" << pTradingAccount->PositionProfit
 			<< " Commission:" << pTradingAccount->Commission
 			<< " FrozenMargin:" << pTradingAccount->FrozenMargin;
-		//m_isAccountFreshed = true;
-	}
+		
 
-	//if (bIsLast) SetEvent(g_tradehEvent);
+		if (m_firstquery_TradingAccount){
+			m_firstquery_TradingAccount = false;
+
+			SYNC_PRINT << "资金查询正常，查询投资者持仓:";
+
+			m_stateChangeHandler.OnRspQryTradingAccount();
+		}
+	}
+	else{
+		if (m_firstquery_TradingAccount){
+			m_firstquery_TradingAccount = false;
+
+
+			SYNC_PRINT << "资金查询出错,查询投资者持仓:";
+			m_stateChangeHandler.OnRspQryTradingAccount();
+		}
+
+	}
 }
 
-void CtpTradeSpi::ReqQryInvestorPosition()//(TThostFtdcInstrumentIDType instId)
+void CtpTradeSpi::ReqQryInvestorPosition_all()
 {
 	CThostFtdcQryInvestorPositionField req;
-	//CThostFtdcQryInvestorPositionDetailField req;
 	memset(&req, 0, sizeof(req));
-	strcpy_s(req.BrokerID, m_brokerID);
-	strcpy_s(req.InvestorID, m_userID);
-	strcpy_s(req.InstrumentID, "");// pAccountMgr->InstrumentID());
-
-	int ret = -1;
-	while (true){
-		ret = pUserApi->ReqQryInvestorPosition(&req, ++requestId);
-		//ret = pUserApi->ReqQryInvestorPositionDetail(&req, ++requestId);
-		if (ret == 0){
-			SYNC_PRINT << "[Trade Thread] Request | send InvestorPosition query...success";
-			break;
-		}
-		else{
-			//SYNC_PRINT << "[Trade Thread] Request | send InvestorPosition query... fail";
-			if (AP::GetManager().isReady())
-				break;
-			sleep(2000);
-		}
-	}
+	//strcpy(req.BrokerID, appId);
+	//strcpy(req.InvestorID, userId);
+	//strcpy(req.InstrumentID, instId);
+	int ret = pUserApi->ReqQryInvestorPosition(&req, ++requestId);
+	SYNC_PRINT << " 请求 | 发送持仓查询..." << ((ret == 0) ? "成功" : "失败");
 }
 
+//[doesn't work, may delete later]
+//void CtpTradeSpi::ReqQryInvestorPosition()//(TThostFtdcInstrumentIDType instId)
+//{
+//	CThostFtdcQryInvestorPositionField req;
+//	//CThostFtdcQryInvestorPositionDetailField req;
+//	memset(&req, 0, sizeof(req));
+//	strcpy_s(req.BrokerID, m_brokerID);
+//	strcpy_s(req.InvestorID, m_userID);
+//	strcpy_s(req.InstrumentID, "");// pAccountMgr->InstrumentID());
+//
+//	int ret = -1;
+//	while (true){
+//		ret = pUserApi->ReqQryInvestorPosition(&req, ++requestId);
+//		//ret = pUserApi->ReqQryInvestorPositionDetail(&req, ++requestId);
+//		if (ret == 0){
+//			SYNC_PRINT << "[Trade Thread] Request | send InvestorPosition query...success";
+//			break;
+//		}
+//		else{
+//			//SYNC_PRINT << "[Trade Thread] Request | send InvestorPosition query... fail";
+//			if (AP::GetManager().isReady())
+//				break;
+//			sleep(2000);
+//		}
+//	}
+//}
+
+
+//持仓查询回调函数,已经平仓的单子，持仓量为0了还会返回
 void CtpTradeSpi::OnRspQryInvestorPosition(
 	CThostFtdcInvestorPositionField *pInvestorPosition, 
 	CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
 	if (!IsErrorRspInfo(pRspInfo) && pInvestorPosition){
-		//depreted
-		//if (pAccountMgr)
-		//	pAccountMgr->update(*pInvestorPosition);
+
 		SYNC_PRINT << "[Trade Thread] Response| Instrument:" << pInvestorPosition->InstrumentID
 			<< " PosiDirection:" << pInvestorPosition->PosiDirection
 			<< " Position:" << pInvestorPosition->Position
@@ -359,8 +361,66 @@ void CtpTradeSpi::OnRspQryInvestorPosition(
 			<< " Today Position:" << pInvestorPosition->TodayPosition
 			<< " Position Profit:" << pInvestorPosition->PositionProfit
 			<< " UseMargin:" << pInvestorPosition->UseMargin;
+
+		if (m_firstquery_Position == true){
+			AP::GetManager().pushTradeMessage(*pInvestorPosition);
+
+			if (bIsLast)
+			{
+				m_firstquery_Position = false;
+				m_stateChangeHandler.OnRspQryInvestorPosition();
+			}
+		}
 	}
-	//if (bIsLast) SetEvent(g_tradehEvent);
+	else
+	{
+		if (m_firstquery_Position == true)
+		{
+			m_firstquery_Position = false;
+			SYNC_PRINT << "查询持仓出错，或没有持仓";
+			m_stateChangeHandler.OnRspQryInvestorPosition();
+		}
+	}
+}
+
+void CtpTradeSpi::ReqQryInstrument_all(){
+	CThostFtdcQryInstrumentField req;
+	memset(&req, 0, sizeof(req));
+
+	int ret = pUserApi->ReqQryInstrument(&req, ++requestId);
+	SYNC_PRINT << " 请求 | 发送合约查询..." << ((ret == 0) ? "成功" : "失败") << " ret:" << ret;
+}
+
+void CtpTradeSpi::ReqQryInstrument(TThostFtdcInstrumentIDType instId)
+{
+	CThostFtdcQryInstrumentField req;
+	memset(&req, 0, sizeof(req));
+	strcpy_s(req.InstrumentID, instId);
+	int ret = pUserApi->ReqQryInstrument(&req, ++requestId);
+	SYNC_PRINT << "[Trade Thread] Request | send Instrument Query..." << ((ret == 0) ? "success" : "fail");
+}
+
+void CtpTradeSpi::OnRspQryInstrument(CThostFtdcInstrumentField *pInstrument,
+	CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
+{
+	if (!IsErrorRspInfo(pRspInfo) && pInstrument)
+	{
+		if (m_firstquery_Instrument == true)
+		{
+			AP::GetManager().pushInstrumentStruct(*pInstrument);
+
+			if (bIsLast)
+			{
+				m_firstquery_Instrument = false;
+				SYNC_PRINT << "所有持仓合约：" << AP::GetManager().getInstrumentList();
+
+				// 为什么在tradespi线程初始化全部完成以后才启动MD?
+				//cerr << "TD初始化完成，启动MD:" << endl;
+				//m_pMDUserApi_td->Init();
+			}
+		}
+	}
+
 }
 
 void CtpTradeSpi::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder,
@@ -430,17 +490,17 @@ extern std::mutex g_OrderRunMtx;
 
 void CtpTradeSpi::OnRtnTrade(CThostFtdcTradeField *pTrade)
 {
-	CThostFtdcTradeField* trade = new CThostFtdcTradeField();
-	memcpy(trade, pTrade, sizeof(CThostFtdcTradeField));
-	bool founded = false;     unsigned int i = 0;
-	for (i = 0; i<tradeList.size(); i++){
-		if (tradeList[i]->TradeID == trade->TradeID) {
-			founded = true;   break;
-		}
-	}
-	if (founded) tradeList[i] = trade;
-	else  tradeList.push_back(trade);
-	SYNC_PRINT << "[Trade Thread] Response | order traded at " << trade->TradeDate << trade->TradeTime << "...TradeID:" << trade->TradeID;
+	//CThostFtdcTradeField* trade = new CThostFtdcTradeField();
+	//memcpy(trade, pTrade, sizeof(CThostFtdcTradeField));
+	//bool founded = false;     unsigned int i = 0;
+	//for (i = 0; i<tradeList.size(); i++){
+	//	if (tradeList[i]->TradeID == trade->TradeID) {
+	//		founded = true;   break;
+	//	}
+	//}
+	//if (founded) tradeList[i] = trade;
+	//else  tradeList.push_back(trade);
+	SYNC_PRINT << "[Trade Thread] Response | order traded at " << pTrade->TradeDate << pTrade->TradeTime << "...TradeID:" << pTrade->TradeID;
 
 	////fresh accout
 	//SYNC_PRINT << "[Trade Thread] Order executed. begin to refresh Account info...";
@@ -453,6 +513,8 @@ void CtpTradeSpi::OnRtnTrade(CThostFtdcTradeField *pTrade)
 	//if (g_OrderRunMtx.try_lock())
 	//	g_OrderRunMtx.unlock();
 	//g_OrderRunMtx.unlock();
+	
+	AP::GetManager().pushTodayNewTrade(*pTrade);//会更新整个账户和仓位的状态，使资金状态保持最新
 }
 
 

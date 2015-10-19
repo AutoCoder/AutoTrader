@@ -52,19 +52,17 @@ class CtpTradeSpi : public CThostFtdcTraderSpi
 
 		//step 7:
 		void OnRspQryTradingAccount(){
-			//todo: 查询所有合约的持仓
-			//m_TradeUserSpiPtr->ReqQryInvestorPosition_all();
+			//查询所有合约的持仓
+			m_TradeUserSpiPtr->ReqQryInvestorPosition_all();
 		}
 
 		//step 8
 		void OnRspQryInvestorPosition(){
-			//todo :
-			// m_TradeUserSpiPtr->ReqQryInstrument_all();
+			m_TradeUserSpiPtr->ReqQryInstrument_all();
 		}
 
 		//step 9
 		void OnRspQryInstrument(){
-			//todo :: nothing
 		}
 
 	private:
@@ -130,7 +128,11 @@ public:
 
 	void ReqQryTradingAccount();
 
-	void ReqQryInvestorPosition();//(TThostFtdcInstrumentIDType instId);
+	void ReqQryInvestorPosition_all();
+
+	void ReqQryInvestorPosition();
+
+	void ReqQryInstrument_all();
 
 	void ReqOrderInsert(Order ord);
 
