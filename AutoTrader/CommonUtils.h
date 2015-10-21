@@ -3,10 +3,12 @@
 #include <time.h>
 #include <string>
 #include "ThostFtdcUserApiDataType.h"
+#include <vector>
 
 typedef int seconds;
 struct CThostFtdcInputOrderField;
-
+struct CThostFtdcOrderField;
+struct CThostFtdcTradeField;
 
 class CommonUtils
 {
@@ -31,5 +33,10 @@ public:
 
 	static bool InSameMinute(const std::string& time1, const std::string& time2);
 	static std::string StringFromStruct(const CThostFtdcInputOrderField& innerStruct);
+
+
+	static std::string ConvertOrderListToString(const std::vector< CThostFtdcOrderField >& list);
+	static std::string ConvertTradeListToString(const std::vector< CThostFtdcTradeField >& list);
+
 };
 

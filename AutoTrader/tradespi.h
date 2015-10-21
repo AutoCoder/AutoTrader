@@ -4,10 +4,11 @@
 #include "ThostFtdcTraderApi.h"
 //#include <future>
 #include <mutex>
+#include <condition_variable>
 class IPositionControl;
 class Order;
 
-
+extern std::condition_variable cv_md;
 
 class CtpTradeSpi : public CThostFtdcTraderSpi
 {
@@ -63,6 +64,8 @@ class CtpTradeSpi : public CThostFtdcTraderSpi
 
 		//step 9
 		void OnRspQryInstrument(){
+			//invoke md thread
+			cv_md.notify_all();
 		}
 
 	private:

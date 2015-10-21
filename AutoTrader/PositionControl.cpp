@@ -12,9 +12,16 @@ bool Pos20Precent::completeOrder(Order& ord){
 
 	double posMoney = 0.0;
 	double available = 0.0;
-	int volume = 0;
-	AP::Direction posDirection = AP::Buy;
-	AP::GetManager().GetPosition(posMoney, posDirection, volume, available);
+
+	AP::Direction posDirection = AP::Long;
+	AP::GetManager().getPosition(posMoney, posDirection, available);
+
+	int subPos = 0;
+	int subtodayPos = 0;
+	int subydPos = 0;
+	AP::Direction subtodayDirection = AP::Long;
+	AP::Direction subydDirection = AP::Long;
+	subPos = AP::GetManager().getPositionVolume(ord.GetInstrumentId(), subtodayDirection, subtodayPos, subydDirection, subydPos);
 
 	//如果订单买卖方向与持仓买卖方向一致,或者仓位为0。
 	if (ord.GetExchangeDirection() == posDirection || posMoney < std::numeric_limits<double>::epsilon()){
@@ -32,8 +39,29 @@ bool Pos20Precent::completeOrder(Order& ord){
 		}
 	}
 	else{
-		ord.SetCombOffsetFlagType(THOST_FTDC_OF_CloseToday);
-		ord.SetVolume(volume);
+		if (subydPos != 0 && subtodayPos != 0){
+			if (subtodayDirection == subydDirection){
+				ord.SetCombOffsetFlagType(THOST_FTDC_OF_Close);
+				ord.SetVolume(subydPos + subtodayPos);
+			}
+			else{
+				ord.SetCombOffsetFlagType(THOST_FTDC_OF_Close);
+				ord.SetVolume(std::abs(subydPos-subtodayPos));
+			}
+		}
+		else{
+			if (subtodayPos != 0){
+				ord.SetCombOffsetFlagType(THOST_FTDC_OF_CloseToday);
+				ord.SetVolume(subtodayPos);
+			}
+			else if (subydPos != 0){
+				ord.SetCombOffsetFlagType(THOST_FTDC_OF_Close);
+				ord.SetVolume(subydPos);
+			}
+			else{ // subydPos == 0 && subtodayPos == 0
+				return false;
+			}
+		}
 		return true;
 	}
 }

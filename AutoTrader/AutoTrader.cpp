@@ -142,13 +142,17 @@ int main(int argc, const char* argv[]){
 		//std::thread mdManagethread(MdManageThread, pMdUserSpi);
 		//std::thread tradeManagethread(TradeManageThread, pTradeUserSpi);
 		*/
-		//[Excute Order Thread] Excute the Order in Queue one by one looply.
-		std::thread tradeThread(ExcuteOrderQueue, pTradeUserSpi);
 
-		//******start md thread******
-		pMdUserApi->Init();
 		//******start trade thread******
 		pTradeUserApi->Init();
+
+		//******start md thread******
+		//std::unique_lock <std::mutex> lck(mtx);
+		//cv_md.wait(lck);
+		pMdUserApi->Init();
+
+		//[Excute Order Thread] Excute the Order in Queue one by one looply.
+		std::thread tradeThread(ExcuteOrderQueue, pTradeUserSpi);
 
 		//mdManagethread.join();
 		//tradeManagethread.join();

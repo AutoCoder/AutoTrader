@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "AP_Mgr.h"
 #include "Order.h"
+#include "CommonUtils.h"
 #include <memory>
 #include <sstream>
 #include <algorithm>
@@ -58,7 +59,7 @@ namespace AP{
 		else{
 			m_tradelist.push_back(tradeField);
 		}
-		
+
 		int close_num_account_long = 0;//平仓的多单手数，如果有的话
 		int close_num_account_short = 0;//平仓的空单手数，如果有的话
 
@@ -206,7 +207,7 @@ namespace AP{
 	}
 
 	std::string AccountAndPositionMgr::todayOrderToString() const{
-		return PrintUtils::ConvertOrderListToString(m_orderlist);
+		return CommonUtils::ConvertOrderListToString(m_orderlist);
 	}
 
 	void AccountAndPositionMgr::pushTodayTrade(const CThostFtdcTradeField& tradeField){
@@ -214,24 +215,24 @@ namespace AP{
 	}
 
 	std::string AccountAndPositionMgr::todayTradeToString() const{
-		return PrintUtils::ConvertTradeListToString(m_tradelist);
+		return CommonUtils::ConvertTradeListToString(m_tradelist);
 	}
 
 	void AccountAndPositionMgr::pushYesterdayUnClosedTrade(const CThostFtdcTradeField& tradeField, Direction direction){
 		if (direction == Buy){
 			m_tradeList_nonClosed_account_long.push_back(tradeField);
 		}
-		else if(direction == Sell){
+		else if (direction == Sell){
 			m_tradeList_notClosed_account_short.push_back(tradeField);
 		}
 	}
 
 	std::string AccountAndPositionMgr::yesterdayUnClosedTradeToString(Direction direction){
 		if (direction == Buy){
-			return PrintUtils::ConvertTradeListToString(m_tradeList_nonClosed_account_long);
+			return CommonUtils::ConvertTradeListToString(m_tradeList_nonClosed_account_long);
 		}
 		else if (direction == Sell){
-			return PrintUtils::ConvertTradeListToString(m_tradeList_notClosed_account_short);
+			return CommonUtils::ConvertTradeListToString(m_tradeList_notClosed_account_short);
 		}
 		else
 			return "";
@@ -246,7 +247,7 @@ namespace AP{
 		}
 
 		if (originalTradeStruct.PosiDirection == '2') //多单
-		{	
+		{
 			//多单持仓量
 			m_tradeMessage_dict[originalTradeStruct.InstrumentID].Holding_long = originalTradeStruct.Position;
 			//多单今仓
@@ -302,95 +303,42 @@ namespace AP{
 		return ret.substr(0, ret.size() - 1);
 	}
 
-	double AccountAndPositionMgr::GetPosition(double& pos, Direction& direction, int& volume, double& available) const{
-		double amount_buy = 0.0; //THOST_FTDC_D_Buy
-		int volume_buy = 0;
-		double amount_sell = 0.0; // THOST_FTDC_D_Sell
-		int volume_sell = 0;
-		
-		std::unique_lock<std::mutex> lk(m_mutex);
-		//for (auto item : m_PositionList){
+	double AccountAndPositionMgr::getPosition(double& pos, Direction& direction, double& available) const{
+		double money_long = 0.0; //THOST_FTDC_D_Buy
+		double money_short = 0.0; // THOST_FTDC_D_Sell
 
-		//	Instrument::InformationMgr& posMgr = Instrument::GetManager();
-		//	int multiple = posMgr.GetVolumeMultiple(item.InstrumentID);
-		//	if (item.Direction == THOST_FTDC_D_Buy){
-		//		amount_buy += (item.Price * item.Volume * multiple);
-		//		volume_buy += item.Volume;
-		//	}
-		//	else if (item.Direction == THOST_FTDC_D_Sell){
-		//		amount_sell += (item.Price * item.Volume * multiple);
-		//		volume_sell += item.Volume;
-		//	}
-		//	else{
-		//		assert(false);
-		//	}
-		//}
+		std::unique_lock<std::mutex> lk(m_mutex);
+
+		for (auto item : m_tradeList_nonClosed_account_long){
+			money_long += (item.Price * item.Volume * m_instrument_dict.at(item.InstrumentID).VolumeMultiple);// operator [] is not const, so that use at() instead
+		}
+
+		for (auto item : m_tradeList_notClosed_account_short){
+			money_short += (item.Price * item.Volume * m_instrument_dict.at(item.InstrumentID).VolumeMultiple);
+		}
 		lk.unlock();
-		direction = amount_buy > amount_sell ? AP::Buy : AP::Sell;
-		pos = amount_buy > amount_sell ? (amount_buy - amount_sell) : (amount_sell - amount_buy);
-		volume = volume_buy > volume_sell ? (volume_buy - volume_sell) : (volume_sell - volume_buy);
-		available = 200.0;
+
+		pos = std::abs(money_long - money_short);
+		direction = money_long > money_short ? AP::Long : AP::Short;
+		available = m_accountInfo.Available;
+
 		return pos;
 	}
 
-
-	std::string PrintUtils::ConvertOrderListToString(const std::vector< CThostFtdcOrderField >& list){
-		if (list.empty())
-			return "";
-
-		std::stringstream result;
-		result << std::endl << "------------------------------------------------" << std::endl;
-
-		for (auto iter = list.begin(); iter != list.end(); iter++){
-			result << "经纪公司代码:" << iter->BrokerID << std::endl
-				<< " 投资者代码:" << iter->InvestorID << std::endl
-				<< " 用户代码:" << iter->UserID << std::endl
-				<< " 合约代码:" << iter->InstrumentID << std::endl
-				<< " 买卖方向:" << iter->Direction << std::endl
-				<< " 组合开平标志:" << iter->CombOffsetFlag << std::endl
-				<< " 价格:" << iter->LimitPrice << std::endl
-				<< " 数量:" << iter->VolumeTotalOriginal << std::endl
-				<< " 报单引用:" << iter->OrderRef << std::endl
-				<< " 客户代码:" << iter->ClientID << std::endl
-				<< " 报单状态:" << iter->OrderStatus << std::endl
-				<< " 委托时间:" << iter->InsertTime << std::endl
-				<< " 报单编号:" << iter->OrderSysID << std::endl
-				<< " GTD日期:" << iter->GTDDate << std::endl
-				<< " 交易日:" << iter->TradingDay << std::endl
-				<< " 报单日期:" << iter->InsertDate << std::endl;
+	int AccountAndPositionMgr::getPositionVolume(const std::string& instruID, Direction& todayDirection, int& todayPos, Direction& ydDirection, int& ydPos) const{
+		if (m_tradeMessage_dict.find(instruID) != m_tradeMessage_dict.end()){
+			int pos = m_tradeMessage_dict.at(instruID).Holding_long - m_tradeMessage_dict.at(instruID).Holding_short;
+			int todayPos1 = m_tradeMessage_dict.at(instruID).TodayPosition_long - m_tradeMessage_dict.at(instruID).TodayPosition_short;
+			int ydPos1 = m_tradeMessage_dict.at(instruID).YdPosition_long - m_tradeMessage_dict.at(instruID).YdPosition_short;
+			todayDirection = todayPos > 0 ? AP::Long : AP::Short;
+			ydDirection = ydPos > 0 ? AP::Long : AP::Short;
+			todayPos = std::abs(todayPos1);
+			ydPos = std::abs(ydPos1);
+			return std::abs(pos);
 		}
-		result << "--------------------------------------------------" << std::endl;
-		return result.str();
-	}
-
-	std::string PrintUtils::ConvertTradeListToString(const std::vector< CThostFtdcTradeField >& list){
-		if (list.empty())
-			return "";
-
-		std::stringstream result;
-		result << std::endl << "------------------------------------------------" << std::endl;
-
-		for (auto iter = list.begin(); iter != list.end(); iter++){
-			result << "合约代码:" << iter->InstrumentID << std::endl
-				<< " 用户代码:" << iter->UserID << std::endl
-				<< " 成交编号:" << iter->TradeID << std::endl
-				<< " 买卖方向:" << iter->Direction << std::endl
-				<< " 开平标志:" << iter->OffsetFlag << std::endl
-				<< " 投机套保标志:" << iter->HedgeFlag << std::endl
-				<< " 价格:" << iter->Price << std::endl
-				<< " 数量:" << iter->Volume << std::endl
-				<< " 成交时间:" << iter->TradeTime << std::endl
-				<< " 成交类型:" << iter->TradeType << std::endl
-				<< " 报单编号:" << iter->OrderSysID << std::endl
-				<< " 报单引用:" << iter->OrderRef << std::endl
-				<< " 本地报单编号:" << iter->OrderLocalID << std::endl
-				<< " 业务单元:" << iter->BusinessUnit << std::endl
-				<< " 序号:" << iter->SequenceNo << std::endl
-				<< " 经纪公司报单编号:" << iter->BrokerOrderSeq << std::endl
-				<< " 成交时期:" << iter->TradeDate << std::endl
-				<< " 交易日:" << iter->TradingDay << std::endl;
+		else{
+			return 0;
 		}
-		result << "--------------------------------------------------" << std::endl;
-		return result.str();
 	}
 }
+

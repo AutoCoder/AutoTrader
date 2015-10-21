@@ -218,9 +218,9 @@ void CtpTradeSpi::OnRspQryInvestorPositionDetail(CThostFtdcInvestorPositionDetai
 			if (pInvestorPositionDetail->Volume > 0)//筛选未平仓的
 			{
 				if (trade.Direction == '0')
-					AP::GetManager().pushYesterdayUnClosedTrade(trade, AP::Buy);
+					AP::GetManager().pushYesterdayUnClosedTrade(trade, AP::Long);
 				else if (trade.Direction == '1')
-					AP::GetManager().pushYesterdayUnClosedTrade(trade, AP::Sell);
+					AP::GetManager().pushYesterdayUnClosedTrade(trade, AP::Short);
 			}
 
 
@@ -229,11 +229,11 @@ void CtpTradeSpi::OnRspQryInvestorPositionDetail(CThostFtdcInvestorPositionDetai
 			{
 				m_firstquery_Detail = false;
 
-				SYNC_PRINT << "账户所有合约未平仓单笔数(不是手数,一笔可对应多手):多单" << AP::GetManager().yesterdayUnClosedTradeCount(AP::Buy) << " 空单" << AP::GetManager().yesterdayUnClosedTradeCount(AP::Sell);
+				SYNC_PRINT << "账户所有合约未平仓单笔数(不是手数,一笔可对应多手):多单" << AP::GetManager().yesterdayUnClosedTradeCount(AP::Long) << " 空单" << AP::GetManager().yesterdayUnClosedTradeCount(AP::Short);
 				SYNC_PRINT << "--------先多后空-------";
 
-				SYNC_PRINT << AP::GetManager().yesterdayUnClosedTradeToString(AP::Buy);
-				SYNC_PRINT << AP::GetManager().yesterdayUnClosedTradeToString(AP::Sell);
+				SYNC_PRINT << AP::GetManager().yesterdayUnClosedTradeToString(AP::Long);
+				SYNC_PRINT << AP::GetManager().yesterdayUnClosedTradeToString(AP::Short);
 
 				SYNC_PRINT << "--------结束-------";
 

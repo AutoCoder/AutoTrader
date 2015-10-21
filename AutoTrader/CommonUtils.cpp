@@ -265,3 +265,63 @@ std::string CommonUtils::StringFromStruct(const CThostFtdcInputOrderField& inner
 	ss << "\nIsSwapOrder:" << innerStruct.IsSwapOrder;
 	return ss.str();
 }
+
+std::string CommonUtils::ConvertOrderListToString(const std::vector< CThostFtdcOrderField >& list){
+	if (list.empty())
+		return "";
+
+	std::stringstream result;
+	result << std::endl << "------------------------------------------------" << std::endl;
+
+	for (auto iter = list.begin(); iter != list.end(); iter++){
+		result << "经纪公司代码:" << iter->BrokerID << std::endl
+			<< " 投资者代码:" << iter->InvestorID << std::endl
+			<< " 用户代码:" << iter->UserID << std::endl
+			<< " 合约代码:" << iter->InstrumentID << std::endl
+			<< " 买卖方向:" << iter->Direction << std::endl
+			<< " 组合开平标志:" << iter->CombOffsetFlag << std::endl
+			<< " 价格:" << iter->LimitPrice << std::endl
+			<< " 数量:" << iter->VolumeTotalOriginal << std::endl
+			<< " 报单引用:" << iter->OrderRef << std::endl
+			<< " 客户代码:" << iter->ClientID << std::endl
+			<< " 报单状态:" << iter->OrderStatus << std::endl
+			<< " 委托时间:" << iter->InsertTime << std::endl
+			<< " 报单编号:" << iter->OrderSysID << std::endl
+			<< " GTD日期:" << iter->GTDDate << std::endl
+			<< " 交易日:" << iter->TradingDay << std::endl
+			<< " 报单日期:" << iter->InsertDate << std::endl;
+	}
+	result << "--------------------------------------------------" << std::endl;
+	return result.str();
+}
+
+std::string CommonUtils::ConvertTradeListToString(const std::vector< CThostFtdcTradeField >& list){
+	if (list.empty())
+		return "";
+
+	std::stringstream result;
+	result << std::endl << "------------------------------------------------" << std::endl;
+
+	for (auto iter = list.begin(); iter != list.end(); iter++){
+		result << "合约代码:" << iter->InstrumentID << std::endl
+			<< " 用户代码:" << iter->UserID << std::endl
+			<< " 成交编号:" << iter->TradeID << std::endl
+			<< " 买卖方向:" << iter->Direction << std::endl
+			<< " 开平标志:" << iter->OffsetFlag << std::endl
+			<< " 投机套保标志:" << iter->HedgeFlag << std::endl
+			<< " 价格:" << iter->Price << std::endl
+			<< " 数量:" << iter->Volume << std::endl
+			<< " 成交时间:" << iter->TradeTime << std::endl
+			<< " 成交类型:" << iter->TradeType << std::endl
+			<< " 报单编号:" << iter->OrderSysID << std::endl
+			<< " 报单引用:" << iter->OrderRef << std::endl
+			<< " 本地报单编号:" << iter->OrderLocalID << std::endl
+			<< " 业务单元:" << iter->BusinessUnit << std::endl
+			<< " 序号:" << iter->SequenceNo << std::endl
+			<< " 经纪公司报单编号:" << iter->BrokerOrderSeq << std::endl
+			<< " 成交时期:" << iter->TradeDate << std::endl
+			<< " 交易日:" << iter->TradingDay << std::endl;
+	}
+	result << "--------------------------------------------------" << std::endl;
+	return result.str();
+}

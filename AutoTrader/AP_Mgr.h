@@ -9,7 +9,7 @@
 
 class Order;
 
-namespace AP{
+namespace AP{ // Account & Position
 
 	struct TradeMessage
 	{
@@ -53,15 +53,15 @@ namespace AP{
 	};
 
 	enum Direction{
-		Buy = '0',
-		Sell = '1',
+		Long = '0',
+		Short = '1',
 	};
 
-	class PrintUtils{
-	public:
-		static std::string ConvertOrderListToString(const std::vector< CThostFtdcOrderField >& list);
-		static std::string ConvertTradeListToString(const std::vector< CThostFtdcTradeField >& list);
-	};
+	//class PrintUtils{
+	//public:
+	//	static std::string ConvertOrderListToString(const std::vector< CThostFtdcOrderField >& list);
+	//	static std::string ConvertTradeListToString(const std::vector< CThostFtdcTradeField >& list);
+	//};
 
 	class AccountAndPositionMgr
 	{
@@ -71,7 +71,7 @@ namespace AP{
 
 		virtual void setAccountStatus(const CThostFtdcTradingAccountField& info);
 
-		void pushTodayNewTrade(const CThostFtdcTradeField& tradeField);
+		void pushTodayNewTrade(const CThostFtdcTradeField& tradeField);//Push the happening trade
 
 		void pushTodayOrder(const CThostFtdcOrderField& orderField);
 
@@ -79,7 +79,7 @@ namespace AP{
 
 		size_t todayOrderCount() const { return m_orderlist.size();  }
 
-		void pushTodayTrade(const CThostFtdcTradeField& tradeField);
+		void pushTodayTrade(const CThostFtdcTradeField& tradeField);//Push the existed trade
 
 		size_t todayTradeCount() const { return m_tradelist.size(); }
 
@@ -89,7 +89,7 @@ namespace AP{
 
 		std::string yesterdayUnClosedTradeToString(Direction direction);
 
-		long yesterdayUnClosedTradeCount(Direction direction){ return direction == AP::Buy ? m_tradeList_nonClosed_account_long.size() : m_tradeList_notClosed_account_short.size(); };
+		long yesterdayUnClosedTradeCount(Direction direction){ return direction == AP::Long ? m_tradeList_nonClosed_account_long.size() : m_tradeList_notClosed_account_short.size(); };
 
 		void pushTradeMessage(const CThostFtdcInvestorPositionField& originalTradeStruct);
 
@@ -101,7 +101,10 @@ namespace AP{
 
 		std::string getInstrumentList() const;
 
-		double GetPosition(double& pos, Direction& direction, int& volume, double& available) const;
+		double getPosition(double& pos, Direction& direction, double& available) const;
+		
+		//return total volume, set TodayPosition & YdPosition by reference
+		int getPositionVolume(const std::string& instruID, Direction& todayDirection, int& todayPos, Direction& ydDirection, int& ydPos) const;
 
 		virtual bool isReady() { return m_isReady; }
 
