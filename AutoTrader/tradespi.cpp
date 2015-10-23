@@ -106,7 +106,7 @@ void CtpTradeSpi::ReqQryOrder(){
 
 ///请求查询报单响应
 void CtpTradeSpi::OnRspQryOrder(CThostFtdcOrderField *pOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
-	SYNC_PRINT << "[Trade Thread] Response | Query order : " << pOrder->OrderRef;
+	SYNC_PRINT << "[Trade Thread] Response | Query order";
 
 	if (!IsErrorRspInfo(pRspInfo) && pOrder)
 	{
