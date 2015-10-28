@@ -147,8 +147,8 @@ int main(int argc, const char* argv[]){
 		pTradeUserApi->Init();
 
 		//******start md thread******
-		//std::unique_lock <std::mutex> lck(mtx);
-		//cv_md.wait(lck);
+		std::unique_lock <std::mutex> lck(mtx);
+		cv_md.wait(lck);
 		pMdUserApi->Init();
 
 		//[Excute Order Thread] Excute the Order in Queue one by one looply.

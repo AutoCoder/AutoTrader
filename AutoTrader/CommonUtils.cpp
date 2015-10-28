@@ -300,7 +300,7 @@ std::string CommonUtils::ConvertTradeListToString(const std::vector< CThostFtdcT
 		return "";
 
 	std::stringstream result;
-	result << std::endl << "------------------------------------------------" << std::endl;
+	result << std::endl << "-----------------------" << std::endl;
 
 	for (auto iter = list.begin(); iter != list.end(); iter++){
 		result << "合约代码:" << iter->InstrumentID << std::endl
@@ -322,6 +322,6 @@ std::string CommonUtils::ConvertTradeListToString(const std::vector< CThostFtdcT
 			<< " 成交时期:" << iter->TradeDate << std::endl
 			<< " 交易日:" << iter->TradingDay << std::endl;
 	}
-	result << "--------------------------------------------------" << std::endl;
+	result << "-----------------------" << std::endl;
 	return result.str();
 }

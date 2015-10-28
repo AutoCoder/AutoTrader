@@ -40,12 +40,12 @@ CtpTradeSpi::CtpTradeSpi(CThostFtdcTraderApi* p, const char * brokerID, const ch
 CtpTradeSpi::~CtpTradeSpi(){}
 
 void CtpTradeSpi::OnFrontConnected(){
-	SYNC_PRINT << "[Trade Thread] Response | connected...";
+	SYNC_PRINT << "[Trade] 回复 | 成功连接...";
 	m_stateChangeHandler.OnFrontConnected();
 }
 
 void CtpTradeSpi::OnFrontDisconnected(int nReason){
-	SYNC_PRINT << "[Trade Thread] Response | Disconnected..." << " reason=" << nReason;
+	SYNC_PRINT << "[Trade] 回复 | 断开连接..." << " reason=" << nReason;
 }
 
 void CtpTradeSpi::ReqUserLogin(){
@@ -56,7 +56,7 @@ void CtpTradeSpi::ReqUserLogin(){
 	strcpy_s(req.Password, m_password);
 	strcpy_s(req.UserProductInfo, m_productName);
 	int ret = pUserApi->ReqUserLogin(&req, ++requestId);
-	SYNC_PRINT << "[Trade Thread] Request | send logging ..." << ((ret == 0) ? "success" : "fail");
+	SYNC_PRINT << "[Trade] 请求 | 登陆 ..." << ((ret == 0) ? "成功" : "失败");
 }
 
 void CtpTradeSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
@@ -68,7 +68,7 @@ void CtpTradeSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CTh
 		int nextOrderRef = atoi(pRspUserLogin->MaxOrderRef);
 		sprintf_s(m_orderRef, "%d", ++nextOrderRef);
 
-		SYNC_PRINT << "[Trade Thread] Response | login successfully...CurrentDate:" << pRspUserLogin->TradingDay << "| FrontID: " << m_frontID << "| SessionID: " << m_sessionID;
+		SYNC_PRINT << "[Trade] 回复 | 登陆成功...当前日期:" << pRspUserLogin->TradingDay << "| FrontID: " << m_frontID << "| SessionID: " << m_sessionID;
 
 		m_stateChangeHandler.OnLogined();
 	}
@@ -80,15 +80,15 @@ void CtpTradeSpi::ReqSettlementInfoConfirm(){
 	strcpy_s(req.BrokerID, m_brokerID);
 	strcpy_s(req.InvestorID, m_userID);
 	int ret = pUserApi->ReqSettlementInfoConfirm(&req, ++requestId);
-	SYNC_PRINT << "[Trade Thread] Request | sending settlementInfo confirmation..." << ((ret == 0) ? "success" : "fail");
+	SYNC_PRINT << "[Trade] 请求 | 发送结算确认单..." << ((ret == 0) ? "成功" : "失败");
 }
 
 void CtpTradeSpi::OnRspSettlementInfoConfirm( CThostFtdcSettlementInfoConfirmField  *pSettlementInfoConfirm, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
 	if (!IsErrorRspInfo(pRspInfo) && pSettlementInfoConfirm){
-		SYNC_PRINT << "[Trade Thread] Response | settlementInfo..." 
+		SYNC_PRINT << "[Trade] 回复 | 结算确认成功..." 
 			<< pSettlementInfoConfirm->InvestorID
 			<< "...<" << pSettlementInfoConfirm->ConfirmDate
-			<< " " << pSettlementInfoConfirm->ConfirmTime << ">...Confirm";
+			<< " " << pSettlementInfoConfirm->ConfirmTime << ">...确认";
 	}
 
 	m_stateChangeHandler.OnConfirmedSettlementInfo();
@@ -101,12 +101,12 @@ void CtpTradeSpi::ReqQryOrder(){
 	strcpy_s(req.InvestorID, m_userID);//投资者代码,也是userId
 	int ret = pUserApi->ReqQryOrder(&req, ++requestId);
 
-	SYNC_PRINT << " 请求 | 发送查询报单..." << ((ret == 0) ? "成功" : "失败") << " ret:" << ret; //ret值为-3表示每秒发送请求数超过许可数
+	SYNC_PRINT << "[Trade] 请求 | 发送查询报单..." << ((ret == 0) ? "成功" : "失败") << " ret:" << ret; //ret值为-3表示每秒发送请求数超过许可数
 }
 
 ///请求查询报单响应
 void CtpTradeSpi::OnRspQryOrder(CThostFtdcOrderField *pOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast){
-	SYNC_PRINT << "[Trade Thread] Response | Query order";
+	SYNC_PRINT << "[Trade] 回复 | 查询报单";
 
 	if (!IsErrorRspInfo(pRspInfo) && pOrder)
 	{
@@ -120,7 +120,7 @@ void CtpTradeSpi::OnRspQryOrder(CThostFtdcOrderField *pOrder, CThostFtdcRspInfoF
 			if (bIsLast)
 			{
 				m_firstquery_order = false;
-				SYNC_PRINT << "所有合约报单次数：" << AP::GetManager().todayOrderCount();
+				SYNC_PRINT << "[Trade] 所有合约报单次数：" << AP::GetManager().todayOrderCount();
 				SYNC_PRINT << AP::GetManager().todayOrderToString();
 			}
 			m_stateChangeHandler.OnRspQryOrder();
@@ -131,7 +131,7 @@ void CtpTradeSpi::OnRspQryOrder(CThostFtdcOrderField *pOrder, CThostFtdcRspInfoF
 		if (m_firstquery_order == true)
 		{
 			m_firstquery_order = false;
-			SYNC_PRINT << "查询报单出错，或没有报单";
+			SYNC_PRINT << "[Trade] 查询报单出错，或没有报单";
 			m_stateChangeHandler.OnRspQryOrder();
 		}
 
@@ -146,7 +146,7 @@ void CtpTradeSpi::ReqQryTrade(){
 
 	int ret = pUserApi->ReqQryTrade(&req, ++requestId);
 
-	SYNC_PRINT << " 请求 | 发送成交查询..." << ((ret == 0) ? "成功" : "失败") << " ret:" << ret;//ret值为-3表示每秒发送请求数超过许可数
+	SYNC_PRINT << "[Trade] 请求 | 发送成交查询..." << ((ret == 0) ? "成功" : "失败") << " ret:" << ret;//ret值为-3表示每秒发送请求数超过许可数
 }
 
 //请求查询成交响应,要区分程序启动时第一次查询跟之后的查询
@@ -187,7 +187,7 @@ void CtpTradeSpi::ReqQryInvestorPositionDetail(){
 
 	int ret = pUserApi->ReqQryInvestorPositionDetail(&req, ++requestId);
 
-	SYNC_PRINT << " 请求 | 发送投资者持仓明细查询..." << ((ret == 0) ? "成功" : "失败") << " ret:" << ret;//ret值为-3表示每秒发送请求数超过许可数
+	SYNC_PRINT << "[Trade] 请求 | 发送投资者持仓明细查询..." << ((ret == 0) ? "成功" : "失败") << " ret:" << ret;//ret值为-3表示每秒发送请求数超过许可数
 }
 
 
@@ -229,7 +229,7 @@ void CtpTradeSpi::OnRspQryInvestorPositionDetail(CThostFtdcInvestorPositionDetai
 			{
 				m_firstquery_Detail = false;
 
-				SYNC_PRINT << "账户所有合约未平仓单笔数(不是手数,一笔可对应多手):多单" << AP::GetManager().yesterdayUnClosedTradeCount(AP::Long) << " 空单" << AP::GetManager().yesterdayUnClosedTradeCount(AP::Short);
+				SYNC_PRINT << "[Trade]账户所有合约未平仓单笔数(不是手数,一笔可对应多手):多单" << AP::GetManager().yesterdayUnClosedTradeCount(AP::Long) << " 空单" << AP::GetManager().yesterdayUnClosedTradeCount(AP::Short);
 				SYNC_PRINT << "--------先多后空-------";
 
 				SYNC_PRINT << AP::GetManager().yesterdayUnClosedTradeToString(AP::Long);
@@ -248,7 +248,7 @@ void CtpTradeSpi::OnRspQryInvestorPositionDetail(CThostFtdcInvestorPositionDetai
 		if (m_firstquery_Detail == true)
 		{
 			m_firstquery_Detail = false;
-			SYNC_PRINT << "查询投资者持仓明细出错，或没有投资者持仓明细";
+			SYNC_PRINT << "[Trade] 查询投资者持仓明细出错，或没有投资者持仓明细";
 			m_stateChangeHandler.OnRspQryInvestorPositionDetail();
 		}
 	}
@@ -264,10 +264,10 @@ void CtpTradeSpi::ReqQryTradingAccount()
 	while (true){
 		ret = pUserApi->ReqQryTradingAccount(&req, ++requestId);
 		if (ret == 0){
-			SYNC_PRINT << "[Trade Thread] Request | send trading account query...success";
+			SYNC_PRINT << "[Trade] 请求 | 交易账户查询...成功";
 			break;
 		}
-		SYNC_PRINT << "[Trade Thread] Request | send trading account query... fail";
+		SYNC_PRINT << "[Trade] 请求 | 交易账户查询...失败";
 	}
 }
 
@@ -279,7 +279,7 @@ void CtpTradeSpi::OnRspQryTradingAccount(
 		AP::GetManager().setAccountStatus(*pTradingAccount);
 
 		memcpy(&m_accountInfo, pTradingAccount, sizeof(CThostFtdcTradingAccountField));
-		SYNC_PRINT << "[Trade Thread] Response | Balance:" << pTradingAccount->Balance
+		SYNC_PRINT << "[Trade] Response | Balance:" << pTradingAccount->Balance
 			<< " Available:" << pTradingAccount->Available
 			<< " CurrMargin:" << pTradingAccount->CurrMargin
 			<< " CloseProfit:" << pTradingAccount->CloseProfit
@@ -291,7 +291,7 @@ void CtpTradeSpi::OnRspQryTradingAccount(
 		if (m_firstquery_TradingAccount){
 			m_firstquery_TradingAccount = false;
 
-			SYNC_PRINT << "资金查询正常，查询投资者持仓:";
+			SYNC_PRINT << "[Trade] 资金查询正常，查询投资者持仓:";
 
 			m_stateChangeHandler.OnRspQryTradingAccount();
 		}
@@ -301,7 +301,7 @@ void CtpTradeSpi::OnRspQryTradingAccount(
 			m_firstquery_TradingAccount = false;
 
 
-			SYNC_PRINT << "资金查询出错,查询投资者持仓:";
+			SYNC_PRINT << " [Trade] 资金查询出错,查询投资者持仓:";
 			m_stateChangeHandler.OnRspQryTradingAccount();
 		}
 
@@ -316,7 +316,7 @@ void CtpTradeSpi::ReqQryInvestorPosition_all()
 	//strcpy(req.InvestorID, userId);
 	//strcpy(req.InstrumentID, instId);
 	int ret = pUserApi->ReqQryInvestorPosition(&req, ++requestId);
-	SYNC_PRINT << " 请求 | 发送持仓查询..." << ((ret == 0) ? "成功" : "失败");
+	SYNC_PRINT << "[Trade] 请求 | 发送持仓查询..." << ((ret == 0) ? "成功" : "失败");
 }
 
 //[doesn't work, may delete later]
@@ -334,11 +334,11 @@ void CtpTradeSpi::ReqQryInvestorPosition_all()
 //		ret = pUserApi->ReqQryInvestorPosition(&req, ++requestId);
 //		//ret = pUserApi->ReqQryInvestorPositionDetail(&req, ++requestId);
 //		if (ret == 0){
-//			SYNC_PRINT << "[Trade Thread] Request | send InvestorPosition query...success";
+//			SYNC_PRINT << "[Trade] Request | send InvestorPosition query...success";
 //			break;
 //		}
 //		else{
-//			//SYNC_PRINT << "[Trade Thread] Request | send InvestorPosition query... fail";
+//			//SYNC_PRINT << "[Trade] Request | send InvestorPosition query... fail";
 //			if (AP::GetManager().isReady())
 //				break;
 //			sleep(2000);
@@ -354,7 +354,7 @@ void CtpTradeSpi::OnRspQryInvestorPosition(
 {
 	if (!IsErrorRspInfo(pRspInfo) && pInvestorPosition){
 
-		SYNC_PRINT << "[Trade Thread] Response| Instrument:" << pInvestorPosition->InstrumentID
+		SYNC_PRINT << "[Trade] Response| Instrument:" << pInvestorPosition->InstrumentID
 			<< " PosiDirection:" << pInvestorPosition->PosiDirection
 			<< " Position:" << pInvestorPosition->Position
 			<< " Yesterday Position:" << pInvestorPosition->YdPosition
@@ -377,7 +377,7 @@ void CtpTradeSpi::OnRspQryInvestorPosition(
 		if (m_firstquery_Position == true)
 		{
 			m_firstquery_Position = false;
-			SYNC_PRINT << "查询持仓出错，或没有持仓";
+			SYNC_PRINT << "[Trade] 查询持仓出错，或没有持仓";
 			m_stateChangeHandler.OnRspQryInvestorPosition();
 		}
 	}
@@ -388,7 +388,7 @@ void CtpTradeSpi::ReqQryInstrument_all(){
 	memset(&req, 0, sizeof(req));
 
 	int ret = pUserApi->ReqQryInstrument(&req, ++requestId);
-	SYNC_PRINT << " 请求 | 发送合约查询..." << ((ret == 0) ? "成功" : "失败") << " ret:" << ret;
+	SYNC_PRINT << "[Trade] 请求 | 发送合约查询..." << ((ret == 0) ? "成功" : "失败") << " ret:" << ret;
 }
 
 void CtpTradeSpi::ReqQryInstrument(TThostFtdcInstrumentIDType instId)
@@ -397,7 +397,7 @@ void CtpTradeSpi::ReqQryInstrument(TThostFtdcInstrumentIDType instId)
 	memset(&req, 0, sizeof(req));
 	strcpy_s(req.InstrumentID, instId);
 	int ret = pUserApi->ReqQryInstrument(&req, ++requestId);
-	SYNC_PRINT << "[Trade Thread] Request | send Instrument Query..." << ((ret == 0) ? "success" : "fail");
+	SYNC_PRINT << "[Trade] 请求 | 发送合约查询..." << ((ret == 0) ? "成功" : "失败");
 }
 
 void CtpTradeSpi::OnRspQryInstrument(CThostFtdcInstrumentField *pInstrument,
@@ -412,11 +412,10 @@ void CtpTradeSpi::OnRspQryInstrument(CThostFtdcInstrumentField *pInstrument,
 			if (bIsLast)
 			{
 				m_firstquery_Instrument = false;
-				SYNC_PRINT << "所有持仓合约：" << AP::GetManager().getInstrumentList();
+				SYNC_PRINT << "[Trade] 所有持仓合约：" << AP::GetManager().getInstrumentList();
 
 				// 为什么在tradespi线程初始化全部完成以后才启动MD?
-				//cerr << "TD初始化完成，启动MD:" << endl;
-				//m_pMDUserApi_td->Init();
+				m_stateChangeHandler.OnRspQryInstrument();
 			}
 		}
 	}
@@ -428,7 +427,7 @@ void CtpTradeSpi::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder,
 {
 	if (!IsErrorRspInfo(pRspInfo) && pInputOrder){
 		SYNC_PRINT << "[Back Order]" << CommonUtils::StringFromStruct(*pInputOrder);
-		SYNC_PRINT << "[Trade Thread] Response | Insert order success...Order Reference:" << pInputOrder->OrderRef;
+		SYNC_PRINT << "[Trade] 回复 | 订单插入成功...订单引用:" << pInputOrder->OrderRef;
 	}
 	//if (bIsLast) SetEvent(g_tradehEvent);
 }
@@ -439,7 +438,7 @@ void CtpTradeSpi::ReqOrderAction(TThostFtdcSequenceNoType orderSeq)
 	for (i = 0; i<orderList.size(); i++){
 		if (orderList[i]->BrokerOrderSeq == orderSeq){ found = true; break; }
 	}
-	if (!found){ SYNC_PRINT << "[Trade Thread] Request | Insert order doesn't exist."; return; }
+	if (!found){ SYNC_PRINT << "[Trade] 请求 | Insert order doesn't exist."; return; }
 
 	CThostFtdcInputOrderActionField req;
 	memset(&req, 0, sizeof(req));
@@ -453,7 +452,7 @@ void CtpTradeSpi::ReqOrderAction(TThostFtdcSequenceNoType orderSeq)
 	req.ActionFlag = THOST_FTDC_AF_Delete;
 
 	int ret = pUserApi->ReqOrderAction(&req, ++requestId);
-	SYNC_PRINT << "[Trade Thread] Request | backout order..." << ((ret == 0) ? "success" : "fail");
+	SYNC_PRINT << "[Trade] Request | backout order..." << ((ret == 0) ? "success" : "fail");
 }
 
 void CtpTradeSpi::OnRspOrderAction(
@@ -461,7 +460,7 @@ void CtpTradeSpi::OnRspOrderAction(
 	CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
 	if (!IsErrorRspInfo(pRspInfo) && pInputOrderAction){
-		SYNC_PRINT << "[Trade Thread] Response | backout order success..."
+		SYNC_PRINT << "[Trade] Response | backout order success..."
 			<< "Exchange ID:" << pInputOrderAction->ExchangeID
 			<< " Order System ID:" << pInputOrderAction->OrderSysID;
 	}
@@ -481,9 +480,9 @@ void CtpTradeSpi::OnRtnOrder(CThostFtdcOrderField *pOrder)
 	if (founded) orderList[i] = order;
 	else  orderList.push_back(order);
 	
-	//SYNC_PRINT << "[Trade Thread] Response | order submitted...ID:" << order->BrokerOrderSeq << ";Order submit Status:" << CommonUtils::InterpretOrderSubmitStatusCode(order->OrderSubmitStatus);
-	//SYNC_PRINT << "[Trade Thread] Response | order submitted...ID:" << order->BrokerOrderSeq << ";Order Status:" << CommonUtils::InterpretOrderStatusCode(order->OrderStatus);
-	SYNC_PRINT << "[Trade Thread] Response | order submitted...ID:" << order->BrokerOrderSeq << ";StatusMsg:" << order->StatusMsg;
+	//SYNC_PRINT << "[Trade] Response | order submitted...ID:" << order->BrokerOrderSeq << ";Order submit Status:" << CommonUtils::InterpretOrderSubmitStatusCode(order->OrderSubmitStatus);
+	//SYNC_PRINT << "[Trade] Response | order submitted...ID:" << order->BrokerOrderSeq << ";Order Status:" << CommonUtils::InterpretOrderStatusCode(order->OrderStatus);
+	SYNC_PRINT << "[Trade] 回复 | 订单已提交...ID:" << order->BrokerOrderSeq << ";订单状态:" << order->StatusMsg;
 	//SetEvent(g_tradehEvent);
 }
 extern std::mutex g_OrderRunMtx;
@@ -500,10 +499,10 @@ void CtpTradeSpi::OnRtnTrade(CThostFtdcTradeField *pTrade)
 	//}
 	//if (founded) tradeList[i] = trade;
 	//else  tradeList.push_back(trade);
-	SYNC_PRINT << "[Trade Thread] Response | order traded at " << pTrade->TradeDate << pTrade->TradeTime << "...TradeID:" << pTrade->TradeID;
+	SYNC_PRINT << "[Trade] 回复 | 订单成交于" << pTrade->TradeDate << pTrade->TradeTime << "...TradeID:" << pTrade->TradeID;
 
 	////fresh accout
-	//SYNC_PRINT << "[Trade Thread] Order executed. begin to refresh Account info...";
+	//SYNC_PRINT << "[Trade] Order executed. begin to refresh Account info...";
 
 	//if (pAccountMgr->isReady()) // this check means that the history trade before account query will not record
 	//	Position::GetManager().PushTradeItem(*pTrade);
@@ -520,7 +519,7 @@ void CtpTradeSpi::OnRtnTrade(CThostFtdcTradeField *pTrade)
 
 void CtpTradeSpi::OnHeartBeatWarning(int nTimeLapse)
 {
-	SYNC_PRINT << "[Trade Thread] Response | heartbeat is out of time limit..."
+	SYNC_PRINT << "[Trade] Response | heartbeat is out of time limit..."
 		<< " TimerLapse = " << nTimeLapse ;
 }
 
@@ -533,7 +532,7 @@ bool CtpTradeSpi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo)
 {
 	bool ret = ((pRspInfo) && (pRspInfo->ErrorID != 0));
 	if (ret && !std::string(pRspInfo->ErrorMsg).empty()){
-		SYNC_PRINT << "[Trade Thread] Response | " << pRspInfo->ErrorMsg;
+		SYNC_PRINT << "[Trade] 回复 | " << pRspInfo->ErrorMsg;
 	}
 	return ret;
 }
@@ -550,14 +549,14 @@ void CtpTradeSpi::ReqOrderInsert(Order ord){
 	CThostFtdcInputOrderField ordstruct;
 	bool success = ord.GetOrderOriginStruct(ordstruct);
 	if (success){
-		SYNC_PRINT << "[Debug] Send Order:" << CommonUtils::StringFromStruct(ordstruct);
+		SYNC_PRINT << "[Debug] 插入订单:" << CommonUtils::StringFromStruct(ordstruct);
 		int ret = pUserApi->ReqOrderInsert(&ordstruct, ++requestId);
-		SYNC_PRINT << "[Trade Thread] Request | insert order..." << ((ret == 0) ? "success" : "fail");
+		SYNC_PRINT << "[Trade] 请求 | 插入订单..." << ((ret == 0) ? "成功" : "失败");
 		//if (ret)
 		//	g_OrderRunMtx.unlock();
 	}
 	else{
-		SYNC_PRINT << "[Trade Thread] Invalid OrderField construct";
+		SYNC_PRINT << "[Trade] Invalid OrderField construct";
 	}
 
 

@@ -58,7 +58,7 @@ void CtpMdSpi::OnHeartBeatWarning(int nTimeLapse)
 
 void CtpMdSpi::OnFrontConnected()
 {
-	SYNC_PRINT << "[MD Thread] Response | connected...";
+	SYNC_PRINT << "[Md] Response | connected...";
 	//m_isFrontConnected = true;
 	//cv_md.notify_all();
 	m_stateChangeHandler.OnFrontConnected();
@@ -72,7 +72,7 @@ bool CtpMdSpi::ReqUserLogin(TThostFtdcBrokerIDType appId, TThostFtdcUserIDType u
 	strcpy(req.UserID, userId);
 	strcpy(req.Password, passwd);
 	int ret = pUserApi->ReqUserLogin(&req, ++requestId);
-	SYNC_PRINT << "[MD Thread] Request | send login request ..." << ((ret == 0) ? "success" : "fail");
+	SYNC_PRINT << "[Md] Request | send login request ..." << ((ret == 0) ? "success" : "fail");
   return (ret == 0);
   //SetEvent(g_hEvent);
 }
@@ -82,7 +82,7 @@ void CtpMdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
 {
 	if (!IsErrorRspInfo(pRspInfo) && pRspUserLogin)
 	{
-		SYNC_PRINT << "[MD Thread] Response | login successfully...CurrentDate:" <<pRspUserLogin->TradingDay;
+		SYNC_PRINT << "[Md] Response | login successfully...CurrentDate:" <<pRspUserLogin->TradingDay;
 		//m_isLogin = true;
 		//cv_md.notify_all();
 		m_stateChangeHandler.OnLogined();
@@ -103,14 +103,14 @@ void CtpMdSpi::SubscribeMarketData(char* instIdList)
 	for(unsigned int i=0; i<len;i++)  pInstId[i]=list[i]; 
 
 	int ret=pUserApi->SubscribeMarketData(pInstId, len);
-	SYNC_PRINT << "[MD Thread] Request | send md subscribe request... " << ((ret == 0) ? "success" : "fail");
+	SYNC_PRINT << "[Md] Request | send md subscribe request... " << ((ret == 0) ? "success" : "fail");
 }
 
 void CtpMdSpi::OnRspSubMarketData(
          CThostFtdcSpecificInstrumentField *pSpecificInstrument, 
          CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
-	SYNC_PRINT << "[MD Thread] Response | [OnRspSubMarketData] : " << ((pRspInfo->ErrorID == 0) ? "success" : "fail") << "; DetailInfo : " << pRspInfo->ErrorMsg;
+	SYNC_PRINT << "[Md] Response | [OnRspSubMarketData] : " << ((pRspInfo->ErrorID == 0) ? "success" : "fail") << "; DetailInfo : " << pRspInfo->ErrorMsg;
   //if(bIsLast)  SetEvent(g_hEvent);
 	if (pRspInfo->ErrorID != 0){
 		//m_isSubscribed = true;
@@ -122,7 +122,7 @@ void CtpMdSpi::OnRspUnSubMarketData(
              CThostFtdcSpecificInstrumentField *pSpecificInstrument,
              CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
-	SYNC_PRINT << "[MD Thread] Response | [OnRspUnSubMarketData] : " << ((pRspInfo->ErrorID == 0) ? "success" : "fail") << "; DetailInfo : " << pRspInfo->ErrorMsg;
+	SYNC_PRINT << "[Md] Response | [OnRspUnSubMarketData] : " << ((pRspInfo->ErrorID == 0) ? "success" : "fail") << "; DetailInfo : " << pRspInfo->ErrorMsg;
   //if(bIsLast)  SetEvent(g_hEvent);
 	
 	if (pRspInfo->ErrorID == 0){
@@ -175,7 +175,7 @@ bool CtpMdSpi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo)
 {	
   bool ret = ((pRspInfo) && (pRspInfo->ErrorID != 0));
   if (ret){
-	  SYNC_PRINT << "[MD Thread] Response | " << pRspInfo->ErrorMsg;
+	  SYNC_PRINT << "[Md] Response | " << pRspInfo->ErrorMsg;
   }
   return ret;
 }
