@@ -141,6 +141,8 @@ public:
 
 	void ReqOrderAction(TThostFtdcSequenceNoType orderSeq);
 
+	void ForceClose();
+
 	bool IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo);
 
 private:

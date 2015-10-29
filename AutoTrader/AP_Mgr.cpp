@@ -219,19 +219,19 @@ namespace AP{
 	}
 
 	void AccountAndPositionMgr::pushYesterdayUnClosedTrade(const CThostFtdcTradeField& tradeField, Direction direction){
-		if (direction == Buy){
+		if (direction == THOST_FTDC_D_Buy){
 			m_tradeList_nonClosed_account_long.push_back(tradeField);
 		}
-		else if (direction == Sell){
+		else if (direction == THOST_FTDC_D_Sell){
 			m_tradeList_notClosed_account_short.push_back(tradeField);
 		}
 	}
 
 	std::string AccountAndPositionMgr::yesterdayUnClosedTradeToString(Direction direction){
-		if (direction == Buy){
+		if (direction == THOST_FTDC_D_Buy){
 			return CommonUtils::ConvertTradeListToString(m_tradeList_nonClosed_account_long);
 		}
-		else if (direction == Sell){
+		else if (direction == THOST_FTDC_D_Sell){
 			return CommonUtils::ConvertTradeListToString(m_tradeList_notClosed_account_short);
 		}
 		else
@@ -293,6 +293,13 @@ namespace AP{
 	void AccountAndPositionMgr::pushInstrumentStruct(const CThostFtdcInstrumentField& instru)
 	{
 		m_instrument_dict[instru.InstrumentID] = instru;
+	}
+
+	CThostFtdcInstrumentField AccountAndPositionMgr::getInstrumentField(const std::string& instrId) const{
+		if (m_instrument_dict.count(instrId) != 0)
+			return m_instrument_dict.at(instrId);
+		else
+			return CThostFtdcInstrumentField();
 	}
 
 	std::string AccountAndPositionMgr::getInstrumentList() const{

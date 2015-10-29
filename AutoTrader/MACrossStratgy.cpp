@@ -76,7 +76,7 @@ bool MACrossStratgy::tryInvoke(const std::list<TickWrapper>& data, TickWrapper& 
 					m_curOrder->SetInstrumentId(info.InstrumentId());
 					m_curOrder->SetOrderType(Order::LimitPriceFOKOrder);
 					m_curOrder->SetRefExchangePrice(info.LastPrice());
-					m_curOrder->SetExchangeDirection(ExchangeDirection::Buy);
+					m_curOrder->SetExchangeDirection(THOST_FTDC_D_Buy);
 					curPtr->SetTickType(TickType::BuyPoint);
 				}
 			}
@@ -100,7 +100,7 @@ bool MACrossStratgy::tryInvoke(const std::list<TickWrapper>& data, TickWrapper& 
 					m_curOrder->SetInstrumentId(info.InstrumentId());
 					m_curOrder->SetOrderType(Order::LimitPriceFOKOrder);
 					m_curOrder->SetRefExchangePrice(info.LastPrice());
-					m_curOrder->SetExchangeDirection(ExchangeDirection::Sell);
+					m_curOrder->SetExchangeDirection(THOST_FTDC_D_Sell);
 					curPtr->SetTickType(TickType::SellPoint);
 				}
 			}
@@ -147,7 +147,7 @@ bool MACrossStratgy::tryInvoke(const std::list<TickWrapper>& tickdata, const std
 					m_curOrder->SetInstrumentId(info.InstrumentId());
 					m_curOrder->SetOrderType(Order::LimitPriceFOKOrder);
 					m_curOrder->SetRefExchangePrice(info.LastPrice());
-					m_curOrder->SetExchangeDirection(ExchangeDirection::Buy);
+					m_curOrder->SetExchangeDirection(THOST_FTDC_D_Buy);
 					curPtr->SetTickType(TickType::BuyPoint);
 				}
 			}
@@ -172,7 +172,7 @@ bool MACrossStratgy::tryInvoke(const std::list<TickWrapper>& tickdata, const std
 					m_curOrder->SetInstrumentId(info.InstrumentId());
 					m_curOrder->SetOrderType(Order::LimitPriceFOKOrder);
 					m_curOrder->SetRefExchangePrice(info.LastPrice());
-					m_curOrder->SetExchangeDirection(ExchangeDirection::Sell);
+					m_curOrder->SetExchangeDirection(THOST_FTDC_D_Sell);
 					curPtr->SetTickType(TickType::SellPoint);
 				}
 			}

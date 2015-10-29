@@ -540,7 +540,7 @@ bool CtpTradeSpi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo)
 void CtpTradeSpi::ReqOrderInsert(Order ord){
 	SYNC_PRINT << ("Execute Order (") << ord.GetInstrumentId() << ", " \
 		<< ord.GetRefExchangePrice() << ", " \
-		<< (ord.GetExchangeDirection() == ExchangeDirection::Buy ? "Buy)" : "Sell)");
+		<< (ord.GetExchangeDirection() == THOST_FTDC_D_Buy ? "Buy)" : "Sell)");
 
 	ord.SetIdentityInfo(m_brokerID, m_userID, m_userID, m_orderRef);
 	int nextOrderRef = atoi(m_orderRef);
@@ -558,15 +558,129 @@ void CtpTradeSpi::ReqOrderInsert(Order ord){
 	else{
 		SYNC_PRINT << "[Trade] Invalid OrderField construct";
 	}
-
-
-	//depreted : don't Real-time update account by API 
-	//if (pAccountMgr)
-	//	pAccountMgr->setUpdated(false);
-
-	////block the order executing thread 
-	//m_isExecutingOrder.set_value(false);
 }
+
+void CtpTradeSpi::ForceClose(){
+	TThostFtdcInstrumentIDType    instId;//合约
+	TThostFtdcDirectionType       dir;//方向,'0'买，'1'卖
+	TThostFtdcCombOffsetFlagType  kpp;//开平，"0"开，"1"平,"3"平今
+	TThostFtdcPriceType           price;//价格，0是市价,上期所不支持
+	TThostFtdcVolumeType          vol;//数量
+
+	for (auto item : AP::GetManager().getAllPositionMap()){
+		//平多
+		if (item.second.Holding_long > 0)
+		{
+			strcpy_s(instId, item.second.InstId.c_str());
+			dir = THOST_FTDC_D_Sell;// #define THOST_FTDC_D_Buy '0' ||| #define THOST_FTDC_D_Sell '1'
+			price = item.second.LastPrice - 5 * AP::GetManager().getInstrumentField(instId).PriceTick;
+
+			//上期所
+			if (strcmp(AP::GetManager().getInstrumentField(instId).ExchangeID, "SHFE") == 0)
+			{
+				if (item.second.YdPosition_long == 0)//没有昨仓
+				{
+					SYNC_PRINT << "[Trade] 多单上期所 全部平今";;
+
+					strcpy_s(kpp, "3");//平今
+					vol = item.second.Holding_long;
+					ReqOrderInsert(Order(item.second.InstId, price, vol, dir, kpp));
+
+				}
+				else if (item.second.TodayPosition_long == 0)//没有今仓
+				{
+					SYNC_PRINT << "[Trade] 多单上期所 全部平昨";
+
+					strcpy_s(kpp, "1");//平仓
+					vol = item.second.Holding_long;
+					ReqOrderInsert(Order(item.second.InstId, price, vol, dir, kpp));
+
+				}
+				//同时持有昨仓和今仓
+				else if (item.second.YdPosition_long > 0 && item.second.TodayPosition_long > 0)
+				{
+					SYNC_PRINT << "[Trade] 多单上期所同时 平今平昨";
+
+					strcpy_s(kpp, "3");//平今
+					vol = item.second.TodayPosition_long;
+					ReqOrderInsert(Order(item.second.InstId, price, vol, dir, kpp));
+
+					strcpy_s(kpp, "1");//平仓
+					vol = item.second.YdPosition_long;
+					ReqOrderInsert(Order(item.second.InstId, price, vol, dir, kpp));
+
+				}
+
+			}
+			//非上期所
+			else
+			{
+				SYNC_PRINT << "[Trade] 非上期所多单 平仓[不支持平今]";
+
+				strcpy_s(kpp, "1");
+				vol = item.second.Holding_long;
+				ReqOrderInsert(Order(item.second.InstId, price, vol, dir, kpp));
+
+			}
+		}
+
+		//平空
+		if (item.second.Holding_short > 0)
+		{
+			strcpy_s(instId, item.second.InstId.c_str());//或strcpy(instId, iter->first.c_str());
+			dir = '0';
+			price = item.second.LastPrice + 5 * AP::GetManager().getInstrumentField(instId).PriceTick;
+
+			//上期所
+			if (strcmp(AP::GetManager().getInstrumentField(instId).ExchangeID, "SHFE") == 0)
+			{
+				if (item.second.YdPosition_short == 0)//没有昨仓
+				{
+					SYNC_PRINT << "[Trade] 空单上期所 全部平今";
+
+					strcpy_s(kpp, "3");//平今
+					vol = item.second.Holding_short;
+					ReqOrderInsert(Order(item.second.InstId, price, vol, dir, kpp));
+
+				}
+				else if (item.second.TodayPosition_short == 0)//没有今仓
+				{
+					SYNC_PRINT << "[Trade] 空单上期所 全部平昨";
+
+					strcpy_s(kpp, "1");//平仓
+					vol = item.second.Holding_short;
+					ReqOrderInsert(Order(item.second.InstId, price, vol, dir, kpp));
+
+				}
+				//同时持有昨仓和今仓
+				else if (item.second.YdPosition_short > 0 && item.second.TodayPosition_short > 0)
+				{
+					SYNC_PRINT << "[Trade] 空单上期所 同时平今平昨";
+
+					strcpy_s(kpp, "3");//平今
+					vol = item.second.TodayPosition_short;
+					ReqOrderInsert(Order(item.second.InstId, price, vol, dir, kpp));
+
+					strcpy_s(kpp, "1");//平仓
+					vol = item.second.YdPosition_short;
+					ReqOrderInsert(Order(item.second.InstId, price, vol, dir, kpp));
+
+				}
+			}
+			//非上期所
+			else
+			{
+				SYNC_PRINT << "[Trade] 非上期所空单 平仓[不支持平今]";
+
+				strcpy_s(kpp, "1");
+				vol = item.second.Holding_short;
+				ReqOrderInsert(Order(item.second.InstId, price, vol, dir, kpp));
+
+			}
+		}
+	}
+}
+
 //
 /////TFtdcTimeConditionType是一个有效期类型类型
 ///////////////////////////////////////////////////////////////////////////

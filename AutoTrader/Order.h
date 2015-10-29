@@ -3,75 +3,75 @@
 #include <string>
 #include "ThostFtdcUserApiStruct.h"
 
-enum ExchangeDirection{
-	Buy = '0',
-	Sell = '1',
-};
+//enum ExchangeDirection{
+//	Buy = '0',
+//	Sell = '1',
+//};
 
-enum ExchangePriceType{
-	AnyPrice = 0x0,
-	LimitPrice = 0x1,
-	LastPrice = 0x2,
-};
-
-enum TimeCondition{
-	///立即完成，否则撤销
-	IOC = '1',
-	///本节有效
-	GFS = '2',
-	///当日有效
-    GFD = '3',
-	///指定日期前有效
-	GTD = '4',
-	///撤销前有效
-	GTC = '5',
-	///集合竞价有效
-	GFA = '6',
-};
-
-enum VolumeCondition{
-	///任何数量
-	AnyVolume = '1',
-	///最小数量
-	MinVolume = '2',
-	///全部数量
-	WholeVolume = '3',
-};
-
-enum ContingentCondition{
-	Immediately = '1',
-	///止损
-	Touch = '2',
-	///止赢
-	TouchProfit = '3',
-	///预埋单
-	ParkedOrder = '4',
-	///最新价大于条件价
-	LastPriceGreaterThanStopPrice = '5',
-	///最新价大于等于条件价
-	LastPriceGreaterEqualStopPrice = '6',
-	///最新价小于条件价
-	LastPriceLesserThanStopPrice = '7',
-	///最新价小于等于条件价
-	LastPriceLesserEqualStopPrice = '8',
-	///卖一价大于条件价
-	AskPriceGreaterThanStopPrice = '9',
-	///卖一价大于等于条件价
-	AskPriceGreaterEqualStopPrice = 'A',
-	///卖一价小于条件价
-	AskPriceLesserThanStopPrice = 'B',
-	///卖一价小于等于条件价
-	AskPriceLesserEqualStopPrice = 'C',
-	///买一价大于条件价
-	BidPriceGreaterThanStopPrice = 'D',
-	///买一价大于等于条件价
-	BidPriceGreaterEqualStopPrice = 'E',
-	///买一价小于条件价
-	BidPriceLesserThanStopPrice = 'F',
-	///买一价小于等于条件价
-	BidPriceLesserEqualStopPrice = 'H',
-};
-
+//enum ExchangePriceType{
+//	AnyPrice = 0x0,
+//	LimitPrice = 0x1,
+//	LastPrice = 0x2,
+//};
+//
+//enum TimeCondition{
+//	///立即完成，否则撤销
+//	IOC = '1',
+//	///本节有效
+//	GFS = '2',
+//	///当日有效
+//    GFD = '3',
+//	///指定日期前有效
+//	GTD = '4',
+//	///撤销前有效
+//	GTC = '5',
+//	///集合竞价有效
+//	GFA = '6',
+//};
+//
+//enum VolumeCondition{
+//	///任何数量
+//	AnyVolume = '1',
+//	///最小数量
+//	MinVolume = '2',
+//	///全部数量
+//	WholeVolume = '3',
+//};
+//
+//enum ContingentCondition{
+//	Immediately = '1',
+//	///止损
+//	Touch = '2',
+//	///止赢
+//	TouchProfit = '3',
+//	///预埋单
+//	ParkedOrder = '4',
+//	///最新价大于条件价
+//	LastPriceGreaterThanStopPrice = '5',
+//	///最新价大于等于条件价
+//	LastPriceGreaterEqualStopPrice = '6',
+//	///最新价小于条件价
+//	LastPriceLesserThanStopPrice = '7',
+//	///最新价小于等于条件价
+//	LastPriceLesserEqualStopPrice = '8',
+//	///卖一价大于条件价
+//	AskPriceGreaterThanStopPrice = '9',
+//	///卖一价大于等于条件价
+//	AskPriceGreaterEqualStopPrice = 'A',
+//	///卖一价小于条件价
+//	AskPriceLesserThanStopPrice = 'B',
+//	///卖一价小于等于条件价
+//	AskPriceLesserEqualStopPrice = 'C',
+//	///买一价大于条件价
+//	BidPriceGreaterThanStopPrice = 'D',
+//	///买一价大于等于条件价
+//	BidPriceGreaterEqualStopPrice = 'E',
+//	///买一价小于条件价
+//	BidPriceLesserThanStopPrice = 'F',
+//	///买一价小于等于条件价
+//	BidPriceLesserEqualStopPrice = 'H',
+//};
+//
 
 
 class Order
@@ -86,12 +86,10 @@ public:
 	};
 
 	Order();
-	//Order(const std::string& instrument, double refprice, \
-	//	ExchangeDirection direction, \
-	//	ExchangePriceType priceType, \
-	//	TimeCondition timeCondition, \
-	//	VolumeCondition vCondition, \
-	//	ContingentCondition ctCondition);
+	Order(const std::string& instrument, TThostFtdcPriceType refprice, \
+		TThostFtdcVolumeType voltype, \
+		TThostFtdcDirectionType direction, \
+		TThostFtdcCombOffsetFlagType kpp);
 	//Order(const std::string& instrument, double refprice, ExchangeDirection direction, OrderType type);
 	~Order();
 
@@ -110,11 +108,11 @@ public:
 		return m_innerStruct.LimitPrice;
 	}
 
-	ExchangeDirection GetExchangeDirection() const {
-		return (ExchangeDirection)m_innerStruct.Direction;
+	TThostFtdcDirectionType GetExchangeDirection() const {
+		return m_innerStruct.Direction;
 	}
 
-	void SetExchangeDirection(ExchangeDirection in){
+	void SetExchangeDirection(TThostFtdcDirectionType in){
 		m_innerStruct.Direction = in;
 	}
 

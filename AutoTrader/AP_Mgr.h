@@ -89,7 +89,7 @@ namespace AP{ // Account & Position
 
 		std::string yesterdayUnClosedTradeToString(Direction direction);
 
-		long yesterdayUnClosedTradeCount(Direction direction){ return direction == AP::Long ? m_tradeList_nonClosed_account_long.size() : m_tradeList_notClosed_account_short.size(); };
+		size_t yesterdayUnClosedTradeCount(Direction direction){ return direction == AP::Long ? m_tradeList_nonClosed_account_long.size() : m_tradeList_notClosed_account_short.size(); };
 
 		void pushTradeMessage(const CThostFtdcInvestorPositionField& originalTradeStruct);
 
@@ -99,12 +99,16 @@ namespace AP{ // Account & Position
 
 		void pushInstrumentStruct(const CThostFtdcInstrumentField& instru);
 
+		CThostFtdcInstrumentField getInstrumentField(const std::string& instrId) const;
+
 		std::string getInstrumentList() const;
 
 		double getPosition(double& pos, Direction& direction, double& available) const;
 		
 		//return total volume, set TodayPosition & YdPosition by reference
 		int getPositionVolume(const std::string& instruID, Direction& todayDirection, int& todayPos, Direction& ydDirection, int& ydPos) const;
+
+		const std::map<std::string, AP::TradeMessage>& getAllPositionMap() { return m_tradeMessage_dict; }
 
 		virtual bool isReady() { return m_isReady; }
 
