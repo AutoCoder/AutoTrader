@@ -23,6 +23,21 @@ namespace AP{
 		CThostFtdcTradeField m_data;
 	};
 
+	struct IsSameOrder{
+
+		IsSameOrder(const CThostFtdcOrderField& input)
+		{
+			memcpy(&m_data, &input, sizeof(input));
+		}
+
+		bool operator() (const CThostFtdcOrderField& input){
+			return m_data.BrokerOrderSeq == input.BrokerOrderSeq;
+		}
+
+	private:
+		CThostFtdcOrderField m_data;
+	};
+
 	AccountAndPositionMgr& GetManager(){
 		static AccountAndPositionMgr mgr;
 		return mgr;
@@ -204,6 +219,16 @@ namespace AP{
 
 	void AccountAndPositionMgr::pushTodayOrder(const CThostFtdcOrderField& orderField){
 		m_orderlist.push_back(orderField);
+	}
+
+	void AccountAndPositionMgr::pushImmediateOrder(const CThostFtdcOrderField& orderField){
+		auto orderIter = std::find_if(m_orderlist.begin(), m_orderlist.end(), IsSameOrder(orderField));
+		if (orderIter != m_orderlist.end()){
+			*orderIter = orderField;
+		}
+		else{
+			m_orderlist.push_back(orderField);
+		}
 	}
 
 	std::string AccountAndPositionMgr::todayOrderToString() const{

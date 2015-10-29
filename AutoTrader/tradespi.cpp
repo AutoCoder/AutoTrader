@@ -469,23 +469,12 @@ void CtpTradeSpi::OnRspOrderAction(
 
 void CtpTradeSpi::OnRtnOrder(CThostFtdcOrderField *pOrder)
 {
-	CThostFtdcOrderField* order = new CThostFtdcOrderField();
-	memcpy(order, pOrder, sizeof(CThostFtdcOrderField));
-	bool founded = false;    unsigned int i = 0;
-	for (i = 0; i<orderList.size(); i++){
-		if (orderList[i]->BrokerOrderSeq == order->BrokerOrderSeq) {
-			founded = true;    break;
-		}
-	}
-	if (founded) orderList[i] = order;
-	else  orderList.push_back(order);
-	
-	//SYNC_PRINT << "[Trade] Response | order submitted...ID:" << order->BrokerOrderSeq << ";Order submit Status:" << CommonUtils::InterpretOrderSubmitStatusCode(order->OrderSubmitStatus);
-	//SYNC_PRINT << "[Trade] Response | order submitted...ID:" << order->BrokerOrderSeq << ";Order Status:" << CommonUtils::InterpretOrderStatusCode(order->OrderStatus);
-	SYNC_PRINT << "[Trade] 回复 | 订单已提交...ID:" << order->BrokerOrderSeq << ";订单状态:" << order->StatusMsg;
-	//SetEvent(g_tradehEvent);
+	SYNC_PRINT << "[Trade] 报单回报:前置编号FrontID:" << pOrder->FrontID << " 会话编号SessionID:" << pOrder->SessionID << " OrderRef:" << pOrder->OrderRef;
+
+	AP::GetManager().pushImmediateOrder(*pOrder);
+
+	SYNC_PRINT << "[Trade] 回复 | 订单...ID:" << pOrder->BrokerOrderSeq << ";订单状态:" << CommonUtils::InterpretOrderSubmitStatusCode(pOrder->OrderSubmitStatus);
 }
-extern std::mutex g_OrderRunMtx;
 
 void CtpTradeSpi::OnRtnTrade(CThostFtdcTradeField *pTrade)
 {
@@ -677,6 +666,22 @@ void CtpTradeSpi::ForceClose(){
 				ReqOrderInsert(Order(item.second.InstId, price, vol, dir, kpp));
 
 			}
+		}
+	}
+}
+
+void CtpTradeSpi::CancelOrder(const std::string& MDtime, int aliveDuration, const std::string& instrumentId){
+	for (auto item : AP::GetManager().getAllOrders())
+	{
+		if (item.OrderStatus == THOST_FTDC_OST_PartTradedQueueing || item.OrderStatus == THOST_FTDC_OST_NoTradeQueueing)
+		{
+			// 超过aliveDuration(6秒)未成交，撤单
+			if (CommonUtils::TimeToSenconds(item.InsertTime) + aliveDuration < CommonUtils::TimeToSenconds(MDtime.c_str()) )
+			{
+				SYNC_PRINT << "[Trade] 撤单...报单ID:" << item.BrokerOrderSeq;
+				ReqOrderAction(item.BrokerOrderSeq);
+			}
+
 		}
 	}
 }

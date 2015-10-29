@@ -143,6 +143,9 @@ public:
 
 	void ForceClose();
 
+	//理解：在触发了新的交易之前，把已提交未成交的报单给撤销
+	void CancelOrder(const std::string& MDtime, int aliveDuration = 6, const std::string& instrumentId = "");
+
 	bool IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo);
 
 private:

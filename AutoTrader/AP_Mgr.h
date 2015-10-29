@@ -75,6 +75,10 @@ namespace AP{ // Account & Position
 
 		void pushTodayOrder(const CThostFtdcOrderField& orderField);
 
+		void pushImmediateOrder(const CThostFtdcOrderField& orderField);
+
+		const std::vector< CThostFtdcOrderField >& getAllOrders() const { return m_orderlist; }
+
 		std::string todayOrderToString() const;
 
 		size_t todayOrderCount() const { return m_orderlist.size();  }
@@ -108,7 +112,7 @@ namespace AP{ // Account & Position
 		//return total volume, set TodayPosition & YdPosition by reference
 		int getPositionVolume(const std::string& instruID, Direction& todayDirection, int& todayPos, Direction& ydDirection, int& ydPos) const;
 
-		const std::map<std::string, AP::TradeMessage>& getAllPositionMap() { return m_tradeMessage_dict; }
+		const std::map<std::string, AP::TradeMessage>& getAllPositionMap() const { return m_tradeMessage_dict; }
 
 		virtual bool isReady() { return m_isReady; }
 
