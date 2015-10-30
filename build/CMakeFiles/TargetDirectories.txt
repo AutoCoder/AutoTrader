@@ -1,0 +1,4 @@
+E:/OpenSource/Spider_praitise/AutoTrader/AutoTrader/build/CMakeFiles/ALL_BUILD.dir
+E:/OpenSource/Spider_praitise/AutoTrader/AutoTrader/build/src/AutoTrader/CMakeFiles/AutoTrader.dir
+E:/OpenSource/Spider_praitise/AutoTrader/AutoTrader/build/CMakeFiles/ZERO_CHECK.dir
+E:/OpenSource/Spider_praitise/AutoTrader/AutoTrader/build/src/lib_json/CMakeFiles/lib_json.dir

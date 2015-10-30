@@ -61,4 +61,4 @@ AutoTrader/*.aps
 x64/*
 *.con
 *.con
-
+/output
