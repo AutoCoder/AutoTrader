@@ -41,7 +41,8 @@ void ExcuteOrderQueue(CtpTradeSpi* pUserSpi){
 		Order ord;
 		if (!order_queue.empty() && order_queue.try_pop(ord)){ // if pop success
 
-			//todo: check the account and position again, discard order if no free money  
+			//撤销该order同一合约的pending合约
+			pUserSpi->CancelOrder(ord.GetTriggerTick(), 6, ord.GetInstrumentId());
 
 			SYNC_PRINT << "Excute Order regarding instrumentID:" << ord.GetInstrumentId();
 			pUserSpi->ReqOrderInsert(ord);

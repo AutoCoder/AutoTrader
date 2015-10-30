@@ -19,10 +19,10 @@ public:
 	virtual IPositionControl* getAccountMgr();
 
 protected:
-	virtual BOLLTech calculateBoll(const std::list<TickWrapper>& data, const TickWrapper& current, int seconds) const;
-	virtual BOLLTech calculateBoll(const std::vector<KData>& data, const KData& current, int mins) const;
-	virtual double calculateK(const std::list<TickWrapper>& data, const TickWrapper& current, int seconds) const;
-	virtual double calculateK(const std::vector<KData>& data, const KData& current, int mins) const;
+	virtual BOLLTech calculateBoll(const std::list<TickWrapper>& data, const TickWrapper& current, size_t seconds) const;
+	virtual BOLLTech calculateBoll(const std::vector<KData>& data, const KData& current, size_t mins) const;
+	virtual double calculateK(const std::list<TickWrapper>& data, const TickWrapper& current, size_t seconds) const;
+	virtual double calculateK(const std::vector<KData>& data, const KData& current, size_t mins) const;
 	//virtual MACrossBOLLTech* generateTechVec(const TickWrapper& info) const;
 
 protected:

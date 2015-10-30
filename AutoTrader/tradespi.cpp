@@ -432,27 +432,19 @@ void CtpTradeSpi::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder,
 	//if (bIsLast) SetEvent(g_tradehEvent);
 }
 
-void CtpTradeSpi::ReqOrderAction(TThostFtdcSequenceNoType orderSeq)
+void CtpTradeSpi::ReqOrderAction(const CThostFtdcOrderField& order)//TThostFtdcSequenceNoType orderSeq, TThostFtdcExchangeIDType exchangeId, TThostFtdcOrderSysIDType orderSysId)
 {
-	bool found = false; unsigned int i = 0;
-	for (i = 0; i<orderList.size(); i++){
-		if (orderList[i]->BrokerOrderSeq == orderSeq){ found = true; break; }
-	}
-	if (!found){ SYNC_PRINT << "[Trade] 请求 | Insert order doesn't exist."; return; }
-
 	CThostFtdcInputOrderActionField req;
 	memset(&req, 0, sizeof(req));
 	strcpy_s(req.BrokerID, m_brokerID);
 	strcpy_s(req.InvestorID, m_userID);
-	//strcpy_s(req.OrderRef, pOrderRef); 
-	//req.FrontID = frontId;           
-	//req.SessionID = sessionId;       
-	strcpy_s(req.ExchangeID, orderList[i]->ExchangeID);
-	strcpy_s(req.OrderSysID, orderList[i]->OrderSysID);
+
+	strcpy_s(req.ExchangeID, order.ExchangeID);
+	strcpy_s(req.OrderSysID, order.OrderSysID);
 	req.ActionFlag = THOST_FTDC_AF_Delete;
 
 	int ret = pUserApi->ReqOrderAction(&req, ++requestId);
-	SYNC_PRINT << "[Trade] Request | backout order..." << ((ret == 0) ? "success" : "fail");
+	SYNC_PRINT << "[Trade] 请求 | 撤销报单..." << ((ret == 0) ? "成功" : "失败");
 }
 
 void CtpTradeSpi::OnRspOrderAction(
@@ -460,9 +452,9 @@ void CtpTradeSpi::OnRspOrderAction(
 	CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
 	if (!IsErrorRspInfo(pRspInfo) && pInputOrderAction){
-		SYNC_PRINT << "[Trade] Response | backout order success..."
-			<< "Exchange ID:" << pInputOrderAction->ExchangeID
-			<< " Order System ID:" << pInputOrderAction->OrderSysID;
+		SYNC_PRINT << "[Trade] 回复 | 撤单成功..."
+			<< "交易所代码:" << pInputOrderAction->ExchangeID
+			<< "报单编号:" << pInputOrderAction->OrderSysID;
 	}
 	//if (bIsLast) SetEvent(g_tradehEvent);
 }
@@ -673,13 +665,16 @@ void CtpTradeSpi::ForceClose(){
 void CtpTradeSpi::CancelOrder(const std::string& MDtime, int aliveDuration, const std::string& instrumentId){
 	for (auto item : AP::GetManager().getAllOrders())
 	{
+		if (std::string(item.InstrumentID) != instrumentId)
+			continue;
+
 		if (item.OrderStatus == THOST_FTDC_OST_PartTradedQueueing || item.OrderStatus == THOST_FTDC_OST_NoTradeQueueing)
 		{
 			// 超过aliveDuration(6秒)未成交，撤单
 			if (CommonUtils::TimeToSenconds(item.InsertTime) + aliveDuration < CommonUtils::TimeToSenconds(MDtime.c_str()) )
 			{
 				SYNC_PRINT << "[Trade] 撤单...报单ID:" << item.BrokerOrderSeq;
-				ReqOrderAction(item.BrokerOrderSeq);
+				ReqOrderAction(item);
 			}
 
 		}

@@ -20,7 +20,7 @@ MACrossTech* WMACrossStratgy::generateTechVec(const TickWrapper& info) const{
 /*
 y=wma(x,a)£¬y=(n*x0+(n-1)*x1+(n- 2)*x2)+...+1*xn)/(n+(n-1)+(n-2)+...+1)
 */
-double WMACrossStratgy::calculateK(const std::list<TickWrapper>& data, const TickWrapper& current, int seconds) const
+double WMACrossStratgy::calculateK(const std::list<TickWrapper>& data, const TickWrapper& current, size_t seconds) const
 {
 	return TechUtils::CalulateWMA(data, current, seconds);
 }

@@ -93,6 +93,10 @@ public:
 	//Order(const std::string& instrument, double refprice, ExchangeDirection direction, OrderType type);
 	~Order();
 
+	void SetTriggerTick(const std::string& ticktime)  { m_triggerTickTime = ticktime; }
+
+	std::string GetTriggerTick() { return m_triggerTickTime; }
+
 	std::string GetInstrumentId() const{
 		return m_innerStruct.InstrumentID;
 	}
@@ -162,6 +166,7 @@ public:
 private:
 	CThostFtdcInputOrderField m_innerStruct;
 	OrderType m_type;
+	std::string m_triggerTickTime;
 };
 
 #endif

@@ -11,7 +11,7 @@ public:
 	virtual ~WMACrossStratgy();
 	 
 protected:
-	virtual double calculateK(const std::list<TickWrapper>& data, const TickWrapper& current, int seconds) const;
+	virtual double calculateK(const std::list<TickWrapper>& data, const TickWrapper& current, size_t seconds) const;
 	virtual MACrossTech* generateTechVec(const TickWrapper& info) const;
 };
 

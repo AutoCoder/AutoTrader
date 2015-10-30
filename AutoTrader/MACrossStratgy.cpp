@@ -30,12 +30,12 @@ IPositionControl* MACrossStratgy::getAccountMgr(){
 }
 
 // common MA 
-double MACrossStratgy::calculateK(const std::list<TickWrapper>& data, const TickWrapper& current, int seconds) const
+double MACrossStratgy::calculateK(const std::list<TickWrapper>& data, const TickWrapper& current, size_t seconds) const
 {
 	return TechUtils::CalulateMA(data, current, seconds);
 }
 
-double MACrossStratgy::calculateK(const std::vector<KData>& data, const KData& current, int mins) const{
+double MACrossStratgy::calculateK(const std::vector<KData>& data, const KData& current, size_t mins) const{
 	return TechUtils::CalulateMA(data, current, mins);
 }
 

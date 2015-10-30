@@ -106,6 +106,10 @@ public:
 		return m_uuid;
 	}
 
+	std::string UpdateTime() const {
+		return m_MdData.UpdateTime;
+	}
+
 	std::string Time() const {
 		std::string ret = m_MdData.TradingDay;
 		ret += " ";

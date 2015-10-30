@@ -188,9 +188,9 @@ bool MACrossBOLLStrategy::generateOrder(Order& out){
 	}
 }
 
-BOLLTech MACrossBOLLStrategy::calculateBoll(const std::list<TickWrapper>& data, const TickWrapper& current, int seconds) const{
+BOLLTech MACrossBOLLStrategy::calculateBoll(const std::list<TickWrapper>& data, const TickWrapper& current, size_t seconds) const{
 	double ma = TechUtils::CalulateMA(data, current, seconds);
-	int tickCount = 2 * seconds;
+	size_t tickCount = 2 * seconds;
 
 	double total = 0;
 	long long count = 0;
@@ -212,7 +212,7 @@ BOLLTech MACrossBOLLStrategy::calculateBoll(const std::list<TickWrapper>& data, 
 	return BOLLTech(ma, var, current.LastPrice());
 }
 
-BOLLTech MACrossBOLLStrategy::calculateBoll(const std::vector<KData>& data, const KData& current, int mins) const{
+BOLLTech MACrossBOLLStrategy::calculateBoll(const std::vector<KData>& data, const KData& current, size_t mins) const{
 	double ma = TechUtils::CalulateMA(data, current, mins);
 
 	double total = 0;
@@ -235,10 +235,10 @@ BOLLTech MACrossBOLLStrategy::calculateBoll(const std::vector<KData>& data, cons
 	return BOLLTech(ma, var, current.LastPrice());
 }
 
-double MACrossBOLLStrategy::calculateK(const std::list<TickWrapper>& data, const TickWrapper& current, int seconds) const{
+double MACrossBOLLStrategy::calculateK(const std::list<TickWrapper>& data, const TickWrapper& current, size_t seconds) const{
 	return TechUtils::CalulateMA(data, current, seconds);
 }
 
-double MACrossBOLLStrategy::calculateK(const std::vector<KData>& data, const KData& current, int mins) const{
+double MACrossBOLLStrategy::calculateK(const std::vector<KData>& data, const KData& current, size_t mins) const{
 	return TechUtils::CalulateMA(data, current, mins);
 }

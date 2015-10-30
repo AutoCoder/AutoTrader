@@ -73,6 +73,7 @@ void RealTimeDataProcessor::AppendRealTimeData(TickWrapper& info){
 #endif
 		if (triggered){
 			Order ord;
+			ord.SetTriggerTick(info.UpdateTime());
 			//for now, only permit order_queue has one item.
 			if (order_queue.empty() && m_strategy->generateOrder(ord)){
 				order_queue.push(ord);

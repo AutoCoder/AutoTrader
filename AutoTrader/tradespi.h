@@ -139,7 +139,7 @@ public:
 
 	void ReqOrderInsert(Order ord);
 
-	void ReqOrderAction(TThostFtdcSequenceNoType orderSeq);
+	void ReqOrderAction(const CThostFtdcOrderField& order);// TThostFtdcSequenceNoType orderSeq, TThostFtdcExchangeIDType exchangeId, TThostFtdcOrderSysIDType orderSysId);
 
 	void ForceClose();
 

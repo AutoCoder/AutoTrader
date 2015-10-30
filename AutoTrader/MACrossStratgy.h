@@ -19,8 +19,8 @@ public:
 	virtual IPositionControl* getAccountMgr();
 
 protected:
-	virtual double calculateK(const std::list<TickWrapper>& data, const TickWrapper& current, int seconds) const;
-	virtual double calculateK(const std::vector<KData>& data, const KData& current, int mins) const;
+	virtual double calculateK(const std::list<TickWrapper>& data, const TickWrapper& current, size_t seconds) const;
+	virtual double calculateK(const std::vector<KData>& data, const KData& current, size_t mins) const;
 	virtual MACrossTech* generateTechVec(const TickWrapper& info) const; 
 
 protected:
