@@ -112,6 +112,10 @@
       <AdditionalDependencies>thostmduserapi.lib;thosttraderapi.lib;libmysql.lib;lib_json.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)\lib;$(OutDir)</AdditionalLibraryDirectories>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy "$(SolutionDir)lib\thostmduserapi.dll" $(OutputPath)
+xcopy "$(SolutionDir)lib\thosttraderapi.dll" $(OutputPath)</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
