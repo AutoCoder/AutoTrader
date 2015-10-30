@@ -113,8 +113,11 @@
       <AdditionalLibraryDirectories>$(SolutionDir)\lib;$(OutDir)</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "$(SolutionDir)lib\thostmduserapi.dll" $(OutputPath)
-xcopy "$(SolutionDir)lib\thosttraderapi.dll" $(OutputPath)</Command>
+      <Command>xcopy "$(SolutionDir)lib\thostmduserapi.dll" $(OutputPath) /Y
+xcopy "$(SolutionDir)lib\thosttraderapi.dll" $(OutputPath) /Y
+xcopy "$(SolutionDir)mysql_dll\libmysql.dll" $(OutputPath) /Y
+xcopy "$(SolutionDir)AutoTrader\config.json" $(OutputPath) /Y
+xcopy "$(SolutionDir)AutoTrader\config.ini" $(OutputPath) /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
