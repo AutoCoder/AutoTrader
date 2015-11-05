@@ -1,0 +1,2 @@
+/usr/bin/ar cq ../../../bin/liblib_json.a  CMakeFiles/lib_json.dir/json_reader.cpp.o CMakeFiles/lib_json.dir/json_value.cpp.o CMakeFiles/lib_json.dir/json_writer.cpp.o
+/usr/bin/ranlib ../../../bin/liblib_json.a
