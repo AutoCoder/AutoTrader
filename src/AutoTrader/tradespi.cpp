@@ -31,10 +31,10 @@ CtpTradeSpi::CtpTradeSpi(CThostFtdcTraderApi* p, const char * brokerID, const ch
 	, m_firstquery_Position(true)
 	, m_firstquery_Instrument(true)
 {
-	strcpy_s(m_brokerID, brokerID);
-	strcpy_s(m_userID, userID);
-	strcpy_s(m_password, password);
-	strcpy_s(m_productName, prodname);
+	STRCPY(m_brokerID, brokerID);
+	STRCPY(m_userID, userID);
+	STRCPY(m_password, password);
+	STRCPY(m_productName, prodname);
 }
 
 CtpTradeSpi::~CtpTradeSpi(){}
@@ -51,10 +51,10 @@ void CtpTradeSpi::OnFrontDisconnected(int nReason){
 void CtpTradeSpi::ReqUserLogin(){
 	CThostFtdcReqUserLoginField req;
 	memset(&req, 0, sizeof(req));
-	strcpy_s(req.BrokerID, m_brokerID);
-	strcpy_s(req.UserID, m_userID);
-	strcpy_s(req.Password, m_password);
-	strcpy_s(req.UserProductInfo, m_productName);
+	STRCPY(req.BrokerID, m_brokerID);
+	STRCPY(req.UserID, m_userID);
+	STRCPY(req.Password, m_password);
+	STRCPY(req.UserProductInfo, m_productName);
 	int ret = pUserApi->ReqUserLogin(&req, ++requestId);
 	SYNC_PRINT << "[Trade] 请求 | 登陆 ..." << ((ret == 0) ? "成功" : "失败");
 }
@@ -77,8 +77,8 @@ void CtpTradeSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CTh
 void CtpTradeSpi::ReqSettlementInfoConfirm(){
 	CThostFtdcSettlementInfoConfirmField req;
 	memset(&req, 0, sizeof(req));
-	strcpy_s(req.BrokerID, m_brokerID);
-	strcpy_s(req.InvestorID, m_userID);
+	STRCPY(req.BrokerID, m_brokerID);
+	STRCPY(req.InvestorID, m_userID);
 	int ret = pUserApi->ReqSettlementInfoConfirm(&req, ++requestId);
 	SYNC_PRINT << "[Trade] 请求 | 发送结算确认单..." << ((ret == 0) ? "成功" : "失败");
 }
@@ -98,7 +98,7 @@ void CtpTradeSpi::ReqQryOrder(){
 	CThostFtdcQryOrderField req;
 	memset(&req, 0, sizeof(req));
 
-	strcpy_s(req.InvestorID, m_userID);//投资者代码,也是userId
+	STRCPY(req.InvestorID, m_userID);//投资者代码,也是userId
 	int ret = pUserApi->ReqQryOrder(&req, ++requestId);
 
 	SYNC_PRINT << "[Trade] 请求 | 发送查询报单..." << ((ret == 0) ? "成功" : "失败") << " ret:" << ret; //ret值为-3表示每秒发送请求数超过许可数
@@ -142,7 +142,7 @@ void CtpTradeSpi::ReqQryTrade(){
 	CThostFtdcQryTradeField req;
 	memset(&req, 0, sizeof(req));
 
-	strcpy_s(req.InvestorID, m_userID);//投资者代码,也是userId
+	STRCPY(req.InvestorID, m_userID);//投资者代码,也是userId
 
 	int ret = pUserApi->ReqQryTrade(&req, ++requestId);
 
@@ -181,7 +181,7 @@ void CtpTradeSpi::ReqQryInvestorPositionDetail(){
 	CThostFtdcQryInvestorPositionDetailField req;
 	memset(&req, 0, sizeof(req));
 
-	strcpy_s(req.InvestorID, m_userID);//投资者代码,也是userId
+	STRCPY(req.InvestorID, m_userID);//投资者代码,也是userId
 
 	//strcpy(req.InstrumentID, "IF1402");
 
@@ -206,13 +206,13 @@ void CtpTradeSpi::OnRspQryInvestorPositionDetail(CThostFtdcInvestorPositionDetai
 
 			CThostFtdcTradeField trade;
 
-			strcpy_s(trade.InvestorID, pInvestorPositionDetail->InvestorID);///投资者代码
-			strcpy_s(trade.InstrumentID, pInvestorPositionDetail->InstrumentID);///合约代码
-			strcpy_s(trade.ExchangeID, pInvestorPositionDetail->ExchangeID);///交易所代码
+			STRCPY(trade.InvestorID, pInvestorPositionDetail->InvestorID);///投资者代码
+			STRCPY(trade.InstrumentID, pInvestorPositionDetail->InstrumentID);///合约代码
+			STRCPY(trade.ExchangeID, pInvestorPositionDetail->ExchangeID);///交易所代码
 			trade.Direction = pInvestorPositionDetail->Direction;///买卖方向
 			trade.Price = pInvestorPositionDetail->OpenPrice;///价格
 			trade.Volume = pInvestorPositionDetail->Volume;///数量
-			strcpy_s(trade.TradeDate, pInvestorPositionDetail->OpenDate);///成交时期
+			STRCPY(trade.TradeDate, pInvestorPositionDetail->OpenDate);///成交时期
 
 
 			if (pInvestorPositionDetail->Volume > 0)//筛选未平仓的
@@ -258,8 +258,8 @@ void CtpTradeSpi::ReqQryTradingAccount()
 {
 	CThostFtdcQryTradingAccountField req;
 	memset(&req, 0, sizeof(req));
-	strcpy_s(req.BrokerID, m_brokerID);
-	strcpy_s(req.InvestorID, m_userID);
+	STRCPY(req.BrokerID, m_brokerID);
+	STRCPY(req.InvestorID, m_userID);
 	int ret = -1;
 	while (true){
 		ret = pUserApi->ReqQryTradingAccount(&req, ++requestId);
@@ -325,9 +325,9 @@ void CtpTradeSpi::ReqQryInvestorPosition_all()
 //	CThostFtdcQryInvestorPositionField req;
 //	//CThostFtdcQryInvestorPositionDetailField req;
 //	memset(&req, 0, sizeof(req));
-//	strcpy_s(req.BrokerID, m_brokerID);
-//	strcpy_s(req.InvestorID, m_userID);
-//	strcpy_s(req.InstrumentID, "");// pAccountMgr->InstrumentID());
+//	STRCPY(req.BrokerID, m_brokerID);
+//	STRCPY(req.InvestorID, m_userID);
+//	STRCPY(req.InstrumentID, "");// pAccountMgr->InstrumentID());
 //
 //	int ret = -1;
 //	while (true){
@@ -395,7 +395,7 @@ void CtpTradeSpi::ReqQryInstrument(TThostFtdcInstrumentIDType instId)
 {
 	CThostFtdcQryInstrumentField req;
 	memset(&req, 0, sizeof(req));
-	strcpy_s(req.InstrumentID, instId);
+	STRCPY(req.InstrumentID, instId);
 	int ret = pUserApi->ReqQryInstrument(&req, ++requestId);
 	SYNC_PRINT << "[Trade] 请求 | 发送合约查询..." << ((ret == 0) ? "成功" : "失败");
 }
@@ -436,11 +436,11 @@ void CtpTradeSpi::ReqOrderAction(const CThostFtdcOrderField& order)//TThostFtdcS
 {
 	CThostFtdcInputOrderActionField req;
 	memset(&req, 0, sizeof(req));
-	strcpy_s(req.BrokerID, m_brokerID);
-	strcpy_s(req.InvestorID, m_userID);
+	STRCPY(req.BrokerID, m_brokerID);
+	STRCPY(req.InvestorID, m_userID);
 
-	strcpy_s(req.ExchangeID, order.ExchangeID);
-	strcpy_s(req.OrderSysID, order.OrderSysID);
+	STRCPY(req.ExchangeID, order.ExchangeID);
+	STRCPY(req.OrderSysID, order.OrderSysID);
 	req.ActionFlag = THOST_FTDC_AF_Delete;
 
 	int ret = pUserApi->ReqOrderAction(&req, ++requestId);
@@ -552,7 +552,7 @@ void CtpTradeSpi::ForceClose(){
 		//平多
 		if (item.second.Holding_long > 0)
 		{
-			strcpy_s(instId, item.second.InstId.c_str());
+			STRCPY(instId, item.second.InstId.c_str());
 			dir = THOST_FTDC_D_Sell;// #define THOST_FTDC_D_Buy '0' ||| #define THOST_FTDC_D_Sell '1'
 			price = item.second.LastPrice - 5 * AP::GetManager().getInstrumentField(instId).PriceTick;
 
@@ -563,7 +563,7 @@ void CtpTradeSpi::ForceClose(){
 				{
 					SYNC_PRINT << "[Trade] 多单上期所 全部平今";;
 
-					strcpy_s(kpp, "3");//平今
+					STRCPY(kpp, "3");//平今
 					vol = item.second.Holding_long;
 					ReqOrderInsert(Order(item.second.InstId, price, vol, dir, kpp));
 
@@ -572,7 +572,7 @@ void CtpTradeSpi::ForceClose(){
 				{
 					SYNC_PRINT << "[Trade] 多单上期所 全部平昨";
 
-					strcpy_s(kpp, "1");//平仓
+					STRCPY(kpp, "1");//平仓
 					vol = item.second.Holding_long;
 					ReqOrderInsert(Order(item.second.InstId, price, vol, dir, kpp));
 
@@ -582,11 +582,11 @@ void CtpTradeSpi::ForceClose(){
 				{
 					SYNC_PRINT << "[Trade] 多单上期所同时 平今平昨";
 
-					strcpy_s(kpp, "3");//平今
+					STRCPY(kpp, "3");//平今
 					vol = item.second.TodayPosition_long;
 					ReqOrderInsert(Order(item.second.InstId, price, vol, dir, kpp));
 
-					strcpy_s(kpp, "1");//平仓
+					STRCPY(kpp, "1");//平仓
 					vol = item.second.YdPosition_long;
 					ReqOrderInsert(Order(item.second.InstId, price, vol, dir, kpp));
 
@@ -598,7 +598,7 @@ void CtpTradeSpi::ForceClose(){
 			{
 				SYNC_PRINT << "[Trade] 非上期所多单 平仓[不支持平今]";
 
-				strcpy_s(kpp, "1");
+				STRCPY(kpp, "1");
 				vol = item.second.Holding_long;
 				ReqOrderInsert(Order(item.second.InstId, price, vol, dir, kpp));
 
@@ -608,7 +608,7 @@ void CtpTradeSpi::ForceClose(){
 		//平空
 		if (item.second.Holding_short > 0)
 		{
-			strcpy_s(instId, item.second.InstId.c_str());//或strcpy(instId, iter->first.c_str());
+			STRCPY(instId, item.second.InstId.c_str());//或strcpy(instId, iter->first.c_str());
 			dir = '0';
 			price = item.second.LastPrice + 5 * AP::GetManager().getInstrumentField(instId).PriceTick;
 
@@ -619,7 +619,7 @@ void CtpTradeSpi::ForceClose(){
 				{
 					SYNC_PRINT << "[Trade] 空单上期所 全部平今";
 
-					strcpy_s(kpp, "3");//平今
+					STRCPY(kpp, "3");//平今
 					vol = item.second.Holding_short;
 					ReqOrderInsert(Order(item.second.InstId, price, vol, dir, kpp));
 
@@ -628,7 +628,7 @@ void CtpTradeSpi::ForceClose(){
 				{
 					SYNC_PRINT << "[Trade] 空单上期所 全部平昨";
 
-					strcpy_s(kpp, "1");//平仓
+					STRCPY(kpp, "1");//平仓
 					vol = item.second.Holding_short;
 					ReqOrderInsert(Order(item.second.InstId, price, vol, dir, kpp));
 
@@ -638,11 +638,11 @@ void CtpTradeSpi::ForceClose(){
 				{
 					SYNC_PRINT << "[Trade] 空单上期所 同时平今平昨";
 
-					strcpy_s(kpp, "3");//平今
+					STRCPY(kpp, "3");//平今
 					vol = item.second.TodayPosition_short;
 					ReqOrderInsert(Order(item.second.InstId, price, vol, dir, kpp));
 
-					strcpy_s(kpp, "1");//平仓
+					STRCPY(kpp, "1");//平仓
 					vol = item.second.YdPosition_short;
 					ReqOrderInsert(Order(item.second.InstId, price, vol, dir, kpp));
 
@@ -653,7 +653,7 @@ void CtpTradeSpi::ForceClose(){
 			{
 				SYNC_PRINT << "[Trade] 非上期所空单 平仓[不支持平今]";
 
-				strcpy_s(kpp, "1");
+				STRCPY(kpp, "1");
 				vol = item.second.Holding_short;
 				ReqOrderInsert(Order(item.second.InstId, price, vol, dir, kpp));
 

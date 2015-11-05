@@ -14,8 +14,8 @@ MACrossBOLLTech::MACrossBOLLTech(CrossStratgyType type, size_t shortMA, size_t l
 , m_maTech()
 , m_bollTech()
 {
-	strcpy_s(m_time, time.c_str());
-	strcpy_s(m_instrumentId, instrumentID.c_str());
+	STRCPY(m_time, time.c_str());
+	STRCPY(m_instrumentId, instrumentID.c_str());
 }
 
 

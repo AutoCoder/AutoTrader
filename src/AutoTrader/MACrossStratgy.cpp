@@ -206,8 +206,8 @@ MACrossTech::MACrossTech(CrossStratgyType type, size_t shortMA, size_t longMA, l
 , m_longMA(longMA)
 , m_ma_tech()
 {
-	strcpy_s(m_time, time.c_str());
-	strcpy_s(m_instrumentId, instrumentID.c_str());
+	STRCPY(m_time, time.c_str());
+	STRCPY(m_instrumentId, instrumentID.c_str());
 }
 
 bool MACrossTech::IsTriggerPoint() const {

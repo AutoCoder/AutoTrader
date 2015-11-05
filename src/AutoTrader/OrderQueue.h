@@ -40,7 +40,7 @@ public:
 	{
 		std::lock_guard<std::mutex> lk(mut);
 		if (data_queue.empty())
-			return std::shared_ptr<t>();
+			return std::shared_ptr<T>();
 		std::shared_ptr<T> res = data_queue.front();
 		data_queue.pop();
 		return res;

@@ -102,7 +102,7 @@ public:
 	}
 
 	void SetInstrumentId(const std::string& in){
-		strcpy_s(m_innerStruct.InstrumentID, sizeof(m_innerStruct.InstrumentID), in.c_str());
+		strncpy(m_innerStruct.InstrumentID, in.c_str(), sizeof(m_innerStruct.InstrumentID));
 	}
 
 	void SetRefExchangePrice(double price);

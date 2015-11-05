@@ -20,7 +20,7 @@ Order::Order(const std::string& instrument, TThostFtdcPriceType refprice,
 	TThostFtdcCombOffsetFlagType kpp)
 {
 	memset(&m_innerStruct, 0, sizeof(m_innerStruct));
-	strcpy_s(m_innerStruct.InstrumentID, instrument.c_str());
+	STRCPY(m_innerStruct.InstrumentID, instrument.c_str());
 
 	if (std::abs(refprice) < std::numeric_limits<double>::epsilon()){
 		m_innerStruct.OrderPriceType = THOST_FTDC_OPT_AnyPrice;
@@ -32,7 +32,7 @@ Order::Order(const std::string& instrument, TThostFtdcPriceType refprice,
 	}
 
 	m_innerStruct.Direction = direction;
-	strcpy_s(m_innerStruct.CombHedgeFlag, kpp);
+	STRCPY(m_innerStruct.CombHedgeFlag, kpp);
 	m_innerStruct.LimitPrice = refprice;
 	m_innerStruct.VolumeTotalOriginal = vol;
 	
@@ -49,7 +49,7 @@ Order::Order(const std::string& instrument, TThostFtdcPriceType refprice,
 //Order::Order(const std::string& instrument, double refprice, ExchangeDirection direction, OrderType type)
 //{
 //	memset(&m_innerStruct, 0, sizeof(m_innerStruct));
-//	strcpy_s(m_innerStruct.InstrumentID, instrument.c_str());
+//	STRCPY(m_innerStruct.InstrumentID, instrument.c_str());
 //	//FAK 立即成交剩余指令自动撤销指令 (THOST_FTDC_OPT_LimitPrice THOST_FTDC_TC_IOC + THOST_FTDC_VC_AV)
 //	if (type == FAK){
 //		m_innerStruct.OrderPriceType = THOST_FTDC_OPT_AnyPrice;
@@ -103,11 +103,11 @@ bool Order::IsValid(){
 }
 
 void Order::SetIdentityInfo(const std::string& brokerId, const std::string& userId, const std::string& investorId, const std::string& ordRef){
-	strcpy_s(m_innerStruct.BrokerID, sizeof(m_innerStruct.BrokerID), brokerId.c_str());
-	strcpy_s(m_innerStruct.InvestorID, sizeof(m_innerStruct.InvestorID), investorId.c_str());
+	strncpy(m_innerStruct.BrokerID, brokerId.c_str(), sizeof(m_innerStruct.BrokerID));
+	strncpy(m_innerStruct.InvestorID, investorId.c_str(), sizeof(m_innerStruct.InvestorID));
 
-	strcpy_s(m_innerStruct.UserID, sizeof(m_innerStruct.UserID), userId.c_str());
-	strcpy_s(m_innerStruct.OrderRef, sizeof(m_innerStruct.OrderRef), ordRef.c_str());
+	strncpy(m_innerStruct.UserID, userId.c_str(), sizeof(m_innerStruct.UserID));
+	strncpy(m_innerStruct.OrderRef, ordRef.c_str(), sizeof(m_innerStruct.OrderRef));
 }
 
 void Order::SetOrderType(OrderType type){

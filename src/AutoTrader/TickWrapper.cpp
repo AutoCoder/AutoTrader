@@ -200,10 +200,10 @@ TickWrapper TickWrapper::RecoverFromDB(const CThostFtdcDepthMDFieldDBStruct& vec
 {
 	CThostFtdcDepthMarketDataField mdStuct;
 	memset(&mdStuct, 0, sizeof(mdStuct));
-	strcpy_s(mdStuct.TradingDay, CommonUtils::ConvertTime(vec[1]).c_str());// todo: from "2015-04-30 00:00:00" to "20150430"
-	strcpy_s(mdStuct.InstrumentID, vec[2].c_str());
-	strcpy_s(mdStuct.ExchangeID, vec[3].c_str());
-	strcpy_s(mdStuct.ExchangeInstID, vec[4].c_str());
+	STRCPY(mdStuct.TradingDay, CommonUtils::ConvertTime(vec[1]).c_str());// todo: from "2015-04-30 00:00:00" to "20150430"
+	STRCPY(mdStuct.InstrumentID, vec[2].c_str());
+	STRCPY(mdStuct.ExchangeID, vec[3].c_str());
+	STRCPY(mdStuct.ExchangeInstID, vec[4].c_str());
 	mdStuct.LastPrice = CommonUtils::StringtoDouble(vec[5]);
 	mdStuct.PreSettlementPrice = CommonUtils::StringtoDouble(vec[6]);
 	mdStuct.PreClosePrice = CommonUtils::StringtoDouble(vec[7]);
@@ -221,7 +221,7 @@ TickWrapper TickWrapper::RecoverFromDB(const CThostFtdcDepthMDFieldDBStruct& vec
 	mdStuct.LowerLimitPrice = CommonUtils::StringtoDouble(vec[18]);
 	mdStuct.PreDelta = CommonUtils::StringtoDouble(vec[19]);
 	mdStuct.CurrDelta = CommonUtils::StringtoDouble(vec[20]);
-	strcpy_s(mdStuct.UpdateTime, vec[21].c_str());// todo: from "00:00:00" to "150430" // enhance :specify the size of str
+	STRCPY(mdStuct.UpdateTime, vec[21].c_str());// todo: from "00:00:00" to "150430" // enhance :specify the size of str
 	mdStuct.UpdateMillisec = CommonUtils::StringtoInt(vec[22]);
 	mdStuct.BidPrice1 = CommonUtils::StringtoDouble(vec[23]);
 	mdStuct.BidVolume1 = CommonUtils::StringtoInt(vec[24]);
@@ -244,7 +244,7 @@ TickWrapper TickWrapper::RecoverFromDB(const CThostFtdcDepthMDFieldDBStruct& vec
 	mdStuct.AskPrice5 = CommonUtils::StringtoDouble(vec[41]);
 	mdStuct.AskVolume5 = CommonUtils::StringtoInt(vec[42]);
 	mdStuct.AveragePrice = CommonUtils::StringtoDouble(vec[43]);
-	strcpy_s(mdStuct.ActionDay, CommonUtils::ConvertTime(vec[44]).c_str());
+	STRCPY(mdStuct.ActionDay, CommonUtils::ConvertTime(vec[44]).c_str());
 	TickWrapper mdObject(&mdStuct);
 	mdObject.recoveryData = true;
 	return mdObject;

@@ -3,10 +3,10 @@
 
 #include "stdafx.h"
 #include "crossplatform.h"
-#include "printer.h"
 #include "DBWrapper.h"
 #include "config.h"
 #include "tradespi.h"
+#include "mdspi.h"
 #include <thread>
 #include "RealTimeDataProcessorPool.h"
 #include <mutex>
@@ -26,8 +26,8 @@ int requestId = 0;
 std::mutex mtx;
 std::condition_variable cv_md;
 std::condition_variable cv_trade;
-std::atomic<bool> g_quit = false;
-std::atomic<bool> g_reply = false;
+std::atomic<bool> g_quit(false);
+std::atomic<bool> g_reply(false);
 threadsafe_queue<Order> order_queue;
 
 //std::mutex g_OrderRunMtx;
@@ -68,7 +68,7 @@ void ReplayTickDataFromDB(const std::string& instrumentID, const std::string& ma
 	//Get the total count of table
 	char countquerybuf[512];
 	const char* countquery = "select count(*) from %s.%s order by id;";
-	sprintf_s(countquerybuf, countquery, Config::Instance()->DBName().c_str(), instrumentID.c_str());
+	SPRINTF(countquerybuf, countquery, Config::Instance()->DBName().c_str(), instrumentID.c_str());
 	std::map<int, std::vector<std::string>> countResult;
 	dbwrapper.Query(countquerybuf, countResult);
 
@@ -84,7 +84,7 @@ void ReplayTickDataFromDB(const std::string& instrumentID, const std::string& ma
 		const char * sqlselect = "select * from %s.%s order by id limit %ld,%d;";
 
 		char sqlbuf[512];
-		sprintf_s(sqlbuf, sqlselect, Config::Instance()->DBName().c_str(), instrumentID.c_str(), i*pagesize, pagesize);
+		SPRINTF(sqlbuf, sqlselect, Config::Instance()->DBName().c_str(), instrumentID.c_str(), i*pagesize, pagesize);
 
 		std::map<int, std::vector<std::string>> map_results;
 		dbwrapper.Query(sqlbuf, map_results);

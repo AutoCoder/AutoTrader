@@ -44,8 +44,8 @@ private:
 
 private:
 	std::shared_ptr<DBWrapper> m_dbptr;
-	std::map<std::string, std::shared_ptr<Strategy>> m_dict;
-	std::map<std::string, std::shared_ptr<RealTimeDataProcessor>> m_processorDict;
+	std::map<std::string, std::shared_ptr<Strategy> > m_dict;
+	std::map<std::string, std::shared_ptr<RealTimeDataProcessor> > m_processorDict;
 };
 
 #endif

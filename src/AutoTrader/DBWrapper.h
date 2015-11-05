@@ -12,7 +12,7 @@ public:
 	DBWrapper();
 	~DBWrapper();
 	int ExecuteNoResult(const std::string& sql);
-	int Query(const std::string& sql, std::map<int, std::vector<std::string>> & map_results);
+	int Query(const std::string& sql, std::map<int, std::vector<std::string> > & map_results);
 private:
 	std::shared_ptr<mysql_db> m_MysqlImpl;
 };

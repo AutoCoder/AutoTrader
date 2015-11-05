@@ -1,36 +1,58 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 2.8)
 
 PROJECT(AUTOTRADE)
 
-ADD_SUBDIRECTORY(src)
+if(UNIX)
 
-SET(CMAKE_BUILD_TYPE "Debug")
+message(STATUS "ON Unix")
 
+SET(LINK_LIB_DIR ${AUTOTRADE_SOURCE_DIR}/linux_lib)
 
-if(USE_X64)
+SET(HEADER_INCLUDE_DIR ${AUTOTRADE_SOURCE_DIR}/linux_include)
 
-message(STATUS "Using 32bits")
+SET(CMAKE_C_COMPILER "clang")
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}-m32")
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}-m32")
+SET(CMAKE_CXX_COMPILER "clang++")
 
 else()
 
-message(STATUS "Using 64bits")
+message(STATUS "ON Windows")
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}-m64")
+set(LINK_LIB_DIR ${AUTOTRADE_SOURCE_DIR}/lib)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}-m64")	
+SET(HEADER_INCLUDE_DIR ${AUTOTRADE_SOURCE_DIR}/linux_include)
 
-endif(USE_X64)
+endif()
 
+message(STATUS "CMAKE_C_COMPILER is " ${CMAKE_C_COMPILER} " AND " "CMAKE_CXX_COMPILER is " ${CMAKE_CXX_COMPILER})
 
+message(STATUS "Link lib directory is " ${LINK_LIB_DIR})
+message(STATUS "Header directory is " ${HEADER_INCLUDE_DIR})
 
-message(STATUS "->overview cmake running")
+#if(USE_X64)
 
-MESSAGE(STATUS "->This is BINARY dir " ${AUTOTRADE_BINARY_DIR})
+#message(STATUS "Using win32")
 
-MESSAGE(STATUS "->This is SOURCE dir " ${AUTOTRADE_SOURCE_DIR})
+#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}-m32")
 
-MESSAGE(STATUS "->Current platform is " ${CMAKE_CXX_FLAGS})
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}-m32")
+
+#else()
+
+#message(STATUS "Using x64")
+
+#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}-m64")
+
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}-m64")	
+
+#endif(USE_X64)
+
+if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
+
+message(STATUS "using Clang compiler")
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -std=c++11") # don't add "-stdlib=libc++" let clang find it by itself
+
+endif()
+
+ADD_SUBDIRECTORY(src)
