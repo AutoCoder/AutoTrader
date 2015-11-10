@@ -141,7 +141,7 @@ void CtpTradeSpi::ReqQryTrade(){
 	memset(&req, 0, sizeof(req));
 
 	STRCPY(req.InvestorID, m_userID);//投资者代码,也是userId
-
+	Sleep(1000);
 	int ret = pUserApi->ReqQryTrade(&req, ++requestId);
 
 	SYNC_PRINT << "[Trade] 请求 | 发送成交查询..." << ((ret == 0) ? "成功" : "失败") << " ret:" << ret;//ret值为-3表示每秒发送请求数超过许可数
@@ -182,7 +182,7 @@ void CtpTradeSpi::ReqQryInvestorPositionDetail(){
 	STRCPY(req.InvestorID, m_userID);//投资者代码,也是userId
 
 	//strcpy(req.InstrumentID, "IF1402");
-
+	Sleep(1000);
 	int ret = pUserApi->ReqQryInvestorPositionDetail(&req, ++requestId);
 
 	SYNC_PRINT << "[Trade] 请求 | 发送投资者持仓明细查询..." << ((ret == 0) ? "成功" : "失败") << " ret:" << ret;//ret值为-3表示每秒发送请求数超过许可数
@@ -260,12 +260,13 @@ void CtpTradeSpi::ReqQryTradingAccount()
 	STRCPY(req.InvestorID, m_userID);
 	int ret = -1;
 	while (true){
+		Sleep(1000);
 		ret = pUserApi->ReqQryTradingAccount(&req, ++requestId);
 		if (ret == 0){
 			SYNC_PRINT << "[Trade] 请求 | 交易账户查询...成功";
 			break;
 		}
-		SYNC_PRINT << "[Trade] 请求 | 交易账户查询...失败";
+		SYNC_PRINT << "[Trade] 请求 | 交易账户查询...失败, ret:" << ret;
 	}
 }
 
@@ -313,6 +314,7 @@ void CtpTradeSpi::ReqQryInvestorPosition_all()
 	//strcpy(req.BrokerID, appId);
 	//strcpy(req.InvestorID, userId);
 	//strcpy(req.InstrumentID, instId);
+	Sleep(1000);
 	int ret = pUserApi->ReqQryInvestorPosition(&req, ++requestId);
 	SYNC_PRINT << "[Trade] 请求 | 发送持仓查询..." << ((ret == 0) ? "成功" : "失败");
 }
@@ -384,7 +386,7 @@ void CtpTradeSpi::OnRspQryInvestorPosition(
 void CtpTradeSpi::ReqQryInstrument_all(){
 	CThostFtdcQryInstrumentField req;
 	memset(&req, 0, sizeof(req));
-
+	Sleep(1000);
 	int ret = pUserApi->ReqQryInstrument(&req, ++requestId);
 	SYNC_PRINT << "[Trade] 请求 | 发送合约查询..." << ((ret == 0) ? "成功" : "失败") << " ret:" << ret;
 }
@@ -394,6 +396,7 @@ void CtpTradeSpi::ReqQryInstrument(TThostFtdcInstrumentIDType instId)
 	CThostFtdcQryInstrumentField req;
 	memset(&req, 0, sizeof(req));
 	STRCPY(req.InstrumentID, instId);
+	Sleep(1000);
 	int ret = pUserApi->ReqQryInstrument(&req, ++requestId);
 	SYNC_PRINT << "[Trade] 请求 | 发送合约查询..." << ((ret == 0) ? "成功" : "失败");
 }
