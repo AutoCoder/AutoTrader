@@ -17,6 +17,7 @@
 #ifdef WIN32
 
 #include <tchar.h>
+#define   _WINSOCKAPI_//define this marco to prohibit including winsock.h in windows.h  -  please refer http://blog.csdn.net/mazhen1986/article/details/7681238
 #include "windows.h"
 #define sleep(x) Sleep(x)
 #define STRCPY strcpy_s
