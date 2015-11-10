@@ -1,5 +1,5 @@
-#ifndef BASE_ACCOUNT_H
-#define BASE_ACCOUNT_H
+#ifndef INSTRUMENT_MGR_H 
+#define INSTRUMENT_MGR_H
 
 #include "ThostFtdcUserApiDataType.h"
 #include <map>
@@ -13,8 +13,6 @@ namespace Instrument{
 
 		TThostFtdcVolumeMultipleType multiple;
 
-		//todo: add property
-		// is_ZhuLi
 	};
 
 	class InformationMgr

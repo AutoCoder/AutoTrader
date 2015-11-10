@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "IPositionControl.h"
 #include "Order.h"
-#include "crossplatform.h"
 #include "AP_Mgr.h"
 
 

@@ -1,8 +1,9 @@
-#pragma once
+#ifndef COMMONUTILS_H
+#define COMMONUTILS_H
 
+#include "ThostFtdcUserApiDataType.h"
 #include <time.h>
 #include <string>
-#include "ThostFtdcUserApiDataType.h"
 #include <vector>
 
 typedef int seconds;
@@ -40,3 +41,4 @@ public:
 
 };
 
+#endif

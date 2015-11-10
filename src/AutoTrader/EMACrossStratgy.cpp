@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "EMACrossStratgy.h"
 #include "TickWrapper.h"
-#include <assert.h>
 #include "TechUtils.h"
 
 EMACrossStratgy::EMACrossStratgy(size_t short_ma, size_t long_ma, IPositionControl* accountMgr)

@@ -1,8 +1,7 @@
-#ifndef BASE_ACCOUNT_H
-#define BASE_ACCOUNT_H
+#ifndef ACCOUNT_POSITION_H
+#define ACCOUNT_POSITION_H
 
 #include "ThostFtdcUserApiStruct.h"
-//#include "IPositionControl.h"
 #include <mutex>
 #include <vector>
 #include <map>

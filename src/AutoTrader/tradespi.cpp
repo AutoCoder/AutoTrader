@@ -1,10 +1,8 @@
 #include "stdafx.h"
-#include "crossplatform.h"
 #include "tradespi.h"
 #include "OrderQueue.h"
 #include "Order.h"
 #include "ThostFtdcTraderApi.h"
-#include "traderspi.h"
 #include "config.h"
 #include <condition_variable>
 #include "spdlog/spdlog.h"
@@ -66,7 +64,7 @@ void CtpTradeSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin, CTh
 		m_sessionID = pRspUserLogin->SessionID;
 
 		int nextOrderRef = atoi(pRspUserLogin->MaxOrderRef);
-		sprintf_s(m_orderRef, "%d", ++nextOrderRef);
+		SPRINTF(m_orderRef, "%d", ++nextOrderRef);
 
 		SYNC_PRINT << "[Trade] 回复 | 登陆成功...当前日期:" << pRspUserLogin->TradingDay << "| FrontID: " << m_frontID << "| SessionID: " << m_sessionID;
 
@@ -525,7 +523,7 @@ void CtpTradeSpi::ReqOrderInsert(Order ord){
 
 	ord.SetIdentityInfo(m_brokerID, m_userID, m_userID, m_orderRef);
 	int nextOrderRef = atoi(m_orderRef);
-	sprintf_s(m_orderRef, "%d", ++nextOrderRef);
+	SPRINTF(m_orderRef, "%d", ++nextOrderRef);
 
 	CThostFtdcInputOrderField ordstruct;
 	bool success = ord.GetOrderOriginStruct(ordstruct);

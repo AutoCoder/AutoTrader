@@ -35,7 +35,7 @@ struct BOLLTech{
 	double mVariance;
 	double mCurValue;
 private:
-	static const size_t m_boll_k = 2;
+	static const unsigned int m_boll_k = 2;
 };
 
 #endif

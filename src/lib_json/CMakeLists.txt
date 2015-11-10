@@ -1,4 +1,4 @@
-message(STATUS "lib_json cmake running")
+message(STATUS "lib_json cmake configuring")
 
 SET(LIBRARY_OUTPUT_PATH ${AUTOTRADE_SOURCE_DIR}/bin)
 

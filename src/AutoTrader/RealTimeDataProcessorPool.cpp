@@ -77,7 +77,7 @@ void RealTimeDataProcessorPool::recoverHistoryData(int beforeSeconds, const std:
 	const char * sqlselect = "SELECT * FROM %s.%s order by id desc limit %d;";
 
 	char sqlbuf[512];
-	sprintf_s(sqlbuf, sqlselect, Config::Instance()->DBName(), instrumentId.c_str(), beforeSeconds*2); //beforeSeconds*2  ==  n(s) * (1 call back /500ms)
+	SPRINTF(sqlbuf, sqlselect, Config::Instance()->DBName().c_str(), instrumentId.c_str(), beforeSeconds*2); //beforeSeconds*2  ==  n(s) * (1 call back /500ms)
 
 	std::map<int, std::vector<std::string> > map_results;
 	m_dbptr->Query(sqlbuf, map_results);

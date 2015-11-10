@@ -2,24 +2,24 @@
 //
 
 #include "stdafx.h"
-#include "crossplatform.h"
 #include "DBWrapper.h"
 #include "config.h"
 #include "tradespi.h"
 #include "mdspi.h"
-#include <thread>
 #include "RealTimeDataProcessorPool.h"
-#include <mutex>
-#include <condition_variable>
 #include "Order.h"
 #include "OrderQueue.h"
-#include <atomic>
 #include "spdlog/spdlog.h"
 #include "TickWrapper.h"
 #include "unittest.h"
 #include "CommonUtils.h"
 #include "IPositionControl.h"
 #include "AP_Mgr.h"
+
+#include <mutex>
+#include <thread>
+#include <atomic>
+#include <condition_variable>
 
 int requestId = 0;
 

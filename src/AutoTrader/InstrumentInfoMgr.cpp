@@ -22,7 +22,8 @@ namespace Instrument{
 			// operator[] may change the inside data, it don't have const version, so here it's should be "at()"
 			return m_InfoDict.at(instr).multiple;
 		else{
-			assert(false, instr + "should be added into this InstrumentInfoMgr");
+			//"should be added into this InstrumentInfoMgr"
+			assert(false);
 			return -10000;
 		}
 	}

@@ -18,8 +18,8 @@ extern threadsafe_queue<Order> order_queue;
 #define UseKDataToInvoke 1
 
 RealTimeDataProcessor::RealTimeDataProcessor(Strategy* strag, const std::string& InstrumentName)
-	: m_strategy(strag)
-	, m_Name(InstrumentName)
+	: m_Name(InstrumentName)
+	, m_strategy(strag)
 	, m_dbptr(new DBWrapper)
 {
 	if (!g_reply)
@@ -109,7 +109,7 @@ void RealTimeDataProcessor::recoverHistoryData(int beforeSeconds)
 	const char * sqlselect = "select * from (select * from %s.%s order by id desc limit %d) as tbl order by tbl.id;";
 
 	char sqlbuf[512];
-	sprintf_s(sqlbuf, sqlselect, Config::Instance()->DBName().c_str(), m_Name.c_str(), beforeSeconds * 2); //beforeSeconds*2  ==  n(s) * (1 call back /500ms)
+	SPRINTF(sqlbuf, sqlselect, Config::Instance()->DBName().c_str(), m_Name.c_str(), beforeSeconds * 2); //beforeSeconds*2  ==  n(s) * (1 call back /500ms)
 
 	std::map<int, std::vector<std::string>> map_results;
 	m_dbptr->Query(sqlbuf, map_results);

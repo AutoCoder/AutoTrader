@@ -110,6 +110,10 @@ void Order::SetIdentityInfo(const std::string& brokerId, const std::string& user
 	strncpy(m_innerStruct.OrderRef, ordRef.c_str(), sizeof(m_innerStruct.OrderRef));
 }
 
+void Order::SetInstrumentId(const std::string& in){
+	STRCPY(m_innerStruct.InstrumentID, in.c_str());
+}
+
 void Order::SetOrderType(OrderType type){
 	m_type = type;
 	m_innerStruct.MinVolume = 1;

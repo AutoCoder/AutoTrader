@@ -101,9 +101,7 @@ public:
 		return m_innerStruct.InstrumentID;
 	}
 
-	void SetInstrumentId(const std::string& in){
-		strncpy(m_innerStruct.InstrumentID, in.c_str(), sizeof(m_innerStruct.InstrumentID));
-	}
+	void SetInstrumentId(const std::string& in);
 
 	void SetRefExchangePrice(double price);
 

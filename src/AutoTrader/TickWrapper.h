@@ -1,5 +1,5 @@
-#ifndef THOST_FTDC_DEPTH_MD_FIELD_WRAPPER_H
-#define THOST_FTDC_DEPTH_MD_FIELD_WRAPPER_H
+#ifndef TICK_WRAPPER_H
+#define TICK_WRAPPER_H
 
 #include "ThostFtdcUserApiStruct.h"
 #include <vector>

@@ -1,3 +1,6 @@
+#ifndef ORDER_QUEUE_H
+#define ORDER_QUEUE_H
+
 #include <mutex>
 #include <condition_variable>
 #include <queue>
@@ -58,3 +61,5 @@ public:
 		return data_queue.empty();
 	}
 };
+
+#endif

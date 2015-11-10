@@ -93,7 +93,7 @@ int MACrossBOLLTech::CreateTableIfNotExists(const std::string& dbname, const std
 								`LastPrice` Double NULL, \
 								PRIMARY KEY(`id`));";
 		char sqlbuf[2046];
-		sprintf_s(sqlbuf, sqltempl, dbname.c_str(), tableName.c_str());
+		SPRINTF(sqlbuf, sqltempl, dbname.c_str(), tableName.c_str());
 		DBWrapper db;
 		return db.ExecuteNoResult(sqlbuf);
 	}

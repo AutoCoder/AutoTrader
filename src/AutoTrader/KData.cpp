@@ -8,11 +8,11 @@
 std::map<std::string, bool> KData::TableIsCreatedMap = {};
 
 KData::KData(const TickSet& tickset, size_t duration)
-: m_duration(duration)
+: m_volume(0)
+, m_Turnover(0)
 , m_LowestPrice(std::numeric_limits<double>::max())
 , m_HighestPrice(0)
-, m_volume(0)
-, m_Turnover(0)
+, m_duration(duration)
 {
 	for (auto item : tickset){
 		m_volume += item.Volume();
@@ -135,7 +135,7 @@ int KData::CreateKDataTableIfNotExists(const std::string& dbname, const std::str
 			`AveragePrice` DOUBLE NULL, \
 			PRIMARY KEY(`id`));";
 		char sqlbuf[2046];
-		sprintf_s(sqlbuf, sqltempl, dbname.c_str(), tableName.c_str());
+		SPRINTF(sqlbuf, sqltempl, dbname.c_str(), tableName.c_str());
 		DBWrapper db;
 		return db.ExecuteNoResult(sqlbuf);
 	}

@@ -1,2 +1,0 @@
-/home/liyuan/Opensource/AutoTrader/build/src/lib_json/CMakeFiles/lib_json.dir
-/home/liyuan/Opensource/AutoTrader/build/src/AutoTrader/CMakeFiles/AutoTrader.dir

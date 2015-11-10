@@ -1,14 +1,17 @@
 ﻿#include "stdafx.h"
 #include "mdspi.h"
-#include <iostream>
 #include "TickWrapper.h"
 #include "RealTimeDataProcessorPool.h"
-#include <condition_variable>
-#include <atomic>
 #include "spdlog/spdlog.h"
 #include "CommonUtils.h"
 
+#include <iostream>
+#include <condition_variable>
+#include <atomic>
+
+#ifdef WIN32
 #pragma warning(disable : 4996)
+#endif
 
 extern int requestId;  
 extern std::condition_variable cv_md;
@@ -166,7 +169,8 @@ void CtpMdSpi::OnRtnDepthMarketData(
 	//1) must create the local variable "pool" here, otherwise it will not call destruction fucntion when exit(0)
 	//2) can't define a local RealTimeDataProcessor variable here, otherwise it will plus the ref-count, so that it will not call destruction fucntion when exit(0)
 	auto pool = RealTimeDataProcessorPool::getInstance();
-	pool->GenRealTimeDataProcessor(pDepthMarketData->InstrumentID)->AppendRealTimeData(TickWrapper(pDepthMarketData));
+	TickWrapper tem(pDepthMarketData);
+	pool->GenRealTimeDataProcessor(pDepthMarketData->InstrumentID)->AppendRealTimeData(tem);
 
 	TryTerminate(pDepthMarketData->UpdateTime);
 }

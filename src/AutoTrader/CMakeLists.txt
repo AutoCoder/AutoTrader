@@ -1,4 +1,4 @@
-message(STATUS "AutoTrader cmake running")
+message(STATUS "AutoTrader cmake configuring")
 
 SET(EXECUTABLE_OUTPUT_PATH ${AUTOTRADE_SOURCE_DIR}/bin)
 

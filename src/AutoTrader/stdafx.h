@@ -3,21 +3,38 @@
 // are changed infrequently
 //
 
-#ifdef STDAFX_H_
+#ifndef STDAFX_H_
 #define STDAFX_H_
 
 #include "targetver.h"
 
 #include <stdio.h>
-#include <tchar.h>
-
 #include <assert.h>
+#include <string>
+#include <string.h>
+#include <stddef.h>
 
+#ifdef WIN32
 
-// TODO: reference additional headers your program requires here
+#include <tchar.h>
+#include "windows.h"
+#define sleep(x) Sleep(x)
+#define STRCPY strcpy_s
+#define SPRINTF sprintf_s
+
+#else
+
+#include <unistd.h>
+#define sleep(x) usleep(x*1000)
+#define STRCPY strcpy
+#define SPRINTF sprintf
+
 #endif
+
 
 #define instrument_1 "rb1601"
 #define instrument_2 "rb1602"
 
 #define SYNC_PRINT spdlog::get("console")->info()
+
+#endif

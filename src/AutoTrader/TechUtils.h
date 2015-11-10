@@ -1,4 +1,6 @@
-#pragma once
+#ifndef TECH_UTILS_H
+#define TECH_UTILS_H
+
 #include <list>
 #include <vector>
 
@@ -22,3 +24,4 @@ public:
 	static double CalulateAMA(const std::vector<KData>& data, const KData& current, size_t mins);
 };
 
+#endif
