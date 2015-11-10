@@ -103,11 +103,11 @@ bool Order::IsValid(){
 }
 
 void Order::SetIdentityInfo(const std::string& brokerId, const std::string& userId, const std::string& investorId, const std::string& ordRef){
-	strncpy(m_innerStruct.BrokerID, brokerId.c_str(), sizeof(m_innerStruct.BrokerID));
-	strncpy(m_innerStruct.InvestorID, investorId.c_str(), sizeof(m_innerStruct.InvestorID));
+	STRCPY(m_innerStruct.BrokerID, brokerId.c_str());
+	STRCPY(m_innerStruct.InvestorID, investorId.c_str());
 
-	strncpy(m_innerStruct.UserID, userId.c_str(), sizeof(m_innerStruct.UserID));
-	strncpy(m_innerStruct.OrderRef, ordRef.c_str(), sizeof(m_innerStruct.OrderRef));
+	STRCPY(m_innerStruct.UserID, userId.c_str());
+	STRCPY(m_innerStruct.OrderRef, ordRef.c_str());
 }
 
 void Order::SetInstrumentId(const std::string& in){

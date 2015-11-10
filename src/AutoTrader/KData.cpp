@@ -10,7 +10,7 @@ std::map<std::string, bool> KData::TableIsCreatedMap = {};
 KData::KData(const TickSet& tickset, size_t duration)
 : m_volume(0)
 , m_Turnover(0)
-, m_LowestPrice(std::numeric_limits<double>::max())
+, m_LowestPrice((std::numeric_limits<double>::max)())
 , m_HighestPrice(0)
 , m_duration(duration)
 {
