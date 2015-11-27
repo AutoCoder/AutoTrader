@@ -118,6 +118,7 @@ namespace AP{ // Account & Position
 	private:
 		AccountAndPositionMgr(const AccountAndPositionMgr& mgr) = delete;
 		AccountAndPositionMgr& operator = (const AccountAndPositionMgr& mgr) = delete;
+		
 
 	private:
 		mutable std::mutex m_mutex; //sync GetPosition() between pushTodayOrder() & pushTodayTrade

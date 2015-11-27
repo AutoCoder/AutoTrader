@@ -141,9 +141,6 @@
     <ClInclude Include="OrderQueue.h">
       <Filter>Header Files\MultiThreadClass</Filter>
     </ClInclude>
-    <ClInclude Include="PositionMgr.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="InstrumentInfoMgr.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -219,9 +216,6 @@
       <Filter>Source Files\Tech</Filter>
     </ClCompile>
     <ClCompile Include="tradespi.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PositionMgr.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="InstrumentInfoMgr.cpp">

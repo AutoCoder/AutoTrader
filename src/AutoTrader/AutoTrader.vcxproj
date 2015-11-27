@@ -175,7 +175,6 @@ xcopy "$(SolutionDir)src\AutoTrader\config.ini" $(OutputPath) /Y</Command>
     <ClInclude Include="crossplatform.h" />
     <ClInclude Include="IPositionControl.h" />
     <ClInclude Include="InstrumentInfoMgr.h" />
-    <ClInclude Include="PositionMgr.h" />
     <ClInclude Include="tradespi.h" />
     <ClInclude Include="AMACrossStratgy.h" />
     <ClInclude Include="BOLLTech.h" />
@@ -209,7 +208,6 @@ xcopy "$(SolutionDir)src\AutoTrader\config.ini" $(OutputPath) /Y</Command>
     <ClCompile Include="AP_Mgr.cpp" />
     <ClCompile Include="InstrumentInfoMgr.cpp" />
     <ClCompile Include="PositionControl.cpp" />
-    <ClCompile Include="PositionMgr.cpp" />
     <ClCompile Include="tradespi.cpp" />
     <ClCompile Include="AMACrossStratgy.cpp" />
     <ClCompile Include="AutoTrader.cpp" />

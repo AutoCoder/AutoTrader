@@ -15,7 +15,6 @@ SET(SRC_LIST	AutoTrader.cpp
 				mysqlwrapper.cpp
 				Order.cpp
 				PositionControl.cpp
-				PositionMgr.cpp
 				RealTimeDataProcessor.cpp
 				RealTimeDataProcessorPool.cpp
 				stdafx.cpp

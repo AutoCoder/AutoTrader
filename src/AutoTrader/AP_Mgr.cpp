@@ -39,7 +39,7 @@ namespace AP{
 	};
 
 	AccountAndPositionMgr& GetManager(){
-		static AccountAndPositionMgr mgr;
+		static AccountAndPositionMgr mgr; //Scott Meyers singleton 
 		return mgr;
 	}
 
