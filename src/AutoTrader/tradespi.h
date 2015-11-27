@@ -37,7 +37,7 @@ class CtpTradeSpi : public CThostFtdcTraderSpi
 
 		//step 4 : get the order list 
 		void OnRspQryOrder(){
-			Sleep(1000);
+			sleep(1000);
 			m_TradeUserSpiPtr->ReqQryTrade();
 		}
 
@@ -45,26 +45,26 @@ class CtpTradeSpi : public CThostFtdcTraderSpi
 		//请求查询成交响应,要区分程序启动时第一次查询跟之后的查询
 		//并且只能查询当天的成交，昨仓不能，所以还要查询持仓明细OnRspQryInvestorPositionDetail()
 		void OnRspQryTrade(){
-			Sleep(1000);
+			sleep(1000);
 			m_TradeUserSpiPtr->ReqQryInvestorPositionDetail();
 		}
 
 		//step 6: query account
 		void OnRspQryInvestorPositionDetail(){
-			Sleep(1000);
+			sleep(1000);
 			m_TradeUserSpiPtr->ReqQryTradingAccount();
 		}
 
 		//step 7:
 		void OnRspQryTradingAccount(){
 			//查询所有合约的持仓
-			Sleep(1000);
+			sleep(1000);
 			m_TradeUserSpiPtr->ReqQryInvestorPosition_all();
 		}
 
 		//step 8
 		void OnRspQryInvestorPosition(){
-			Sleep(1000);
+			sleep(1000);
 			m_TradeUserSpiPtr->ReqQryInstrument_all();
 		}
 
