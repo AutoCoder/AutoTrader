@@ -1,9 +1,8 @@
 ﻿#ifndef CTP_CONFIG_H_
 #define CTP_CONFIG_H_
-#include <string>
+
 #include <map>
 #include <vector>
-
 
 #ifdef CONF_INI
  class ini_parser;

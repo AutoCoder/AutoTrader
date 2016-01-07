@@ -2,7 +2,7 @@
 #include "IPositionControl.h"
 #include "Order.h"
 #include "AP_Mgr.h"
-
+#include "crossplatform.h"
 
 bool Pos20Precent::completeOrder(Order& ord){
 	while (!AP::GetManager().isReady()){

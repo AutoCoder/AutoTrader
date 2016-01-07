@@ -11,6 +11,7 @@
 #include "DBWrapper.h"
 #include "CommonUtils.h"
 #include "spdlog/spdlog.h"
+#include "crossplatform.h"
 
 extern std::atomic<bool> g_reply;
 extern threadsafe_queue<Order> order_queue;

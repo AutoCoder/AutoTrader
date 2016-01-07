@@ -7,7 +7,7 @@
 #include "TickWrapper.h"
 #include "TechVec.h"
 #include "CommonUtils.h"
-
+#include "crossplatform.h"
 bool TickWrapper::firstlanuch = true;
 
 TickWrapper::TickWrapper(CThostFtdcDepthMarketDataField* p)

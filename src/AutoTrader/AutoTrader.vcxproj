@@ -107,13 +107,13 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)include\;$(SolutionDir)src\lib_json\include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include\;$(SolutionDir)src\lib_json\include\;E:\OpenSource\Spider_praitise\AutoTrader\AutoTrader\boost_1_60_0\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>thostmduserapi.lib;thosttraderapi.lib;libmysql.lib;lib_json.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)\lib;$(OutDir)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>thostmduserapi.lib;thosttraderapi.lib;libmysql.lib;lib_json.lib;libboost_system-vc120-mt-gd-1_60.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)\lib;$(OutDir);E:\OpenSource\Spider_praitise\AutoTrader\AutoTrader\boost_1_60_0\stage\lib</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(SolutionDir)lib\thostmduserapi.dll" $(OutputPath) /Y
@@ -152,7 +152,7 @@ xcopy "$(SolutionDir)src\AutoTrader\config.ini" $(OutputPath) /Y</Command>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)include\;$(SolutionDir)src\lib_json\include\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include\;$(SolutionDir)src\lib_json\include\;E:\OpenSource\Spider_praitise\AutoTrader\AutoTrader\boost_1_60_0\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -171,10 +171,16 @@ xcopy "$(SolutionDir)src\AutoTrader\config.ini" $(OutputPath) /Y</Command>
     <ClInclude Include="..\include\ThostFtdcTraderApi.h" />
     <ClInclude Include="..\include\ThostFtdcUserApiDataType.h" />
     <ClInclude Include="..\include\ThostFtdcUserApiStruct.h" />
+    <ClInclude Include="Account.h" />
+    <ClInclude Include="ActionProcessor.h" />
     <ClInclude Include="AP_Mgr.h" />
     <ClInclude Include="crossplatform.h" />
+    <ClInclude Include="fifo_action_queue.h" />
     <ClInclude Include="IPositionControl.h" />
     <ClInclude Include="InstrumentInfoMgr.h" />
+    <ClInclude Include="remote_server_action.h" />
+    <ClInclude Include="socket_server.h" />
+    <ClInclude Include="socket_server_impl.h" />
     <ClInclude Include="tradespi.h" />
     <ClInclude Include="AMACrossStratgy.h" />
     <ClInclude Include="BOLLTech.h" />
@@ -202,12 +208,19 @@ xcopy "$(SolutionDir)src\AutoTrader\config.ini" $(OutputPath) /Y</Command>
     <ClInclude Include="TechVec.h" />
     <ClInclude Include="TickWrapper.h" />
     <ClInclude Include="unittest.h" />
+    <ClInclude Include="remote_user_action.h" />
     <ClInclude Include="WMACrossStratgy.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Account.cpp" />
+    <ClCompile Include="ActionProcessor.cpp" />
     <ClCompile Include="AP_Mgr.cpp" />
+    <ClCompile Include="fifo_action_queue.cpp" />
     <ClCompile Include="InstrumentInfoMgr.cpp" />
     <ClCompile Include="PositionControl.cpp" />
+    <ClCompile Include="remote_server_action.cpp" />
+    <ClCompile Include="socket_server.cpp" />
+    <ClCompile Include="socket_server_impl.cpp" />
     <ClCompile Include="tradespi.cpp" />
     <ClCompile Include="AMACrossStratgy.cpp" />
     <ClCompile Include="AutoTrader.cpp" />
@@ -234,6 +247,7 @@ xcopy "$(SolutionDir)src\AutoTrader\config.ini" $(OutputPath) /Y</Command>
     </ClCompile>
     <ClCompile Include="TechUtils.cpp" />
     <ClCompile Include="TickWrapper.cpp" />
+    <ClCompile Include="remote_user_action.cpp" />
     <ClCompile Include="WMACrossStratgy.cpp" />
   </ItemGroup>
   <ItemGroup>

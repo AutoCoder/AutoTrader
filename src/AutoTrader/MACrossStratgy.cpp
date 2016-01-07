@@ -9,6 +9,7 @@
 #include <sstream>
 #include <assert.h>
 #include "IPositionControl.h"
+#include "crossplatform.h"
 
 MACrossStratgy::MACrossStratgy(size_t short_ma, size_t long_ma, IPositionControl* accountMgr)
 : m_curOrder(new Order())//m_order is a pointer so that it will only update so, create it at constructor.

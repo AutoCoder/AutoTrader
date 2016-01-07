@@ -16,12 +16,6 @@
     <Filter Include="include">
       <UniqueIdentifier>{2be6b69d-9721-4337-a577-cc2ef8ecdbbe}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\MACrossStratgy">
-      <UniqueIdentifier>{55f5bfed-66a6-4801-b4cd-d95b2927b3d6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\MACrossStratgy">
-      <UniqueIdentifier>{d6b2ef8d-e86d-43ee-a545-4cd9d2d38667}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Tech">
       <UniqueIdentifier>{5367d900-c2c1-46b0-8715-be11b731e6a9}</UniqueIdentifier>
     </Filter>
@@ -31,11 +25,17 @@
     <Filter Include="Header Files\MultiThreadClass">
       <UniqueIdentifier>{1679c759-104e-4ff9-a9a4-d740702b2a66}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Position">
+    <Filter Include="Header Files\Strategy">
       <UniqueIdentifier>{d911c4d6-8ab5-436f-b168-4f4828fded26}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Position">
+    <Filter Include="Source Files\Strategy">
       <UniqueIdentifier>{7954562a-eb4f-4c81-9b3b-4be473b483cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Transmission">
+      <UniqueIdentifier>{481d96fe-a197-4fdf-bbd3-b16a5b170f2c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Transmission">
+      <UniqueIdentifier>{7eae3745-6cd3-41e4-8a2e-e42f35c9dfe1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -69,9 +69,6 @@
     <ClInclude Include="Order.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Strategy.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="mysqlwrapper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -90,26 +87,11 @@
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="TechVec.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="CommonUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="unittest.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="AMACrossStratgy.h">
-      <Filter>Header Files\MACrossStratgy</Filter>
-    </ClInclude>
-    <ClInclude Include="MACrossStratgy.h">
-      <Filter>Header Files\MACrossStratgy</Filter>
-    </ClInclude>
-    <ClInclude Include="WMACrossStratgy.h">
-      <Filter>Header Files\MACrossStratgy</Filter>
-    </ClInclude>
-    <ClInclude Include="EMACrossStratgy.h">
-      <Filter>Header Files\MACrossStratgy</Filter>
     </ClInclude>
     <ClInclude Include="MACrossBOLLTech.h">
       <Filter>Header Files</Filter>
@@ -123,9 +105,6 @@
     <ClInclude Include="BOLLTech.h">
       <Filter>Header Files\Tech</Filter>
     </ClInclude>
-    <ClInclude Include="TechUtils.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="TickWrapper.h">
       <Filter>Header Files\Tech</Filter>
     </ClInclude>
@@ -133,9 +112,6 @@
       <Filter>Header Files\Tech</Filter>
     </ClInclude>
     <ClInclude Include="tradespi.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="crossplatform.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="OrderQueue.h">
@@ -148,7 +124,52 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="IPositionControl.h">
-      <Filter>Header Files\Position</Filter>
+      <Filter>Header Files\Strategy</Filter>
+    </ClInclude>
+    <ClInclude Include="crossplatform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="socket_server_impl.h">
+      <Filter>Header Files\Transmission</Filter>
+    </ClInclude>
+    <ClInclude Include="socket_server.h">
+      <Filter>Header Files\Transmission</Filter>
+    </ClInclude>
+    <ClInclude Include="remote_user_action.h">
+      <Filter>Header Files\Transmission</Filter>
+    </ClInclude>
+    <ClInclude Include="Account.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AMACrossStratgy.h">
+      <Filter>Header Files\Strategy</Filter>
+    </ClInclude>
+    <ClInclude Include="EMACrossStratgy.h">
+      <Filter>Header Files\Strategy</Filter>
+    </ClInclude>
+    <ClInclude Include="MACrossStratgy.h">
+      <Filter>Header Files\Strategy</Filter>
+    </ClInclude>
+    <ClInclude Include="WMACrossStratgy.h">
+      <Filter>Header Files\Strategy</Filter>
+    </ClInclude>
+    <ClInclude Include="Strategy.h">
+      <Filter>Header Files\Strategy</Filter>
+    </ClInclude>
+    <ClInclude Include="TechVec.h">
+      <Filter>Header Files\Tech</Filter>
+    </ClInclude>
+    <ClInclude Include="TechUtils.h">
+      <Filter>Header Files\Tech</Filter>
+    </ClInclude>
+    <ClInclude Include="ActionProcessor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="remote_server_action.h">
+      <Filter>Header Files\Transmission</Filter>
+    </ClInclude>
+    <ClInclude Include="fifo_action_queue.h">
+      <Filter>Header Files\Transmission</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -182,18 +203,6 @@
     <ClCompile Include="CommonUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="AMACrossStratgy.cpp">
-      <Filter>Source Files\MACrossStratgy</Filter>
-    </ClCompile>
-    <ClCompile Include="MACrossStratgy.cpp">
-      <Filter>Source Files\MACrossStratgy</Filter>
-    </ClCompile>
-    <ClCompile Include="WMACrossStratgy.cpp">
-      <Filter>Source Files\MACrossStratgy</Filter>
-    </ClCompile>
-    <ClCompile Include="EMACrossStratgy.cpp">
-      <Filter>Source Files\MACrossStratgy</Filter>
-    </ClCompile>
     <ClCompile Include="MACrossBOLLTech.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -205,9 +214,6 @@
     </ClCompile>
     <ClCompile Include="BOLLTech.cpp">
       <Filter>Source Files\Tech</Filter>
-    </ClCompile>
-    <ClCompile Include="TechUtils.cpp">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TickWrapper.cpp">
       <Filter>Source Files\Tech</Filter>
@@ -225,7 +231,43 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PositionControl.cpp">
-      <Filter>Source Files\Position</Filter>
+      <Filter>Source Files\Strategy</Filter>
+    </ClCompile>
+    <ClCompile Include="socket_server_impl.cpp">
+      <Filter>Source Files\Transmission</Filter>
+    </ClCompile>
+    <ClCompile Include="socket_server.cpp">
+      <Filter>Source Files\Transmission</Filter>
+    </ClCompile>
+    <ClCompile Include="remote_user_action.cpp">
+      <Filter>Source Files\Transmission</Filter>
+    </ClCompile>
+    <ClCompile Include="Account.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AMACrossStratgy.cpp">
+      <Filter>Source Files\Strategy</Filter>
+    </ClCompile>
+    <ClCompile Include="EMACrossStratgy.cpp">
+      <Filter>Source Files\Strategy</Filter>
+    </ClCompile>
+    <ClCompile Include="MACrossStratgy.cpp">
+      <Filter>Source Files\Strategy</Filter>
+    </ClCompile>
+    <ClCompile Include="WMACrossStratgy.cpp">
+      <Filter>Source Files\Strategy</Filter>
+    </ClCompile>
+    <ClCompile Include="TechUtils.cpp">
+      <Filter>Source Files\Tech</Filter>
+    </ClCompile>
+    <ClCompile Include="ActionProcessor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="remote_server_action.cpp">
+      <Filter>Source Files\Transmission</Filter>
+    </ClCompile>
+    <ClCompile Include="fifo_action_queue.cpp">
+      <Filter>Source Files\Transmission</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

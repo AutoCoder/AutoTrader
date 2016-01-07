@@ -1,7 +1,7 @@
 #ifndef DB_WRAPPER_H
 #define DB_WRAPPER_H
+
 #include <memory>
-#include <string>
 #include <map>
 #include <vector>
 class mysql_db;

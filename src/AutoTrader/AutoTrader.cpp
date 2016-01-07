@@ -1,6 +1,5 @@
 ﻿// AutoTrader.cpp : Defines the entry point for the console application.
 //
-
 #include "stdafx.h"
 #include "DBWrapper.h"
 #include "config.h"
@@ -15,10 +14,13 @@
 #include "CommonUtils.h"
 #include "IPositionControl.h"
 #include "AP_Mgr.h"
+#include "socket_server.h"
+#include "remote_user_action.h"
 
 #include <mutex>
 #include <thread>
 #include <atomic>
+#include <future>
 #include <condition_variable>
 
 int requestId = 0;
@@ -105,7 +107,7 @@ Usage:
    AutoTrade.exe replay rb1510 table_mark
 */
 int main(int argc, const char* argv[]){
-	
+
 	auto console = spdlog::stdout_logger_mt("console");
 
 	//Test
@@ -117,73 +119,78 @@ int main(int argc, const char* argv[]){
 	else{
 		auto pool = RealTimeDataProcessorPool::getInstance();
 		
-		//******Init md thread*******
-		CThostFtdcMdApi* pMdUserApi = CThostFtdcMdApi::CreateFtdcMdApi();
-		CtpMdSpi* pMdUserSpi = new CtpMdSpi(pMdUserApi);
-		pMdUserApi->RegisterSpi(pMdUserSpi);
-		pMdUserApi->RegisterFront(const_cast<char*>(Config::Instance()->CtpMdFront().c_str()));
+		////******Init md thread*******
+		//CThostFtdcMdApi* pMdUserApi = CThostFtdcMdApi::CreateFtdcMdApi();
+		//CtpMdSpi* pMdUserSpi = new CtpMdSpi(pMdUserApi);
+		//pMdUserApi->RegisterSpi(pMdUserSpi);
+		//pMdUserApi->RegisterFront(const_cast<char*>(Config::Instance()->CtpMdFront().c_str()));
 
-		//*******Init trade thread********
-		CThostFtdcTraderApi* pTradeUserApi = CThostFtdcTraderApi::CreateFtdcTraderApi();
-		CtpTradeSpi* pTradeUserSpi = new CtpTradeSpi(pTradeUserApi, \
-			Config::Instance()->CtpBrokerID().c_str(), \
-			Config::Instance()->CtpUserID().c_str(), \
-			Config::Instance()->CtpPassword().c_str(), \
-			Config::Instance()->ProductName().c_str());
-		pTradeUserApi->RegisterSpi((CThostFtdcTraderSpi*)pTradeUserSpi);
-		pTradeUserApi->SubscribePublicTopic(THOST_TERT_RESTART);
-		pTradeUserApi->SubscribePrivateTopic(THOST_TERT_RESTART);
-		pTradeUserApi->RegisterFront(const_cast<char*>(Config::Instance()->CtpTradeFront().c_str()));
+		////*******Init trade thread********
+		//CThostFtdcTraderApi* pTradeUserApi = CThostFtdcTraderApi::CreateFtdcTraderApi();
+		//CtpTradeSpi* pTradeUserSpi = new CtpTradeSpi(pTradeUserApi, \
+		//	Config::Instance()->CtpBrokerID().c_str(), \
+		//	Config::Instance()->CtpUserID().c_str(), \
+		//	Config::Instance()->CtpPassword().c_str(), \
+		//	Config::Instance()->ProductName().c_str());
+		//pTradeUserApi->RegisterSpi((CThostFtdcTraderSpi*)pTradeUserSpi);
+		//pTradeUserApi->SubscribePublicTopic(THOST_TERT_RESTART);
+		//pTradeUserApi->SubscribePrivateTopic(THOST_TERT_RESTART);
+		//pTradeUserApi->RegisterFront(const_cast<char*>(Config::Instance()->CtpTradeFront().c_str()));
 
-		//*******pool's process's stratgy's accountMgr listen to account updation received from pTradeUserSpi.
-		pool->ListenToTradeSpi(pTradeUserSpi);
+		////*******pool's process's stratgy's accountMgr listen to account updation received from pTradeUserSpi.
+		//pool->ListenToTradeSpi(pTradeUserSpi);
 
-		/*depreted:
-		//Create a thread, Once FrontDisconnect ,try to reconnect and subscribeMD again if needed.
-		//std::thread mdManagethread(MdManageThread, pMdUserSpi);
-		//std::thread tradeManagethread(TradeManageThread, pTradeUserSpi);
-		*/
+		///*depreted:
+		////Create a thread, Once FrontDisconnect ,try to reconnect and subscribeMD again if needed.
+		////std::thread mdManagethread(MdManageThread, pMdUserSpi);
+		////std::thread tradeManagethread(TradeManageThread, pTradeUserSpi);
+		//*/
 
-		//******start trade thread******
-		pTradeUserApi->Init();
+		////******start trade thread******
+		//pTradeUserApi->Init();
 
-		//******start md thread******
-		std::unique_lock <std::mutex> lck(mtx);
-		cv_md.wait(lck);
-		pMdUserApi->Init();
+		////******start md thread******
+		//std::unique_lock <std::mutex> lck(mtx);
+		//cv_md.wait(lck);
+		//pMdUserApi->Init();
 
-		//[Excute Order Thread] Excute the Order in Queue one by one looply.
-		std::thread tradeThread(ExcuteOrderQueue, pTradeUserSpi);
+		//
+			Transmission::socket_server server(2007);
+			server.run();
+		//});
 
-		//mdManagethread.join();
-		//tradeManagethread.join();
-		tradeThread.join();
+		////[Excute Order Thread] Excute the Order in Queue one by one looply.
+		//std::thread tradeThread(ExcuteOrderQueue, pTradeUserSpi);
 
-		//[Main Thread]Release the resource and pointer.
-		console->info() << "Start to release resource...";
-		if (pMdUserApi)
-		{
-			pMdUserApi->RegisterSpi(NULL);
-			pMdUserApi->Release();
-			pMdUserApi = NULL;
-		}
-		if (pMdUserSpi)
-		{
-			delete pMdUserSpi;
-			pMdUserSpi = NULL;
-		}
-		if (pTradeUserApi)
-		{
-			pTradeUserApi->RegisterSpi(NULL);
-			pTradeUserApi->Release();
-			pTradeUserApi = NULL;
-		}
-		if (pTradeUserSpi)
-		{
-			delete pTradeUserSpi;
-			pTradeUserSpi = NULL;
-		}
-		console->info() << "Quit ... ";
+		////mdManagethread.join();
+		////tradeManagethread.join();
+		//tradeThread.join();
+
+		////[Main Thread]Release the resource and pointer.
+		//console->info() << "Start to release resource...";
+		//if (pMdUserApi)
+		//{
+		//	pMdUserApi->RegisterSpi(NULL);
+		//	pMdUserApi->Release();
+		//	pMdUserApi = NULL;
+		//}
+		//if (pMdUserSpi)
+		//{
+		//	delete pMdUserSpi;
+		//	pMdUserSpi = NULL;
+		//}
+		//if (pTradeUserApi)
+		//{
+		//	pTradeUserApi->RegisterSpi(NULL);
+		//	pTradeUserApi->Release();
+		//	pTradeUserApi = NULL;
+		//}
+		//if (pTradeUserSpi)
+		//{
+		//	delete pTradeUserSpi;
+		//	pTradeUserSpi = NULL;
+		//}
+		//console->info() << "Quit ... ";
 
 		//write to db
 		pool->FreeProcessors();

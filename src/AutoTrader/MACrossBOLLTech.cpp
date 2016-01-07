@@ -3,6 +3,7 @@
 #include "DBWrapper.h"
 #include <sstream>
 #include "config.h"
+#include "crossplatform.h"
 
 MACrossBOLLTech::MACrossBOLLTech(CrossStratgyType type, size_t shortMA, size_t longMA, long long uuid, const std::string& instrumentID, const std::string& time, double lastprice)
 : m_type(type)

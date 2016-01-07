@@ -5,6 +5,8 @@
 //#include <future>
 #include <mutex>
 #include <condition_variable>
+#include "crossplatform.h"
+
 class IPositionControl;
 class Order;
 

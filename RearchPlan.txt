@@ -62,3 +62,8 @@
 
 遇到问题，OnRtnTrade()不会被回调，查出原因是由于changelist（2015年9月2日）引起的。把带中文注释的api 头文件替换了之前去掉中文注释的头文件。
 因为encoding的问题，暂时没有很好的解决。所以暂时先替换会之前的无中文注释的头文件。
+
+[2016-1-6]
+include "boost/asio.hpp"报错，error LNK2019: unresolved external symbol "class boost::system::error_category const & __cdecl boost::system::system_category(void)" (?
+
+解决： 在include <winodws.h> 前 include <boost/asio.hpp>

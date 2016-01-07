@@ -2,6 +2,7 @@
 #include "Order.h"
 #include "spdlog/spdlog.h"
 #include <assert.h>
+#include "crossplatform.h"
 
 Order::Order()
 {
