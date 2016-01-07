@@ -1,5 +1,5 @@
-#ifndef ORDER_QUEUE_H
-#define ORDER_QUEUE_H
+#ifndef THREAD_SAFE_QUEUE_H
+#define THREAD_SAFE_QUEUE_H
 
 #include <mutex>
 #include <condition_variable>

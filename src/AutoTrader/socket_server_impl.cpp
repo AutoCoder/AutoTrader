@@ -3,6 +3,7 @@
 #include <memory>
 #include "socket_server_impl.h"
 #include "remote_user_action.h"
+#include "fifo_action_queue.h"
 
 namespace Transmission{
 
@@ -31,17 +32,18 @@ namespace Transmission{
 					RemoteUserAction::Parse_Result result = user_action_.Parse(
 						buffer_, buffer_ + bytes_transferred);
 
-					if (result == RemoteUserAction::indeterminate){
+					if (result == RemoteUserAction::Parse_Result::indeterminate){
 						//do nothing
 					}
 					else{
 						std::string immediatelyReply;
-						if (result == RemoteUserAction::Good)
+						if (result == RemoteUserAction::Parse_Result::Good)
 						{
 							immediatelyReply = "Valid Action is received, responsing...";
-							//todo : send signal(UserAction Object) to strategy engine
+							//send (UserAction Object) to fifo queue for handling...
+							GetFIFOActionQueue().Push_back(user_action_);
 						}
-						else if (result == RemoteUserAction::Bad){
+						else if (result == RemoteUserAction::Parse_Result::Bad){
 							immediatelyReply = "Invalid Action is received, ignored...";	
 						}
 						do_write(immediatelyReply.c_str(), immediatelyReply.length());

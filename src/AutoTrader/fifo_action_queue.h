@@ -1,7 +1,7 @@
 #ifndef FIFO_ACTION_QUEUE_H
 #define FIFO_ACTION_QUEUE_H
 
-#include "OrderQueue.h"
+#include "ThreadSafeQueue.h"
 
 namespace Transmission{
 
@@ -38,7 +38,7 @@ namespace Transmission{
 		void Push_back(T item)
 		{
 			std::shared_ptr<BaseAction> tem(std::make_shared<Holder<T> >(item));
-			remote_action_queue.push(tem)
+			remote_action_queue.push(tem);
 		}
 
 		std::shared_ptr<BaseAction> Wait_And_Pop(){

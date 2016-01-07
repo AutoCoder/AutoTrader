@@ -114,9 +114,6 @@
     <ClInclude Include="tradespi.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="OrderQueue.h">
-      <Filter>Header Files\MultiThreadClass</Filter>
-    </ClInclude>
     <ClInclude Include="InstrumentInfoMgr.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -170,6 +167,15 @@
     </ClInclude>
     <ClInclude Include="fifo_action_queue.h">
       <Filter>Header Files\Transmission</Filter>
+    </ClInclude>
+    <ClInclude Include="ConfigV2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AccountPool.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ThreadSafeQueue.h">
+      <Filter>Header Files\MultiThreadClass</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -268,6 +274,12 @@
     </ClCompile>
     <ClCompile Include="fifo_action_queue.cpp">
       <Filter>Source Files\Transmission</Filter>
+    </ClCompile>
+    <ClCompile Include="ConfigV2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AccountPool.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

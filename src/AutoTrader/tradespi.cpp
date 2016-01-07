@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "tradespi.h"
-#include "OrderQueue.h"
+#include "ThreadSafeQueue.h"
 #include "Order.h"
 #include "ThostFtdcTraderApi.h"
 #include "config.h"

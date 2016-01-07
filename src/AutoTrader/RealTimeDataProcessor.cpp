@@ -4,7 +4,7 @@
 #include "KData.h"
 #include "Strategy.h"
 #include "Order.h"
-#include "OrderQueue.h"
+#include "ThreadSafeQueue.h"
 #include <iostream>
 #include <assert.h>
 #include "config.h"

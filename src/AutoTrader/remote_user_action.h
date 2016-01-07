@@ -2,33 +2,64 @@
 #define USER_ACTION_H
 
 #include <vector>
-#include "socket_server.h"
+#include <string>
 
 namespace Transmission{
+
+	class socket_session;
+
+	struct LoginActionMeta{
+		bool Parse(const std::string& input);
+
+		std::string Id() {
+			return brokerId + userName;
+		}
+
+		std::string brokerId;
+		std::string userName;
+		std::string passWord;
+	};
+
+	struct TradeActionMeta{
+		bool Parse(const std::string& input);
+
+		int strategyId;
+		int positionCtlId;
+		std::string instrumentId;
+	};
 
 	class RemoteUserAction
 	{
 	public:
 		RemoteUserAction(){};
-		explicit RemoteUserAction(Transmission::socket_session_ptr session);
+		explicit RemoteUserAction(socket_session* session);
 		~RemoteUserAction();
 
-		enum Parse_Result {
+		enum class Parse_Result {
 			Good,
 			Bad,
 			indeterminate
 		};
 
+		enum class ActionType{
+			Invalid,
+			Login,
+			Logout,
+			StartTrade,
+			StopTrade
+		};
+
 		Parse_Result Parse(char* begin, char* end);
 		void Invoke();
 		void Reset();
-		const std::vector<char>& Bytes() { return original_data_; }
 
 	private:
 		size_t                            length_;
-		std::vector<char>                 original_data_;
-		Transmission::socket_session_ptr  session_;
-
+		std::string						  original_data_;
+		ActionType                        action_type_;
+		std::shared_ptr<socket_session>   session_;
+		std::shared_ptr<LoginActionMeta>  login_meta_;
+		std::shared_ptr<TradeActionMeta>  trade_meta_;
 	};
 }
 #endif 

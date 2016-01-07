@@ -19,6 +19,7 @@ namespace Transmission{
 		std::shared_ptr<Detail::socket_server> server_impl_;
 	};
 
+	typedef Detail::session  socket_session;
 	typedef Detail::session* socket_session_ptr;
 }
 

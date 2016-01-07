@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "ActionProcessor.h"
-#include "OrderQueue.h"
 #include "fifo_action_queue.h"
 
 

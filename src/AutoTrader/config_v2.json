@@ -1,0 +1,61 @@
+{
+   "CtpServer":{
+      "MdFront":"tcp://180.168.146.187:10010",
+      "TradeFront":"tcp://180.168.146.187:10000",
+      "RiskFront":""
+   },
+
+   "ProductInfo":{
+      "Name":"LyATTrader"
+   },
+
+   "DataBase":{
+      "Host":"127.0.0.1",
+      "Port":3306,
+      "DBName":"qihuo",
+      "User":"root",
+      "Password":"wodemima"
+   },
+
+   "AccountList":[
+      {
+         "BrokerID" : "9999",
+         "UserID"   : "021510",
+         "Password" : "wodemima",
+         "Instruments" : [
+            "rb1604",
+         ],
+         "Strategies" : [
+            0, 1, 2
+         ], 
+         "PositionControl" : [
+            0, 1
+         ]
+      },
+
+      {
+         "BrokerID" : "9999",
+         "UserID"   : "038775",
+         "Password" : "wodemima",
+         "Instruments" : [
+            "rb1604",
+            "rb1605"
+         ],
+         "Strategies" : [
+            0, 1, 4
+         ],
+         "PositionControl" : [
+            0
+         ]
+      }
+   ],
+
+   "StrategyList": [
+      "MACross",
+      "MACross[3,5]",
+      "WMACross",
+      "AMACross",
+      "EMACross",
+      "MACrossBOLL"
+   ]
+}

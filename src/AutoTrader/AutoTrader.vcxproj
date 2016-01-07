@@ -172,8 +172,10 @@ xcopy "$(SolutionDir)src\AutoTrader\config.ini" $(OutputPath) /Y</Command>
     <ClInclude Include="..\include\ThostFtdcUserApiDataType.h" />
     <ClInclude Include="..\include\ThostFtdcUserApiStruct.h" />
     <ClInclude Include="Account.h" />
+    <ClInclude Include="AccountPool.h" />
     <ClInclude Include="ActionProcessor.h" />
     <ClInclude Include="AP_Mgr.h" />
+    <ClInclude Include="ConfigV2.h" />
     <ClInclude Include="crossplatform.h" />
     <ClInclude Include="fifo_action_queue.h" />
     <ClInclude Include="IPositionControl.h" />
@@ -197,7 +199,7 @@ xcopy "$(SolutionDir)src\AutoTrader\config.ini" $(OutputPath) /Y</Command>
     <ClInclude Include="mdspi.h" />
     <ClInclude Include="mysqlwrapper.h" />
     <ClInclude Include="Order.h" />
-    <ClInclude Include="OrderQueue.h" />
+    <ClInclude Include="ThreadSafeQueue.h" />
     <ClInclude Include="RealTimeDataProcessor.h" />
     <ClInclude Include="RealTimeDataProcessorPool.h" />
     <ClInclude Include="resource.h" />
@@ -213,8 +215,10 @@ xcopy "$(SolutionDir)src\AutoTrader\config.ini" $(OutputPath) /Y</Command>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Account.cpp" />
+    <ClCompile Include="AccountPool.cpp" />
     <ClCompile Include="ActionProcessor.cpp" />
     <ClCompile Include="AP_Mgr.cpp" />
+    <ClCompile Include="ConfigV2.cpp" />
     <ClCompile Include="fifo_action_queue.cpp" />
     <ClCompile Include="InstrumentInfoMgr.cpp" />
     <ClCompile Include="PositionControl.cpp" />
