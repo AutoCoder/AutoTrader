@@ -1,27 +1,31 @@
 ﻿// AutoTrader.cpp : Defines the entry point for the console application.
 //
 #include "stdafx.h"
+#include <mutex>
+#include <thread>
+#include <atomic>
+#include <future>
+#include <condition_variable>
+
+#include "spdlog/spdlog.h"
+#include "ThreadSafeQueue.h"
+#include "unittest.h"
+
 #include "DBWrapper.h"
 #include "config.h"
+#include "ConfigV2.h"
 #include "tradespi.h"
 #include "mdspi.h"
 #include "RealTimeDataProcessorPool.h"
 #include "Order.h"
-#include "ThreadSafeQueue.h"
-#include "spdlog/spdlog.h"
 #include "TickWrapper.h"
-#include "unittest.h"
 #include "CommonUtils.h"
 #include "IPositionControl.h"
 #include "AP_Mgr.h"
 #include "socket_server.h"
 #include "remote_user_action.h"
 
-#include <mutex>
-#include <thread>
-#include <atomic>
-#include <future>
-#include <condition_variable>
+
 
 int requestId = 0;
 
@@ -119,6 +123,10 @@ int main(int argc, const char* argv[]){
 	else{
 		auto pool = RealTimeDataProcessorPool::getInstance();
 		
+		//******setup Accout Pool**********
+		auto config = ConfigV2::Instance();
+
+
 		////******Init md thread*******
 		//CThostFtdcMdApi* pMdUserApi = CThostFtdcMdApi::CreateFtdcMdApi();
 		//CtpMdSpi* pMdUserSpi = new CtpMdSpi(pMdUserApi);

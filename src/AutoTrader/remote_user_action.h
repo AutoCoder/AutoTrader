@@ -6,6 +6,7 @@
 
 namespace Transmission{
 
+
 	class socket_session;
 
 	struct LoginActionMeta{
@@ -32,7 +33,7 @@ namespace Transmission{
 	{
 	public:
 		RemoteUserAction(){};
-		explicit RemoteUserAction(socket_session* session);
+		explicit RemoteUserAction(const std::shared_ptr<socket_session>& session);
 		~RemoteUserAction();
 
 		enum class Parse_Result {
@@ -57,7 +58,7 @@ namespace Transmission{
 		size_t                            length_;
 		std::string						  original_data_;
 		ActionType                        action_type_;
-		std::shared_ptr<socket_session>   session_;
+		std::shared_ptr<socket_session>	  session_;
 		std::shared_ptr<LoginActionMeta>  login_meta_;
 		std::shared_ptr<TradeActionMeta>  trade_meta_;
 	};

@@ -2,10 +2,12 @@
 #define SOCKET_SERVER_H
 #include <memory>
 
+//This wrapper is to avoid include <boost/asio.hpp> to outside.
+
 namespace Transmission{
 
 	namespace Detail{
-		class socket_server;
+		class server;
 		class session;
 	}
 
@@ -16,11 +18,8 @@ namespace Transmission{
 		void run();/// Run the server's io_service loop.
 
 	private:
-		std::shared_ptr<Detail::socket_server> server_impl_;
+		std::shared_ptr<Detail::server> server_impl_;
 	};
-
-	typedef Detail::session  socket_session;
-	typedef Detail::session* socket_session_ptr;
 }
 
 #endif

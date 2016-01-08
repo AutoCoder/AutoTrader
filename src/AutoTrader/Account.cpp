@@ -25,10 +25,14 @@ Account::~Account()
 }
 
 
-bool Account::Login(const std::shared_ptr<Transmission::socket_session>& s) {
-	m_session = s;
-	m_isLogin = true;
-	return true;
+bool Account::Login(const std::shared_ptr<Transmission::socket_session>& s, const std::string& pw) {
+	if (pw == m_ctp_password){
+		m_session = s;
+		m_isLogin = true;
+	}
+	else{
+		return false;
+	}
 }
 
 bool Account::Logout() {

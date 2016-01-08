@@ -5,7 +5,7 @@
 namespace Transmission{
 
 	socket_server::socket_server(short port)
-		:server_impl_(std::make_shared<Transmission::Detail::socket_server>(port))
+		:server_impl_(std::make_shared<Transmission::Detail::server>(port))
 	{
 	}
 

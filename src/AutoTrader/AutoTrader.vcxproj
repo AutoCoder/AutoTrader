@@ -183,6 +183,7 @@ xcopy "$(SolutionDir)src\AutoTrader\config.ini" $(OutputPath) /Y</Command>
     <ClInclude Include="remote_server_action.h" />
     <ClInclude Include="socket_server.h" />
     <ClInclude Include="socket_server_impl.h" />
+    <ClInclude Include="socket_session.h" />
     <ClInclude Include="tradespi.h" />
     <ClInclude Include="AMACrossStratgy.h" />
     <ClInclude Include="BOLLTech.h" />
@@ -225,6 +226,7 @@ xcopy "$(SolutionDir)src\AutoTrader\config.ini" $(OutputPath) /Y</Command>
     <ClCompile Include="remote_server_action.cpp" />
     <ClCompile Include="socket_server.cpp" />
     <ClCompile Include="socket_server_impl.cpp" />
+    <ClCompile Include="socket_session.cpp" />
     <ClCompile Include="tradespi.cpp" />
     <ClCompile Include="AMACrossStratgy.cpp" />
     <ClCompile Include="AutoTrader.cpp" />

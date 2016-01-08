@@ -4,6 +4,7 @@
 #include "socket_server_impl.h"
 #include "remote_user_action.h"
 #include "fifo_action_queue.h"
+#include "socket_session.h" // notice recursive include 
 
 namespace Transmission{
 
@@ -11,7 +12,7 @@ namespace Transmission{
 
 		session::session(tcp::socket socket)
 			: socket_(std::move(socket))
-			, user_action_(this)
+			, user_action_(std::make_shared<socket_session>(this))
 		{
 		}
 
@@ -74,7 +75,7 @@ namespace Transmission{
 			});
 		}
 
-		socket_server::socket_server(short port)
+		server::server(short port)
 			: io_service_()
 			, acceptor_(io_service_, tcp::endpoint(tcp::v4(), port))
 			, socket_(io_service_)
@@ -82,11 +83,11 @@ namespace Transmission{
 			do_accept();
 		}
 
-		void socket_server::run(){
+		void server::run(){
 			io_service_.run();
 		}
 
-		void socket_server::do_accept()
+		void server::do_accept()
 		{
 			acceptor_.async_accept(socket_,
 				[this](boost::system::error_code ec)

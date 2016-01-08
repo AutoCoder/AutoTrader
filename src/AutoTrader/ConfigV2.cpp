@@ -3,6 +3,7 @@
 #include <fstream>
 #include "json/json.h"
 #include "Account.h"
+#include "AccountPool.h"
 
 ConfigV2* ConfigV2::m_instance = NULL;
 
@@ -60,7 +61,7 @@ ConfigV2::ConfigV2(const std::string& pathName)
 			for (int i = 0; i < ac_size; ++i)
 			{
 				auto& item = root["AccountList"][i];
-				std::shared_ptr<Account> account = std::make_shared<Account>(item["AccoutId"].asString(), item["BrokerID"].asString(), item["UserID"].asString(), item["Password"].asString());
+				std::shared_ptr<Account> account = std::make_shared<Account>(item["BrokerID"].asString(), item["UserID"].asString(), item["Password"].asString());
 
 				auto& instruList = item["Instruments"];
 				for (int i = 0; i < instruList.size(); ++i){
@@ -77,6 +78,7 @@ ConfigV2::ConfigV2(const std::string& pathName)
 					account->AddPositionControl(pcList[i].asInt());
 				}
 
+				AccountPool::getInstance()->AddAccount(account);
 
 			}
 		}

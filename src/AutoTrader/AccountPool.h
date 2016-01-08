@@ -31,7 +31,7 @@ public:
 	void AddAccount(const std::shared_ptr<Account>& newAcc);
 
 private:
-	AccountPool();
+	AccountPool(){}
 	AccountPool(const AccountPool&) = delete;
 	AccountPool& operator=(const AccountPool &) = delete;
 	static AccountPool *_instance;

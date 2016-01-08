@@ -35,10 +35,10 @@ namespace Transmission{
 		};
 
 
-		class socket_server : public boost::noncopyable
+		class server : public boost::noncopyable
 		{
 		public:
-			explicit socket_server(short port);
+			explicit server(short port);
 			void run();
 
 		private:

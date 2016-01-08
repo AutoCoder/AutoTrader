@@ -4,13 +4,16 @@
 #include "Account.h"
 #include "AccountPool.h"
 #include "remote_user_action.h"
-//#include "socket_server_impl.h"
-#include "socket_server.h"
+#include "socket_session.h"
 
 
 
 
 namespace{
+	static const char* LoginSucceed = "Login successfully!";
+	static const char* LoginFailed_PW = "Login fail, Reason:Wrong password";
+	static const char* LoginFailed_AC = "Login fail, Reason:unexisted account";
+
 	bool is_digit(int c){
 		return c >= '0' && c <= '9';
 	}
@@ -122,7 +125,7 @@ namespace Transmission{
 		}
 	}
 
-	RemoteUserAction::RemoteUserAction(socket_session* session)
+	RemoteUserAction::RemoteUserAction(const std::shared_ptr<socket_session>& session)
 		: length_(0)
 		, session_(session)
 	{
@@ -205,9 +208,21 @@ namespace Transmission{
 		switch (action_type_){
 			case ActionType::Login:
 			{
-				//todo: execute login
+				//execute login
 				auto accout = AccountPool::getInstance()->GetAccount(login_meta_->Id());
-				accout->Login(std::make_shared<socket_session>(session_));
+				if (accout){
+					bool login_success = accout->Login(session_, login_meta_->passWord);
+					if (login_success){
+						session_->do_write(LoginSucceed, strlen(LoginSucceed));
+					}
+					else{
+						session_->do_write(LoginFailed_PW, strlen(LoginFailed_PW));
+					}
+				}
+				else{
+					session_->do_write(LoginFailed_AC, strlen(LoginFailed_AC));
+				}
+				
 			}
 			break;
 			case ActionType::StartTrade:

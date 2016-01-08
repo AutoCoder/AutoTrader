@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "remote_server_action.h"
-#include "socket_server_impl.h"
+
 namespace Transmission{
-	RemoteServerAction::RemoteServerAction(Transmission::socket_session_ptr session)
+	RemoteServerAction::RemoteServerAction(const Transmission::socket_session& session)
 		:session_(session)
 	{
 	}
@@ -14,8 +14,7 @@ namespace Transmission{
 
 
 	void RemoteServerAction::Invoke(){
-		if (session_)
-			session_->do_write(reinterpret_cast<char*>(original_data_.data()), original_data_.size());
+		session_.do_write(original_data_.c_str(), original_data_.size());
 	}
 
 }

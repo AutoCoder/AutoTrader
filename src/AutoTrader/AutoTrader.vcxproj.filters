@@ -177,6 +177,9 @@
     <ClInclude Include="ThreadSafeQueue.h">
       <Filter>Header Files\MultiThreadClass</Filter>
     </ClInclude>
+    <ClInclude Include="socket_session.h">
+      <Filter>Header Files\Transmission</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -280,6 +283,9 @@
     </ClCompile>
     <ClCompile Include="AccountPool.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="socket_session.cpp">
+      <Filter>Source Files\Transmission</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

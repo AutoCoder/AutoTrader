@@ -30,8 +30,8 @@ public:
 		m_positionControlList.push_back(pcIdx);
 	}
 
-	bool Login(const std::shared_ptr<Transmission::socket_session>& s);
-	bool Logout();
+	bool Login(const std::shared_ptr<Transmission::socket_session>& s, const std::string& pw);
+	bool Logout(); //identify User By session
 
 	void StartTrade(const std::string& instru, int strategyId, int PositionCtlId);
 
