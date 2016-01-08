@@ -209,20 +209,7 @@ namespace Transmission{
 			case ActionType::Login:
 			{
 				//execute login
-				auto accout = AccountMgr::getInstance()->GetAccount(login_meta_->Id());
-				if (accout){
-					bool login_success = accout->Login(session_, login_meta_->passWord);
-					if (login_success){
-						session_->do_write(LoginSucceed, strlen(LoginSucceed));
-					}
-					else{
-						session_->do_write(LoginFailed_PW, strlen(LoginFailed_PW));
-					}
-				}
-				else{
-					session_->do_write(LoginFailed_AC, strlen(LoginFailed_AC));
-				}
-				
+				AccountMgr::getInstance()->LoginAccount(login_meta_->Id(), login_meta_->passWord, session_);
 			}
 			break;
 			case ActionType::StartTrade:

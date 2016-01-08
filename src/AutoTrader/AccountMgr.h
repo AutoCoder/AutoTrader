@@ -3,7 +3,7 @@
 #include <string>
 #include <map>
 #include <memory>
-//#include "socket_server.h"
+#include "socket_session.h"
 
 class Account;
 
@@ -29,6 +29,8 @@ public:
 	//}
 
 	void AddAccount(const std::shared_ptr<Account>& newAcc);
+
+	void LoginAccount(const std::string& userId, const std::string& pw, const std::shared_ptr<Transmission::socket_session>& session);
 
 private:
 	AccountMgr(){}
