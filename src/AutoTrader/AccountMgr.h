@@ -7,11 +7,11 @@
 
 class Account;
 
-class AccountPool
+class AccountMgr
 {
 public:
-	~AccountPool(){};
-	static AccountPool* getInstance();
+	~AccountMgr(){};
+	static AccountMgr* getInstance();
 
 public:
 	std::shared_ptr<Account> GetAccount(const std::string& userId) const {
@@ -31,10 +31,10 @@ public:
 	void AddAccount(const std::shared_ptr<Account>& newAcc);
 
 private:
-	AccountPool(){}
-	AccountPool(const AccountPool&) = delete;
-	AccountPool& operator=(const AccountPool &) = delete;
-	static AccountPool *_instance;
+	AccountMgr(){}
+	AccountMgr(const AccountMgr&) = delete;
+	AccountMgr& operator=(const AccountMgr &) = delete;
+	static AccountMgr *_instance;
 
 private:
 	std::map<std::string/*id*/, std::shared_ptr<Account> >                m_pool;

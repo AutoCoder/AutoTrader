@@ -171,14 +171,14 @@
     <ClInclude Include="ConfigV2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="AccountPool.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ThreadSafeQueue.h">
       <Filter>Header Files\MultiThreadClass</Filter>
     </ClInclude>
     <ClInclude Include="socket_session.h">
       <Filter>Header Files\Transmission</Filter>
+    </ClInclude>
+    <ClInclude Include="AccountMgr.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -281,11 +281,11 @@
     <ClCompile Include="ConfigV2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="AccountPool.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="socket_session.cpp">
       <Filter>Source Files\Transmission</Filter>
+    </ClCompile>
+    <ClCompile Include="AccountMgr.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

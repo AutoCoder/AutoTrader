@@ -3,7 +3,7 @@
 #include <fstream>
 #include "json/json.h"
 #include "Account.h"
-#include "AccountPool.h"
+#include "AccountMgr.h"
 
 ConfigV2* ConfigV2::m_instance = NULL;
 
@@ -66,6 +66,7 @@ ConfigV2::ConfigV2(const std::string& pathName)
 				auto& instruList = item["Instruments"];
 				for (int i = 0; i < instruList.size(); ++i){
 					account->AddInstrument(instruList[i].asString());
+					m_instruments.insert(instruList[i].asString());
 				}
 				
 				auto& strategyList = item["Strategies"];
@@ -78,7 +79,7 @@ ConfigV2::ConfigV2(const std::string& pathName)
 					account->AddPositionControl(pcList[i].asInt());
 				}
 
-				AccountPool::getInstance()->AddAccount(account);
+				AccountMgr::getInstance()->AddAccount(account);
 
 			}
 		}
@@ -133,4 +134,12 @@ std::string ConfigV2::DBPassword() const{
 std::string ConfigV2::ProductName() const
 {
 	return m_db_productName;
+}
+
+std::string ConfigV2::GetStrategy(size_t idx) const
+{
+	if (idx <= m_strategies.size())
+		return m_strategies.at(idx);
+	else
+		return "";
 }

@@ -2,7 +2,7 @@
 #include <assert.h>
 #include "json/json.h"
 #include "Account.h"
-#include "AccountPool.h"
+#include "AccountMgr.h"
 #include "remote_user_action.h"
 #include "socket_session.h"
 
@@ -209,7 +209,7 @@ namespace Transmission{
 			case ActionType::Login:
 			{
 				//execute login
-				auto accout = AccountPool::getInstance()->GetAccount(login_meta_->Id());
+				auto accout = AccountMgr::getInstance()->GetAccount(login_meta_->Id());
 				if (accout){
 					bool login_success = accout->Login(session_, login_meta_->passWord);
 					if (login_success){

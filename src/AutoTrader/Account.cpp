@@ -38,11 +38,13 @@ bool Account::Login(const std::shared_ptr<Transmission::socket_session>& s, cons
 bool Account::Logout() {
 	m_session.reset();
 	m_isLogin = false;
+
+	StopTrade();// must
 	return true;
 }
 
 void Account::StartTrade(const std::string& instru, int strategyId, int PositionCtlId){
-
+	//todo: verify arguments, start the traderprocessor, register strategy
 }
 
 void Account::StopTrade(){

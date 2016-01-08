@@ -172,7 +172,7 @@ xcopy "$(SolutionDir)src\AutoTrader\config.ini" $(OutputPath) /Y</Command>
     <ClInclude Include="..\include\ThostFtdcUserApiDataType.h" />
     <ClInclude Include="..\include\ThostFtdcUserApiStruct.h" />
     <ClInclude Include="Account.h" />
-    <ClInclude Include="AccountPool.h" />
+    <ClInclude Include="AccountMgr.h" />
     <ClInclude Include="ActionProcessor.h" />
     <ClInclude Include="AP_Mgr.h" />
     <ClInclude Include="ConfigV2.h" />
@@ -216,7 +216,7 @@ xcopy "$(SolutionDir)src\AutoTrader\config.ini" $(OutputPath) /Y</Command>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Account.cpp" />
-    <ClCompile Include="AccountPool.cpp" />
+    <ClCompile Include="AccountMgr.cpp" />
     <ClCompile Include="ActionProcessor.cpp" />
     <ClCompile Include="AP_Mgr.cpp" />
     <ClCompile Include="ConfigV2.cpp" />
