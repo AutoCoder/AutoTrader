@@ -29,6 +29,7 @@ bool Account::Login(const std::shared_ptr<Transmission::socket_session>& s, cons
 	if (pw == m_ctp_password){
 		m_session = s;
 		m_isLogin = true;
+		return true;
 	}
 	else{
 		return false;
@@ -43,8 +44,21 @@ bool Account::Logout() {
 	return true;
 }
 
-void Account::StartTrade(const std::string& instru, int strategyId, int PositionCtlId){
-	//todo: verify arguments, start the traderprocessor, register strategy
+bool Account::StartTrade(const std::string& instru, int strategyId, int PositionCtlId){
+	if (m_isTrading)
+		return false;
+
+	//verify arguments
+	if (std::find(m_instrumentList.begin(), m_instrumentList.end(), instru) != m_instrumentList.end()
+		&& std::find(m_strategyList.begin(), m_strategyList.end(), strategyId) != m_strategyList.end()
+		&& std::find(m_positionControlList.begin(), m_positionControlList.end(), PositionCtlId) != m_positionControlList.end())
+	{
+		//todo: start the traderprocessor, register strategy
+		return true;
+	}
+	else{
+		return false;
+	}
 }
 
 void Account::StopTrade(){

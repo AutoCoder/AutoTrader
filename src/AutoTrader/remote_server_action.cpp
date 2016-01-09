@@ -2,8 +2,9 @@
 #include "remote_server_action.h"
 
 namespace Transmission{
-	RemoteServerAction::RemoteServerAction(const Transmission::socket_session& session)
-		:session_(session)
+	RemoteServerAction::RemoteServerAction(const std::shared_ptr<socket_session>& session, const std::string& data)
+		: session_(session)
+		, original_data_(data)
 	{
 	}
 
@@ -14,7 +15,7 @@ namespace Transmission{
 
 
 	void RemoteServerAction::Invoke(){
-		session_.do_write(original_data_.c_str(), original_data_.size());
+		session_->do_write(original_data_.c_str(), original_data_.size());
 	}
 
 }

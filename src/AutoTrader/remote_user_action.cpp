@@ -10,10 +10,6 @@
 
 
 namespace{
-	static const char* LoginSucceed = "Login successfully!";
-	static const char* LoginFailed_PW = "Login fail, Reason:Wrong password";
-	static const char* LoginFailed_AC = "Login fail, Reason:unexisted account";
-
 	bool is_digit(int c){
 		return c >= '0' && c <= '9';
 	}
@@ -214,7 +210,7 @@ namespace Transmission{
 			break;
 			case ActionType::StartTrade:
 			{
-				//todo: execute startTrade
+				AccountMgr::getInstance()->StartTrade(trade_meta_->instrumentId, trade_meta_->strategyId, trade_meta_->positionCtlId, session_);
 			}
 			break;
 			case ActionType::Logout:

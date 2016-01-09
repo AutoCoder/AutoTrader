@@ -21,16 +21,11 @@ public:
 			return NULL;
 	}
 
-	//std::shared_ptr<Account> GetAccount(Transmission::socket_session_ptr sessionPtr) const {
-	//	if (m_pool.find(sessionPtr) != m_pool.end())
-	//		return m_pool.at(sessionPtr);
-	//	else
-	//		return NULL;
-	//}
-
 	void AddAccount(const std::shared_ptr<Account>& newAcc);
 
 	void LoginAccount(const std::string& userId, const std::string& pw, const std::shared_ptr<Transmission::socket_session>& session);
+
+	void StartTrade(const std::string& instru, int strategyId, int PositionCtlId, const std::shared_ptr<Transmission::socket_session>& session);
 
 private:
 	AccountMgr(){}
@@ -39,8 +34,8 @@ private:
 	static AccountMgr *_instance;
 
 private:
-	std::map<std::string/*id*/, std::shared_ptr<Account> >                m_pool;
-	//std::map<Transmission::socket_session_ptr, std::shared_ptr<Account> > m_AccountIndex;
+	std::map<std::string/*id*/, std::shared_ptr<Account> >                             m_pool;
+	std::map<std::shared_ptr<Transmission::socket_session>, std::shared_ptr<Account>>  m_LoggedAccount;
 };
 
 #endif

@@ -8,14 +8,14 @@ namespace Transmission{
 	class RemoteServerAction
 	{
 	public:
-		RemoteServerAction(const Transmission::socket_session& session);
+		RemoteServerAction(const std::shared_ptr<socket_session>& session,const std::string& data);
 		~RemoteServerAction();
 
 		void Invoke();
 
 	private:
 		std::string                       original_data_;
-		Transmission::socket_session      session_;
+		std::shared_ptr<socket_session>   session_;
 	};
 }
 #endif
