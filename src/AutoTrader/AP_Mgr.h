@@ -62,11 +62,11 @@ namespace AP{ // Account & Position
 	//	static std::string ConvertTradeListToString(const std::vector< CThostFtdcTradeField >& list);
 	//};
 
-	class AccountAndPositionMgr
+	class AccountDetailMgr
 	{
 	public:
-		AccountAndPositionMgr();
-		virtual ~AccountAndPositionMgr();
+		AccountDetailMgr();
+		virtual ~AccountDetailMgr();
 
 		virtual void setAccountStatus(const CThostFtdcTradingAccountField& info);
 
@@ -113,11 +113,12 @@ namespace AP{ // Account & Position
 
 		const std::map<std::string, AP::TradeMessage>& getAllPositionMap() const { return m_tradeMessage_dict; }
 
-		virtual bool isReady() { return m_isReady; }
+		//indicate that the accout init is finish, is ready for return account info back to client
+		void finishInitialize();
 
 	private:
-		AccountAndPositionMgr(const AccountAndPositionMgr& mgr) = delete;
-		AccountAndPositionMgr& operator = (const AccountAndPositionMgr& mgr) = delete;
+		AccountDetailMgr(const AccountDetailMgr& mgr) = delete;
+		AccountDetailMgr& operator = (const AccountDetailMgr& mgr) = delete;
 		
 
 	private:
@@ -136,13 +137,11 @@ namespace AP{ // Account & Position
 		std::map<std::string, CThostFtdcInstrumentField> m_instrument_dict;
 
 		std::vector< CThostFtdcTradeField > m_newTrades; //委托记录，全部合约
-
-
 	};
 
-	AccountAndPositionMgr& GetManager();
+	
 }
 
-
+//typedef AP::AccountDetailMgr AccountDetailMgr;
 
 #endif

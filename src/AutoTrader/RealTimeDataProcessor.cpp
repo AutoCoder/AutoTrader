@@ -12,15 +12,17 @@
 #include "CommonUtils.h"
 #include "spdlog/spdlog.h"
 #include "crossplatform.h"
+#include "Account.h"
 
 extern std::atomic<bool> g_reply;
 extern threadsafe_queue<Order> order_queue;
 
 #define UseKDataToInvoke 1
 
-RealTimeDataProcessor::RealTimeDataProcessor(Strategy* strag, const std::string& InstrumentName)
+RealTimeDataProcessor::RealTimeDataProcessor(Strategy* strag, const std::string& InstrumentName, Account* owner)
 	: m_Name(InstrumentName)
 	, m_strategy(strag)
+	, m_owner(owner)
 	, m_dbptr(new DBWrapper)
 {
 	if (!g_reply)
@@ -75,10 +77,12 @@ void RealTimeDataProcessor::AppendRealTimeData(TickWrapper& info){
 		if (triggered){
 			Order ord;
 			ord.SetTriggerTick(info.UpdateTime());
-			//for now, only permit order_queue has one item.
-			if (order_queue.empty() && m_strategy->generateOrder(ord)){
-				order_queue.push(ord);
-			}
+			////for now, only permit order_queue has one item.
+			//if (order_queue.empty() && m_strategy->generateOrder(ord)){
+			//	order_queue.push(ord);
+			//}
+			if (m_owner && m_strategy->generateOrder(ord))
+				m_owner->AppendOrder(ord);
 		}
 			
 	}
@@ -119,4 +123,9 @@ void RealTimeDataProcessor::recoverHistoryData(int beforeSeconds)
 		m_DataSeq.push_front(TickWrapper::RecoverFromDB(item.second));
 	}
 
+}
+
+bool RealTimeDataProcessor::IsTrading() const 
+{ 
+	return m_owner ? m_owner->IsTrading() : false;
 }

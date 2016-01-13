@@ -8,11 +8,12 @@ class ConfigV2 {
 public:
 	~ConfigV2();
 	static ConfigV2* Instance();
-	std::string CtpBrokerID() const ;
-	std::string CtpUserID() const;
-	std::string CtpPassword() const;
+	std::string DefaultCtpBrokerID() const;
+	std::string DefaultCtpUserID() const;
+	std::string DefaultCtpPassword() const;
 	std::string CtpMdFront() const;
 	std::string CtpTradeFront() const;
+	std::vector<std::string> Instruments() const;
 
 	std::string DBHost() const;
 	int DBPort();
@@ -30,6 +31,11 @@ private:
 private:
 	static ConfigV2* m_instance;
 	std::string m_filepath;
+
+	std::string m_ctp_brokerId;
+	std::string m_ctp_userId;
+	std::string m_ctp_password;
+
 	std::string m_ctp_mdfront;
 	std::string m_ctp_tradefront;
 	std::string m_ctp_riskfront;

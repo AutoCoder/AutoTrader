@@ -10,7 +10,7 @@ class IPositionControl;
 class MACrossStratgy : public Strategy
 {
 public:
-	MACrossStratgy(size_t short_ma, size_t long_ma, IPositionControl* accountMgr);
+	MACrossStratgy(size_t short_ma, size_t long_ma, IPositionControl* pctl);
 	virtual ~MACrossStratgy();
 
 	virtual bool tryInvoke(const std::list<TickWrapper>& data, TickWrapper& info);
@@ -29,7 +29,7 @@ protected:
 
 private:
 	Order* m_curOrder;
-	IPositionControl* m_AccoutMgr;
+	IPositionControl* m_posControl;
 };
 
 class MACrossTech : public StrategyTech{

@@ -24,8 +24,11 @@
 #include "AP_Mgr.h"
 #include "socket_server.h"
 #include "remote_user_action.h"
+#include "ActionProcessor.h"
 
-
+#include "MACrossStratgy.h"
+#include "RealTimeDataProcessor.h"
+#include "Account.h"
 
 int requestId = 0;
 
@@ -63,13 +66,17 @@ void ExcuteOrderQueue(CtpTradeSpi* pUserSpi){
 	SYNC_PRINT << "End to loop order queue";
 }
 
-void ReplayTickDataFromDB(const std::string& instrumentID, const std::string& mark)
+void ReplayTickDataFromDB(const std::string& instrumentID, const std::string& strategyName, const std::string& posCtlName, const std::string& mark)
 {
 	SYNC_PRINT << "Reply " << instrumentID << " data from db";
 	DBWrapper dbwrapper;
 	g_reply = true;
 	auto pool = RealTimeDataProcessorPool::getInstance();
 	//TODO: Get 2000 dataItem from db per 
+
+	//todo: get strategy pointer by strategyName, get IPositionCtl* by posCtlName
+	std::unique_ptr<MACrossStratgy> p = std::make_unique<MACrossStratgy>(3, 5, (IPositionControl*)NULL);
+	auto processor = std::make_shared<RealTimeDataProcessor>(p.get(), instrumentID, (Account*)NULL);
 
 	//Get the total count of table
 	char countquerybuf[512];
@@ -97,12 +104,12 @@ void ReplayTickDataFromDB(const std::string& instrumentID, const std::string& ma
 
 		for (auto item : map_results){
 			auto dataItem = TickWrapper::RecoverFromDB(item.second);
-			pool->GenRealTimeDataProcessor(instrumentID)->AppendRealTimeData(dataItem);
+			pool->AppendRealTimeData(dataItem);
 		}
 	}
 	SYNC_PRINT << "Reply " << instrumentID << " finished.";
 	//Store to db
-	pool->GenRealTimeDataProcessor(instrumentID)->StoreStrategySequenceToDB(mark);
+	pool->StoreStrategySequenceToDB(instrumentID, mark);
 }
 
 /*
@@ -117,8 +124,8 @@ int main(int argc, const char* argv[]){
 	//Test
 	//RunUnitTest();
 
-	if (argc == 4 && strcmp(argv[1], "replay") == 0){
-		ReplayTickDataFromDB(argv[2], argv[3]);
+	if (argc == 6 && strcmp(argv[1], "replay") == 0){
+		ReplayTickDataFromDB(argv[2], argv[3], argv[4], argv[5]);
 	}
 	else{
 		auto pool = RealTimeDataProcessorPool::getInstance();
@@ -127,12 +134,13 @@ int main(int argc, const char* argv[]){
 		auto config = ConfigV2::Instance();
 
 
-		////******Init md thread*******
-		//CThostFtdcMdApi* pMdUserApi = CThostFtdcMdApi::CreateFtdcMdApi();
-		//CtpMdSpi* pMdUserSpi = new CtpMdSpi(pMdUserApi);
-		//pMdUserApi->RegisterSpi(pMdUserSpi);
-		//pMdUserApi->RegisterFront(const_cast<char*>(Config::Instance()->CtpMdFront().c_str()));
+		//******Init md thread*******
+		CThostFtdcMdApi* pMdUserApi = CThostFtdcMdApi::CreateFtdcMdApi();
+		CtpMdSpi* pMdUserSpi = new CtpMdSpi(pMdUserApi, config->Instruments(), config->DefaultCtpBrokerID(), config->DefaultCtpUserID(), config->DefaultCtpPassword());
+		pMdUserApi->RegisterSpi(pMdUserSpi);
+		pMdUserApi->RegisterFront(const_cast<char*>(ConfigV2::Instance()->CtpMdFront().c_str()));
 
+		std::thread actionInvoker(ProcessActionQueue);
 		////*******Init trade thread********
 		//CThostFtdcTraderApi* pTradeUserApi = CThostFtdcTraderApi::CreateFtdcTraderApi();
 		//CtpTradeSpi* pTradeUserSpi = new CtpTradeSpi(pTradeUserApi, \
@@ -201,7 +209,7 @@ int main(int argc, const char* argv[]){
 		//console->info() << "Quit ... ";
 
 		//write to db
-		pool->FreeProcessors();
+		//pool->FreeProcessors();
 	}
 
 	return 0;

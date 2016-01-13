@@ -6,9 +6,13 @@
 #include <mutex>
 #include <condition_variable>
 #include "crossplatform.h"
+#include <functional>
 
 class IPositionControl;
 class Order;
+namespace AP{
+	class AccountDetailMgr;
+};
 
 extern std::condition_variable cv_md;
 
@@ -73,7 +77,8 @@ class CtpTradeSpi : public CThostFtdcTraderSpi
 		//step 9
 		void OnRspQryInstrument(){
 			//invoke md thread
-			cv_md.notify_all();
+			//cv_md.notify_all();
+			//send accout init finish action to fifo
 		}
 
 	private:
@@ -81,11 +86,13 @@ class CtpTradeSpi : public CThostFtdcTraderSpi
 	};
 
 public:
-	CtpTradeSpi(CThostFtdcTraderApi* pUserApi, \
-		const char * brokerID, \
-		const char* userID, \
-		const char* password, \
-		const char* prodName);
+	CtpTradeSpi(CThostFtdcTraderApi* pUserApi,
+		const char * brokerID, const char* userID, const char* password, const char* prodName, 
+		AP::AccountDetailMgr& admgr, 
+		std::function<void(void)> initFinishCallback,
+		std::function<void(void)> onRtnOrderCallback,
+		std::function<void(void)> onRtnTradeCallback,
+		std::function<void(void)> OnRtnCancellOrderCallback);
 	~CtpTradeSpi();
 
 	virtual void OnFrontConnected();
@@ -174,7 +181,12 @@ private:
 	bool m_firstquery_Instrument;//是否首次查询合约
 
 private:
-	CThostFtdcTraderApi* pUserApi;
+	std::function<void()>		   m_initFinish_callback;
+	std::function<void()>		   m_OnRtnOrder_callback;
+	std::function<void()>		   m_OnRtnTrade_callback;
+	std::function<void()>		   m_OnCancelOrder_callback;
+	AP::AccountDetailMgr&          m_account_detail_mgr;
+	CThostFtdcTraderApi*		   pUserApi;
 	TradeThreadStateChangedHandler m_stateChangeHandler;
 };
 

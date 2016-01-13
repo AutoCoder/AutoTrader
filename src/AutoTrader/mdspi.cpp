@@ -31,12 +31,9 @@ namespace {
 }
 
 
-CtpMdSpi::CtpMdSpi(CThostFtdcMdApi* api) 
+CtpMdSpi::CtpMdSpi(CThostFtdcMdApi* api, const std::vector<std::string>& instruments, const std::string& brokerId, const std::string& userID, const std::string& pw)
 	: pUserApi(api)
-	//, m_isSubscribed(false)
-	//, m_isFrontConnected(false)
-	//, m_isLogin(false)
-	, m_stateChangeHandler(this)
+	, m_stateChangeHandler(this, instruments, brokerId, userID, pw)
 {
 }
 
@@ -49,9 +46,6 @@ void CtpMdSpi::OnRspError(CThostFtdcRspInfoField *pRspInfo,
 void CtpMdSpi::OnFrontDisconnected(int nReason)
 {
 	SYNC_PRINT << __FUNCTION__ << " reason=" << nReason;
-	//m_isFrontConnected = false;
-	//m_isLogin = false;
-	//m_isSubscribed = false;
 }
 		
 void CtpMdSpi::OnHeartBeatWarning(int nTimeLapse)
@@ -62,8 +56,6 @@ void CtpMdSpi::OnHeartBeatWarning(int nTimeLapse)
 void CtpMdSpi::OnFrontConnected()
 {
 	SYNC_PRINT << "[Md] Response | connected...";
-	//m_isFrontConnected = true;
-	//cv_md.notify_all();
 	m_stateChangeHandler.OnFrontConnected();
 }
 
@@ -86,26 +78,17 @@ void CtpMdSpi::OnRspUserLogin(CThostFtdcRspUserLoginField *pRspUserLogin,
 	if (!IsErrorRspInfo(pRspInfo) && pRspUserLogin)
 	{
 		SYNC_PRINT << "[Md] Response | login successfully...CurrentDate:" <<pRspUserLogin->TradingDay;
-		//m_isLogin = true;
-		//cv_md.notify_all();
 		m_stateChangeHandler.OnLogined();
 	}
 	//if (bIsLast) SetEvent(g_hEvent);
 }
+void CtpMdSpi::SubscribeMarketData(const std::vector<std::string>& instIdList){
+	size_t len = instIdList.size();
+	char** pInstId = new char*[len];
+	for (size_t i = 0; i<len; i++)  
+		pInstId[i] = const_cast<char*>(instIdList[i].c_str());
 
-void CtpMdSpi::SubscribeMarketData(char* instIdList)
-{
-	std::vector<char*> list;
-	char *token = strtok(instIdList, ",");
-	while( token != NULL ){
-		list.push_back(token); 
-		token = strtok(NULL, ",");
-	}
-	unsigned int len = list.size();
-	char** pInstId = new char* [len];  
-	for(unsigned int i=0; i<len;i++)  pInstId[i]=list[i]; 
-
-	int ret=pUserApi->SubscribeMarketData(pInstId, len);
+	int ret = pUserApi->SubscribeMarketData(pInstId, len);
 	SYNC_PRINT << "[Md] Request | send md subscribe request... " << ((ret == 0) ? "success" : "fail");
 }
 
@@ -170,7 +153,7 @@ void CtpMdSpi::OnRtnDepthMarketData(
 	//2) can't define a local RealTimeDataProcessor variable here, otherwise it will plus the ref-count, so that it will not call destruction fucntion when exit(0)
 	auto pool = RealTimeDataProcessorPool::getInstance();
 	TickWrapper tem(pDepthMarketData);
-	pool->GenRealTimeDataProcessor(pDepthMarketData->InstrumentID)->AppendRealTimeData(tem);
+	pool->AppendRealTimeData(tem);
 
 	TryTerminate(pDepthMarketData->UpdateTime);
 }

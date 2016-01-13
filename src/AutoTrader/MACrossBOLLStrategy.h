@@ -32,7 +32,7 @@ protected:
 
 private:
 	Order* m_curOrder;
-	IPositionControl* m_AccoutMgr;
+	IPositionControl* m_posControl;
 
 };
 

@@ -17,7 +17,8 @@ extern std::condition_variable cv_trade;
 std::vector<CThostFtdcOrderField*> orderList;
 std::vector<CThostFtdcTradeField*> tradeList;
 
-CtpTradeSpi::CtpTradeSpi(CThostFtdcTraderApi* p, const char * brokerID, const char* userID, const char* password, const char* prodname)
+CtpTradeSpi::CtpTradeSpi(CThostFtdcTraderApi* p, const char * brokerID, const char* userID, const char* password, const char* prodname, AP::AccountDetailMgr& admgr, 
+	std::function<void()> initFinishCallback, std::function<void()> onRtnOrderCallback, std::function<void()> onRtnTradeCallback, std::function<void()> onRtnCancellOrderCallback)
 	: pUserApi(p)
 	, m_frontID(-1)
 	, m_sessionID(-1)
@@ -28,6 +29,11 @@ CtpTradeSpi::CtpTradeSpi(CThostFtdcTraderApi* p, const char * brokerID, const ch
 	, m_firstquery_TradingAccount(true)
 	, m_firstquery_Position(true)
 	, m_firstquery_Instrument(true)
+	, m_account_detail_mgr(admgr)
+	, m_initFinish_callback(initFinishCallback)
+	, m_OnRtnOrder_callback(onRtnOrderCallback)
+	, m_OnRtnTrade_callback(onRtnTradeCallback)
+	, m_OnCancelOrder_callback(onRtnCancellOrderCallback)
 {
 	STRCPY(m_brokerID, brokerID);
 	STRCPY(m_userID, userID);
@@ -113,13 +119,13 @@ void CtpTradeSpi::OnRspQryOrder(CThostFtdcOrderField *pOrder, CThostFtdcRspInfoF
 			std::shared_ptr<CThostFtdcOrderField> order(new CThostFtdcOrderField());
 			CThostFtdcOrderField copy_order;
 			memcpy(&copy_order, pOrder, sizeof(CThostFtdcOrderField));
-			AP::GetManager().pushTodayOrder(copy_order);
+			m_account_detail_mgr.pushTodayOrder(copy_order);
 
 			if (bIsLast)
 			{
 				m_firstquery_order = false;
-				SYNC_PRINT << "[Trade] 所有合约报单次数：" << AP::GetManager().todayOrderCount();
-				SYNC_PRINT << AP::GetManager().todayOrderToString();
+				SYNC_PRINT << "[Trade] 所有合约报单次数：" << m_account_detail_mgr.todayOrderCount();
+				SYNC_PRINT << m_account_detail_mgr.todayOrderToString();
 			}
 			m_stateChangeHandler.OnRspQryOrder();
 		}
@@ -155,13 +161,13 @@ void CtpTradeSpi::OnRspQryTrade(CThostFtdcTradeField *pTrade, CThostFtdcRspInfoF
 		{
 			CThostFtdcTradeField trade;
 			memcpy(&trade, pTrade, sizeof(CThostFtdcTradeField));
-			AP::GetManager().pushTodayTrade(trade);
+			m_account_detail_mgr.pushTodayTrade(trade);
 
 			if (bIsLast)
 			{
 				m_firstquery_trade = false;
-				SYNC_PRINT << "成交次数：" << AP::GetManager().todayTradeCount();
-				SYNC_PRINT << AP::GetManager().todayTradeToString();
+				SYNC_PRINT << "成交次数：" << m_account_detail_mgr.todayTradeCount();
+				SYNC_PRINT << m_account_detail_mgr.todayTradeToString();
 				m_stateChangeHandler.OnRspQryTrade();
 			}
 		}
@@ -214,9 +220,9 @@ void CtpTradeSpi::OnRspQryInvestorPositionDetail(CThostFtdcInvestorPositionDetai
 			if (pInvestorPositionDetail->Volume > 0)//筛选未平仓的
 			{
 				if (trade.Direction == '0')
-					AP::GetManager().pushYesterdayUnClosedTrade(trade, AP::Long);
+					m_account_detail_mgr.pushYesterdayUnClosedTrade(trade, AP::Long);
 				else if (trade.Direction == '1')
-					AP::GetManager().pushYesterdayUnClosedTrade(trade, AP::Short);
+					m_account_detail_mgr.pushYesterdayUnClosedTrade(trade, AP::Short);
 			}
 
 
@@ -225,11 +231,11 @@ void CtpTradeSpi::OnRspQryInvestorPositionDetail(CThostFtdcInvestorPositionDetai
 			{
 				m_firstquery_Detail = false;
 
-				SYNC_PRINT << "[Trade]账户所有合约未平仓单笔数(不是手数,一笔可对应多手):多单" << AP::GetManager().yesterdayUnClosedTradeCount(AP::Long) << " 空单" << AP::GetManager().yesterdayUnClosedTradeCount(AP::Short);
+				SYNC_PRINT << "[Trade]账户所有合约未平仓单笔数(不是手数,一笔可对应多手):多单" << m_account_detail_mgr.yesterdayUnClosedTradeCount(AP::Long) << " 空单" << m_account_detail_mgr.yesterdayUnClosedTradeCount(AP::Short);
 				SYNC_PRINT << "--------先多后空-------";
 
-				SYNC_PRINT << AP::GetManager().yesterdayUnClosedTradeToString(AP::Long);
-				SYNC_PRINT << AP::GetManager().yesterdayUnClosedTradeToString(AP::Short);
+				SYNC_PRINT << m_account_detail_mgr.yesterdayUnClosedTradeToString(AP::Long);
+				SYNC_PRINT << m_account_detail_mgr.yesterdayUnClosedTradeToString(AP::Short);
 
 				SYNC_PRINT << "--------结束-------";
 
@@ -272,7 +278,7 @@ void CtpTradeSpi::OnRspQryTradingAccount(
 	CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
 	if (!IsErrorRspInfo(pRspInfo) && pTradingAccount){
-		AP::GetManager().setAccountStatus(*pTradingAccount);
+		m_account_detail_mgr.setAccountStatus(*pTradingAccount);
 
 		memcpy(&m_accountInfo, pTradingAccount, sizeof(CThostFtdcTradingAccountField));
 		SYNC_PRINT << "[Trade] Response | Balance:" << pTradingAccount->Balance
@@ -335,7 +341,7 @@ void CtpTradeSpi::ReqQryInvestorPosition_all()
 //		}
 //		else{
 //			//SYNC_PRINT << "[Trade] Request | send InvestorPosition query... fail";
-//			if (AP::GetManager().isReady())
+//			if (m_account_detail_mgr().isReady())
 //				break;
 //			sleep(2000);
 //		}
@@ -359,7 +365,7 @@ void CtpTradeSpi::OnRspQryInvestorPosition(
 			<< " UseMargin:" << pInvestorPosition->UseMargin;
 
 		if (m_firstquery_Position == true){
-			AP::GetManager().pushTradeMessage(*pInvestorPosition);
+			m_account_detail_mgr.pushTradeMessage(*pInvestorPosition);
 
 			if (bIsLast)
 			{
@@ -402,15 +408,17 @@ void CtpTradeSpi::OnRspQryInstrument(CThostFtdcInstrumentField *pInstrument,
 	{
 		if (m_firstquery_Instrument == true)
 		{
-			AP::GetManager().pushInstrumentStruct(*pInstrument);
+			m_account_detail_mgr.pushInstrumentStruct(*pInstrument);
 
 			if (bIsLast)
 			{
 				m_firstquery_Instrument = false;
-				SYNC_PRINT << "[Trade] 所有持仓合约：" << AP::GetManager().getInstrumentList();
+				SYNC_PRINT << "[Trade] 所有持仓合约：" << m_account_detail_mgr.getInstrumentList();
 
 				// 为什么在tradespi线程初始化全部完成以后才启动MD?
 				m_stateChangeHandler.OnRspQryInstrument();
+
+				m_initFinish_callback();
 			}
 		}
 	}
@@ -458,9 +466,11 @@ void CtpTradeSpi::OnRtnOrder(CThostFtdcOrderField *pOrder)
 {
 	SYNC_PRINT << "[Trade] 报单回报:前置编号FrontID:" << pOrder->FrontID << " 会话编号SessionID:" << pOrder->SessionID << " OrderRef:" << pOrder->OrderRef;
 
-	AP::GetManager().pushImmediateOrder(*pOrder);
-
+	m_account_detail_mgr.pushImmediateOrder(*pOrder);
+	
 	SYNC_PRINT << "[Trade] 回复 | 订单...ID:" << pOrder->BrokerOrderSeq << ";订单状态:" << CommonUtils::InterpretOrderSubmitStatusCode(pOrder->OrderSubmitStatus);
+
+	m_OnRtnOrder_callback();
 }
 
 void CtpTradeSpi::OnRtnTrade(CThostFtdcTradeField *pTrade)
@@ -489,7 +499,9 @@ void CtpTradeSpi::OnRtnTrade(CThostFtdcTradeField *pTrade)
 	//	g_OrderRunMtx.unlock();
 	//g_OrderRunMtx.unlock();
 	
-	AP::GetManager().pushTodayNewTrade(*pTrade);//会更新整个账户和仓位的状态，使资金状态保持最新
+	m_account_detail_mgr.pushTodayNewTrade(*pTrade);//会更新整个账户和仓位的状态，使资金状态保持最新
+
+	m_OnRtnTrade_callback();
 }
 
 
@@ -543,16 +555,16 @@ void CtpTradeSpi::ForceClose(){
 	TThostFtdcPriceType           price;//价格，0是市价,上期所不支持
 	TThostFtdcVolumeType          vol;//数量
 
-	for (auto item : AP::GetManager().getAllPositionMap()){
+	for (auto item : m_account_detail_mgr.getAllPositionMap()){
 		//平多
 		if (item.second.Holding_long > 0)
 		{
 			STRCPY(instId, item.second.InstId.c_str());
 			dir = THOST_FTDC_D_Sell;// #define THOST_FTDC_D_Buy '0' ||| #define THOST_FTDC_D_Sell '1'
-			price = item.second.LastPrice - 5 * AP::GetManager().getInstrumentField(instId).PriceTick;
+			price = item.second.LastPrice - 5 * m_account_detail_mgr.getInstrumentField(instId).PriceTick;
 
 			//上期所
-			if (strcmp(AP::GetManager().getInstrumentField(instId).ExchangeID, "SHFE") == 0)
+			if (strcmp(m_account_detail_mgr.getInstrumentField(instId).ExchangeID, "SHFE") == 0)
 			{
 				if (item.second.YdPosition_long == 0)//没有昨仓
 				{
@@ -605,10 +617,10 @@ void CtpTradeSpi::ForceClose(){
 		{
 			STRCPY(instId, item.second.InstId.c_str());//或strcpy(instId, iter->first.c_str());
 			dir = '0';
-			price = item.second.LastPrice + 5 * AP::GetManager().getInstrumentField(instId).PriceTick;
+			price = item.second.LastPrice + 5 * m_account_detail_mgr.getInstrumentField(instId).PriceTick;
 
 			//上期所
-			if (strcmp(AP::GetManager().getInstrumentField(instId).ExchangeID, "SHFE") == 0)
+			if (strcmp(m_account_detail_mgr.getInstrumentField(instId).ExchangeID, "SHFE") == 0)
 			{
 				if (item.second.YdPosition_short == 0)//没有昨仓
 				{
@@ -658,7 +670,7 @@ void CtpTradeSpi::ForceClose(){
 }
 
 void CtpTradeSpi::CancelOrder(const std::string& MDtime, int aliveDuration, const std::string& instrumentId){
-	for (auto item : AP::GetManager().getAllOrders())
+	for (auto item : m_account_detail_mgr.getAllOrders())
 	{
 		if (std::string(item.InstrumentID) != instrumentId)
 			continue;

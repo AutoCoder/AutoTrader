@@ -6,7 +6,11 @@
 #include "socket_session.h"
 
 class Account;
+class CThostFtdcTraderApi;
 
+//*********************************************************
+//This singleton must be launched before mutli thread start
+//*********************************************************
 class AccountMgr
 {
 public:
@@ -21,19 +25,26 @@ public:
 			return NULL;
 	}
 
+	CThostFtdcTraderApi* TradeApiPtr() const { return m_pTradeUserApi; }
+
 	void AddAccount(const std::shared_ptr<Account>& newAcc);
 
 	void LoginAccount(const std::string& userId, const std::string& pw, const std::shared_ptr<Transmission::socket_session>& session);
 
 	void StartTrade(const std::string& instru, int strategyId, int PositionCtlId, const std::shared_ptr<Transmission::socket_session>& session);
 
+	void LogoutAccount(const std::shared_ptr<Transmission::socket_session>& session);
+
+	void StopTrade(const std::shared_ptr<Transmission::socket_session>& session);
+
 private:
-	AccountMgr(){}
+	AccountMgr();
 	AccountMgr(const AccountMgr&) = delete;
 	AccountMgr& operator=(const AccountMgr &) = delete;
 	static AccountMgr *_instance;
 
 private:
+	CThostFtdcTraderApi*															   m_pTradeUserApi;
 	std::map<std::string/*id*/, std::shared_ptr<Account> >                             m_pool;
 	std::map<std::shared_ptr<Transmission::socket_session>, std::shared_ptr<Account>>  m_LoggedAccount;
 };

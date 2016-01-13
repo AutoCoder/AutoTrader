@@ -3,24 +3,30 @@
 #include "Order.h"
 #include "AP_Mgr.h"
 #include "crossplatform.h"
+#include "AP_Mgr.h"
+
+Pos20Precent::Pos20Precent(AP::AccountDetailMgr* mgr)
+	:m_detailMgr(mgr)
+{
+
+}
 
 bool Pos20Precent::completeOrder(Order& ord){
-	while (!AP::GetManager().isReady()){
-		sleep(20);
-	}
+	if (!m_detailMgr)
+		return false;
 
 	double posMoney = 0.0;
 	double available = 0.0;
 
 	AP::Direction posDirection = AP::Long;
-	AP::GetManager().getPosition(posMoney, posDirection, available);
+	m_detailMgr->getPosition(posMoney, posDirection, available);
 
 	int subPos = 0;
 	int subtodayPos = 0;
 	int subydPos = 0;
 	AP::Direction subtodayDirection = AP::Long;
 	AP::Direction subydDirection = AP::Long;
-	subPos = AP::GetManager().getPositionVolume(ord.GetInstrumentId(), subtodayDirection, subtodayPos, subydDirection, subydPos);
+	subPos = m_detailMgr->getPositionVolume(ord.GetInstrumentId(), subtodayDirection, subtodayPos, subydDirection, subydPos);
 
 	//如果订单买卖方向与持仓买卖方向一致,或者仓位为0。
 	if (ord.GetExchangeDirection() == posDirection || posMoney < std::numeric_limits<double>::epsilon()){

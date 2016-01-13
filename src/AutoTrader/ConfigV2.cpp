@@ -58,9 +58,12 @@ ConfigV2::ConfigV2(const std::string& pathName)
 			auto acnode = root["AccountList"];
 			int ac_size = root["AccountList"].size();
 			
+			m_ctp_brokerId = acnode[0]["BrokerID"].asString();
+			m_ctp_userId = acnode[0]["UserID"].asString();
+			m_ctp_password = acnode[0]["Password"].asString();
 			for (int i = 0; i < ac_size; ++i)
 			{
-				auto& item = root["AccountList"][i];
+				auto& item = acnode[i];
 				std::shared_ptr<Account> account = std::make_shared<Account>(item["BrokerID"].asString(), item["UserID"].asString(), item["Password"].asString());
 
 				auto& instruList = item["Instruments"];
@@ -95,7 +98,7 @@ ConfigV2::~ConfigV2(){
 ConfigV2* ConfigV2::Instance()
 {
 	if (!m_instance){
-		m_instance = new ConfigV2("config.json");
+		m_instance = new ConfigV2("config_v2.json");
 	}
 
 	return m_instance;
@@ -109,6 +112,15 @@ std::string ConfigV2::CtpTradeFront() const{
 	return m_ctp_tradefront;
 }
 
+std::vector<std::string> ConfigV2::Instruments() const {
+	//auto iter = m_instruments.begin();
+	//std::string ret = *iter++;
+	//for (; iter != m_instruments.end(); iter++)
+	//	ret += (*iter);
+	std::vector<std::string> ret;
+	ret.assign(m_instruments.begin(), m_instruments.end());
+	return ret;
+}
 
 std::string ConfigV2::DBHost() const{
 	return m_db_host;
@@ -142,4 +154,14 @@ std::string ConfigV2::GetStrategy(size_t idx) const
 		return m_strategies.at(idx);
 	else
 		return "";
+}
+
+std::string ConfigV2::DefaultCtpBrokerID() const{
+	return m_ctp_brokerId;
+}
+std::string ConfigV2::DefaultCtpUserID() const{
+	return m_ctp_userId;
+}
+std::string ConfigV2::DefaultCtpPassword() const{
+	return m_ctp_password;
 }

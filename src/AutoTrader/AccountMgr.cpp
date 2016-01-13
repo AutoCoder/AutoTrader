@@ -3,6 +3,8 @@
 #include "AccountMgr.h"
 #include "remote_server_action.h"
 #include "fifo_action_queue.h"
+#include "ThostFtdcTraderApi.h"
+#include "ConfigV2.h"
 
 static const char* LoginSucceed = "Login Successfully!";
 static const char* LoginRepeatedly = "Login Repeatedly!";
@@ -23,7 +25,16 @@ namespace {
 AccountMgr* AccountMgr::_instance = NULL;
 
 AccountMgr* AccountMgr::getInstance(){
+	if (_instance == NULL)
+	{
+		_instance = new AccountMgr();
+	}
 	return _instance;
+}
+
+AccountMgr::AccountMgr()
+	:m_pTradeUserApi(CThostFtdcTraderApi::CreateFtdcTraderApi())
+{
 }
 
 void AccountMgr::AddAccount(const std::shared_ptr<Account>& newAcc){
@@ -67,5 +78,22 @@ void AccountMgr::StartTrade(const std::string& instru, int strategyId, int Posit
 	}
 	else{
 		AppendReplyBySession(session, LoginNeeded);
+	}
+}
+
+
+void AccountMgr::LogoutAccount(const std::shared_ptr<Transmission::socket_session>& session){
+	auto accoutIter = m_LoggedAccount.find(session);
+	if (accoutIter != m_LoggedAccount.end())// logged
+	{
+		accoutIter->second->Logout();
+	}
+}
+
+void AccountMgr::StopTrade(const std::shared_ptr<Transmission::socket_session>& session){
+	auto accoutIter = m_LoggedAccount.find(session);
+	if (accoutIter != m_LoggedAccount.end())// logged
+	{
+		accoutIter->second->StopTrade();
 	}
 }

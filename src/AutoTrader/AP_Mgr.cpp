@@ -38,26 +38,21 @@ namespace AP{
 		CThostFtdcOrderField m_data;
 	};
 
-	AccountAndPositionMgr& GetManager(){
-		static AccountAndPositionMgr mgr; //Scott Meyers singleton 
-		return mgr;
-	}
-
-	AccountAndPositionMgr::AccountAndPositionMgr()
+	AccountDetailMgr::AccountDetailMgr()
 		: m_isReady(false)
 	{
 	}
 
-	AccountAndPositionMgr::~AccountAndPositionMgr()
+	AccountDetailMgr::~AccountDetailMgr()
 	{
 	}
 
 
-	void AccountAndPositionMgr::setAccountStatus(const CThostFtdcTradingAccountField& info){
+	void AccountDetailMgr::setAccountStatus(const CThostFtdcTradingAccountField& info){
 		memcpy(&m_accountInfo, &info, sizeof(CThostFtdcTradingAccountField));
 	}
 
-	void AccountAndPositionMgr::pushTodayNewTrade(const CThostFtdcTradeField& tradeField){
+	void AccountDetailMgr::pushTodayNewTrade(const CThostFtdcTradeField& tradeField){
 		std::map<std::string, TradeMessage>::iterator iter = m_tradeMessage_dict.find(std::string(tradeField.InstrumentID));
 		if (iter == m_tradeMessage_dict.end()){ // if the instrument is not existed, create it.
 			TradeMessage message;
@@ -217,11 +212,11 @@ namespace AP{
 		}
 	}
 
-	void AccountAndPositionMgr::pushTodayOrder(const CThostFtdcOrderField& orderField){
+	void AccountDetailMgr::pushTodayOrder(const CThostFtdcOrderField& orderField){
 		m_orderlist.push_back(orderField);
 	}
 
-	void AccountAndPositionMgr::pushImmediateOrder(const CThostFtdcOrderField& orderField){
+	void AccountDetailMgr::pushImmediateOrder(const CThostFtdcOrderField& orderField){
 		auto orderIter = std::find_if(m_orderlist.begin(), m_orderlist.end(), IsSameOrder(orderField));
 		if (orderIter != m_orderlist.end()){
 			*orderIter = orderField;
@@ -231,19 +226,19 @@ namespace AP{
 		}
 	}
 
-	std::string AccountAndPositionMgr::todayOrderToString() const{
+	std::string AccountDetailMgr::todayOrderToString() const{
 		return CommonUtils::ConvertOrderListToString(m_orderlist);
 	}
 
-	void AccountAndPositionMgr::pushTodayTrade(const CThostFtdcTradeField& tradeField){
+	void AccountDetailMgr::pushTodayTrade(const CThostFtdcTradeField& tradeField){
 		m_tradelist.push_back(tradeField);
 	}
 
-	std::string AccountAndPositionMgr::todayTradeToString() const{
+	std::string AccountDetailMgr::todayTradeToString() const{
 		return CommonUtils::ConvertTradeListToString(m_tradelist);
 	}
 
-	void AccountAndPositionMgr::pushYesterdayUnClosedTrade(const CThostFtdcTradeField& tradeField, Direction direction){
+	void AccountDetailMgr::pushYesterdayUnClosedTrade(const CThostFtdcTradeField& tradeField, Direction direction){
 		if (direction == THOST_FTDC_D_Buy){
 			m_tradeList_nonClosed_account_long.push_back(tradeField);
 		}
@@ -252,7 +247,7 @@ namespace AP{
 		}
 	}
 
-	std::string AccountAndPositionMgr::yesterdayUnClosedTradeToString(Direction direction){
+	std::string AccountDetailMgr::yesterdayUnClosedTradeToString(Direction direction){
 		if (direction == THOST_FTDC_D_Buy){
 			return CommonUtils::ConvertTradeListToString(m_tradeList_nonClosed_account_long);
 		}
@@ -263,7 +258,7 @@ namespace AP{
 			return "";
 	}
 
-	void AccountAndPositionMgr::pushTradeMessage(const CThostFtdcInvestorPositionField& originalTradeStruct){
+	void AccountDetailMgr::pushTradeMessage(const CThostFtdcInvestorPositionField& originalTradeStruct){
 		std::map<std::string, TradeMessage>::iterator iter = m_tradeMessage_dict.find(std::string(originalTradeStruct.InstrumentID));
 		if (iter == m_tradeMessage_dict.end()){ // if the instrument is not existed, create it.
 			TradeMessage message;
@@ -299,7 +294,7 @@ namespace AP{
 		}
 	}
 
-	double AccountAndPositionMgr::getCloseProfit(){
+	double AccountDetailMgr::getCloseProfit(){
 		double ret = 0;
 		for (auto item : m_tradeMessage_dict){
 			ret += (item.second.closeProfit_long + item.second.closeProfit_short);
@@ -307,7 +302,7 @@ namespace AP{
 		return ret;
 	}
 
-	double AccountAndPositionMgr::getOpenProfit(){
+	double AccountDetailMgr::getOpenProfit(){
 		double ret = 0;
 		for (auto item : m_tradeMessage_dict){
 			ret += (item.second.OpenProfit_long + item.second.OpenProfit_short);
@@ -315,19 +310,19 @@ namespace AP{
 		return ret;
 	}
 
-	void AccountAndPositionMgr::pushInstrumentStruct(const CThostFtdcInstrumentField& instru)
+	void AccountDetailMgr::pushInstrumentStruct(const CThostFtdcInstrumentField& instru)
 	{
 		m_instrument_dict[instru.InstrumentID] = instru;
 	}
 
-	CThostFtdcInstrumentField AccountAndPositionMgr::getInstrumentField(const std::string& instrId) const{
+	CThostFtdcInstrumentField AccountDetailMgr::getInstrumentField(const std::string& instrId) const{
 		if (m_instrument_dict.count(instrId) != 0)
 			return m_instrument_dict.at(instrId);
 		else
 			return CThostFtdcInstrumentField();
 	}
 
-	std::string AccountAndPositionMgr::getInstrumentList() const{
+	std::string AccountDetailMgr::getInstrumentList() const{
 		std::string ret;
 		for (auto item : m_instrument_dict){
 			ret += (item.first + ", ");
@@ -335,7 +330,7 @@ namespace AP{
 		return ret.substr(0, ret.size() - 1);
 	}
 
-	double AccountAndPositionMgr::getPosition(double& pos, Direction& direction, double& available) const{
+	double AccountDetailMgr::getPosition(double& pos, Direction& direction, double& available) const{
 		double money_long = 0.0; //THOST_FTDC_D_Buy
 		double money_short = 0.0; // THOST_FTDC_D_Sell
 
@@ -357,7 +352,7 @@ namespace AP{
 		return pos;
 	}
 
-	int AccountAndPositionMgr::getPositionVolume(const std::string& instruID, Direction& todayDirection, int& todayPos, Direction& ydDirection, int& ydPos) const{
+	int AccountDetailMgr::getPositionVolume(const std::string& instruID, Direction& todayDirection, int& todayPos, Direction& ydDirection, int& ydPos) const{
 		if (m_tradeMessage_dict.find(instruID) != m_tradeMessage_dict.end()){
 			int pos = m_tradeMessage_dict.at(instruID).Holding_long - m_tradeMessage_dict.at(instruID).Holding_short;
 			int todayPos1 = m_tradeMessage_dict.at(instruID).TodayPosition_long - m_tradeMessage_dict.at(instruID).TodayPosition_short;

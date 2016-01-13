@@ -10,6 +10,8 @@
 #include "MACrossBOLLStrategy.h"
 #include "tradespi.h"
 #include "IPositionControl.h"
+#include "TickWrapper.h"
+#include "RealTimeDataProcessor.h"
 
 RealTimeDataProcessorPool* RealTimeDataProcessorPool::_instance = NULL;
 
@@ -22,53 +24,53 @@ RealTimeDataProcessorPool* RealTimeDataProcessorPool::getInstance()
 	return _instance;
 }
 
-RealTimeDataProcessorPool::RealTimeDataProcessorPool()
-	:m_dbptr(new DBWrapper)
-{
-	//construct the Strategy dict 
-	Config::Instance()->CtpBrokerID();
-	std::vector<StrategyMetaData> stgySet = Config::Instance()->StrategySet();
-	m_dict.clear();
-	IPositionControl* mgr = new Pos20Precent();
-	for (StrategyMetaData it : stgySet){
-		if (it.name == "MACross"){
-			m_dict["MACross"] = std::shared_ptr<Strategy>(new MACrossStratgy(it.short_ma, it.long_ma, mgr));
-		}
-		else if (it.name == "WMACross"){
-			m_dict["WMACross"] = std::shared_ptr<Strategy>(new WMACrossStratgy(it.short_ma, it.long_ma, mgr));
-		}
-		else if (it.name == "AMACross"){
-			m_dict["AMACross"] = std::shared_ptr<Strategy>(new AMACrossStratgy(it.short_ma, it.long_ma, mgr));
-		}
-		else if (it.name == "EMACross"){
-			m_dict["EMACross"] = std::shared_ptr<Strategy>(new EMACrossStratgy(it.short_ma, it.long_ma, mgr));
-		}
-		else if (it.name == "MACrossBOLL"){
-			m_dict["MACrossBOLL"] = std::shared_ptr<Strategy>(new MACrossBOLLStrategy(it.short_ma, it.long_ma, 26, mgr));
-		}
-	}
-
-	m_processorDict.clear();
-
-	if (Config::Instance()->RecordModeOn()){
-		m_processorDict[instrument_1] = std::shared_ptr<RealTimeDataProcessor>(new RealTimeDataProcessor(nullptr, instrument_1));
-		m_processorDict[instrument_2] = std::shared_ptr<RealTimeDataProcessor>(new RealTimeDataProcessor(nullptr, instrument_2));
-	}
-	else{
-		//m_processorDict["rb1510"] = std::shared_ptr<RealTimeDataProcessor>(new RealTimeDataProcessor(m_dict["k3UpThroughK5"].get(), "rb1510"));
-		std::string st1 = Config::Instance()->CtpStrategy(instrument_1);
-		std::string st2 = Config::Instance()->CtpStrategy(instrument_2);
-		m_processorDict[instrument_1] = std::shared_ptr<RealTimeDataProcessor>(new RealTimeDataProcessor(m_dict[st1].get(), instrument_1));
-		m_processorDict[instrument_2] = std::shared_ptr<RealTimeDataProcessor>(new RealTimeDataProcessor(m_dict[st2].get(), instrument_2));
-	}
+RealTimeDataProcessorPool::RealTimeDataProcessorPool(){
 
 }
-
-void RealTimeDataProcessorPool::ListenToTradeSpi(CtpTradeSpi* tradespi){
-	for (auto item : m_dict){
-		//warning: for now, as the accoutMgr is shared by all strategy, so AddSubscriber function can rewrite this pointer.
-		//tradespi->AddSubscriber(item.second->getAccountMgr());
-	}
+//RealTimeDataProcessorPool::RealTimeDataProcessorPool()
+//	:m_dbptr(new DBWrapper)
+//{
+//	//construct the Strategy dict 
+//	Config::Instance()->CtpBrokerID();
+//	std::vector<StrategyMetaData> stgySet = Config::Instance()->StrategySet();
+//	m_dict.clear();
+//	IPositionControl* mgr = new Pos20Precent();
+//	for (StrategyMetaData it : stgySet){
+//		if (it.name == "MACross"){
+//			m_dict["MACross"] = std::shared_ptr<Strategy>(new MACrossStratgy(it.short_ma, it.long_ma, mgr));
+//		}
+//		else if (it.name == "WMACross"){
+//			m_dict["WMACross"] = std::shared_ptr<Strategy>(new WMACrossStratgy(it.short_ma, it.long_ma, mgr));
+//		}
+//		else if (it.name == "AMACross"){
+//			m_dict["AMACross"] = std::shared_ptr<Strategy>(new AMACrossStratgy(it.short_ma, it.long_ma, mgr));
+//		}
+//		else if (it.name == "EMACross"){
+//			m_dict["EMACross"] = std::shared_ptr<Strategy>(new EMACrossStratgy(it.short_ma, it.long_ma, mgr));
+//		}
+//		else if (it.name == "MACrossBOLL"){
+//			m_dict["MACrossBOLL"] = std::shared_ptr<Strategy>(new MACrossBOLLStrategy(it.short_ma, it.long_ma, 26, mgr));
+//		}
+//	}
+//
+//	m_processorDict.clear();
+//
+//	if (Config::Instance()->RecordModeOn()){
+//		m_processorDict[instrument_1] = std::shared_ptr<RealTimeDataProcessor>(new RealTimeDataProcessor(nullptr, instrument_1));
+//		m_processorDict[instrument_2] = std::shared_ptr<RealTimeDataProcessor>(new RealTimeDataProcessor(nullptr, instrument_2));
+//	}
+//	else{
+//		//m_processorDict["rb1510"] = std::shared_ptr<RealTimeDataProcessor>(new RealTimeDataProcessor(m_dict["k3UpThroughK5"].get(), "rb1510"));
+//		std::string st1 = Config::Instance()->CtpStrategy(instrument_1);
+//		std::string st2 = Config::Instance()->CtpStrategy(instrument_2);
+//		m_processorDict[instrument_1] = std::shared_ptr<RealTimeDataProcessor>(new RealTimeDataProcessor(m_dict[st1].get(), instrument_1));
+//		m_processorDict[instrument_2] = std::shared_ptr<RealTimeDataProcessor>(new RealTimeDataProcessor(m_dict[st2].get(), instrument_2));
+//	}
+//
+//}
+void RealTimeDataProcessorPool::AddProcessor(const std::shared_ptr<RealTimeDataProcessor>& processor){
+	auto processorVec = m_processorDict[processor->Instrument()];
+	processorVec.push_back(processor);
 }
 
 void RealTimeDataProcessorPool::recoverHistoryData(int beforeSeconds, const std::string& instrumentId)
@@ -86,19 +88,32 @@ void RealTimeDataProcessorPool::recoverHistoryData(int beforeSeconds, const std:
 
 }
 
-std::shared_ptr<RealTimeDataProcessor> RealTimeDataProcessorPool::GenRealTimeDataProcessor(const std::string& instrumentID)
+
+void RealTimeDataProcessorPool::StoreCachedData()
 {
-	if (m_processorDict.end() == m_processorDict.find(instrumentID))
-		return NULL;
-	else{
-		return m_processorDict[instrumentID];
+	//for (auto item : m_processorDict){
+	//	item.second->StoreDataToDB();
+	//}
+
+}
+
+void RealTimeDataProcessorPool::AppendRealTimeData(TickWrapper& info)
+{
+	auto processorVec = m_processorDict[info.InstrumentId()];
+	for (auto proccessor : processorVec){
+		if (auto sp = proccessor.lock()){
+			if (sp->IsTrading())
+				sp->AppendRealTimeData(info);
+		}
 	}
 }
 
-
-void RealTimeDataProcessorPool::FreeProcessors()
+void RealTimeDataProcessorPool::StoreStrategySequenceToDB(const std::string& instrumentID, const std::string& mark)
 {
-	for (auto item : m_processorDict){
-		item.second->StoreDataToDB();
+	auto processorVec = m_processorDict[instrumentID]; 
+	for (auto proccessor : processorVec){
+		if (auto sp = proccessor.lock()){
+			sp->StoreStrategySequenceToDB(mark);
+		}
 	}
 }

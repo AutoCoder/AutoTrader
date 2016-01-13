@@ -25,7 +25,7 @@ namespace{
 //	}
 //}
 
-//{"ActionType":"Login","Arguments":{"BrokerId":"9999","UserName":"123","Password":"123"}}
+//{"ActionType":"Login","Arguments":{"BrokerId":"9999","UserName":"021510","Password":"wodemima"}}
 
 //Start Trade Action
 //{
@@ -216,12 +216,12 @@ namespace Transmission{
 			case ActionType::Logout:
 			{
 				//todo: execute loginOUT
-
+				AccountMgr::getInstance()->LogoutAccount(session_);
 			}
 			break;
 			case ActionType::StopTrade:
 			{
-				//todo: execute StopTrade
+				AccountMgr::getInstance()->StopTrade(session_);
 			}
 			break;
 			default:

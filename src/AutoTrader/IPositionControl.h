@@ -2,6 +2,9 @@
 #define IPositionControl_H
 
 class Order;
+namespace AP{
+	class AccountDetailMgr;
+};
 
 class IPositionControl
 {
@@ -15,11 +18,14 @@ public:
 
 class Pos20Precent : public IPositionControl{
 public:
-	Pos20Precent(){};
+	explicit Pos20Precent(AP::AccountDetailMgr* mgr);
 	~Pos20Precent(){};
 
 	//return fail or success
 	virtual bool completeOrder(Order& ord);
+
+private:
+	AP::AccountDetailMgr* m_detailMgr;
 };
 
 #endif

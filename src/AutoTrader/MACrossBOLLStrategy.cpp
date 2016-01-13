@@ -12,12 +12,12 @@
 #include "IPositionControl.h"
 
 
-MACrossBOLLStrategy::MACrossBOLLStrategy(size_t short_ma, size_t long_ma, size_t boll_period, IPositionControl* accountMgr)
+MACrossBOLLStrategy::MACrossBOLLStrategy(size_t short_ma, size_t long_ma, size_t boll_period, IPositionControl* pctl)
 : m_curOrder(new Order())
 , m_shortMA(short_ma)
 , m_longMA(long_ma)
 , m_bollperiod(boll_period)
-, m_AccoutMgr(accountMgr)
+, m_posControl(pctl)
 {
 }
 
@@ -28,7 +28,7 @@ MACrossBOLLStrategy::~MACrossBOLLStrategy()
 
 
 IPositionControl* MACrossBOLLStrategy::getAccountMgr(){
-	return m_AccoutMgr;
+	return m_posControl;
 }
 
 bool MACrossBOLLStrategy::tryInvoke(const std::list<TickWrapper>& data, TickWrapper& info){
@@ -179,7 +179,7 @@ bool MACrossBOLLStrategy::tryInvoke(const std::list<TickWrapper>& tickdata, cons
 
 bool MACrossBOLLStrategy::generateOrder(Order& out){
 	assert(m_curOrder);
-	if (m_AccoutMgr->completeOrder(*m_curOrder)){
+	if (m_posControl->completeOrder(*m_curOrder)){
 		out = *m_curOrder;
 		return true;
 	}

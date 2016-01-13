@@ -11,11 +11,11 @@
 #include "IPositionControl.h"
 #include "crossplatform.h"
 
-MACrossStratgy::MACrossStratgy(size_t short_ma, size_t long_ma, IPositionControl* accountMgr)
+MACrossStratgy::MACrossStratgy(size_t short_ma, size_t long_ma, IPositionControl* pctl)
 : m_curOrder(new Order())//m_order is a pointer so that it will only update so, create it at constructor.
 , m_shortMA(short_ma)
 , m_longMA(long_ma)
-, m_AccoutMgr(accountMgr)
+, m_posControl(pctl)
 {
 }
 
@@ -27,7 +27,7 @@ MACrossStratgy::~MACrossStratgy()
 }
 
 IPositionControl* MACrossStratgy::getAccountMgr(){
-	return m_AccoutMgr;
+	return m_posControl;
 }
 
 // common MA 
@@ -187,7 +187,7 @@ bool MACrossStratgy::tryInvoke(const std::list<TickWrapper>& tickdata, const std
 
 bool MACrossStratgy::generateOrder(Order& out){
 	assert(m_curOrder);
-	if (m_AccoutMgr->completeOrder(*m_curOrder)){
+	if (m_posControl->completeOrder(*m_curOrder)){
 		out = *m_curOrder;
 		return true;
 	}	
