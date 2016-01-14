@@ -43,12 +43,11 @@ namespace{
 namespace Transmission{
 
 	std::string ReadActionType(const std::string& input){
-		std::string input2 = "{\"ActionType\":\"Login\",\"Arguments\":{\"BrokerId\":\"9999\",\"UserName\":\"021510\",\"Password\":\"wodemima\"}}";
 		Json::Reader reader;
 
 		Json::Value root;
 
-		if (reader.parse(input2, root))
+		if (reader.parse(input, root))
 		{
 			auto& actionTypeNode = root["ActionType"];
 			return actionTypeNode.isNull() ? "" : actionTypeNode.asString();

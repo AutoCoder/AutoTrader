@@ -6,14 +6,14 @@
 #include "ThostFtdcTraderApi.h"
 #include "ConfigV2.h"
 
-static const char* LoginSucceed = "Login Successfully!";
-static const char* LoginRepeatedly = "Login Repeatedly!";
-static const char* LoginFailed_PW = "Login fail, Reason:Wrong password.";
-static const char* LoginFailed_AC = "Login fail, Reason:unexisted account.";
-static const char* TradingNow = "Trading now, Please stop current trading first.";
-static const char* LoginNeeded = "Please login first before start to trade.";
-static const char* StartTradeSucceed = "Start To Trade Successfully";
-static const char* InvalidTradeArguments = "Trade arguments is invalid.";
+static const char* LoginSucceed = "Login Successfully!\n";
+static const char* LoginRepeatedly = "Login Repeatedly!\n";
+static const char* LoginFailed_PW = "Login fail, Reason:Wrong password.\n";
+static const char* LoginFailed_AC = "Login fail, Reason:unexisted account.\n";
+static const char* TradingNow = "Trading now, Please stop current trading first.\n";
+static const char* LoginNeeded = "Please login first before start to trade.\n";
+static const char* StartTradeSucceed = "Start To Trade Successfully.\n";
+static const char* InvalidTradeArguments = "Trade arguments is invalid.\n";
 
 namespace {
 	void AppendReplyBySession(const std::shared_ptr<Transmission::socket_session>& session, const std::string& data){
