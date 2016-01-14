@@ -11,7 +11,7 @@ namespace Transmission{
 	class socket_session
 	{
 	public:
-		explicit socket_session(Detail::session* innerPtr);
+		explicit socket_session(const std::shared_ptr<Detail::session>& impl_ptr);
 		bool do_write(const char* reply, size_t size);
 
 	private:

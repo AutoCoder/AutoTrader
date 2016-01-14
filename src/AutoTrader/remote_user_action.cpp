@@ -25,7 +25,7 @@ namespace{
 //	}
 //}
 
-//{"ActionType":"Login","Arguments":{"BrokerId":"9999","UserName":"021510","Password":"wodemima"}}
+//96{"ActionType":"Login","Arguments":{"BrokerId":"9999","UserName":"021510","Password":"wodemima"}}
 
 //Start Trade Action
 //{
@@ -43,14 +43,15 @@ namespace{
 namespace Transmission{
 
 	std::string ReadActionType(const std::string& input){
+		std::string input2 = "{\"ActionType\":\"Login\",\"Arguments\":{\"BrokerId\":\"9999\",\"UserName\":\"021510\",\"Password\":\"wodemima\"}}";
 		Json::Reader reader;
 
 		Json::Value root;
 
-		if (reader.parse(input, root))
+		if (reader.parse(input2, root))
 		{
 			auto& actionTypeNode = root["ActionType"];
-			return actionTypeNode.isNull() ? actionTypeNode.asString() : "";
+			return actionTypeNode.isNull() ? "" : actionTypeNode.asString();
 		}
 		else
 			return "";
@@ -121,9 +122,8 @@ namespace Transmission{
 		}
 	}
 
-	RemoteUserAction::RemoteUserAction(const std::shared_ptr<socket_session>& session)
+	RemoteUserAction::RemoteUserAction()
 		: length_(0)
-		, session_(session)
 	{
 	}
 
@@ -132,6 +132,9 @@ namespace Transmission{
 	{
 	}
 
+	void RemoteUserAction::SetSession(const std::shared_ptr<socket_session>& session){
+		session_ = session;
+	}
 
 	RemoteUserAction::Parse_Result RemoteUserAction::Parse(char* begin, char* end){
 		assert(begin);

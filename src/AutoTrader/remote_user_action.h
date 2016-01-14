@@ -32,8 +32,7 @@ namespace Transmission{
 	class RemoteUserAction
 	{
 	public:
-		RemoteUserAction(){};
-		explicit RemoteUserAction(const std::shared_ptr<socket_session>& session);
+		RemoteUserAction();
 		~RemoteUserAction();
 
 		enum class Parse_Result {
@@ -53,6 +52,8 @@ namespace Transmission{
 		Parse_Result Parse(char* begin, char* end);
 		void Invoke();
 		void Reset();
+
+		void SetSession(const std::shared_ptr<socket_session>& session);
 
 	private:
 		size_t                            length_;

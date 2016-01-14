@@ -5,8 +5,8 @@
 
 namespace Transmission{
 
-	socket_session::socket_session(Detail::session* innerPtr):
-		session_impl_(std::shared_ptr<Detail::session>(innerPtr)) //Comment: weak_ptr can't be constructed with a native ptr, constructed by a shared_ptr is ok
+	socket_session::socket_session(const std::shared_ptr<Detail::session>& impl_ptr)
+		:session_impl_(impl_ptr)
 	{
 	}
 

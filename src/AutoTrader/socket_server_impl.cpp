@@ -11,13 +11,13 @@ namespace Transmission{
 	namespace Detail{
 
 		session::session(tcp::socket socket)
-			: socket_(std::move(socket))
-			, user_action_(std::make_shared<socket_session>(this))
+			: socket_(std::move(socket)) // shared_from_this() can't be called in ctor()
 		{
 		}
 
 		void session::start()
 		{
+			user_action_.SetSession(std::make_shared<socket_session>(shared_from_this()));
 			do_read();
 		}
 
@@ -54,7 +54,6 @@ namespace Transmission{
 					do_read();
 				}
 				else{
-					assert(false);
 					on_socket_error();
 				}
 			});

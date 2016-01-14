@@ -59,7 +59,7 @@ public:
 
 	//Transmission::socket_session_ptr SessionPtr() const { return m_session.get(); }
 
-	std::string Id() const { return m_ctp_username + m_brokderId; };
+	std::string Id() const { return m_brokderId + m_ctp_username; };
 
 	~Account();
 private:
