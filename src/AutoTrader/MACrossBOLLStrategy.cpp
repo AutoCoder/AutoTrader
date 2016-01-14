@@ -27,8 +27,8 @@ MACrossBOLLStrategy::~MACrossBOLLStrategy()
 }
 
 
-IPositionControl* MACrossBOLLStrategy::getAccountMgr(){
-	return m_posControl;
+Order MACrossBOLLStrategy::GetCurOrder() const{
+	return *m_curOrder;
 }
 
 bool MACrossBOLLStrategy::tryInvoke(const std::list<TickWrapper>& data, TickWrapper& info){

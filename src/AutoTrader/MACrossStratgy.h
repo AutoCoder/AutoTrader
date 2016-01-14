@@ -10,14 +10,14 @@ class IPositionControl;
 class MACrossStratgy : public Strategy
 {
 public:
-	MACrossStratgy(size_t short_ma, size_t long_ma, IPositionControl* pctl);
+	MACrossStratgy(size_t short_ma, size_t long_ma, IPositionControl* pctl = nullptr);
 	virtual ~MACrossStratgy();
 
 	virtual bool tryInvoke(const std::list<TickWrapper>& data, TickWrapper& info);
 	virtual bool tryInvoke(const std::list<TickWrapper>& tickdata, const std::vector<KData>& data, std::vector<TickWrapper> curmindata, TickWrapper& info);
 	virtual bool generateOrder(Order& out);
-	virtual IPositionControl* getAccountMgr();
 
+	Order GetCurOrder() const;
 protected:
 	virtual double calculateK(const std::list<TickWrapper>& data, const TickWrapper& current, size_t seconds) const;
 	virtual double calculateK(const std::vector<KData>& data, const KData& current, size_t mins) const;

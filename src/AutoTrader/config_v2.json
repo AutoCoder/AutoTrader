@@ -52,7 +52,7 @@
 
    "StrategyList": [
       "MACross",
-      "MACross[3,5]",
+      "MACross,3,5",
       "WMACross",
       "AMACross",
       "EMACross",

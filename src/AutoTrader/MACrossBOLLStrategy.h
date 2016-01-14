@@ -10,13 +10,13 @@ class IPositionControl;
 class MACrossBOLLStrategy : public Strategy
 {
 public:
-	MACrossBOLLStrategy(size_t short_ma, size_t long_ma, size_t boll_period, IPositionControl* accountMgr);
+	MACrossBOLLStrategy(size_t short_ma, size_t long_ma, size_t boll_period, IPositionControl* accountMgr = nullptr);
 	virtual ~MACrossBOLLStrategy();
 
 	virtual bool tryInvoke(const std::list<TickWrapper>& data, TickWrapper& info);
 	virtual bool tryInvoke(const std::list<TickWrapper>& tickdata, const std::vector<KData>& data, std::vector<TickWrapper> curmindata, TickWrapper& info);
 	virtual bool generateOrder(Order& out);
-	virtual IPositionControl* getAccountMgr();
+	Order GetCurOrder() const;
 
 protected:
 	virtual BOLLTech calculateBoll(const std::list<TickWrapper>& data, const TickWrapper& current, size_t seconds) const;

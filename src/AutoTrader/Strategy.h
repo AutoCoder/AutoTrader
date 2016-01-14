@@ -19,7 +19,6 @@ public:
 	virtual bool tryInvoke(const std::list<TickWrapper>& tickdata, const std::vector<KData>& data, std::vector<TickWrapper> curmindata, TickWrapper& info) = 0;
 
 	virtual bool generateOrder(Order& out) = 0;
-	virtual IPositionControl* getAccountMgr() = 0;
 };
 
 struct StrategyMetaData{

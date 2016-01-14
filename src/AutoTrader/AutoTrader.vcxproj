@@ -184,6 +184,7 @@ xcopy "$(SolutionDir)src\AutoTrader\config.ini" $(OutputPath) /Y</Command>
     <ClInclude Include="socket_server.h" />
     <ClInclude Include="socket_server_impl.h" />
     <ClInclude Include="socket_session.h" />
+    <ClInclude Include="OrderTrigger.h" />
     <ClInclude Include="tradespi.h" />
     <ClInclude Include="AMACrossStratgy.h" />
     <ClInclude Include="BOLLTech.h" />
@@ -210,6 +211,7 @@ xcopy "$(SolutionDir)src\AutoTrader\config.ini" $(OutputPath) /Y</Command>
     <ClInclude Include="TechUtils.h" />
     <ClInclude Include="TechVec.h" />
     <ClInclude Include="TickWrapper.h" />
+    <ClInclude Include="TriggerFactory.h" />
     <ClInclude Include="unittest.h" />
     <ClInclude Include="remote_user_action.h" />
     <ClInclude Include="WMACrossStratgy.h" />
@@ -254,6 +256,7 @@ xcopy "$(SolutionDir)src\AutoTrader\config.ini" $(OutputPath) /Y</Command>
     <ClCompile Include="TechUtils.cpp" />
     <ClCompile Include="TickWrapper.cpp" />
     <ClCompile Include="remote_user_action.cpp" />
+    <ClCompile Include="TriggerFactory.cpp" />
     <ClCompile Include="WMACrossStratgy.cpp" />
   </ItemGroup>
   <ItemGroup>

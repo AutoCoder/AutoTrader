@@ -93,12 +93,6 @@
     <ClInclude Include="unittest.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="MACrossBOLLTech.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MACrossBOLLStrategy.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="MATech.h">
       <Filter>Header Files\Tech</Filter>
     </ClInclude>
@@ -180,6 +174,18 @@
     <ClInclude Include="AccountMgr.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MACrossBOLLTech.h">
+      <Filter>Header Files\Tech</Filter>
+    </ClInclude>
+    <ClInclude Include="MACrossBOLLStrategy.h">
+      <Filter>Header Files\Strategy</Filter>
+    </ClInclude>
+    <ClInclude Include="OrderTrigger.h">
+      <Filter>Header Files\Strategy</Filter>
+    </ClInclude>
+    <ClInclude Include="TriggerFactory.h">
+      <Filter>Header Files\Strategy</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -210,12 +216,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CommonUtils.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MACrossBOLLTech.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MACrossBOLLStrategy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MATech.cpp">
@@ -286,6 +286,15 @@
     </ClCompile>
     <ClCompile Include="AccountMgr.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MACrossBOLLStrategy.cpp">
+      <Filter>Source Files\Strategy</Filter>
+    </ClCompile>
+    <ClCompile Include="MACrossBOLLTech.cpp">
+      <Filter>Source Files\Tech</Filter>
+    </ClCompile>
+    <ClCompile Include="TriggerFactory.cpp">
+      <Filter>Source Files\Strategy</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

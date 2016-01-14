@@ -26,8 +26,8 @@ MACrossStratgy::~MACrossStratgy()
 	m_curOrder = nullptr;
 }
 
-IPositionControl* MACrossStratgy::getAccountMgr(){
-	return m_posControl;
+Order MACrossStratgy::GetCurOrder() const{
+	return *m_curOrder;
 }
 
 // common MA 
