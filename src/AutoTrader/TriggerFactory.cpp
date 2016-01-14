@@ -4,10 +4,16 @@
 #include "IPositionControl.h"
 #include "MACrossStratgy.h"
 
+#ifndef MustImpl
 
+OrderTriggerBase* TriggerFactory::GetTrigger(){
+	return new OrderTrigger<Pos20Precent, MACrossStratgy, int, int>(3, 5);
+}
+
+#else
 TriggerFactory::TriggerFactory(){
-	OrderTriggerBase* p1 = new OrderTrigger<Pos20Precent, MACrossStratgy, int, int>(nullptr, 3 ,5);
-	m_factory["MACross,3,5"] = new OrderTrigger<Pos20Precent, MACrossStratgy, int, int>(nullptr, 3, 5);
+	OrderTriggerBase* p1 = new OrderTrigger<Pos20Precent, MACrossStratgy, int, int>(3 ,5);
+	m_factory["MACross,3,5"] = new OrderTrigger<Pos20Precent, MACrossStratgy, int, int>(3, 5);
 }
 
 OrderTriggerBase* TriggerFactory::GetTrigger(const std::string& name){
@@ -17,3 +23,5 @@ OrderTriggerBase* TriggerFactory::GetTrigger(const std::string& name){
 	else
 		return false;
 }
+
+#endif

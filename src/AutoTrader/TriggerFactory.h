@@ -4,7 +4,13 @@
 #include <map>
 #include <string>
 
+#ifndef MustImpl
+class TriggerFactory{
 
+public:
+	static OrderTriggerBase* GetTrigger();
+};
+#else
 class OrderTriggerBase;
 
 class TriggerFactory{
@@ -15,5 +21,6 @@ public:
 private:
 	std::map<std::string, OrderTriggerBase*> m_factory;
 };
+#endif
 
 #endif

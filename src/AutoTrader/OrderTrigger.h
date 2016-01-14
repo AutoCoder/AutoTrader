@@ -16,6 +16,8 @@ public:
 	virtual ~OrderTriggerBase(){};
 	virtual bool tryInvoke(const std::list<TickWrapper>& data, TickWrapper& info, Order& order) = 0;
 	virtual bool tryInvoke(const std::list<TickWrapper>& tickdata, const std::vector<KData>& data, std::vector<TickWrapper> curmindata, TickWrapper& info, Order& order) = 0;
+
+	virtual void BindWithAccout(AP::AccountDetailMgr*) = 0;
 };
 
 
@@ -23,9 +25,9 @@ template <typename P, typename S, typename ... Args>
 class OrderTrigger : public OrderTriggerBase
 {
 public:
-	OrderTrigger(AP::AccountDetailMgr* ap, Args ... args)
+	OrderTrigger(Args ... args)
 	{
-		m_positionCtl = std::make_unique<P>(ap);
+		m_positionCtl = std::make_unique<P>();
 		m_strategy = std::make_unique<S>(args...);
 	}
 	virtual ~OrderTrigger(){}
@@ -52,8 +54,13 @@ public:
 			return false;
 	}
 
+	virtual void BindWithAccout(AP::AccountDetailMgr* mgr){
+		m_positionCtl->BindAccount(mgr);
+	}
+
 private:
 	std::unique_ptr<P>    m_positionCtl;
 	std::unique_ptr<S>    m_strategy;
 };
+
 #endif

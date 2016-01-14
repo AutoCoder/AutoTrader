@@ -5,8 +5,7 @@
 #include "crossplatform.h"
 #include "AP_Mgr.h"
 
-Pos20Precent::Pos20Precent(AP::AccountDetailMgr* mgr)
-	:m_detailMgr(mgr)
+Pos20Precent::Pos20Precent()
 {
 
 }

@@ -112,7 +112,9 @@ bool Account::StartTrade(const std::string& instru, int strategyId, int Position
 	{
 		if (!m_realtimedata_processor.get()){
 			//todo: Need to refinement the structure of code
-			m_position_ctl = std::make_shared<Pos20Precent>(m_detailMgr.get()); // todo: construct it by pctl id
+			//m_position_ctl = std::make_shared<Pos20Precent>(m_detailMgr.get()); 
+			// todo: construct it by pctl id
+			m_position_ctl = std::make_shared<Pos20Precent>();
 			m_strategy = std::make_shared<MACrossStratgy>(3, 5, m_position_ctl.get());
 			m_realtimedata_processor = std::make_shared<RealTimeDataProcessor>(m_strategy.get(), instru, this);
 			RealTimeDataProcessorPool::getInstance()->AddProcessor(m_realtimedata_processor);
