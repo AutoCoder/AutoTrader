@@ -2,6 +2,9 @@
 #include "InstrumentInfoMgr.h"
 #include <assert.h>
 
+#define instrument_1 "rb1601"
+#define instrument_2 "rb1602"
+
 namespace Instrument{
 
 	InformationMgr::InformationMgr()

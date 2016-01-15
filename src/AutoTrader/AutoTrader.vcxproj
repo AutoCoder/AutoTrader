@@ -107,12 +107,12 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)include\;$(SolutionDir)src\lib_json\include\;$(SolutionDir)boost_1_60_0\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include\;$(SolutionDir)src\lib_json\include\;$(SolutionDir)boost_1_60_0\;$(SolutionDir)src\Common\;$(SolutionDir)src\StrategyFramework\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>thostmduserapi.lib;thosttraderapi.lib;libmysql.lib;lib_json.lib;libboost_system-vc120-mt-gd-1_60.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>thostmduserapi.lib;thosttraderapi.lib;libmysql.lib;lib_json.lib;Common.lib;StrategyFramework.lib;libboost_system-vc120-mt-gd-1_60.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)\lib;$(OutDir);$(SolutionDir)boost_1_60_0\stage\lib</AdditionalLibraryDirectories>
     </Link>
     <PostBuildEvent>
@@ -152,14 +152,14 @@ xcopy "$(SolutionDir)src\AutoTrader\config.ini" $(OutputPath) /Y</Command>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)include\;$(SolutionDir)src\lib_json\include\;$(SolutionDir)boost_1_60_0\</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)include\;$(SolutionDir)src\lib_json\include\;$(SolutionDir)boost_1_60_0\;$(SolutionDir)src\Common\</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>thostmduserapi.lib;thosttraderapi.lib;libmysql.lib;lib_json.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>thostmduserapi.lib;thosttraderapi.lib;libmysql.lib;lib_json.lib;Common.lib;StrategyFramework.lib;libboost_system-vc120-mt-1_60.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)\lib;$(OutDir);$(SolutionDir)boost_1_60_0\stage\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -174,77 +174,39 @@ xcopy "$(SolutionDir)src\AutoTrader\config.ini" $(OutputPath) /Y</Command>
     <ClInclude Include="Account.h" />
     <ClInclude Include="AccountMgr.h" />
     <ClInclude Include="ActionProcessor.h" />
-    <ClInclude Include="AP_Mgr.h" />
-    <ClInclude Include="ConfigV2.h" />
-    <ClInclude Include="crossplatform.h" />
     <ClInclude Include="fifo_action_queue.h" />
-    <ClInclude Include="IPositionControl.h" />
     <ClInclude Include="InstrumentInfoMgr.h" />
     <ClInclude Include="remote_server_action.h" />
     <ClInclude Include="socket_server.h" />
     <ClInclude Include="socket_server_impl.h" />
     <ClInclude Include="socket_session.h" />
-    <ClInclude Include="OrderTrigger.h" />
     <ClInclude Include="tradespi.h" />
-    <ClInclude Include="AMACrossStratgy.h" />
-    <ClInclude Include="BOLLTech.h" />
-    <ClInclude Include="CommonUtils.h" />
     <ClInclude Include="config.h" />
-    <ClInclude Include="DBWrapper.h" />
-    <ClInclude Include="EMACrossStratgy.h" />
     <ClInclude Include="ini_parser.h" />
-    <ClInclude Include="KData.h" />
-    <ClInclude Include="MACrossBOLLStrategy.h" />
-    <ClInclude Include="MACrossBOLLTech.h" />
-    <ClInclude Include="MACrossStratgy.h" />
-    <ClInclude Include="MATech.h" />
     <ClInclude Include="mdspi.h" />
-    <ClInclude Include="mysqlwrapper.h" />
-    <ClInclude Include="Order.h" />
     <ClInclude Include="ThreadSafeQueue.h" />
     <ClInclude Include="RealTimeDataProcessor.h" />
     <ClInclude Include="RealTimeDataProcessorPool.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="Strategy.h" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="TechUtils.h" />
-    <ClInclude Include="TechVec.h" />
-    <ClInclude Include="TickWrapper.h" />
-    <ClInclude Include="TriggerFactory.h" />
     <ClInclude Include="unittest.h" />
     <ClInclude Include="remote_user_action.h" />
-    <ClInclude Include="WMACrossStratgy.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Account.cpp" />
     <ClCompile Include="AccountMgr.cpp" />
     <ClCompile Include="ActionProcessor.cpp" />
-    <ClCompile Include="AP_Mgr.cpp" />
-    <ClCompile Include="ConfigV2.cpp" />
     <ClCompile Include="fifo_action_queue.cpp" />
     <ClCompile Include="InstrumentInfoMgr.cpp" />
-    <ClCompile Include="PositionControl.cpp" />
     <ClCompile Include="remote_server_action.cpp" />
     <ClCompile Include="socket_server.cpp" />
     <ClCompile Include="socket_server_impl.cpp" />
     <ClCompile Include="socket_session.cpp" />
     <ClCompile Include="tradespi.cpp" />
-    <ClCompile Include="AMACrossStratgy.cpp" />
     <ClCompile Include="AutoTrader.cpp" />
-    <ClCompile Include="BOLLTech.cpp" />
-    <ClCompile Include="CommonUtils.cpp" />
     <ClCompile Include="config.cpp" />
-    <ClCompile Include="DBWrapper.cpp" />
-    <ClCompile Include="EMACrossStratgy.cpp" />
-    <ClCompile Include="KData.cpp" />
-    <ClCompile Include="MACrossBOLLStrategy.cpp" />
-    <ClCompile Include="MACrossBOLLTech.cpp" />
-    <ClCompile Include="MACrossStratgy.cpp" />
-    <ClCompile Include="MATech.cpp" />
     <ClCompile Include="mdspi.cpp" />
-    <ClCompile Include="mysqlwrapper.cpp" />
-    <ClCompile Include="Order.cpp" />
     <ClCompile Include="RealTimeDataProcessor.cpp" />
     <ClCompile Include="RealTimeDataProcessorPool.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -253,11 +215,7 @@ xcopy "$(SolutionDir)src\AutoTrader\config.ini" $(OutputPath) /Y</Command>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="TechUtils.cpp" />
-    <ClCompile Include="TickWrapper.cpp" />
     <ClCompile Include="remote_user_action.cpp" />
-    <ClCompile Include="TriggerFactory.cpp" />
-    <ClCompile Include="WMACrossStratgy.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="AutoTrader.rc" />

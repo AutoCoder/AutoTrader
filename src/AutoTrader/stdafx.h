@@ -41,11 +41,11 @@
 //#define SPRINTF sprintf
 //
 //#endif
-
-
-#define instrument_1 "rb1601"
-#define instrument_2 "rb1602"
-
-#define SYNC_PRINT spdlog::get("console")->info()
+//
+//
+//#define instrument_1 "rb1601"
+//#define instrument_2 "rb1602"
+//
+//#define SYNC_PRINT spdlog::get("console")->info()
 
 #endif

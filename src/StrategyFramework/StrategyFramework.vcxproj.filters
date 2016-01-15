@@ -1,0 +1,135 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\Strategy">
+      <UniqueIdentifier>{35c42684-250a-4b2f-8470-de6127a8e044}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Strategy">
+      <UniqueIdentifier>{5159760c-4ba2-4570-8dd1-92fd70a1b184}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Tech">
+      <UniqueIdentifier>{83624b9e-1e0f-4d88-bd55-c49803e1dbcf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Tech">
+      <UniqueIdentifier>{c5639523-d813-4ac8-af14-7dab4752c580}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AMACrossStratgy.h">
+      <Filter>Header Files\Strategy</Filter>
+    </ClInclude>
+    <ClInclude Include="EMACrossStratgy.h">
+      <Filter>Header Files\Strategy</Filter>
+    </ClInclude>
+    <ClInclude Include="IPositionControl.h">
+      <Filter>Header Files\Strategy</Filter>
+    </ClInclude>
+    <ClInclude Include="MACrossBOLLStrategy.h">
+      <Filter>Header Files\Strategy</Filter>
+    </ClInclude>
+    <ClInclude Include="MACrossStratgy.h">
+      <Filter>Header Files\Strategy</Filter>
+    </ClInclude>
+    <ClInclude Include="OrderTrigger.h">
+      <Filter>Header Files\Strategy</Filter>
+    </ClInclude>
+    <ClInclude Include="TriggerFactory.h">
+      <Filter>Header Files\Strategy</Filter>
+    </ClInclude>
+    <ClInclude Include="WMACrossStratgy.h">
+      <Filter>Header Files\Strategy</Filter>
+    </ClInclude>
+    <ClInclude Include="BOLLTech.h">
+      <Filter>Header Files\Tech</Filter>
+    </ClInclude>
+    <ClInclude Include="KData.h">
+      <Filter>Header Files\Tech</Filter>
+    </ClInclude>
+    <ClInclude Include="MACrossBOLLTech.h">
+      <Filter>Header Files\Tech</Filter>
+    </ClInclude>
+    <ClInclude Include="MATech.h">
+      <Filter>Header Files\Tech</Filter>
+    </ClInclude>
+    <ClInclude Include="TechVec.h">
+      <Filter>Header Files\Tech</Filter>
+    </ClInclude>
+    <ClInclude Include="TickWrapper.h">
+      <Filter>Header Files\Tech</Filter>
+    </ClInclude>
+    <ClInclude Include="TechUtils.h">
+      <Filter>Header Files\Tech</Filter>
+    </ClInclude>
+    <ClInclude Include="AP_Mgr.h">
+      <Filter>Header Files\Strategy</Filter>
+    </ClInclude>
+    <ClInclude Include="Order.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Strategy.h">
+      <Filter>Header Files\Strategy</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files\Strategy</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="WMACrossStratgy.cpp">
+      <Filter>Source Files\Strategy</Filter>
+    </ClCompile>
+    <ClCompile Include="TriggerFactory.cpp">
+      <Filter>Source Files\Strategy</Filter>
+    </ClCompile>
+    <ClCompile Include="PositionControl.cpp">
+      <Filter>Source Files\Strategy</Filter>
+    </ClCompile>
+    <ClCompile Include="MACrossStratgy.cpp">
+      <Filter>Source Files\Strategy</Filter>
+    </ClCompile>
+    <ClCompile Include="MACrossBOLLStrategy.cpp">
+      <Filter>Source Files\Strategy</Filter>
+    </ClCompile>
+    <ClCompile Include="EMACrossStratgy.cpp">
+      <Filter>Source Files\Strategy</Filter>
+    </ClCompile>
+    <ClCompile Include="AMACrossStratgy.cpp">
+      <Filter>Source Files\Strategy</Filter>
+    </ClCompile>
+    <ClCompile Include="TickWrapper.cpp">
+      <Filter>Source Files\Tech</Filter>
+    </ClCompile>
+    <ClCompile Include="TechUtils.cpp">
+      <Filter>Source Files\Tech</Filter>
+    </ClCompile>
+    <ClCompile Include="MATech.cpp">
+      <Filter>Source Files\Tech</Filter>
+    </ClCompile>
+    <ClCompile Include="MACrossBOLLTech.cpp">
+      <Filter>Source Files\Tech</Filter>
+    </ClCompile>
+    <ClCompile Include="KData.cpp">
+      <Filter>Source Files\Tech</Filter>
+    </ClCompile>
+    <ClCompile Include="BOLLTech.cpp">
+      <Filter>Source Files\Tech</Filter>
+    </ClCompile>
+    <ClCompile Include="AP_Mgr.cpp">
+      <Filter>Source Files\Strategy</Filter>
+    </ClCompile>
+    <ClCompile Include="Order.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

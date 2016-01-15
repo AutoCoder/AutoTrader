@@ -1,6 +1,9 @@
 ﻿#ifndef CTP_CONFIG_H_
 #define CTP_CONFIG_H_
 
+#define instrument_1 "rb1601"
+#define instrument_2 "rb1602"
+
 #include <map>
 #include <vector>
 

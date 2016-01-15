@@ -4,6 +4,7 @@
 #include "RealTimeDataProcessorPool.h"
 #include "spdlog/spdlog.h"
 #include "CommonUtils.h"
+#include "crossplatform.h"
 
 #include <iostream>
 #include <condition_variable>
