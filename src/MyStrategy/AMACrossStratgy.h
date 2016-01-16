@@ -1,13 +1,12 @@
 #ifndef AMACROSS_STRATEGY_H
 #define AMACROSS_STRATEGY_H
-#include "stdafx.h"
+
 #include "MACrossStratgy.h"
 
-class IPositionControl;
-class STRATEGY_API AMACrossStratgy : public MACrossStratgy
+class AMACrossStratgy : public MACrossStratgy
 {
 public:
-	AMACrossStratgy(size_t short_ma, size_t long_ma, IPositionControl* accountMgr);
+	AMACrossStratgy(size_t short_ma, size_t long_ma);
 	virtual ~AMACrossStratgy();
 
 protected:

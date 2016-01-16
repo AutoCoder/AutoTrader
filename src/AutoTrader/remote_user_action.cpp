@@ -38,7 +38,7 @@ namespace{
 //	}
 //}
 
-//{"ActionType":"StartTrade","Arguments":{"InstrumentId":"rb1604","StrategyId":1,"PositionCtlId":0}}
+//{"ActionType":"StartTrade","Arguments":{"InstrumentId":"rb1604","StrategyName":"Pos20Precent_3_5_MACrossStratgy"}}
 
 namespace Transmission{
 
@@ -97,24 +97,17 @@ namespace Transmission{
 			if (arguments.isNull())
 				return false;
 
-			auto& instruNode = arguments["InstrumentId"];
-			if (instruNode.isNull())
-				return false;
-			else{
-				instrumentId = instruNode.asString();
-			}
-
-			auto readfun = [&arguments](const std::string& subName, int& out) -> bool {
+			auto readfun = [&arguments](const std::string& subName, std::string& out) -> bool {
 				auto& subNode = arguments[subName];
 				if (subNode.isNull())
 					return false;
 				else{
-					out = subNode.asInt();
+					out = subNode.asString();
 					return true;
 				}
 			};
 
-			return readfun("StrategyId", strategyId) && readfun("PositionCtlId", positionCtlId);
+			return readfun("InstrumentId", instrumentId) && readfun("StrategyName", strategyName);
 		}
 		else{
 			return false;
@@ -212,7 +205,7 @@ namespace Transmission{
 			break;
 			case ActionType::StartTrade:
 			{
-				AccountMgr::getInstance()->StartTrade(trade_meta_->instrumentId, trade_meta_->strategyId, trade_meta_->positionCtlId, session_);
+				AccountMgr::getInstance()->StartTrade(trade_meta_->instrumentId, trade_meta_->strategyName, session_);
 			}
 			break;
 			case ActionType::Logout:

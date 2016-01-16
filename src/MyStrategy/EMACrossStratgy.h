@@ -1,14 +1,12 @@
 #ifndef EMACROSS_STRATEGY_H
 #define EMACROSS_STRATEGY_H
 
-#include "stdafx.h"
 #include "MACrossStratgy.h"
 
-class IPositionControl;
-class STRATEGY_API EMACrossStratgy : public MACrossStratgy
+class EMACrossStratgy : public MACrossStratgy
 {
 public:
-	EMACrossStratgy(size_t short_ma, size_t long_ma, IPositionControl* accountMgr);
+	EMACrossStratgy(size_t short_ma, size_t long_ma);
 	virtual ~EMACrossStratgy();
 
 protected:

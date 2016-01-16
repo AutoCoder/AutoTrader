@@ -31,7 +31,7 @@ public:
 
 	void LoginAccount(const std::string& userId, const std::string& pw, const std::shared_ptr<Transmission::socket_session>& session);
 
-	void StartTrade(const std::string& instru, int strategyId, int PositionCtlId, const std::shared_ptr<Transmission::socket_session>& session);
+	void StartTrade(const std::string& instru, const std::string& strategyName, const std::shared_ptr<Transmission::socket_session>& session);
 
 	void LogoutAccount(const std::shared_ptr<Transmission::socket_session>& session);
 

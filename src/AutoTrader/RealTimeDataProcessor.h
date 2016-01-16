@@ -6,7 +6,7 @@
 #include <memory>
 
 class TickWrapper;
-class Strategy;
+class OrderTriggerBase;
 class DBWrapper;
 class KData;
 class Account;
@@ -16,7 +16,7 @@ class RealTimeDataProcessor
 {
 public:
 	//if strag == nullptr, that mean RealTimeDataProcessor is in data-recording mode. 
-	RealTimeDataProcessor(Strategy* strag, const std::string& InstrumentName, Account* owner);
+	RealTimeDataProcessor(OrderTriggerBase* trigger, const std::string& InstrumentName, Account* owner);
 	~RealTimeDataProcessor();
 
 	void AppendRealTimeData(TickWrapper& info);
@@ -29,13 +29,13 @@ private:
 	void recoverHistoryData(int beforeSeconds);
 
 private:
-	std::list<TickWrapper> m_DataSeq;
-	std::vector<TickWrapper> m_TickSet60;
-	std::vector<KData> m_KDataVec;
-	std::string m_Name;
-	Strategy* m_strategy;
-	Account*  m_owner;
-	std::shared_ptr<DBWrapper> m_dbptr;
+	std::list<TickWrapper>		m_DataSeq;
+	std::vector<TickWrapper>	m_TickSet60;
+	std::vector<KData>		    m_KDataVec;
+	std::string					m_Name;
+	OrderTriggerBase*			m_trigger;
+	Account*					m_owner;
+	std::shared_ptr<DBWrapper>	m_dbptr;
 };
 
 

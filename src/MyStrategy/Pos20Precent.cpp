@@ -1,9 +1,7 @@
-//#include "stdafx.h"
-#include "IPositionControl.h"
+#include "Pos20Precent.h"
 #include "Order.h"
 #include "AP_Mgr.h"
 #include "crossplatform.h"
-#include "AP_Mgr.h"
 
 Pos20Precent::Pos20Precent()
 {
@@ -50,7 +48,7 @@ bool Pos20Precent::completeOrder(Order& ord){
 			}
 			else{
 				ord.SetCombOffsetFlagType(THOST_FTDC_OF_Close);
-				ord.SetVolume(std::abs(subydPos-subtodayPos));
+				ord.SetVolume(std::abs(subydPos - subtodayPos));
 			}
 		}
 		else{

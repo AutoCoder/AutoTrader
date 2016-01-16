@@ -34,12 +34,8 @@ public:
 		m_instrumentList.push_back(instr);
 	}
 
-	void AddStrategy(int strategyIdx){
+	void AddStrategy(const std::string& strategyIdx){
 		m_strategyList.push_back(strategyIdx);
-	}
-
-	void AddPositionControl(int pcIdx){
-		m_positionControlList.push_back(pcIdx);
 	}
 
 	bool AppendOrder(const Order& order);//multi-thread notice
@@ -53,7 +49,7 @@ public:
 	bool Login(const std::shared_ptr<Transmission::socket_session>& s, const std::string& pw);
 	bool Logout(); //identify User By session
 
-	bool StartTrade(const std::string& instru, int strategyId, int PositionCtlId);
+	bool StartTrade(const std::string& instru, const std::string& strategyName);
 
 	void StopTrade();
 
@@ -84,8 +80,7 @@ private:
 	std::string										m_ctp_username;
 	std::string										m_ctp_password;
 	std::vector<std::string>						m_instrumentList;
-	std::vector<int>							    m_strategyList;
-	std::vector<int>								m_positionControlList;
+	std::vector<std::string>						m_strategyList;
 	std::unique_ptr<Order>                          m_pending_order;
 	std::unique_ptr<CtpTradeSpi>                    m_trade_spi;
 	std::shared_ptr<IPositionControl>               m_position_ctl;

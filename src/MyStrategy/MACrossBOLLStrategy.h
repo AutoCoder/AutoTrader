@@ -1,22 +1,28 @@
 #ifndef MACROSSBOLL_STRATEGY_H
 #define MACROSSBOLL_STRATEGY_H
 
+#include <list>
+#include <vector>
+
 #include "stdafx.h"
 #include "Strategy.h"
 #include "MACrossBOLLTech.h"
 #include "TechVec.h"
+#include "TickWrapper.h"
+#include "KData.h"
+#include "Order.h"
 
 struct BOLLTech;
-class IPositionControl;
-class STRATEGY_API MACrossBOLLStrategy : public Strategy
+
+class MACrossBOLLStrategy
 {
 public:
-	MACrossBOLLStrategy(size_t short_ma, size_t long_ma, size_t boll_period, IPositionControl* accountMgr = nullptr);
+	MACrossBOLLStrategy(size_t short_ma, size_t long_ma, size_t boll_period);
 	virtual ~MACrossBOLLStrategy();
 
 	virtual bool tryInvoke(const std::list<TickWrapper>& data, TickWrapper& info);
 	virtual bool tryInvoke(const std::list<TickWrapper>& tickdata, const std::vector<KData>& data, std::vector<TickWrapper> curmindata, TickWrapper& info);
-	virtual bool generateOrder(Order& out);
+
 	Order GetCurOrder() const;
 
 protected:
@@ -33,8 +39,6 @@ protected:
 
 private:
 	Order* m_curOrder;
-	IPositionControl* m_posControl;
-
 };
 
 #endif

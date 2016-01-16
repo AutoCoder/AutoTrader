@@ -6,10 +6,19 @@
 #include <string>
 
 #ifndef MustImpl
+
+class OrderTriggerBase;
 class STRATEGY_API TriggerFactory{
 
 public:
-	static OrderTriggerBase* GetTrigger();
+	static TriggerFactory* Instance();
+	void RegisterTrigger(const std::string& ownerAccount, const std::string& strategyName, OrderTriggerBase*);
+	void UnRegisterTrigger(const std::string& ownerAccount);
+	OrderTriggerBase* GetTrigger(const std::string& ownerAccount, const std::string& strategyName);
+
+private:
+	static TriggerFactory* m_instance;
+	std::map < std::string/*Account Name*/, std::map<std::string/*StrategyName*/, OrderTriggerBase*> > m_store;
 };
 #else
 class OrderTriggerBase;

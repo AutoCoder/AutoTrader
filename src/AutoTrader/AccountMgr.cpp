@@ -61,7 +61,7 @@ void AccountMgr::LoginAccount(const std::string& userId, const std::string& pw, 
 	}
 }
 
-void AccountMgr::StartTrade(const std::string& instru, int strategyId, int PositionCtlId, const std::shared_ptr<Transmission::socket_session>& session){
+void AccountMgr::StartTrade(const std::string& instru, const std::string& strategyName, const std::shared_ptr<Transmission::socket_session>& session){
 	auto accoutIter = m_LoggedAccount.find(session);
 	if (accoutIter != m_LoggedAccount.end())// logged
 	{
@@ -69,7 +69,7 @@ void AccountMgr::StartTrade(const std::string& instru, int strategyId, int Posit
 			AppendReplyBySession(session, TradingNow);
 			return;
 		}
-		if (accoutIter->second->StartTrade(instru, strategyId, PositionCtlId)){//succeed
+		if (accoutIter->second->StartTrade(instru, strategyName)){//succeed
 			AppendReplyBySession(session, StartTradeSucceed);
 		}
 		else{//failed

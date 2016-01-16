@@ -3,14 +3,13 @@
 #include "Account.h"
 #include "ConfigV2.h"
 #include "AccountMgr.h"
-#include "IPositionControl.h"
 #include "RealTimeDataProcessor.h"
 #include "RealTimeDataProcessorPool.h"
-#include "MACrossStratgy.h"
 #include "Order.h"
 #include "tradespi.h"
 #include "AP_Mgr.h"
 #include <functional>
+#include "TriggerFactory.h"
 
 Account::Account()
 	:m_isLogin(true)
@@ -31,7 +30,6 @@ Account::~Account()
 {
 	m_instrumentList.clear();
 	m_strategyList.clear();
-	m_positionControlList.clear();
 }
 
 //may access by mdThread and m_exeOrderThread
@@ -101,22 +99,17 @@ bool Account::Logout() {
 	return true;
 }
 
-bool Account::StartTrade(const std::string& instru, int strategyId, int PositionCtlId){
+bool Account::StartTrade(const std::string& instru, const std::string& strategyName){
 	if (m_isTrading)
 		return false;
 
 	//verify arguments
 	if (std::find(m_instrumentList.begin(), m_instrumentList.end(), instru) != m_instrumentList.end()
-		&& std::find(m_strategyList.begin(), m_strategyList.end(), strategyId) != m_strategyList.end()
-		&& std::find(m_positionControlList.begin(), m_positionControlList.end(), PositionCtlId) != m_positionControlList.end())
+		&& std::find(m_strategyList.begin(), m_strategyList.end(), strategyName) != m_strategyList.end())
 	{
 		if (!m_realtimedata_processor.get()){
-			//todo: Need to refinement the structure of code
-			//m_position_ctl = std::make_shared<Pos20Precent>(m_detailMgr.get()); 
-			// todo: construct it by pctl id
-			m_position_ctl = std::make_shared<Pos20Precent>();
-			m_strategy = std::make_shared<MACrossStratgy>(3, 5, m_position_ctl.get());
-			m_realtimedata_processor = std::make_shared<RealTimeDataProcessor>(m_strategy.get(), instru, this);
+			auto strategyPtr = TriggerFactory::Instance()->GetTrigger(Id(), strategyName);
+			m_realtimedata_processor = std::make_shared<RealTimeDataProcessor>(strategyPtr, instru, this);
 			RealTimeDataProcessorPool::getInstance()->AddProcessor(m_realtimedata_processor);
 		}
 		m_isTrading.store(true);

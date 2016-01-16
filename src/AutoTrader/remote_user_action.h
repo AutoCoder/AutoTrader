@@ -24,8 +24,7 @@ namespace Transmission{
 	struct TradeActionMeta{
 		bool Parse(const std::string& input);
 
-		int strategyId;
-		int positionCtlId;
+		std::string strategyName;
 		std::string instrumentId;
 	};
 

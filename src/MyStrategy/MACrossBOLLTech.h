@@ -1,13 +1,12 @@
 #ifndef MACROSS_BOLL_TECH_H
 #define MACROSS_BOLL_TECH_H
 
-#include "stdafx.h"
 #include "TechVec.h"
 #include "BOLLTech.h"
 #include "MATech.h"
 #include "Strategy.h"
 
-class STRATEGY_API MACrossBOLLTech : public StrategyTech
+class MACrossBOLLTech : public StrategyTech
 {
 public:
 	MACrossBOLLTech(CrossStratgyType type, size_t shortMA, size_t longMA, long long uuid, const std::string& instrumentID, const std::string& time = "", double lastprice = 0);

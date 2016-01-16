@@ -23,7 +23,7 @@ public:
 
 
 template <typename P, typename S, typename ... Args>
-class STRATEGY_API OrderTrigger : public OrderTriggerBase
+class OrderTrigger : public OrderTriggerBase
 {
 public:
 	OrderTrigger(Args ... args)

@@ -8,14 +8,12 @@
 #include "TechUtils.h"
 #include <sstream>
 #include <assert.h>
-#include "IPositionControl.h"
 #include "crossplatform.h"
 
-MACrossStratgy::MACrossStratgy(size_t short_ma, size_t long_ma, IPositionControl* pctl)
+MACrossStratgy::MACrossStratgy(size_t short_ma, size_t long_ma)
 : m_curOrder(new Order())//m_order is a pointer so that it will only update so, create it at constructor.
 , m_shortMA(short_ma)
 , m_longMA(long_ma)
-, m_posControl(pctl)
 {
 }
 
@@ -183,17 +181,6 @@ bool MACrossStratgy::tryInvoke(const std::list<TickWrapper>& tickdata, const std
 	//info.SetTechVec((StrategyTech*)curPtr);
 	info.m_techvec = curPtr;
 	return orderSingal;
-}
-
-bool MACrossStratgy::generateOrder(Order& out){
-	assert(m_curOrder);
-	if (m_posControl->completeOrder(*m_curOrder)){
-		out = *m_curOrder;
-		return true;
-	}	
-	else{
-		return false;
-	}
 }
 
 bool MACrossTech::IsTableCreated = false;

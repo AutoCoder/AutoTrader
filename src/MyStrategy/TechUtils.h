@@ -8,7 +8,7 @@
 class TickWrapper;
 class KData;
 
-class STRATEGY_API TechUtils
+class TechUtils
 {
 public:
 	TechUtils();

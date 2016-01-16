@@ -3,8 +3,8 @@
 #include "TickWrapper.h"
 #include "TechUtils.h"
 
-EMACrossStratgy::EMACrossStratgy(size_t short_ma, size_t long_ma, IPositionControl* accountMgr)
-:MACrossStratgy(short_ma, long_ma, accountMgr)
+EMACrossStratgy::EMACrossStratgy(size_t short_ma, size_t long_ma)
+:MACrossStratgy(short_ma, long_ma)
 {
 }
 

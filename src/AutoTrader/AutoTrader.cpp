@@ -20,15 +20,14 @@
 #include "Order.h"
 #include "TickWrapper.h"
 #include "CommonUtils.h"
-#include "IPositionControl.h"
 #include "AP_Mgr.h"
 #include "socket_server.h"
 #include "remote_user_action.h"
 #include "ActionProcessor.h"
 
-#include "MACrossStratgy.h"
 #include "RealTimeDataProcessor.h"
 #include "Account.h"
+#include "LoadStrategies.h"
 
 int requestId = 0;
 
@@ -66,6 +65,7 @@ void ExcuteOrderQueue(CtpTradeSpi* pUserSpi){
 	SYNC_PRINT << "End to loop order queue";
 }
 
+#ifdef MUSTIMPL
 void ReplayTickDataFromDB(const std::string& instrumentID, const std::string& strategyName, const std::string& posCtlName, const std::string& mark)
 {
 	SYNC_PRINT << "Reply " << instrumentID << " data from db";
@@ -111,21 +111,23 @@ void ReplayTickDataFromDB(const std::string& instrumentID, const std::string& st
 	//Store to db
 	pool->StoreStrategySequenceToDB(instrumentID, mark);
 }
-
+#endif
 /*
 Usage: 
    AutoTrade.exe
    AutoTrade.exe replay rb1510 table_mark
 */
 int main(int argc, const char* argv[]){
-
+	StrategyPluginsLoader loader;
 	auto console = spdlog::stdout_logger_mt("console");
 
 	//Test
 	//RunUnitTest();
 
 	if (argc == 6 && strcmp(argv[1], "replay") == 0){
+#ifdef MUSTIMPL
 		ReplayTickDataFromDB(argv[2], argv[3], argv[4], argv[5]);
+#endif
 	}
 	else{
 		auto pool = RealTimeDataProcessorPool::getInstance();

@@ -9,15 +9,13 @@
 #include "BOLLTech.h"
 #include "TechUtils.h"
 #include <math.h>
-#include "IPositionControl.h"
 
 
-MACrossBOLLStrategy::MACrossBOLLStrategy(size_t short_ma, size_t long_ma, size_t boll_period, IPositionControl* pctl)
+MACrossBOLLStrategy::MACrossBOLLStrategy(size_t short_ma, size_t long_ma, size_t boll_period)
 : m_curOrder(new Order())
 , m_shortMA(short_ma)
 , m_longMA(long_ma)
 , m_bollperiod(boll_period)
-, m_posControl(pctl)
 {
 }
 
@@ -175,17 +173,6 @@ bool MACrossBOLLStrategy::tryInvoke(const std::list<TickWrapper>& tickdata, cons
 	//info.SetTechVec((StrategyTech*)curPtr);
 	info.m_techvec = curPtr;
 	return orderSingal;
-}
-
-bool MACrossBOLLStrategy::generateOrder(Order& out){
-	assert(m_curOrder);
-	if (m_posControl->completeOrder(*m_curOrder)){
-		out = *m_curOrder;
-		return true;
-	}
-	else{
-		return false;
-	}
 }
 
 BOLLTech MACrossBOLLStrategy::calculateBoll(const std::list<TickWrapper>& data, const TickWrapper& current, size_t seconds) const{

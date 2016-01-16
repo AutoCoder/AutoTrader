@@ -176,6 +176,7 @@ xcopy "$(SolutionDir)src\AutoTrader\config.ini" $(OutputPath) /Y</Command>
     <ClInclude Include="ActionProcessor.h" />
     <ClInclude Include="fifo_action_queue.h" />
     <ClInclude Include="InstrumentInfoMgr.h" />
+    <ClInclude Include="LoadStrategies.h" />
     <ClInclude Include="remote_server_action.h" />
     <ClInclude Include="socket_server.h" />
     <ClInclude Include="socket_server_impl.h" />

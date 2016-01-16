@@ -2,33 +2,34 @@
 #define STRATEGY_H
 
 #include "stdafx.h"
-#include <list>
-#include <vector>
+#include <string>
+//#include <list>
+//#include <vector>
+//
+//class Order;
+//class TickWrapper;
+//class KData;
+//class IPositionControl;
 
-class Order;
-class TickWrapper;
-class KData;
-class IPositionControl;
+//class STRATEGY_API Strategy
+//{
+//public:
+//	Strategy(){}
+//	~Strategy(){}
+//
+//	virtual bool tryInvoke(const std::list<TickWrapper>& data, TickWrapper& info) = 0;
+//	virtual bool tryInvoke(const std::list<TickWrapper>& tickdata, const std::vector<KData>& data, std::vector<TickWrapper> curmindata, TickWrapper& info) = 0;
+//
+//	virtual bool generateOrder(Order& out) = 0;
+//};
 
-class STRATEGY_API Strategy
-{
-public:
-	Strategy(){}
-	~Strategy(){}
-
-	virtual bool tryInvoke(const std::list<TickWrapper>& data, TickWrapper& info) = 0;
-	virtual bool tryInvoke(const std::list<TickWrapper>& tickdata, const std::vector<KData>& data, std::vector<TickWrapper> curmindata, TickWrapper& info) = 0;
-
-	virtual bool generateOrder(Order& out) = 0;
-};
-
-struct STRATEGY_API StrategyMetaData{
+struct StrategyMetaData{
 	std::string name;
 	size_t short_ma;
 	size_t long_ma;
 };
 
-class STRATEGY_API StratgyType{
+class StratgyType{
 public:
 	enum class MACrossStratgyType{
 		MA = 0x0,

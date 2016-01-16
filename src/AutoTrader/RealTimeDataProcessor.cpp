@@ -2,7 +2,6 @@
 #include "RealTimeDataProcessor.h"
 #include "TickWrapper.h"
 #include "KData.h"
-#include "Strategy.h"
 #include "Order.h"
 #include "ThreadSafeQueue.h"
 #include <iostream>
@@ -13,15 +12,16 @@
 #include "spdlog/spdlog.h"
 #include "crossplatform.h"
 #include "Account.h"
+#include "OrderTrigger.h"
 
 extern std::atomic<bool> g_reply;
 extern threadsafe_queue<Order> order_queue;
 
 #define UseKDataToInvoke 1
 
-RealTimeDataProcessor::RealTimeDataProcessor(Strategy* strag, const std::string& InstrumentName, Account* owner)
+RealTimeDataProcessor::RealTimeDataProcessor(OrderTriggerBase* trigger, const std::string& InstrumentName, Account* owner)
 	: m_Name(InstrumentName)
-	, m_strategy(strag)
+	, m_trigger(trigger)
 	, m_owner(owner)
 	, m_dbptr(new DBWrapper)
 {
@@ -68,20 +68,17 @@ void RealTimeDataProcessor::StoreStrategySequenceToDB(const std::string& mark)
 void RealTimeDataProcessor::AppendRealTimeData(TickWrapper& info){
 	//(in)front-------------back(out)
 	// if m_strategy == nullptr, that means RealTimeDataProcessor is in data-recording mode
-	if (m_strategy){
+	if (m_trigger){
+		Order ord;
 #ifdef UseKDataToInvoke
-		bool triggered = m_strategy->tryInvoke(m_DataSeq, m_KDataVec, m_TickSet60, info);
+		bool triggered = m_trigger->tryInvoke(m_DataSeq, m_KDataVec, m_TickSet60, info, ord);
 #else
-		bool triggered = m_strategy->tryInvoke(m_DataSeq, info);
+		bool triggered = m_trigger->tryInvoke(m_DataSeq, info, ord);
 #endif
 		if (triggered){
-			Order ord;
 			ord.SetTriggerTick(info.UpdateTime());
-			////for now, only permit order_queue has one item.
-			//if (order_queue.empty() && m_strategy->generateOrder(ord)){
-			//	order_queue.push(ord);
-			//}
-			if (m_owner && m_strategy->generateOrder(ord))
+
+			if (m_owner)
 				m_owner->AppendOrder(ord);
 		}
 			

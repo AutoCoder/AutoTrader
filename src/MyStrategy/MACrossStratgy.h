@@ -1,22 +1,23 @@
 #ifndef MACROSS_STRATEGY_H
 #define MACROSS_STRATEGY_H
 
-#include "stdafx.h"
-#include "Strategy.h"
 #include "TechVec.h"
 #include "MATech.h"
+#include "Order.h"
+#include <list>
+#include "KData.h"
+#include "Strategy.h"
 
 class MACrossTech;
-class IPositionControl;
-class STRATEGY_API MACrossStratgy : public Strategy
+
+class MACrossStratgy
 {
 public:
-	MACrossStratgy(size_t short_ma, size_t long_ma, IPositionControl* pctl = nullptr);
+	MACrossStratgy(size_t short_ma, size_t long_ma);
 	virtual ~MACrossStratgy();
 
-	virtual bool tryInvoke(const std::list<TickWrapper>& data, TickWrapper& info);
-	virtual bool tryInvoke(const std::list<TickWrapper>& tickdata, const std::vector<KData>& data, std::vector<TickWrapper> curmindata, TickWrapper& info);
-	virtual bool generateOrder(Order& out);
+	bool tryInvoke(const std::list<TickWrapper>& data, TickWrapper& info);
+	bool tryInvoke(const std::list<TickWrapper>& tickdata, const std::vector<KData>& data, std::vector<TickWrapper> curmindata, TickWrapper& info);
 
 	Order GetCurOrder() const;
 protected:
@@ -30,7 +31,6 @@ protected:
 
 private:
 	Order* m_curOrder;
-	IPositionControl* m_posControl;
 };
 
 class MACrossTech : public StrategyTech{

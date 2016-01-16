@@ -18,33 +18,13 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="AP_Mgr.h" />
-    <ClInclude Include="BOLLTech.h" />
-    <ClInclude Include="KData.h" />
-    <ClInclude Include="Order.h" />
-    <ClInclude Include="OrderTrigger.h" />
-    <ClInclude Include="stdafx.h" />
-    <ClInclude Include="Strategy.h" />
-    <ClInclude Include="TechVec.h" />
-    <ClInclude Include="TickWrapper.h" />
-    <ClInclude Include="TriggerFactory.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="AP_Mgr.cpp" />
-    <ClCompile Include="BOLLTech.cpp" />
-    <ClCompile Include="KData.cpp" />
-    <ClCompile Include="Order.cpp" />
-    <ClCompile Include="TickWrapper.cpp" />
-    <ClCompile Include="TriggerFactory.cpp" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{6AE18949-C4D5-4F7F-832F-0D71B016BDFD}</ProjectGuid>
-    <RootNamespace>StrategyFramework</RootNamespace>
+    <ProjectGuid>{B90000FB-D518-4297-8089-DB8D87C43048}</ProjectGuid>
+    <RootNamespace>MyStrategy</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
@@ -66,7 +46,7 @@
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
-    <WholeProgramOptimization>false</WholeProgramOptimization>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -106,13 +86,13 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)include\;$(SolutionDir)src\Common\</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;STRATEGY_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)src\Common\;$(SolutionDir)src\StrategyFramework\;$(SolutionDir)include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;MY_STRATEGY_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(OutDir)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Common.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Common.lib;StrategyFramework.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -136,17 +116,43 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)include\;$(SolutionDir)src\Common\</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;STRATEGY_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)src\Common\;$(SolutionDir)src\StrategyFramework\;$(SolutionDir)include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;MY_STRATEGY_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>Common.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(OutDir)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>Common.lib;StrategyFramework.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="AMACrossStratgy.h" />
+    <ClInclude Include="EMACrossStratgy.h" />
+    <ClInclude Include="MACrossBOLLStrategy.h" />
+    <ClInclude Include="MACrossBOLLTech.h" />
+    <ClInclude Include="MACrossStratgy.h" />
+    <ClInclude Include="MATech.h" />
+    <ClInclude Include="mystrategy.h" />
+    <ClInclude Include="Pos20Precent.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="TechUtils.h" />
+    <ClInclude Include="TechVec.h" />
+    <ClInclude Include="WMACrossStratgy.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="AMACrossStratgy.cpp" />
+    <ClCompile Include="EMACrossStratgy.cpp" />
+    <ClCompile Include="MACrossBOLLStrategy.cpp" />
+    <ClCompile Include="MACrossBOLLTech.cpp" />
+    <ClCompile Include="MACrossStratgy.cpp" />
+    <ClCompile Include="MATech.cpp" />
+    <ClCompile Include="mystrategy.cpp" />
+    <ClCompile Include="Pos20Precent.cpp" />
+    <ClCompile Include="TechUtils.cpp" />
+    <ClCompile Include="WMACrossStratgy.cpp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

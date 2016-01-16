@@ -3,7 +3,7 @@
 
 #include "stdafx.h"
 
-struct STRATEGY_API MATech{
+struct MATech{
 	MATech(){};
 	~MATech(){};
 

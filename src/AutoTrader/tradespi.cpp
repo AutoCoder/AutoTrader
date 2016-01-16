@@ -7,7 +7,6 @@
 #include <condition_variable>
 #include "spdlog/spdlog.h"
 #include "CommonUtils.h"
-#include "IPositionControl.h"
 #include "AP_Mgr.h"
 
 extern int requestId;
