@@ -8,13 +8,13 @@
 #define DLLPTR HMODULE 
 #define OpenDLL LoadLibrary
 #define GetFuncPtr GetProcAddress 
-#define CloseDLL FreeLibrary 
+#define FreeDLL FreeLibrary 
 #else
 #include <dlfcn.h>
 #define DLLPTR void*
 #define OpenDLL dlopen
 #define GetFuncPtr dlsym
-#define CloseDLL dlclose
+#define FreeDLL dlclose
 #endif
 namespace fs = boost::filesystem;
 typedef void(*loadFunc)(void);
@@ -55,11 +55,19 @@ private:
 	}
 
 	void _FreeLibraries(){
+#ifdef WIN32
 		for (DLLPTR handle : m_handles){
 			loadFunc funPtr = (loadFunc)GetFuncPtr(handle, "UnRegisterAllStrategy");
 			funPtr();
-			CloseDLL(handle);
+			FreeLibrary(handle);
 		}
+#else
+		for (void* handle : m_handles){
+			loadFunc funPtr = (loadFunc)GetProcAddress(handle, "UnRegisterAllStrategy");
+			funPtr();
+			dlclose(handle);
+		}
+#endif
 	}
 
 private:

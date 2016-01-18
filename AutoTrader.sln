@@ -21,6 +21,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Common", "src\Common\Common
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MyStrategy", "src\MyStrategy\MyStrategy.vcxproj", "{B90000FB-D518-4297-8089-DB8D87C43048}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6AE18949-C4D5-4F7F-832F-0D71B016BDFD} = {6AE18949-C4D5-4F7F-832F-0D71B016BDFD}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
