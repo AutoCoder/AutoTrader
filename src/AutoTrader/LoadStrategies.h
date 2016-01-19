@@ -49,14 +49,14 @@ private:
 
 	void _CallEntryFunction(){
 		for (DLLPTR handle : m_handles){
-			loadFunc funPtr = (loadFunc)GetFuncPtr(handle, "RegisterAllStrategy");
+			loadFunc funPtr = (loadFunc)GetFuncPtr(handle, "LoadPlugin");
 			funPtr();
 		}
 	}
 
 	void _FreeLibraries(){
 		for (DLLPTR handle : m_handles){
-			loadFunc funPtr = (loadFunc)GetFuncPtr(handle, "UnRegisterAllStrategy");
+			loadFunc funPtr = (loadFunc)GetFuncPtr(handle, "FreePlugin");
 			funPtr();
 			CloseDLL(handle);
 		}
