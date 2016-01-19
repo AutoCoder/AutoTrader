@@ -33,9 +33,11 @@ namespace Account{
 		~Manager(){};
 
 		static Manager& Instance(){
-			static Manager _mgr; //Meryers singleton
+			static Manager _mgr; //Note: Meryers singleton, not thread-safe, postpone thread-safe enhancement for all singletons in solution.
 			return _mgr;
 		}
+
+		std::vector<std::string> Instruments() const;
 
 		void AddAccontMeta(const Meta& acm);
 

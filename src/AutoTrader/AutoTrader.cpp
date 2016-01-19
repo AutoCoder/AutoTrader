@@ -27,6 +27,7 @@
 
 #include "RealTimeDataProcessor.h"
 #include "LoadStrategies.h"
+#include "AccountMgr.h"
 
 int requestId = 0;
 
@@ -39,30 +40,30 @@ threadsafe_queue<Order> order_queue;
 
 //std::mutex g_OrderRunMtx;
 
-void ExcuteOrderQueue(CtpTradeSpi* pUserSpi){
-	SYNC_PRINT << "Start to trade";
-	SYNC_PRINT << "Start to loop order queue";
-
-	while (true){
-		//g_OrderRunMtx.lock();// synchronize the order execute process
-		Order ord;
-		if (!order_queue.empty() && order_queue.try_pop(ord)){ // if pop success
-
-			//撤销该order同一合约的pending合约
-			pUserSpi->CancelOrder(ord.GetTriggerTick(), 6, ord.GetInstrumentId());
-
-			SYNC_PRINT << "Excute Order regarding instrumentID:" << ord.GetInstrumentId();
-			pUserSpi->ReqOrderInsert(ord);
-		}
-
-		if (g_quit/* && order_queue.empty()*/) //todo : close position
-			break;
-
-		sleep(500);
-	}
-
-	SYNC_PRINT << "End to loop order queue";
-}
+//void ExcuteOrderQueue(CtpTradeSpi* pUserSpi){
+//	SYNC_PRINT << "Start to trade";
+//	SYNC_PRINT << "Start to loop order queue";
+//
+//	while (true){
+//		//g_OrderRunMtx.lock();// synchronize the order execute process
+//		Order ord;
+//		if (!order_queue.empty() && order_queue.try_pop(ord)){ // if pop success
+//
+//			//撤销该order同一合约的pending合约
+//			pUserSpi->CancelOrder(ord.GetTriggerTick(), 6, ord.GetInstrumentId());
+//
+//			SYNC_PRINT << "Excute Order regarding instrumentID:" << ord.GetInstrumentId();
+//			pUserSpi->ReqOrderInsert(ord);
+//		}
+//
+//		if (g_quit/* && order_queue.empty()*/) //todo : close position
+//			break;
+//
+//		sleep(500);
+//	}
+//
+//	SYNC_PRINT << "End to loop order queue";
+//}
 
 #ifdef MUSTIMPL
 void ReplayTickDataFromDB(const std::string& instrumentID, const std::string& strategyName, const std::string& posCtlName, const std::string& mark)
@@ -117,7 +118,7 @@ Usage:
    AutoTrade.exe replay rb1510 table_mark
 */
 int main(int argc, const char* argv[]){
-	StrategyPluginsLoader loader;
+	StrategyPluginsLoader loader; //must be top
 	auto console = spdlog::stdout_logger_mt("console");
 
 	//Test
@@ -134,46 +135,16 @@ int main(int argc, const char* argv[]){
 		//******setup Account Pool**********
 		auto config = ConfigV2::Instance();
 
-
 		//******Init md thread*******
 		CThostFtdcMdApi* pMdUserApi = CThostFtdcMdApi::CreateFtdcMdApi();
-		CtpMdSpi* pMdUserSpi = new CtpMdSpi(pMdUserApi, config->Instruments(), config->DefaultCtpBrokerID(), config->DefaultCtpUserID(), config->DefaultCtpPassword());
+		CtpMdSpi* pMdUserSpi = new CtpMdSpi(pMdUserApi, Account::Manager::Instance().Instruments(), config->DefaultCtpBrokerID(), config->DefaultCtpUserID(), config->DefaultCtpPassword());
 		pMdUserApi->RegisterSpi(pMdUserSpi);
 		pMdUserApi->RegisterFront(const_cast<char*>(ConfigV2::Instance()->CtpMdFront().c_str()));
 
 		std::thread actionInvoker(ProcessActionQueue);
-		////*******Init trade thread********
-		//CThostFtdcTraderApi* pTradeUserApi = CThostFtdcTraderApi::CreateFtdcTraderApi();
-		//CtpTradeSpi* pTradeUserSpi = new CtpTradeSpi(pTradeUserApi, \
-		//	Config::Instance()->CtpBrokerID().c_str(), \
-		//	Config::Instance()->CtpUserID().c_str(), \
-		//	Config::Instance()->CtpPassword().c_str(), \
-		//	Config::Instance()->ProductName().c_str());
-		//pTradeUserApi->RegisterSpi((CThostFtdcTraderSpi*)pTradeUserSpi);
-		//pTradeUserApi->SubscribePublicTopic(THOST_TERT_RESTART);
-		//pTradeUserApi->SubscribePrivateTopic(THOST_TERT_RESTART);
-		//pTradeUserApi->RegisterFront(const_cast<char*>(Config::Instance()->CtpTradeFront().c_str()));
 
-		////*******pool's process's stratgy's accountMgr listen to account updation received from pTradeUserSpi.
-		//pool->ListenToTradeSpi(pTradeUserSpi);
-
-		///*depreted:
-		////Create a thread, Once FrontDisconnect ,try to reconnect and subscribeMD again if needed.
-		////std::thread mdManagethread(MdManageThread, pMdUserSpi);
-		////std::thread tradeManagethread(TradeManageThread, pTradeUserSpi);
-		//*/
-
-		////******start trade thread******
-		//pTradeUserApi->Init();
-
-		////******start md thread******
-		//std::unique_lock <std::mutex> lck(mtx);
-		//cv_md.wait(lck);
-		//pMdUserApi->Init();
-
-		//
-			Transmission::socket_server server(2007);
-			server.run();
+		Transmission::socket_server server(2007);
+		server.run();
 		//});
 
 		////[Excute Order Thread] Excute the Order in Queue one by one looply.

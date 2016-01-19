@@ -1,16 +1,18 @@
 #include "stdafx.h"
+#include <functional>
+
 #include "ThostFtdcTraderApi.h"
 #include "ClientSession.h"
-#include "ConfigV2.h"
 #include "ClientSessionMgr.h"
+#include "AccountMgr.h"
+
+#include "TriggerFactory.h"
 #include "RealTimeDataProcessor.h"
 #include "RealTimeDataProcessorPool.h"
 #include "Order.h"
 #include "tradespi.h"
 #include "AP_Mgr.h"
-#include <functional>
-#include "TriggerFactory.h"
-#include "AccountMgr.h"
+#include "ConfigV2.h"
 
 static const char* StrategyIsNotInPlugin = "The Strategy is not existed.\n";
 static const char* AlreadyTrading        = "Is Trading, please stop first.\n";
