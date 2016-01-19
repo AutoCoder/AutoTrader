@@ -26,7 +26,6 @@
 #include "ActionProcessor.h"
 
 #include "RealTimeDataProcessor.h"
-#include "Account.h"
 #include "LoadStrategies.h"
 
 int requestId = 0;
@@ -132,7 +131,7 @@ int main(int argc, const char* argv[]){
 	else{
 		auto pool = RealTimeDataProcessorPool::getInstance();
 		
-		//******setup Accout Pool**********
+		//******setup Account Pool**********
 		auto config = ConfigV2::Instance();
 
 

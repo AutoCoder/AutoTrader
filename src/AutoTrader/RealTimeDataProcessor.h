@@ -9,14 +9,14 @@ class TickWrapper;
 class OrderTriggerBase;
 class DBWrapper;
 class KData;
-class Account;
+class ClientSession;
 #define QueueSize 10
 
 class RealTimeDataProcessor
 {
 public:
 	//if strag == nullptr, that mean RealTimeDataProcessor is in data-recording mode. 
-	RealTimeDataProcessor(OrderTriggerBase* trigger, const std::string& InstrumentName, Account* owner);
+	RealTimeDataProcessor(OrderTriggerBase* trigger, const std::string& InstrumentName, ClientSession* owner);
 	~RealTimeDataProcessor();
 
 	void AppendRealTimeData(TickWrapper& info);
@@ -34,7 +34,7 @@ private:
 	std::vector<KData>		    m_KDataVec;
 	std::string					m_Name;
 	OrderTriggerBase*			m_trigger;
-	Account*					m_owner;
+	ClientSession*			    m_owner;
 	std::shared_ptr<DBWrapper>	m_dbptr;
 };
 

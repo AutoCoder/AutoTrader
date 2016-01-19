@@ -18,7 +18,7 @@ public:
 	virtual bool tryInvoke(const std::list<TickWrapper>& data, TickWrapper& info, Order& order) = 0;
 	virtual bool tryInvoke(const std::list<TickWrapper>& tickdata, const std::vector<KData>& data, std::vector<TickWrapper> curmindata, TickWrapper& info, Order& order) = 0;
 
-	virtual void BindWithAccout(AP::AccountDetailMgr*) = 0;
+	virtual void BindWithAccount(AP::AccountDetailMgr*) = 0;
 };
 
 
@@ -55,7 +55,7 @@ public:
 			return false;
 	}
 
-	virtual void BindWithAccout(AP::AccountDetailMgr* mgr){
+	virtual void BindWithAccount(AP::AccountDetailMgr* mgr){
 		m_positionCtl->BindAccount(mgr);
 	}
 

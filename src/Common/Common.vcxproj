@@ -126,6 +126,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="AccontMetaMgr.h" />
     <ClInclude Include="Common.h" />
     <ClInclude Include="CommonUtils.h" />
     <ClInclude Include="ConfigV2.h" />
@@ -134,6 +135,7 @@
     <ClInclude Include="mysqlwrapper.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AccontMetaMgr.cpp" />
     <ClCompile Include="CommonUtils.cpp" />
     <ClCompile Include="ConfigV2.cpp" />
     <ClCompile Include="DBWrapper.cpp" />

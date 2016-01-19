@@ -486,7 +486,7 @@ void CtpTradeSpi::OnRtnTrade(CThostFtdcTradeField *pTrade)
 	//else  tradeList.push_back(trade);
 	SYNC_PRINT << "[Trade] 回复 | 订单成交于" << pTrade->TradeDate << pTrade->TradeTime << "...TradeID:" << pTrade->TradeID;
 
-	////fresh accout
+	////fresh Account
 	//SYNC_PRINT << "[Trade] Order executed. begin to refresh Account info...";
 
 	//if (pAccountMgr->isReady()) // this check means that the history trade before account query will not record

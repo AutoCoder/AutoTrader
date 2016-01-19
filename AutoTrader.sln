@@ -5,6 +5,7 @@ VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AutoTrader", "src\AutoTrader\AutoTrader.vcxproj", "{D611D0BA-5ED4-4C8D-A3C3-6C161CC33D30}"
 	ProjectSection(ProjectDependencies) = postProject
+		{1DD2D319-E1B0-4B8D-BD0B-50672C929B84} = {1DD2D319-E1B0-4B8D-BD0B-50672C929B84}
 		{1E6C2C1C-6453-4129-AE3F-0EE8E6599C89} = {1E6C2C1C-6453-4129-AE3F-0EE8E6599C89}
 	EndProjectSection
 EndProject

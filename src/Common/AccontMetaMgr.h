@@ -6,9 +6,10 @@
 #include <vector>
 #include "Common.h"
 
-namespace Accout{
+namespace Account{
 
 	struct COMMON_API Meta{
+		Meta(){};
 
 		Meta(const std::string& b, const std::string& un, const std::string& pw, const std::vector<std::string>& instus)
 		: m_BrokerId(b)
@@ -26,31 +27,35 @@ namespace Accout{
 		std::vector<std::string>	m_Instruments;
 	};
 
-	class COMMON_API MetaMgr
+	class COMMON_API Manager
 	{
 	public:
-		MetaMgr();
-		~MetaMgr(){};
-		static MetaMgr* getInstance();
+		~Manager(){};
+
+		static Manager& Instance(){
+			static Manager _mgr; //Meryers singleton
+			return _mgr;
+		}
 
 		void AddAccontMeta(const Meta& acm);
 
 		void RemoveAccontMeta(const std::string& id);
 
-		const std::vector<Meta>& AllAccontMetas();
+		bool IsAccountExisted(const std::string& aId);
+
+		bool CheckPassword(const std::string& aId, const std::string& pw);
+
+		const Meta& GetMeta(const std::string& aId);
 
 	private:
-		MetaMgr();
-		MetaMgr(const MetaMgr&) = delete;
-		MetaMgr& operator=(const MetaMgr &) = delete;
+		Manager(){}
+		Manager(const Manager&) = delete;
+		Manager& operator=(const Manager &) = delete;
 	private:
 		std::map<std::string, Meta> m_metas;
 	};
 
-	MetaMgr& GetManager(){
-		static MetaMgr _mgr; //Meryers singleton
-		return _mgr;
-	}
+
 
 }
 #endif

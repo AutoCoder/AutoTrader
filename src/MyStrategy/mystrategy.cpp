@@ -15,13 +15,13 @@ std::string AccountId(){
 	return ret;
 }
 
-void RegisterAccoutMeta(){
-	Accout::Meta m("9999", "021510", "wodemima", { "rb1604", "rb1605" });
-	Accout::GetManager().AddAccontMeta(m);
+void RegisterAccountMeta(){
+	Account::Meta m("9999", "021510", "wodemima", { "rb1604", "rb1605" });
+	Account::GetManager().AddAccontMeta(m);
 }
-void UnRegisterAccoutMeta(){
+void UnRegisterAccountMeta(){
 	
-	Accout::GetManager().RemoveAccontMeta(AccountId());
+	Account::GetManager().RemoveAccontMeta(AccountId());
 }
 
 void RegisterAllStrategy(){
@@ -36,12 +36,12 @@ void UnRegisterAllStrategy(){
 	delete st1;
 }
 
-
 void LoadPlugin(){
 	RegisterAllStrategy();
-	RegisterAccoutMeta();
+	RegisterAccountMeta();
 }
 
 void FreePlugin(){
 	UnRegisterAllStrategy();
+	UnRegisterAccountMeta();
 }

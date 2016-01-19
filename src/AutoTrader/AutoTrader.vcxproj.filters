@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="include">
-      <UniqueIdentifier>{2be6b69d-9721-4337-a577-cc2ef8ecdbbe}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\MultiThreadClass">
       <UniqueIdentifier>{1679c759-104e-4ff9-a9a4-d740702b2a66}</UniqueIdentifier>
     </Filter>
@@ -24,6 +21,9 @@
     </Filter>
     <Filter Include="Source Files\Transmission">
       <UniqueIdentifier>{7eae3745-6cd3-41e4-8a2e-e42f35c9dfe1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\CTP_API_Header">
+      <UniqueIdentifier>{2be6b69d-9721-4337-a577-cc2ef8ecdbbe}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -43,16 +43,16 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\include\ThostFtdcMdApi.h">
-      <Filter>include</Filter>
+      <Filter>Header Files\CTP_API_Header</Filter>
     </ClInclude>
     <ClInclude Include="..\include\ThostFtdcTraderApi.h">
-      <Filter>include</Filter>
+      <Filter>Header Files\CTP_API_Header</Filter>
     </ClInclude>
     <ClInclude Include="..\include\ThostFtdcUserApiDataType.h">
-      <Filter>include</Filter>
+      <Filter>Header Files\CTP_API_Header</Filter>
     </ClInclude>
     <ClInclude Include="..\include\ThostFtdcUserApiStruct.h">
-      <Filter>include</Filter>
+      <Filter>Header Files\CTP_API_Header</Filter>
     </ClInclude>
     <ClInclude Include="RealTimeDataProcessor.h">
       <Filter>Header Files</Filter>
@@ -84,9 +84,6 @@
     <ClInclude Include="remote_user_action.h">
       <Filter>Header Files\Transmission</Filter>
     </ClInclude>
-    <ClInclude Include="Account.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ActionProcessor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -102,10 +99,13 @@
     <ClInclude Include="socket_session.h">
       <Filter>Header Files\Transmission</Filter>
     </ClInclude>
-    <ClInclude Include="AccountMgr.h">
+    <ClInclude Include="LoadStrategies.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="LoadStrategies.h">
+    <ClInclude Include="ClientSession.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ClientSessionMgr.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -143,9 +143,6 @@
     <ClCompile Include="remote_user_action.cpp">
       <Filter>Source Files\Transmission</Filter>
     </ClCompile>
-    <ClCompile Include="Account.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ActionProcessor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -158,7 +155,10 @@
     <ClCompile Include="socket_session.cpp">
       <Filter>Source Files\Transmission</Filter>
     </ClCompile>
-    <ClCompile Include="AccountMgr.cpp">
+    <ClCompile Include="ClientSession.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientSessionMgr.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -11,7 +11,7 @@
 #include "CommonUtils.h"
 #include "spdlog/spdlog.h"
 #include "crossplatform.h"
-#include "Account.h"
+#include "ClientSession.h"
 #include "OrderTrigger.h"
 
 extern std::atomic<bool> g_reply;
@@ -19,7 +19,7 @@ extern threadsafe_queue<Order> order_queue;
 
 #define UseKDataToInvoke 1
 
-RealTimeDataProcessor::RealTimeDataProcessor(OrderTriggerBase* trigger, const std::string& InstrumentName, Account* owner)
+RealTimeDataProcessor::RealTimeDataProcessor(OrderTriggerBase* trigger, const std::string& InstrumentName, ClientSession* owner)
 	: m_Name(InstrumentName)
 	, m_trigger(trigger)
 	, m_owner(owner)

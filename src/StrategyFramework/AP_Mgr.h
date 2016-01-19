@@ -114,7 +114,7 @@ namespace AP{ // Account & Position
 
 		const std::map<std::string, AP::TradeMessage>& getAllPositionMap() const { return m_tradeMessage_dict; }
 
-		//indicate that the accout init is finish, is ready for return account info back to client
+		//indicate that the Account init is finish, is ready for return account info back to client
 		void finishInitialize();
 
 	private:
