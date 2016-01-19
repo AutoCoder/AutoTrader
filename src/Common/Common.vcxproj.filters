@@ -33,7 +33,7 @@
     <ClInclude Include="Common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="AccontMetaMgr.h">
+    <ClInclude Include="AccountMgr.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -50,7 +50,7 @@
     <ClCompile Include="mysqlwrapper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="AccontMetaMgr.cpp">
+    <ClCompile Include="AccountMgr.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

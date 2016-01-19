@@ -10,7 +10,7 @@
 #include "AP_Mgr.h"
 #include <functional>
 #include "TriggerFactory.h"
-#include "AccontMetaMgr.h"
+#include "AccountMgr.h"
 
 static const char* StrategyIsNotInPlugin = "The Strategy is not existed.\n";
 static const char* AlreadyTrading        = "Is Trading, please stop first.\n";

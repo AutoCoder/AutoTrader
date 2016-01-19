@@ -5,7 +5,7 @@
 #include "MACrossStratgy.h"
 #include "Pos20Precent.h"
 #include <string>
-#include "AccontMetaMgr.h"
+#include "AccountMgr.h"
 
 OrderTriggerBase* st1;
 
@@ -17,11 +17,11 @@ std::string AccountId(){
 
 void RegisterAccountMeta(){
 	Account::Meta m("9999", "021510", "wodemima", { "rb1604", "rb1605" });
-	Account::GetManager().AddAccontMeta(m);
+	Account::Manager::Instance().AddAccontMeta(m);
 }
 void UnRegisterAccountMeta(){
 	
-	Account::GetManager().RemoveAccontMeta(AccountId());
+	Account::Manager::Instance().RemoveAccontMeta(AccountId());
 }
 
 void RegisterAllStrategy(){
