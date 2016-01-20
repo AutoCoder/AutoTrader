@@ -33,8 +33,7 @@ namespace{
 //	"Arguments" : 
 //	{
 //		"InstrumentId" : "rb1604",
-//      "StrategyId" : 1,
-//		"PositionCtlId" : 0
+//      "StrategyName" : "Pos20Precent_3_5_MACrossStratgy"
 //	}
 //}
 

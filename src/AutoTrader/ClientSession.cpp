@@ -11,6 +11,7 @@
 #include "RealTimeDataProcessorPool.h"
 #include "Order.h"
 #include "tradespi.h"
+#include "OrderTrigger.h"
 #include "AP_Mgr.h"
 #include "ConfigV2.h"
 
@@ -20,6 +21,7 @@ static const char* AlreadyTrading        = "Is Trading, please stop first.\n";
 ClientSession::ClientSession(const std::string& userId, const std::shared_ptr<Transmission::socket_session>& s, CThostFtdcTraderApi* api)
 : m_userId(userId)
 , m_session(s)
+, m_detailMgr(std::make_unique<AP::AccountDetailMgr>())
 {
 	assert(api);
 	Account::Meta meta = Account::Manager::Instance().GetMeta(m_userId);
@@ -40,8 +42,6 @@ ClientSession::ClientSession(const std::string& userId, const std::shared_ptr<Tr
 
 ClientSession::~ClientSession()
 {
-	m_instrumentList.clear();
-	m_strategyList.clear();
 }
 
 //may access by mdThread and m_exeOrderThread
@@ -86,9 +86,10 @@ bool ClientSession::StartTrade(const std::string& instru, const std::string& str
 
 	Account::Meta meta = Account::Manager::Instance().GetMeta(m_userId);
 
-	if (std::find(meta.m_Instruments.begin(), meta.m_Instruments.end(), instru) != m_instrumentList.end()){
+	if (std::find(meta.m_Instruments.begin(), meta.m_Instruments.end(), instru) != meta.m_Instruments.end()){
 		auto strategyPtr = TriggerFactory::Instance()->GetTrigger(m_userId, strategyName);
 		if (strategyPtr){
+			strategyPtr->BindWithAccount(m_detailMgr.get());
 			m_realtimedata_processor = std::make_shared<RealTimeDataProcessor>(strategyPtr, instru, this);
 			RealTimeDataProcessorPool::getInstance()->AddProcessor(m_realtimedata_processor);
 			m_isTrading.store(true);

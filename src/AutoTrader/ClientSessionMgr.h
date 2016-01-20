@@ -18,12 +18,6 @@ public:
 	static ClientSessionMgr* getInstance();
 
 public:
-	//std::shared_ptr<ClientSession> GetClientSession(const std::string& userId) const {
-	//	if (m_pool.find(userId) != m_pool.end())
-	//		return m_pool.at(userId);
-	//	else
-	//		return NULL;
-	//}
 
 	CThostFtdcTraderApi* TradeApiPtr() const { return m_pTradeUserApi; }
 
@@ -45,7 +39,6 @@ private:
 
 private:
 	CThostFtdcTraderApi*																		m_pTradeUserApi;
-	//std::map<std::string/*id*/, std::shared_ptr<ClientSession> >								m_pool;
 	std::map<std::shared_ptr<Transmission::socket_session>, std::shared_ptr<ClientSession>>		m_client_sessions;
 
 };
