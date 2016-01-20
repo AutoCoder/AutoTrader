@@ -17,12 +17,11 @@ public:
 	static RealTimeDataProcessorPool* getInstance();
 
 public:
-	//std::shared_ptr<RealTimeDataProcessor> GenRealTimeDataProcessor(const std::string& instrumentID);
 	void StoreCachedData();
-	//void ListenToTradeSpi(CtpTradeSpi* tradespi);
 	void AddProcessor(const std::shared_ptr<RealTimeDataProcessor>& processor);
 	void AppendRealTimeData(TickWrapper& info);
 	void StoreStrategySequenceToDB(const std::string& instrumentID, const std::string& mark);
+
 private:
 	RealTimeDataProcessorPool();
 	RealTimeDataProcessorPool(const RealTimeDataProcessorPool&) = delete;
@@ -47,9 +46,6 @@ private:
 
 private:
 	std::shared_ptr<DBWrapper> m_dbptr;
-	//std::map<std::string, std::shared_ptr<Strategy> > m_dict;
-	//std::map<std::string, std::shared_ptr<RealTimeDataProcessor> > m_processorDict;
-
 	std::map<std::string/*instrument*/, std::vector<std::weak_ptr<RealTimeDataProcessor> > >  m_processorDict;
 };
 

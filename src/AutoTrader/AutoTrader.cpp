@@ -13,7 +13,7 @@
 
 #include "DBWrapper.h"
 #include "config.h"
-#include "ConfigV2.h"
+#include "Config.h"
 #include "tradespi.h"
 #include "mdspi.h"
 #include "RealTimeDataProcessorPool.h"
@@ -133,13 +133,13 @@ int main(int argc, const char* argv[]){
 		auto pool = RealTimeDataProcessorPool::getInstance();
 		
 		//******setup Account Pool**********
-		auto config = ConfigV2::Instance();
+		auto config = Config::Instance();
 
 		//******Init md thread*******
 		CThostFtdcMdApi* pMdUserApi = CThostFtdcMdApi::CreateFtdcMdApi();
 		CtpMdSpi* pMdUserSpi = new CtpMdSpi(pMdUserApi, Account::Manager::Instance().Instruments(), config->DefaultCtpBrokerID(), config->DefaultCtpUserID(), config->DefaultCtpPassword());
 		pMdUserApi->RegisterSpi(pMdUserSpi);
-		pMdUserApi->RegisterFront(const_cast<char*>(ConfigV2::Instance()->CtpMdFront().c_str()));
+		pMdUserApi->RegisterFront(const_cast<char*>(Config::Instance()->CtpMdFront().c_str()));
 
 		std::thread actionInvoker(ProcessActionQueue);
 

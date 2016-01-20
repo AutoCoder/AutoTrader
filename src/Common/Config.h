@@ -1,14 +1,14 @@
-#ifndef CTP_CONFIGV2_H_
-#define CTP_CONFIGV2_H_
+#ifndef CTP_Config_H_
+#define CTP_Config_H_
 
 #include "Common.h"
 #include <vector>
 #include <set>
 
-class COMMON_API ConfigV2 {
+class COMMON_API Config {
 public:
-	~ConfigV2();
-	static ConfigV2* Instance();
+	~Config();
+	static Config* Instance();
 	std::string DefaultCtpBrokerID() const;
 	std::string DefaultCtpUserID() const;
 	std::string DefaultCtpPassword() const;
@@ -23,12 +23,12 @@ public:
 	std::string ProductName() const;
 
 private:
-	ConfigV2(const ConfigV2&) = delete;
-	ConfigV2& operator = (const ConfigV2&) = delete;
-	ConfigV2(const std::string& pathName);
+	Config(const Config&) = delete;
+	Config& operator = (const Config&) = delete;
+	Config(const std::string& pathName);
 
 private:
-	static ConfigV2* m_instance;
+	static Config* m_instance;
 	std::string m_filepath;
 
 	std::string m_ctp_brokerId;

@@ -4,7 +4,7 @@
 #include <winsock2.h>
 #endif
 #include "mysqlwrapper.h"
-#include "ConfigV2.h"
+#include "Config.h"
 #include "spdlog/spdlog.h"
 #include "crossplatform.h"
 
@@ -76,11 +76,11 @@ int DBUtils::CreateTickTableIfNotExists(const std::string& dbname, const std::st
 DBWrapper::DBWrapper()
 	:m_MysqlImpl(new mysql_db())
 {
-	if (-1 == m_MysqlImpl->mysql_open(ConfigV2::Instance()->DBHost().c_str() \
-		, ConfigV2::Instance()->DBUser().c_str() \
-		, ConfigV2::Instance()->DBPassword().c_str() \
-		, ConfigV2::Instance()->DBName().c_str() \
-		, ConfigV2::Instance()->DBPort()))
+	if (-1 == m_MysqlImpl->mysql_open(Config::Instance()->DBHost().c_str() \
+		, Config::Instance()->DBUser().c_str() \
+		, Config::Instance()->DBPassword().c_str() \
+		, Config::Instance()->DBName().c_str() \
+		, Config::Instance()->DBPort()))
 	{
 		SYNC_PRINT << m_MysqlImpl->mysql_lasterror();
 	}

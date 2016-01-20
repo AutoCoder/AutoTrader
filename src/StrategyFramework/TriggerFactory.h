@@ -5,8 +5,6 @@
 #include <map>
 #include <string>
 
-#ifndef MustImpl
-
 class OrderTriggerBase;
 class STRATEGY_API TriggerFactory{
 
@@ -18,19 +16,7 @@ public:
 
 private:
 	static TriggerFactory* m_instance;
-	std::map < std::string/*Account Name*/, std::map<std::string/*StrategyName*/, OrderTriggerBase*> > m_store;
+	std::map < std::string/*Account Id*/, std::map<std::string/*StrategyName*/, OrderTriggerBase*> > m_store;
 };
-#else
-class OrderTriggerBase;
-
-class TriggerFactory{
-public:
-	TriggerFactory();
-	OrderTriggerBase* GetTrigger(const std::string& name);
-
-private:
-	std::map<std::string, OrderTriggerBase*> m_factory;
-};
-#endif
 
 #endif

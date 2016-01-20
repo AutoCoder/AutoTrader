@@ -1,13 +1,13 @@
-//#include "stdafx.h"
 #include "DBWrapper.h"
 #include <sstream>
 #include <assert.h>
 #include <time.h>
-#include "ConfigV2.h"
+#include "Config.h"
 #include "TickWrapper.h"
 #include "TechVec.h"
 #include "CommonUtils.h"
 #include "crossplatform.h"
+
 bool TickWrapper::firstlanuch = true;
 
 TickWrapper::TickWrapper(CThostFtdcDepthMarketDataField* p)
@@ -96,7 +96,7 @@ void TickWrapper::serializeToDB(DBWrapper& db) const {
 
 	std::string tableName(m_MdData.InstrumentID);
 
-	DBUtils::CreateTickTableIfNotExists(ConfigV2::Instance()->DBName(), tableName);
+	DBUtils::CreateTickTableIfNotExists(Config::Instance()->DBName(), tableName);
 
 	std::stringstream sql;
 	sql << "INSERT INTO `" << tableName << "` (`";

@@ -1,10 +1,10 @@
 #include <fstream>
-#include "ConfigV2.h"
+#include "Config.h"
 #include "json/json.h"
 
-ConfigV2* ConfigV2::m_instance = NULL;
+Config* Config::m_instance = NULL;
 
-ConfigV2::ConfigV2(const std::string& pathName)
+Config::Config(const std::string& pathName)
 :m_filepath(pathName)
 {
 	Json::Reader reader;
@@ -47,59 +47,59 @@ ConfigV2::ConfigV2(const std::string& pathName)
 	is.close();
 }
 
-ConfigV2::~ConfigV2(){
+Config::~Config(){
 
 }
 
-ConfigV2* ConfigV2::Instance()
+Config* Config::Instance()
 {
 	if (!m_instance){
-		m_instance = new ConfigV2("config_v2.json");
+		m_instance = new Config("config_v2.json");
 	}
 
 	return m_instance;
 }
 
-std::string ConfigV2::CtpMdFront() const{
+std::string Config::CtpMdFront() const{
 	return m_ctp_mdfront;
 }
 
-std::string ConfigV2::CtpTradeFront() const{
+std::string Config::CtpTradeFront() const{
 	return m_ctp_tradefront;
 }
 
-std::string ConfigV2::DBHost() const{
+std::string Config::DBHost() const{
 	return m_db_host;
 }
 
-int ConfigV2::DBPort(){
+int Config::DBPort(){
 	return m_db_port;
 }
 
-std::string ConfigV2::DBName() const{
+std::string Config::DBName() const{
 	return m_db_name;
 }
 
-std::string ConfigV2::DBUser() const{
+std::string Config::DBUser() const{
 	return m_db_user;
 }
 
-std::string ConfigV2::DBPassword() const{
+std::string Config::DBPassword() const{
 	return m_db_password;
 }
 
 
-std::string ConfigV2::ProductName() const
+std::string Config::ProductName() const
 {
 	return m_db_productName;
 }
 
-std::string ConfigV2::DefaultCtpBrokerID() const{
+std::string Config::DefaultCtpBrokerID() const{
 	return m_ctp_brokerId;
 }
-std::string ConfigV2::DefaultCtpUserID() const{
+std::string Config::DefaultCtpUserID() const{
 	return m_ctp_userId;
 }
-std::string ConfigV2::DefaultCtpPassword() const{
+std::string Config::DefaultCtpPassword() const{
 	return m_ctp_password;
 }

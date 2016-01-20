@@ -13,7 +13,7 @@
 #include "tradespi.h"
 #include "OrderTrigger.h"
 #include "AP_Mgr.h"
-#include "ConfigV2.h"
+#include "Config.h"
 
 static const char* StrategyIsNotInPlugin = "The Strategy is not existed.\n";
 static const char* AlreadyTrading        = "Is Trading, please stop first.\n";
@@ -31,13 +31,13 @@ ClientSession::ClientSession(const std::string& userId, const std::shared_ptr<Tr
 	std::function<void(void)> OnCancelOrder_Callback = std::bind(&ClientSession::OnCancelOrder, this);
 
 	m_trade_spi = std::make_unique<CtpTradeSpi>(api, meta.m_BrokerId.c_str(), meta.m_UserId.c_str(), meta.m_Password.c_str(), \
-		ConfigV2::Instance()->ProductName().c_str(), *(m_detailMgr.get()), \
+		Config::Instance()->ProductName().c_str(), *(m_detailMgr.get()), \
 		accountInitFinished_Callback, onRtnOrder_Callback, OnRtnTrade_Callback, OnCancelOrder_Callback);
 
 	api->RegisterSpi((CThostFtdcTraderSpi*)(m_trade_spi.get()));
 	api->SubscribePublicTopic(THOST_TERT_RESTART);
 	api->SubscribePrivateTopic(THOST_TERT_RESTART);
-	api->RegisterFront(const_cast<char*>(ConfigV2::Instance()->CtpTradeFront().c_str()));
+	api->RegisterFront(const_cast<char*>(Config::Instance()->CtpTradeFront().c_str()));
 }
 
 ClientSession::~ClientSession()

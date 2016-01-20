@@ -4,7 +4,7 @@
 #include "remote_server_action.h"
 #include "fifo_action_queue.h"
 #include "ThostFtdcTraderApi.h"
-#include "ConfigV2.h"
+#include "Config.h"
 #include "AccountMgr.h"
 
 static const char* LoginSucceed = "Login Successfully!\n";
@@ -39,7 +39,6 @@ ClientSessionMgr::ClientSessionMgr()
 }
 
 void ClientSessionMgr::LoginAccount(const std::string& userId, const std::string& pw, const std::shared_ptr<Transmission::socket_session>& session){
-	//auto Account = GetAccount(userId);
 	bool isExisted = Account::Manager::Instance().IsAccountExisted(userId);
 	if (isExisted){
 		bool success = Account::Manager::Instance().CheckPassword(userId, pw);

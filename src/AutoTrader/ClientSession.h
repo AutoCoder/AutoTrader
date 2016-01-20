@@ -2,15 +2,12 @@
 #define ACCOUNT_H
 
 #include <string>
-#include <vector>
 #include <memory>
 #include <mutex>
 #include <thread>
 #include <atomic>
 #include <condition_variable>
 
-class IPositionControl;
-class Strategy;
 class Order;
 class CtpTradeSpi;
 class RealTimeDataProcessor;
