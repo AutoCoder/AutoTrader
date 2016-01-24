@@ -119,6 +119,7 @@
       <Command>xcopy "$(SolutionDir)lib\thostmduserapi.dll" $(OutputPath) /Y
 xcopy "$(SolutionDir)lib\thosttraderapi.dll" $(OutputPath) /Y
 xcopy "$(SolutionDir)lib\libmysql.dll" $(OutputPath) /Y
+xcopy "$(SolutionDir)src\AutoTrader\config_v2.json" $(OutputPath) /Y
 xcopy "$(SolutionDir)src\AutoTrader\config.json" $(OutputPath) /Y
 xcopy "$(SolutionDir)src\AutoTrader\config.ini" $(OutputPath) /Y</Command>
     </PostBuildEvent>
@@ -162,6 +163,14 @@ xcopy "$(SolutionDir)src\AutoTrader\config.ini" $(OutputPath) /Y</Command>
       <AdditionalDependencies>thostmduserapi.lib;thosttraderapi.lib;libmysql.lib;lib_json.lib;Common.lib;StrategyFramework.lib;libboost_system-vc120-mt-1_60.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SolutionDir)\lib;$(OutDir);$(SolutionDir)boost_1_60_0\stage\lib</AdditionalLibraryDirectories>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy "$(SolutionDir)lib\thostmduserapi.dll" $(OutputPath) /Y
+xcopy "$(SolutionDir)lib\thosttraderapi.dll" $(OutputPath) /Y
+xcopy "$(SolutionDir)lib\libmysql.dll" $(OutputPath) /Y
+xcopy "$(SolutionDir)src\AutoTrader\config_v2.json" $(OutputPath) /Y
+xcopy "$(SolutionDir)src\AutoTrader\config.json" $(OutputPath) /Y
+xcopy "$(SolutionDir)src\AutoTrader\config.ini" $(OutputPath) /Y</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -171,8 +180,8 @@ xcopy "$(SolutionDir)src\AutoTrader\config.ini" $(OutputPath) /Y</Command>
     <ClInclude Include="..\include\ThostFtdcTraderApi.h" />
     <ClInclude Include="..\include\ThostFtdcUserApiDataType.h" />
     <ClInclude Include="..\include\ThostFtdcUserApiStruct.h" />
-    <ClInclude Include="Account.h" />
-    <ClInclude Include="AccountMgr.h" />
+    <ClInclude Include="ClientSession.h" />
+    <ClInclude Include="ClientSessionMgr.h" />
     <ClInclude Include="ActionProcessor.h" />
     <ClInclude Include="fifo_action_queue.h" />
     <ClInclude Include="InstrumentInfoMgr.h" />
@@ -182,7 +191,6 @@ xcopy "$(SolutionDir)src\AutoTrader\config.ini" $(OutputPath) /Y</Command>
     <ClInclude Include="socket_server_impl.h" />
     <ClInclude Include="socket_session.h" />
     <ClInclude Include="tradespi.h" />
-    <ClInclude Include="config.h" />
     <ClInclude Include="ini_parser.h" />
     <ClInclude Include="mdspi.h" />
     <ClInclude Include="ThreadSafeQueue.h" />
@@ -195,8 +203,8 @@ xcopy "$(SolutionDir)src\AutoTrader\config.ini" $(OutputPath) /Y</Command>
     <ClInclude Include="remote_user_action.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Account.cpp" />
-    <ClCompile Include="AccountMgr.cpp" />
+    <ClCompile Include="ClientSession.cpp" />
+    <ClCompile Include="ClientSessionMgr.cpp" />
     <ClCompile Include="ActionProcessor.cpp" />
     <ClCompile Include="fifo_action_queue.cpp" />
     <ClCompile Include="InstrumentInfoMgr.cpp" />
@@ -206,7 +214,6 @@ xcopy "$(SolutionDir)src\AutoTrader\config.ini" $(OutputPath) /Y</Command>
     <ClCompile Include="socket_session.cpp" />
     <ClCompile Include="tradespi.cpp" />
     <ClCompile Include="AutoTrader.cpp" />
-    <ClCompile Include="config.cpp" />
     <ClCompile Include="mdspi.cpp" />
     <ClCompile Include="RealTimeDataProcessor.cpp" />
     <ClCompile Include="RealTimeDataProcessorPool.cpp" />

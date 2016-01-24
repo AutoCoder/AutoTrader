@@ -78,7 +78,7 @@ class CtpTradeSpi : public CThostFtdcTraderSpi
 		void OnRspQryInstrument(){
 			//invoke md thread
 			//cv_md.notify_all();
-			//send accout init finish action to fifo
+			//send Account init finish action to fifo
 		}
 
 	private:

@@ -126,16 +126,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="AccountMgr.h" />
     <ClInclude Include="Common.h" />
     <ClInclude Include="CommonUtils.h" />
-    <ClInclude Include="ConfigV2.h" />
+    <ClInclude Include="Config.h" />
     <ClInclude Include="crossplatform.h" />
     <ClInclude Include="DBWrapper.h" />
     <ClInclude Include="mysqlwrapper.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AccountMgr.cpp" />
     <ClCompile Include="CommonUtils.cpp" />
-    <ClCompile Include="ConfigV2.cpp" />
+    <ClCompile Include="Config.cpp" />
     <ClCompile Include="DBWrapper.cpp" />
     <ClCompile Include="mysqlwrapper.cpp" />
   </ItemGroup>

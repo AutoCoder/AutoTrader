@@ -1,7 +1,6 @@
-//#include "stdafx.h"
 #include "KData.h"
 #include "DBWrapper.h"
-#include "ConfigV2.h"
+#include "Config.h"
 #include <limits>  
 #include <sstream>
 #include "crossplatform.h"
@@ -54,7 +53,7 @@ void KData::serializeToDB(DBWrapper& db){
 	std::string tableName(m_InstrumentID);
 	tableName += "_1m";
 
-	KData::CreateKDataTableIfNotExists(ConfigV2::Instance()->DBName(), tableName);
+	KData::CreateKDataTableIfNotExists(Config::Instance()->DBName(), tableName);
 
 	std::stringstream sql;
 	sql << "INSERT INTO `" << tableName << "` (`";

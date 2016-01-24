@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include <assert.h>
 #include "json/json.h"
-#include "Account.h"
-#include "AccountMgr.h"
+#include "ClientSession.h"
+#include "ClientSessionMgr.h"
 #include "remote_user_action.h"
 #include "socket_session.h"
 
@@ -33,8 +33,7 @@ namespace{
 //	"Arguments" : 
 //	{
 //		"InstrumentId" : "rb1604",
-//      "StrategyId" : 1,
-//		"PositionCtlId" : 0
+//      "StrategyName" : "Pos20Precent_3_5_MACrossStratgy"
 //	}
 //}
 
@@ -200,23 +199,23 @@ namespace Transmission{
 			case ActionType::Login:
 			{
 				//execute login
-				AccountMgr::getInstance()->LoginAccount(login_meta_->Id(), login_meta_->passWord, session_);
+				ClientSessionMgr::getInstance()->LoginAccount(login_meta_->Id(), login_meta_->passWord, session_);
 			}
 			break;
 			case ActionType::StartTrade:
 			{
-				AccountMgr::getInstance()->StartTrade(trade_meta_->instrumentId, trade_meta_->strategyName, session_);
+				ClientSessionMgr::getInstance()->StartTrade(trade_meta_->instrumentId, trade_meta_->strategyName, session_);
 			}
 			break;
 			case ActionType::Logout:
 			{
 				//todo: execute loginOUT
-				AccountMgr::getInstance()->LogoutAccount(session_);
+				ClientSessionMgr::getInstance()->LogoutAccount(session_);
 			}
 			break;
 			case ActionType::StopTrade:
 			{
-				AccountMgr::getInstance()->StopTrade(session_);
+				ClientSessionMgr::getInstance()->StopTrade(session_);
 			}
 			break;
 			default:

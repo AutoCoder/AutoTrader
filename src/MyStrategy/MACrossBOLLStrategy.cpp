@@ -96,7 +96,6 @@ bool MACrossBOLLStrategy::tryInvoke(const std::list<TickWrapper>& data, TickWrap
 		}
 	}
 
-	//info.SetTechVec((StrategyTech*)curPtr);
 	info.m_techvec = curPtr;
 	return orderSingal;
 }
@@ -170,7 +169,6 @@ bool MACrossBOLLStrategy::tryInvoke(const std::list<TickWrapper>& tickdata, cons
 		}
 	}
 
-	//info.SetTechVec((StrategyTech*)curPtr);
 	info.m_techvec = curPtr;
 	return orderSingal;
 }

@@ -1,5 +1,4 @@
-//#include "stdafx.h"
-#include "ConfigV2.h"
+#include "Config.h"
 #include "DBWrapper.h"
 #include "Order.h"
 #include "MACrossStratgy.h"
@@ -106,7 +105,6 @@ bool MACrossStratgy::tryInvoke(const std::list<TickWrapper>& data, TickWrapper& 
 		}
 	}
 
-	//info.SetTechVec((StrategyTech*)curPtr);
 	info.m_techvec = curPtr;
 	return orderSingal;
 }
@@ -178,7 +176,6 @@ bool MACrossStratgy::tryInvoke(const std::list<TickWrapper>& tickdata, const std
 		}
 	}
 
-	//info.SetTechVec((StrategyTech*)curPtr);
 	info.m_techvec = curPtr;
 	return orderSingal;
 }
@@ -236,7 +233,7 @@ void MACrossTech::serializeToDB(DBWrapper& db, const std::string& mark)
 	tableName << mark;
 
 
-	MACrossTech::CreateTableIfNotExists(ConfigV2::Instance()->DBName(), tableName.str());
+	MACrossTech::CreateTableIfNotExists(Config::Instance()->DBName(), tableName.str());
 
 	std::stringstream sql;
 	sql.precision(12);

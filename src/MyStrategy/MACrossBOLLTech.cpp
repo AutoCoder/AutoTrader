@@ -1,8 +1,7 @@
-//#include "stdafx.h"
 #include "MACrossBOLLTech.h"
 #include "DBWrapper.h"
 #include <sstream>
-#include "ConfigV2.h"
+#include "Config.h"
 #include "crossplatform.h"
 
 MACrossBOLLTech::MACrossBOLLTech(CrossStratgyType type, size_t shortMA, size_t longMA, long long uuid, const std::string& instrumentID, const std::string& time, double lastprice)
@@ -42,7 +41,7 @@ void MACrossBOLLTech::serializeToDB(DBWrapper& db, const std::string& mark)
 	tableName << mark;
 
 
-	MACrossBOLLTech::CreateTableIfNotExists(ConfigV2::Instance()->DBName(), tableName.str());
+	MACrossBOLLTech::CreateTableIfNotExists(Config::Instance()->DBName(), tableName.str());
 
 	std::stringstream sql;
 	sql.precision(12);

@@ -1,3 +1,3 @@
 
-extern "C" __declspec(dllexport) void RegisterAllStrategy();
-extern "C" __declspec(dllexport) void UnRegisterAllStrategy();
+extern "C" __declspec(dllexport) void LoadPlugin();
+extern "C" __declspec(dllexport) void FreePlugin();

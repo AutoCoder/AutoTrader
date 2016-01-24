@@ -24,13 +24,16 @@
     <ClInclude Include="DBWrapper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ConfigV2.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="mysqlwrapper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AccountMgr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Config.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -41,10 +44,13 @@
     <ClCompile Include="DBWrapper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ConfigV2.cpp">
+    <ClCompile Include="mysqlwrapper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="mysqlwrapper.cpp">
+    <ClCompile Include="AccountMgr.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Config.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
