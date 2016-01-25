@@ -17,7 +17,7 @@ std::vector<CThostFtdcOrderField*> orderList;
 std::vector<CThostFtdcTradeField*> tradeList;
 
 CtpTradeSpi::CtpTradeSpi(CThostFtdcTraderApi* p, const char * brokerID, const char* userID, const char* password, const char* prodname, AP::AccountDetailMgr& admgr, 
-	std::function<void()> initFinishCallback, std::function<void()> onRtnOrderCallback, std::function<void()> onRtnTradeCallback, std::function<void()> onRtnCancellOrderCallback)
+	InitedAccountCallback initFinishCallback, RtnOrderCallback onRtnOrderCallback, RtnTradeCallback onRtnTradeCallback, CancelOrderCallback onRtnCancellOrderCallback)
 	: pUserApi(p)
 	, m_frontID(-1)
 	, m_sessionID(-1)
@@ -459,6 +459,7 @@ void CtpTradeSpi::OnRspOrderAction(
 			<< "报单编号:" << pInputOrderAction->OrderSysID;
 	}
 	//if (bIsLast) SetEvent(g_tradehEvent);
+	m_OnCancelOrder_callback(pInputOrderAction, pRspInfo);
 }
 
 void CtpTradeSpi::OnRtnOrder(CThostFtdcOrderField *pOrder)
@@ -469,7 +470,7 @@ void CtpTradeSpi::OnRtnOrder(CThostFtdcOrderField *pOrder)
 	
 	SYNC_PRINT << "[Trade] 回复 | 订单...ID:" << pOrder->BrokerOrderSeq << ";订单状态:" << CommonUtils::InterpretOrderSubmitStatusCode(pOrder->OrderSubmitStatus);
 
-	m_OnRtnOrder_callback();
+	m_OnRtnOrder_callback(pOrder);
 }
 
 void CtpTradeSpi::OnRtnTrade(CThostFtdcTradeField *pTrade)
@@ -500,7 +501,7 @@ void CtpTradeSpi::OnRtnTrade(CThostFtdcTradeField *pTrade)
 	
 	m_account_detail_mgr.pushTodayNewTrade(*pTrade);//会更新整个账户和仓位的状态，使资金状态保持最新
 
-	m_OnRtnTrade_callback();
+	m_OnRtnTrade_callback(pTrade);
 }
 
 
@@ -668,7 +669,7 @@ void CtpTradeSpi::ForceClose(){
 	}
 }
 
-void CtpTradeSpi::CancelOrder(const std::string& MDtime, int aliveDuration, const std::string& instrumentId){
+void CtpTradeSpi::CancelOrder(long long MDtime, int aliveDuration, const std::string& instrumentId){
 	for (auto item : m_account_detail_mgr.getAllOrders())
 	{
 		if (std::string(item.InstrumentID) != instrumentId)
@@ -677,7 +678,7 @@ void CtpTradeSpi::CancelOrder(const std::string& MDtime, int aliveDuration, cons
 		if (item.OrderStatus == THOST_FTDC_OST_PartTradedQueueing || item.OrderStatus == THOST_FTDC_OST_NoTradeQueueing)
 		{
 			// 超过aliveDuration(6秒)未成交，撤单
-			if (CommonUtils::TimeToSenconds(item.InsertTime) + aliveDuration < CommonUtils::TimeToSenconds(MDtime.c_str()) )
+			if ((CommonUtils::TimeToSenconds(item.InsertTime) + aliveDuration) * 2 < MDtime) // unit = 0.5s
 			{
 				SYNC_PRINT << "[Trade] 撤单...报单ID:" << item.BrokerOrderSeq;
 				ReqOrderAction(item);

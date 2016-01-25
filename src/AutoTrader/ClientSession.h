@@ -9,6 +9,7 @@
 #include <condition_variable>
 
 class Order;
+class TickWrapper;
 class CtpTradeSpi;
 class RealTimeDataProcessor;
 class CThostFtdcTraderApi;
@@ -19,11 +20,17 @@ namespace AP{
 
 namespace Transmission{
 	class socket_session;
+	enum ErrorCode;
 };
 
 namespace Account{
 	class Meta;
 }
+
+struct CThostFtdcOrderField;
+struct CThostFtdcTradeField;
+struct CThostFtdcInputOrderActionField;
+struct CThostFtdcRspInfoField;
 
 class ClientSession
 {
@@ -38,9 +45,11 @@ public:
 
 	bool Logout(); //identify User By session
 
-	bool StartTrade(const std::string& instru, const std::string& strategyName, std::string& errmsg);
+	bool StartTrade(const std::string& instru, const std::string& strategyName, Transmission::ErrorCode& errcode);
 
 	void StopTrade();
+
+	void InformClientViewer(const TickWrapper& tick);
 
 	~ClientSession();
 private:
@@ -50,13 +59,13 @@ private:
 	void OnAccountInitFinished();
 
 	//send out Account status to fifo, finally got by client
-	void OnRtnOrder();
+	void OnRtnOrder(CThostFtdcOrderField* pOrder);
 
 	//send out Account status to fifo, finally got by client
-	void OnRtnTrade();
+	void OnRtnTrade(CThostFtdcTradeField* pTrade);
 
 	//send out Account status to fifo, finally got by client
-	void OnCancelOrder();
+	void OnCancelOrder(CThostFtdcInputOrderActionField *pInputOrderAction, CThostFtdcRspInfoField *pRspInfo);
 
 private:
 	std::atomic<bool>                               m_isTrading;

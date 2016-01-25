@@ -125,9 +125,9 @@ public class ClientSession {
 					}else{
 						//return md & trade
 						//{"Type":"MD","Details":{"OpenPrice":123,"ClosePrice":124, "HighPrice":125, "LowPrice":122,"Vol":500, "TIMESTAMP": 111111.5}}
-						//{"Type":"ORDER","Details":{"Price":123,"Vol":124, "ORDER_ID":11156, "TIMESTAMP": 111111.5}}
-						//{"Type":"CANCELL_ORDER","Details":{"Price":123,"Vol":124, "ORDER_ID":11156, "TIMESTAMP": 111111.5}}
-						//{"Type":"TRADE","Details":{"Price":124, "Vol":125,"ORDER_ID":11156, "TIMESTAMP": 111111.5}}
+						//{"Type":"INSERT_ORDER","Details":{"Direction" : 1, Price":123,"Vol":124, "ORDER_ID":11156, "TIMESTAMP": 111111.5}}
+						//{"Type":"CANCELL_ORDER","Details":{"Direction" : 1, "Price":123,"Vol":124, "ORDER_ID":11156, "TIMESTAMP": 111111.5}}
+						//{"Type":"TRADE","Details":{"Direction" : 1, "Price":124, "Vol":125,"ORDER_ID":11156, "TIMESTAMP": 111111.5}}
 						if (obj.has("Type") && obj.getString("Type") == "MD"){
 							TradeEntity temp;
 							TradeEntity.type t = TradeEntity.type.MD;

@@ -14,9 +14,9 @@
 #include "OrderTrigger.h"
 #include "AP_Mgr.h"
 #include "Config.h"
-
-static const char* StrategyIsNotInPlugin = "The Strategy is not existed.\n";
-static const char* AlreadyTrading        = "Is Trading, please stop first.\n";
+#include "TickWrapper.h"
+#include "Transmission.h"
+#include "Utils.h"
 
 ClientSession::ClientSession(const std::string& userId, const std::shared_ptr<Transmission::socket_session>& s, CThostFtdcTraderApi* api)
 : m_userId(userId)
@@ -25,10 +25,10 @@ ClientSession::ClientSession(const std::string& userId, const std::shared_ptr<Tr
 {
 	assert(api);
 	Account::Meta meta = Account::Manager::Instance().GetMeta(m_userId);
-	std::function<void(void)> accountInitFinished_Callback = std::bind(&ClientSession::OnAccountInitFinished, this);
-	std::function<void(void)> onRtnOrder_Callback = std::bind(&ClientSession::OnRtnOrder, this);
-	std::function<void(void)> OnRtnTrade_Callback = std::bind(&ClientSession::OnRtnTrade, this);
-	std::function<void(void)> OnCancelOrder_Callback = std::bind(&ClientSession::OnCancelOrder, this);
+	InitedAccountCallback accountInitFinished_Callback = std::bind(&ClientSession::OnAccountInitFinished, this);
+	RtnOrderCallback onRtnOrder_Callback = std::bind(&ClientSession::OnRtnOrder, this, std::placeholders::_1);
+	RtnTradeCallback OnRtnTrade_Callback = std::bind(&ClientSession::OnRtnTrade, this, std::placeholders::_1);
+	CancelOrderCallback OnCancelOrder_Callback = std::bind(&ClientSession::OnCancelOrder, this, std::placeholders::_1, std::placeholders::_2);
 
 	m_trade_spi = std::make_unique<CtpTradeSpi>(api, meta.m_BrokerId.c_str(), meta.m_UserId.c_str(), meta.m_Password.c_str(), \
 		Config::Instance()->ProductName().c_str(), *(m_detailMgr.get()), \
@@ -78,9 +78,9 @@ void ClientSession::ExecutePendingOrder(){
 	}
 }
 
-bool ClientSession::StartTrade(const std::string& instru, const std::string& strategyName, std::string& errmsg){
+bool ClientSession::StartTrade(const std::string& instru, const std::string& strategyName, Transmission::ErrorCode& errcode){
 	if (m_isTrading){
-		errmsg = AlreadyTrading;
+		errcode = Transmission::TradingNow;
 		return false;
 	}
 
@@ -99,10 +99,14 @@ bool ClientSession::StartTrade(const std::string& instru, const std::string& str
 			return true;
 		}
 		else{
-			errmsg = StrategyIsNotInPlugin;
+			errcode = Transmission::InvalidTradeArguments;
 			return false;
 		}
 	}
+}
+
+void ClientSession::InformClientViewer(const TickWrapper& tick){
+	Transmission::Utils::SendMDInfo(m_session, tick.OpenPrice(), tick.ClosePrice(), tick.HighestPrice(), tick.LowestPrice(), tick.toTimeStamp());
 }
 
 void ClientSession::StopTrade(){
@@ -111,13 +115,18 @@ void ClientSession::StopTrade(){
 	m_isTrading = false;
 }
 
-
 void ClientSession::OnAccountInitFinished(){
 
 }
 
-void ClientSession::OnRtnOrder(){}
+void ClientSession::OnRtnOrder(CThostFtdcOrderField* pOrder){
 
-void ClientSession::OnRtnTrade(){}
+}
 
-void ClientSession::OnCancelOrder(){}
+void ClientSession::OnRtnTrade(CThostFtdcTradeField* pTrade){
+
+}
+
+void ClientSession::OnCancelOrder(CThostFtdcInputOrderActionField *pInputOrderAction, CThostFtdcRspInfoField *pRspInfo){
+
+}

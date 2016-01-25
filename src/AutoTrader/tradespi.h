@@ -16,8 +16,14 @@ namespace AP{
 
 extern std::condition_variable cv_md;
 
+typedef std::function<void()>															InitedAccountCallback;
+typedef std::function<void(CThostFtdcOrderField*)>										RtnOrderCallback;
+typedef std::function<void(CThostFtdcTradeField*)>										RtnTradeCallback;
+typedef std::function<void(CThostFtdcInputOrderActionField*, CThostFtdcRspInfoField*)>	CancelOrderCallback;
+
 class CtpTradeSpi : public CThostFtdcTraderSpi
 {
+
 	class TradeThreadStateChangedHandler{
 		//Sleep(1000) is for avoiding query frequency limit, otherwise the queryRequest will return -3
 	public:
@@ -89,10 +95,10 @@ public:
 	CtpTradeSpi(CThostFtdcTraderApi* pUserApi,
 		const char * brokerID, const char* userID, const char* password, const char* prodName, 
 		AP::AccountDetailMgr& admgr, 
-		std::function<void(void)> initFinishCallback,
-		std::function<void(void)> onRtnOrderCallback,
-		std::function<void(void)> onRtnTradeCallback,
-		std::function<void(void)> OnRtnCancellOrderCallback);
+		InitedAccountCallback initFinishCallback,
+		RtnOrderCallback onRtnOrderCallback,
+		RtnTradeCallback onRtnTradeCallback,
+		CancelOrderCallback OnRtnCancellOrderCallback);
 	~CtpTradeSpi();
 
 	virtual void OnFrontConnected();
@@ -159,7 +165,7 @@ public:
 	void ForceClose();
 
 	//理解：在触发了新的交易之前，把已提交未成交的报单给撤销
-	void CancelOrder(const std::string& MDtime, int aliveDuration = 6, const std::string& instrumentId = "");
+	void CancelOrder(long long MDtime, int aliveDuration = 6, const std::string& instrumentId = "");
 
 	bool IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo);
 
@@ -181,13 +187,13 @@ private:
 	bool m_firstquery_Instrument;//是否首次查询合约
 
 private:
-	std::function<void()>		   m_initFinish_callback;
-	std::function<void()>		   m_OnRtnOrder_callback;
-	std::function<void()>		   m_OnRtnTrade_callback;
-	std::function<void()>		   m_OnCancelOrder_callback;
-	AP::AccountDetailMgr&          m_account_detail_mgr;
-	CThostFtdcTraderApi*		   pUserApi;
-	TradeThreadStateChangedHandler m_stateChangeHandler;
+	InitedAccountCallback								m_initFinish_callback;
+	RtnOrderCallback									m_OnRtnOrder_callback;
+	RtnTradeCallback									m_OnRtnTrade_callback;
+	CancelOrderCallback									m_OnCancelOrder_callback;
+	AP::AccountDetailMgr&								m_account_detail_mgr;
+	CThostFtdcTraderApi*								pUserApi;
+	TradeThreadStateChangedHandler						m_stateChangeHandler;
 };
 
 #endif 

@@ -1,27 +1,9 @@
 #include "stdafx.h"
 #include "ClientSession.h"
 #include "ClientSessionMgr.h"
-#include "remote_server_action.h"
-#include "fifo_action_queue.h"
 #include "ThostFtdcTraderApi.h"
-#include "Config.h"
 #include "AccountMgr.h"
-
-static const char* LoginSucceed = "Login Successfully!\n";
-static const char* LoginRepeatedly = "Login Repeatedly!\n";
-static const char* LoginFailed_PW = "Login fail, Reason:Wrong password.\n";
-static const char* LoginFailed_AC = "Login fail, Reason:unexisted account.\n";
-static const char* TradingNow = "Trading now, Please stop current trading first.\n";
-static const char* LoginNeeded = "Please login first before start to trade.\n";
-static const char* StartTradeSucceed = "Start To Trade Successfully.\n";
-static const char* InvalidTradeArguments = "Trade arguments is invalid.\n";
-
-namespace {
-	void AppendReplyBySession(const std::shared_ptr<Transmission::socket_session>& session, const std::string& data){
-		Transmission::GetFIFOActionQueue().Push_back(Transmission::RemoteServerAction(session, data));
-	}
-}
-
+#include "Utils.h"
 
 ClientSessionMgr* ClientSessionMgr::_instance = NULL;
 
@@ -45,39 +27,39 @@ void ClientSessionMgr::LoginAccount(const std::string& userId, const std::string
 		if (success){
 			if (m_client_sessions.find(session) == m_client_sessions.end()){
 				m_client_sessions[session] = std::make_shared<ClientSession>(userId, session, m_pTradeUserApi);
-				AppendReplyBySession(session, LoginSucceed);
+				Transmission::Utils::SendLoginResultInfo(session, Transmission::Succeed);
 			}
 			else{
-				AppendReplyBySession(session, LoginRepeatedly);
+				Transmission::Utils::SendLoginResultInfo(session, Transmission::LoginRepeatedly);
 			}
 		}
 		else{
-			AppendReplyBySession(session, LoginFailed_PW);
+			Transmission::Utils::SendLoginResultInfo(session, Transmission::LoginFailed_PW);
 		}
 	}
 	else{
-		AppendReplyBySession(session, LoginFailed_AC);
+		Transmission::Utils::SendLoginResultInfo(session, Transmission::LoginFailed_AC);
 	}
 }
 
 void ClientSessionMgr::StartTrade(const std::string& instru, const std::string& strategyName, const std::shared_ptr<Transmission::socket_session>& session){
 	if (m_client_sessions.find(session) != m_client_sessions.end()){
 		if (m_client_sessions[session]->IsTrading()){
-			AppendReplyBySession(session, TradingNow);
+			Transmission::Utils::SendStartTradeResultInfo(session, Transmission::TradingNow);
 		}
 		else{
-			std::string err_string;
-			if (m_client_sessions[session]->StartTrade(instru, strategyName, err_string)){
-				AppendReplyBySession(session, StartTradeSucceed);
+			Transmission::ErrorCode code;
+			if (m_client_sessions[session]->StartTrade(instru, strategyName, code)){
+				Transmission::Utils::SendStartTradeResultInfo(session, Transmission::Succeed);
 			}
 			else{
-				AppendReplyBySession(session, err_string);
+				Transmission::Utils::SendStartTradeResultInfo(session, code);
 			}
 		}
 
 	}
 	else{
-		AppendReplyBySession(session, LoginNeeded);
+		Transmission::Utils::SendStartTradeResultInfo(session, Transmission::LoginNeeded);
 	}
 }
 

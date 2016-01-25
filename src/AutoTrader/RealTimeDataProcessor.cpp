@@ -76,13 +76,16 @@ void RealTimeDataProcessor::AppendRealTimeData(TickWrapper& info){
 		bool triggered = m_trigger->tryInvoke(m_DataSeq, info, ord);
 #endif
 		if (triggered){
-			ord.SetTriggerTick(info.UpdateTime());
+			ord.SetTriggerTick(info.toTimeStamp());
 
-			if (m_owner)
+			if (m_owner){
 				m_owner->AppendOrder(ord);
+			}
 		}
-			
 	}
+	if (m_owner)
+		m_owner->InformClientViewer(info);
+
 	m_DataSeq.push_front(info);
 
 	//construct 1-minutes k-line intermediate data
