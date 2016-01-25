@@ -17,6 +17,7 @@
 #include "TickWrapper.h"
 #include "Transmission.h"
 #include "Utils.h"
+#include "CommonUtils.h"
 
 ClientSession::ClientSession(const std::string& userId, const std::shared_ptr<Transmission::socket_session>& s, CThostFtdcTraderApi* api)
 : m_userId(userId)
@@ -120,11 +121,13 @@ void ClientSession::OnAccountInitFinished(){
 }
 
 void ClientSession::OnRtnOrder(CThostFtdcOrderField* pOrder){
-
+	long long timeStamp = CommonUtils::DateTimeToTimestamp(pOrder->InsertDate, pOrder->InsertTime) * 2;
+	Transmission::Utils::SendDealInfo(m_session, Transmission::INSERT_ORDER, pOrder->Direction, pOrder->LimitPrice, pOrder->VolumeTotalOriginal, pOrder->OrderSysID, timeStamp);
 }
 
 void ClientSession::OnRtnTrade(CThostFtdcTradeField* pTrade){
-
+	long long timeStamp = CommonUtils::DateTimeToTimestamp(pTrade->TradeDate, pTrade->TradeTime) * 2;
+	Transmission::Utils::SendDealInfo(m_session, Transmission::INSERT_ORDER, pTrade->Direction, pTrade->Price, pTrade->Volume, pTrade->OrderSysID, timeStamp);
 }
 
 void ClientSession::OnCancelOrder(CThostFtdcInputOrderActionField *pInputOrderAction, CThostFtdcRspInfoField *pRspInfo){

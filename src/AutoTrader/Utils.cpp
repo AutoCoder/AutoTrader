@@ -31,7 +31,7 @@ namespace Transmission{
 		Transmission::GetFIFOActionQueue().Push_back(Transmission::RemoteServerAction(session, ret));
 	}
 
-	void Utils::SendDealInfo(const std::shared_ptr<Transmission::socket_session>& session, TradeEventType type, int direction, int price, int vol, int  order_id, long long timestamp){
+	void Utils::SendDealInfo(const std::shared_ptr<Transmission::socket_session>& session, TradeEventType type, int direction, int price, int vol, char* orderRef, long long timestamp){
 		Json::Value root;
 		switch (type){
 		case INSERT_ORDER:
@@ -50,7 +50,7 @@ namespace Transmission{
 		root["Details"]["Direction"] = direction;
 		root["Details"]["Price"] = price;
 		root["Details"]["Vol"] = vol;
-		root["Details"]["ORDER_ID"] = order_id;
+		root["Details"]["ORDER_ID"] = orderRef;
 		root["Details"]["TIMESTAMP"] = timestamp;
 		Json::FastWriter writer;
 		std::string ret = writer.write(root);
