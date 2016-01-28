@@ -94,6 +94,9 @@ namespace Transmission{
 		std::string err_msg;
 		int err_code = code;
 		switch (code){
+			case Succeed:
+				err_msg = "Succeed.";
+				break;
 			case TradingNow:
 				err_msg = "Trading now, Please stop current trading first.";
 				break;

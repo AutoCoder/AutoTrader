@@ -11,7 +11,7 @@ TriggerFactory* TriggerFactory::Instance(){
 
 }
 void TriggerFactory::RegisterTrigger(const std::string& ownerAccount, const std::string& strategyName, OrderTriggerBase* trigger){
-	auto stratgyMap = m_store[ownerAccount];
+	auto& stratgyMap = m_store[ownerAccount];
 	stratgyMap[strategyName] = trigger;
 }
 

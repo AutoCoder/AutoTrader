@@ -118,6 +118,8 @@ Usage:
    AutoTrade.exe replay rb1510 table_mark
 */
 int main(int argc, const char* argv[]){
+	//std::string temp = "{\"ActionType\":\"StartTrade\",\"Arguments\":{\"InstrumentId\":\"rb1604\",\"StrategyName\":\"Pos20Precent_3_5_MACrossStratgy\"}}";
+	//int size = temp.length();
 	StrategyPluginsLoader loader; //must be top
 	auto console = spdlog::stdout_logger_mt("console");
 

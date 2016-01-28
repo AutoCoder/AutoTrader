@@ -23,7 +23,7 @@ RealTimeDataProcessorPool::RealTimeDataProcessorPool()
 }
 
 void RealTimeDataProcessorPool::AddProcessor(const std::shared_ptr<RealTimeDataProcessor>& processor){
-	auto processorVec = m_processorDict[processor->Instrument()];
+	auto& processorVec = m_processorDict[processor->Instrument()];
 	processorVec.push_back(processor);
 }
 
