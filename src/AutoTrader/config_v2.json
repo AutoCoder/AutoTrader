@@ -1,7 +1,7 @@
 {
    "CtpServer":{
-      "MdFront":"tcp://180.168.146.187:10010",
-      "TradeFront":"tcp://180.168.146.187:10000",
+      "MdFront":"tcp://218.202.237.33:10012",
+      "TradeFront":"tcp://218.202.237.33:10002",
       "RiskFront":""
    },
 

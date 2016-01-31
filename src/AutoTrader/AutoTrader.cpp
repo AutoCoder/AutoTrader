@@ -142,7 +142,7 @@ int main(int argc, const char* argv[]){
 		CtpMdSpi* pMdUserSpi = new CtpMdSpi(pMdUserApi, Account::Manager::Instance().Instruments(), config->DefaultCtpBrokerID(), config->DefaultCtpUserID(), config->DefaultCtpPassword());
 		pMdUserApi->RegisterSpi(pMdUserSpi);
 		pMdUserApi->RegisterFront(const_cast<char*>(Config::Instance()->CtpMdFront().c_str()));
-
+		pMdUserApi->Init();
 		std::thread actionInvoker(ProcessActionQueue);
 
 		Transmission::socket_server server(2007);

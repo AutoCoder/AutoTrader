@@ -67,3 +67,7 @@
 include "boost/asio.hpp"报错，error LNK2019: unresolved external symbol "class boost::system::error_category const & __cdecl boost::system::system_category(void)" (?
 
 解决： 在include <winodws.h> 前 include <boost/asio.hpp>
+
+[2016-1-31]
+问题： mdspi中的 OnFrontConnected的回调一直不被调用了。
+通过调试别人的代码发现，没有调用mdApi->Init()

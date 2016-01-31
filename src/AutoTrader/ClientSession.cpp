@@ -39,6 +39,7 @@ ClientSession::ClientSession(const std::string& userId, const std::shared_ptr<Tr
 	api->SubscribePublicTopic(THOST_TERT_RESTART);
 	api->SubscribePrivateTopic(THOST_TERT_RESTART);
 	api->RegisterFront(const_cast<char*>(Config::Instance()->CtpTradeFront().c_str()));
+	api->Init();
 }
 
 ClientSession::~ClientSession()
