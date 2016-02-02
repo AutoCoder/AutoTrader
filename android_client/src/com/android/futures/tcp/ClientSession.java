@@ -12,19 +12,23 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.android.futures.entity.TradeEntity;
+import com.android.futures.tcp.AccountInfo;
+import android.app.Application;
+import android.os.Message;
 
 
-public class ClientSession {
+public class ClientSession extends Application {
 	private Socket mSocket;
-	enum state{
-		Logined,
-		Loging,
-		LogOut,
-		NoTrading,
-		StartTrading,
-		Trading
-	}
-	private state mState;
+	public final int LogOut = 1;
+	public final int Loging = 2;
+	public final int Logined = 3;
+	public final int AccountInited = 4;
+	public final int NoTrading = 5;
+	public final int StartTrading = 6;
+	public final int Trading = 7;
+
+
+	private int mState;
 	
 	private void Send(String data){
 		try {
@@ -52,7 +56,7 @@ public class ClientSession {
 			String info = loginJson.toString();
 			String wrapInfo = String.valueOf(info.length()) + info;
 			Send(wrapInfo);
-			mState = state.Loging;
+			mState = Loging;
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -73,7 +77,7 @@ public class ClientSession {
 			String info = loginJson.toString();
 			String wrapInfo = String.valueOf(info.length()) + info;
 			Send(wrapInfo);
-			mState = state.StartTrading;
+			mState = StartTrading;
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -117,10 +121,10 @@ public class ClientSession {
 				try {
 					JSONObject obj = new JSONObject(String.valueOf(jsonstr));
 					if (obj.has("ActionType")){
-						if (obj.getString("ActionType")=="Login" && mState == state.Loging){
-							mState = obj.getInt("ErrorCode") == 0 ? state.Logined : state.LogOut;
-						}else if(obj.getString("ActionType")=="StartTrade" && mState == state.StartTrading){
-							mState = obj.getInt("ErrorCode") == 0 ? state.Trading : state.NoTrading;
+						if (obj.getString("ActionType")=="Login" && mState == Loging){
+							mState = obj.getInt("ErrorCode") == 0 ? Logined : LogOut;
+						}else if(obj.getString("ActionType")=="StartTrade" && mState == StartTrading){
+							mState = obj.getInt("ErrorCode") == 0 ? Trading : NoTrading;
 						}
 					}else{
 						//return md & trade
@@ -128,7 +132,8 @@ public class ClientSession {
 						//{"Type":"INSERT_ORDER","Details":{"Direction" : 1, Price":123,"Vol":124, "ORDER_ID":11156, "TIMESTAMP": 111111.5}}
 						//{"Type":"CANCELL_ORDER","Details":{"Direction" : 1, "Price":123,"Vol":124, "ORDER_ID":11156, "TIMESTAMP": 111111.5}}
 						//{"Type":"TRADE","Details":{"Direction" : 1, "Price":124, "Vol":125,"ORDER_ID":11156, "TIMESTAMP": 111111.5}}
-						if (obj.has("Type") && obj.getString("Type") == "MD"){
+						//{"Type":"ACCOUNT_INFO","Details":{"Blance":122313,"Position":20, "Instrument":"rb1605", "Price":2555}}
+						if (obj.has("Type")){
 							TradeEntity temp;
 							TradeEntity.type t = TradeEntity.type.MD;
 							JSONObject details = obj.getJSONObject("Details");
@@ -141,7 +146,14 @@ public class ClientSession {
 									t = TradeEntity.type.Cancell_Order;
 								}else if (obj.getString("Type") == "TRADE"){
 									t = TradeEntity.type.Trade;
-								}else{}
+								}else if (obj.getString("Type") == "ACCOUNT_INFO"){
+									AccountInfo info = new AccountInfo(details.getDouble("Balance"), details.getInt("Position"), details.getInt("Price"), details.getString("Instrument"));
+									Message msg = Message.obtain();
+									msg.obj = info;
+									msg.what = AccountInited;
+								}else{
+									
+								}
 								temp = new TradeEntity(t, details.getInt("Price"), details.getInt("Vol"), details.getInt("ORDER_ID"), details.getDouble("TIMESTAMP"));
 							}
 							

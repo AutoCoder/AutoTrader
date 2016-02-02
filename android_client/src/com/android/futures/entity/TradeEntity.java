@@ -5,7 +5,8 @@ public class TradeEntity {
 		MD,
 		Order,
 		Cancell_Order,
-		Trade
+		Trade,
+		AccountInit,
 	}
 	
 	private type mType;

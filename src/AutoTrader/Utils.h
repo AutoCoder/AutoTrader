@@ -16,6 +16,7 @@ namespace Transmission{
 		static void SendMDInfo(const std::shared_ptr<Transmission::socket_session>& session, int openPrice, int closePrice, int highPrice, int lowPrice, long long timestamp);
 		static void SendDealInfo(const std::shared_ptr<Transmission::socket_session>& session, TradeEventType type, int direction, int price, int vol, char*  orderRef, long long timestamp);
 		static void SendLoginResultInfo(const std::shared_ptr<Transmission::socket_session>& session, ErrorCode code);
+		static void SendAccountInfo(const std::shared_ptr<Transmission::socket_session>& session, double blance, int position, const std::string& instrument, int currentPrice);
 		static void SendStartTradeResultInfo(const std::shared_ptr<Transmission::socket_session>& session, ErrorCode code);
 	};
 }

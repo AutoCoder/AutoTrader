@@ -31,6 +31,22 @@ namespace Transmission{
 		Transmission::GetFIFOActionQueue().Push_back(Transmission::RemoteServerAction(session, ret));
 	}
 
+	void Utils::SendAccountInfo(const std::shared_ptr<Transmission::socket_session>& session, double blance, int position, const std::string& instrument, int currentPrice){
+		Json::Value root;
+		root["Type"] = "AccountInfo";
+		Json::Value details;
+		details["Balance"] = blance;
+		details["Position"] = position;
+		details["Instrument"] = instrument;
+		details["Price"] = currentPrice;
+		root["Details"] = details;
+		Json::FastWriter writer;
+		std::string ret = writer.write(root);
+		//{"Type":"ACCOUNT_INFO","Details":{"Blance":122313,"Position":20, "Instrument":"rb1605", "Price":2555}}
+		ret = str(boost::format("%1%%2%") % ret.length() % ret);
+		Transmission::GetFIFOActionQueue().Push_back(Transmission::RemoteServerAction(session, ret));
+	}
+
 	void Utils::SendDealInfo(const std::shared_ptr<Transmission::socket_session>& session, TradeEventType type, int direction, int price, int vol, char* orderRef, long long timestamp){
 		Json::Value root;
 		switch (type){
