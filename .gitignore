@@ -63,5 +63,5 @@ x64/*
 *.con
 /output
 /boost_1_60_0
-android_client/gen/*.*
-android_client/bin/*.*
+android_client/gen/*
+android_client/bin/*
