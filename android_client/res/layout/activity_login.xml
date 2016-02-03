@@ -97,9 +97,10 @@
                 android:layout_marginLeft="20dip"
                 android:layout_toRightOf="@id/pwd"
                 android:hint="密码"
+                android:password="true" 
                 android:textSize="15sp" />
         </RelativeLayout>
-        
+
         <RelativeLayout
             android:id="@+id/brokerRel"
             android:layout_width="fill_parent"
@@ -127,5 +128,62 @@
                 android:hint="brokerId"
                 android:textSize="15sp" />
         </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/hostRel"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/brokerRel"
+            android:clickable="true"
+            android:gravity="center_vertical" >
+
+            <TextView
+                android:id="@+id/host_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="服务器IP："
+                android:textColor="#000"
+                android:textSize="17sp" />
+
+            <EditText
+                android:id="@+id/host_text"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="20dip"
+                android:layout_toRightOf="@id/host_label"
+                android:hint="127.0.0.1"
+                android:textSize="15sp" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/portRel"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/hostRel"
+            android:clickable="true"
+            android:gravity="center_vertical" >
+
+            <TextView
+                android:id="@+id/port_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="端口："
+                android:textColor="#000"
+                android:textSize="17sp" />
+
+            <EditText
+                android:id="@+id/port_text"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="20dip"
+                android:layout_toRightOf="@id/port_label"
+                android:hint="2007"
+                android:textSize="15sp" />
+        </RelativeLayout>
     </RelativeLayout>
+
 </LinearLayout>

@@ -31,9 +31,9 @@ namespace Transmission{
 		Transmission::GetFIFOActionQueue().Push_back(Transmission::RemoteServerAction(session, ret));
 	}
 
-	void Utils::SendAccountInfo(const std::shared_ptr<Transmission::socket_session>& session, double blance, int position, const std::string& instrument, int currentPrice){
+	void Utils::SendAccountStatus(const std::shared_ptr<Transmission::socket_session>& session, double blance, int position, const std::string& instrument, int currentPrice){
 		Json::Value root;
-		root["Type"] = "AccountInfo";
+		root["Type"] = "AccountStatus";
 		Json::Value details;
 		details["Balance"] = blance;
 		details["Position"] = position;
@@ -42,7 +42,30 @@ namespace Transmission{
 		root["Details"] = details;
 		Json::FastWriter writer;
 		std::string ret = writer.write(root);
-		//{"Type":"ACCOUNT_INFO","Details":{"Blance":122313,"Position":20, "Instrument":"rb1605", "Price":2555}}
+		//{"Type":"ACCOUNT_STATUS","Details":{"Blance":122313,"Position":20, "Instrument":"rb1605", "Price":2555}}
+		ret = str(boost::format("%1%%2%") % ret.length() % ret);
+		Transmission::GetFIFOActionQueue().Push_back(Transmission::RemoteServerAction(session, ret));
+	}
+
+	void Utils::SendAccountInfo(const std::shared_ptr<Transmission::socket_session>& session, const std::vector<std::string>& instruments, const std::vector<std::string>& strategies){
+		Json::Value root;
+		root["Type"] = "AccountInfo";
+		Json::Value details;
+		Json::Value arrayInstru;
+		Json::Value arrayStrategy;
+		for (auto instru : instruments){
+			arrayInstru.append(instru);
+		}
+		for (auto st : strategies){
+			arrayStrategy.append(st);
+		}
+		details["Instruments"] = arrayInstru;
+		details["Strategies"] = arrayStrategy;
+
+		root["Details"] = details;
+		Json::FastWriter writer;
+		std::string ret = writer.write(root);
+		//{"Type":"ACCOUNT_INFO","Details":{"Instruments": [ "122313", "12233" ], "Strategies": [ "CROSS_3_5" ]}}
 		ret = str(boost::format("%1%%2%") % ret.length() % ret);
 		Transmission::GetFIFOActionQueue().Push_back(Transmission::RemoteServerAction(session, ret));
 	}

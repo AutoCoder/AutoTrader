@@ -46,7 +46,7 @@ namespace Transmission{
 
 		private:
 			boost::asio::io_service io_service_;
-			tcp::acceptor acceptor_;
+			std::shared_ptr<tcp::acceptor> acceptor_;
 			tcp::socket socket_;
 		};
 	}

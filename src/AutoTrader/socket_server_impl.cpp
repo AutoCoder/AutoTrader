@@ -76,9 +76,13 @@ namespace Transmission{
 
 		server::server(short port)
 			: io_service_()
-			, acceptor_(io_service_, tcp::endpoint(tcp::v4(), port))
+			//, acceptor_(io_service_, tcp::endpoint(tcp::v4(), port))
 			, socket_(io_service_)
 		{
+			boost::asio::ip::address add;
+			add.from_string("10.0.2.2");
+			tcp::endpoint endpoint(add, short(port));
+			acceptor_ = std::make_shared<tcp::acceptor>(io_service_, endpoint);
 			do_accept();
 		}
 
@@ -88,7 +92,7 @@ namespace Transmission{
 
 		void server::do_accept()
 		{
-			acceptor_.async_accept(socket_,
+			acceptor_->async_accept(socket_,
 				[this](boost::system::error_code ec)
 			{
 				if (!ec)

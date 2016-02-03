@@ -5,7 +5,9 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Reader;
+import java.net.InetAddress;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.nio.CharBuffer;
 
 import org.json.JSONException;
@@ -14,11 +16,15 @@ import org.json.JSONObject;
 import com.android.futures.entity.TradeEntity;
 import com.android.futures.tcp.AccountInfo;
 import android.app.Application;
+import android.os.Handler;
 import android.os.Message;
 
-
 public class ClientSession extends Application {
-	private Socket mSocket;
+	private Socket mSocket = null;
+	private Thread mReceiveThread = null;
+	private String mBrokerId, mAccount, mPassword, mHost;
+	private int mPort;
+	private Handler mHandler;
 	public final int LogOut = 1;
 	public final int Loging = 2;
 	public final int Logined = 3;
@@ -26,9 +32,20 @@ public class ClientSession extends Application {
 	public final int NoTrading = 5;
 	public final int StartTrading = 6;
 	public final int Trading = 7;
-
-
 	private int mState;
+
+	public void SetHandler(Handler handler){
+		mHandler = handler;
+	}
+	
+	public void SetLoginMeta(String brokerId, String account, String pwd, String host, int port)
+	{
+		mBrokerId = brokerId;
+		mAccount = account;
+		mPassword = pwd;
+		mHost = host;
+		mPort = port;
+	}
 	
 	private void Send(String data){
 		try {
@@ -41,26 +58,43 @@ public class ClientSession extends Application {
 		}  
 	}
 	
-	public void Login(String brokerId, String name, String pw){
+	public void Login(){
 		//96{"ActionType":"Login","Arguments":{"BrokerId":"9999","UserName":"021510","Password":"wodemima"}}
-		try {
-			JSONObject meta = new JSONObject();
-			meta.put("BrokerId", brokerId);
-			meta.put("UserName", name);
-			meta.put("Password", pw);
-			
-			JSONObject loginJson = new JSONObject(); 
-			loginJson.put("ActionType", "Login");
-			loginJson.put("Arguments", meta);
-			
-			String info = loginJson.toString();
-			String wrapInfo = String.valueOf(info.length()) + info;
-			Send(wrapInfo);
-			mState = Loging;
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} 
+		Thread login_thread = new Thread(  
+                new Runnable(){  
+                    @Override  
+                    public void run() {  
+            			try {
+							mSocket = new Socket(mHost, mPort);
+							JSONObject meta = new JSONObject();
+							meta.put("BrokerId", mBrokerId);
+							meta.put("UserName", mAccount);
+							meta.put("Password", mPassword);
+							
+							JSONObject loginJson = new JSONObject(); 
+							loginJson.put("ActionType", "Login");
+							loginJson.put("Arguments", meta);
+							
+							String info = loginJson.toString();
+							String wrapInfo = String.valueOf(info.length()) + info;
+							Send(wrapInfo);
+							mState = Loging;
+						} catch (UnknownHostException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (JSONException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}                       
+                    }  
+                }  
+        );  
+		login_thread.start();  
+		mReceiveThread = new ReceiveThread();
+		mReceiveThread.start();
 	}
 	
 	public void StartTrade(String strategyName, String instrument){
@@ -86,17 +120,17 @@ public class ClientSession extends Application {
 	
 	
 	class ReceiveThread extends Thread{  
-        private Socket socket;  
-          
-        public ReceiveThread(Socket socket) {  
-            this.socket = socket;  
-        }  
+//        private Socket socket;  
+//          
+//        public ReceiveThread(Socket socket) {  
+//            this.socket = socket;  
+//        }  
   
         @Override  
         public void run() {  
-            while(true){  
+            while(true && mSocket != null){  
                 try {                     
-                    Reader reader = new InputStreamReader(socket.getInputStream());  
+                    Reader reader = new InputStreamReader(mSocket.getInputStream());  
                     CharBuffer charBuffer = CharBuffer.allocate(8192); 
                     int index = -1;  
                     while((index=reader.read(charBuffer))!=-1){  
@@ -151,6 +185,7 @@ public class ClientSession extends Application {
 									Message msg = Message.obtain();
 									msg.obj = info;
 									msg.what = AccountInited;
+									mHandler.sendMessage(msg);
 								}else{
 									
 								}
