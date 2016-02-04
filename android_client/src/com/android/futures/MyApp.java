@@ -1,13 +1,13 @@
 package com.android.futures;
 
-import com.android.futures.tcp.ClientSession;
+import com.android.futures.tcp.ClientSessionNew;
 
 import android.app.Application;
 
 public class MyApp extends Application {
-	private ClientSession mSession = new ClientSession();
+	private ClientSessionNew mSession = new ClientSessionNew();
 	
-	public ClientSession GetSession(){
+	public ClientSessionNew GetSession(){
 		return mSession;
 	}
 }

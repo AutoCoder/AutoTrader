@@ -71,3 +71,7 @@ include "boost/asio.hpp"报错，error LNK2019: unresolved external symbol "clas
 [2016-1-31]
 问题： mdspi中的 OnFrontConnected的回调一直不被调用了。
 通过调试别人的代码发现，没有调用mdApi->Init()
+
+[2016-2-3]
+connection refused.
+用android的模拟器只能连接10.0.2.2这个地址，于是把server的地址改成这个

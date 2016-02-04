@@ -1,16 +1,30 @@
 package com.android.futures.tcp;
 
+import java.util.ArrayList;
 
 public class AccountInfo {
-	private String   mInstrument;
-	private double mBalance;
-	private int   mPosition;
-	private int mPrice;
+
+	private ArrayList<String> mInstrumentList;
+	private ArrayList<String> mStrategies;
 	
-	AccountInfo(double balance, int position, int price, String instru){
-		mBalance = balance;
-		mPosition = position;
-		mPrice = price;
-		mInstrument = instru;
+	public AccountInfo(ArrayList<String> instrus, ArrayList<String> sts){
+		setInstrumentList(instrus);
+		setStrategies(sts);
+	}
+
+	public ArrayList<String> getStrategies() {
+		return mStrategies;
+	}
+
+	public void setStrategies(ArrayList<String> mStrategies) {
+		this.mStrategies = mStrategies;
+	}
+
+	public ArrayList<String> getInstrumentList() {
+		return mInstrumentList;
+	}
+
+	public void setInstrumentList(ArrayList<String> mInstrumentList) {
+		this.mInstrumentList = mInstrumentList;
 	}
 }

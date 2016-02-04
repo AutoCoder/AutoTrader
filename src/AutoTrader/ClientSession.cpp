@@ -118,7 +118,16 @@ void ClientSession::StopTrade(){
 }
 
 void ClientSession::OnAccountInitFinished(){
-
+	double posMoney = 0.0;
+	double balance = 0.0;
+	AP::Direction posDirection = AP::Long;
+	m_detailMgr->getPosition(posMoney, posDirection, balance);
+	std::string instru = m_detailMgr->getInstrumentList();
+	int todayPos = 0;    AP::Direction todayDirection = AP::Long;
+	int ydPos = 0;       AP::Direction ydDirection = AP::Long;
+	
+	int posVol = m_detailMgr->getPositionVolume(instru, todayDirection, todayPos, ydDirection, ydPos);
+	Transmission::Utils::SendAccountStatus(m_session, balance, posVol, m_detailMgr->getInstrumentList(), (int)(posMoney / posVol));
 }
 
 void ClientSession::OnRtnOrder(CThostFtdcOrderField* pOrder){

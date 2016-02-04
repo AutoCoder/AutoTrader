@@ -48,7 +48,7 @@ namespace Transmission{
 
 		if (reader.parse(input, root))
 		{
-			auto& actionTypeNode = root["ActionType"];
+			auto& actionTypeNode = root["Action"];
 			return actionTypeNode.isNull() ? "" : actionTypeNode.asString();
 		}
 		else

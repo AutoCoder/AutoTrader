@@ -3,6 +3,7 @@
 #include "ClientSessionMgr.h"
 #include "ThostFtdcTraderApi.h"
 #include "AccountMgr.h"
+#include "TriggerFactory.h"
 #include "Utils.h"
 
 ClientSessionMgr* ClientSessionMgr::_instance = NULL;
@@ -28,6 +29,9 @@ void ClientSessionMgr::LoginAccount(const std::string& userId, const std::string
 			if (m_client_sessions.find(session) == m_client_sessions.end()){
 				m_client_sessions[session] = std::make_shared<ClientSession>(userId, session, m_pTradeUserApi);
 				Transmission::Utils::SendLoginResultInfo(session, Transmission::Succeed);
+				const std::vector<std::string>& instu = Account::Manager::Instance().GetMeta(userId).m_Instruments;
+				const std::vector<std::string>& strategies = TriggerFactory::Instance()->GetStrategies(userId);
+				Transmission::Utils::SendAccountInfo(session, instu, strategies);
 			}
 			else{
 				Transmission::Utils::SendLoginResultInfo(session, Transmission::LoginRepeatedly);

@@ -22,13 +22,24 @@ void TriggerFactory::UnRegisterTrigger(const std::string& ownerAccount){
 	}
 }
 
-OrderTriggerBase* TriggerFactory::GetTrigger(const std::string& ownerAccount, const std::string& strategyName){
+OrderTriggerBase* TriggerFactory::GetTrigger(const std::string& ownerAccount, const std::string& strategyName) const{
 	if (m_store.find(ownerAccount) != m_store.end()){
-		auto stratgyMap = m_store[ownerAccount];
+		auto stratgyMap = m_store.at(ownerAccount);
 		if (stratgyMap.find(strategyName) != stratgyMap.end()){
 			return stratgyMap[strategyName];
 		}
 	}
 
 	return nullptr;
+}
+
+std::vector<std::string> TriggerFactory::GetStrategies(const std::string& ownerAccount) const{
+	std::vector<std::string> temp;
+	if (m_store.find(ownerAccount) != m_store.end()){
+		auto stratgyMap = m_store.at(ownerAccount);
+		for (auto pair : stratgyMap){
+			temp.push_back(pair.first);
+		}
+	}
+	return temp;
 }

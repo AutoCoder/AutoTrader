@@ -18,7 +18,7 @@ namespace Transmission{
 
 	void Utils::SendMDInfo(const std::shared_ptr<Transmission::socket_session>& session, int openPrice, int closePrice, int highPrice, int lowPrice, long long timestamp){
 		Json::Value root;
-		root["Type"] = "MD";
+		root["Info"] = "MD";
 		root["Details"] = Json::Value::nullRef;
 		root["Details"]["OpenPrice"] = openPrice;
 		root["Details"]["ClosePrice"] = closePrice;
@@ -31,14 +31,14 @@ namespace Transmission{
 		Transmission::GetFIFOActionQueue().Push_back(Transmission::RemoteServerAction(session, ret));
 	}
 
-	void Utils::SendAccountStatus(const std::shared_ptr<Transmission::socket_session>& session, double blance, int position, const std::string& instrument, int currentPrice){
+	void Utils::SendAccountStatus(const std::shared_ptr<Transmission::socket_session>& session, double blance, int position, const std::string& instrument, int costPrice){
 		Json::Value root;
-		root["Type"] = "AccountStatus";
+		root["Info"] = "ACCOUNT_STATUS";
 		Json::Value details;
 		details["Balance"] = blance;
 		details["Position"] = position;
 		details["Instrument"] = instrument;
-		details["Price"] = currentPrice;
+		details["Price"] = costPrice;
 		root["Details"] = details;
 		Json::FastWriter writer;
 		std::string ret = writer.write(root);
@@ -49,7 +49,7 @@ namespace Transmission{
 
 	void Utils::SendAccountInfo(const std::shared_ptr<Transmission::socket_session>& session, const std::vector<std::string>& instruments, const std::vector<std::string>& strategies){
 		Json::Value root;
-		root["Type"] = "AccountInfo";
+		root["Info"] = "ACCOUNT_INFO";
 		Json::Value details;
 		Json::Value arrayInstru;
 		Json::Value arrayStrategy;
@@ -74,13 +74,13 @@ namespace Transmission{
 		Json::Value root;
 		switch (type){
 		case INSERT_ORDER:
-			root["Type"] = "INSERT_ORDER";
+			root["Info"] = "INSERT_ORDER";
 			break;
 		case CANCELL_ORDER:
-			root["Type"] = "CANCELL_ORDER";
+			root["Info"] = "CANCELL_ORDER";
 			break;
 		case TRADE:
-			root["Type"] = "TRADE";
+			root["Info"] = "TRADE";
 		default:
 			assert(false);
 			break;
@@ -120,7 +120,7 @@ namespace Transmission{
 			}
 		}
 		Json::Value root;
-		root["Type"] = "Login";
+		root["Action"] = "Login";
 		root["ErrorCode"] = code;
 		root["ErrorMsg"] = err_msg;
 		Json::FastWriter writer;
@@ -152,7 +152,7 @@ namespace Transmission{
 			}
 		}
 		Json::Value root;
-		root["Type"] = "StartTrade";
+		root["Action"] = "StartTrade";
 		root["ErrorCode"] = code;
 		root["ErrorMsg"] = err_msg;
 		Json::FastWriter writer;

@@ -7,7 +7,8 @@ import android.widget.Button;
 import android.view.View;
 import android.widget.EditText; 
 import com.android.futures.MyApp;
-import com.android.futures.tcp.ClientSession;;
+//import com.android.futures.tcp.ClientSession;
+import com.android.futures.tcp.ClientSessionNew;;
 
 public class LoginActivity extends Activity{
 	
@@ -35,9 +36,9 @@ public class LoginActivity extends Activity{
 			public void onClick(View v) {
 				
 				MyApp app = (MyApp) getApplication();
-				ClientSession session = app.GetSession();
+				ClientSessionNew session = app.GetSession();
 				int port = Integer.parseInt(portEdit.getText().toString());
-				session.SetLoginMeta(brokerIdEdit.getText().toString(),accountEdit.getText().toString(),pwdEdit.getText().toString(), hostEdit.getText().toString(), port);
+				session.ConnectServer(brokerIdEdit.getText().toString(),accountEdit.getText().toString(),pwdEdit.getText().toString(), hostEdit.getText().toString(), port);
 			    Intent intent = new Intent(LoginActivity.this,  
 			    		AccountActivity.class);  
                 startActivity(intent);  
