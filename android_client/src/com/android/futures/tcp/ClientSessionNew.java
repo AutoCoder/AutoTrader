@@ -9,7 +9,7 @@ import android.os.Handler;
 import android.os.Message;
 
 public class ClientSessionNew implements TraderStatusListener {
-	public int mState;
+
 	private String mBrokerId, mAccount, mPassword, mHost;
 	private int mPort;
 	private Handler mHandler;
@@ -23,12 +23,12 @@ public class ClientSessionNew implements TraderStatusListener {
 	{
 		if (mSocketHandler != null)//if socket is connected, skip this function.
 			return;
-		
+
 		mBrokerId = brokerId;
 		mAccount = account;
 		mPassword = pwd;
-//		mHost = host;
-//		mPort = port;
+		mHost = host;
+		mPort = port;
 		try {
 			mSocketHandler = new SocketHandler(host, port, this);
 			mSocketHandler.listen(true);
@@ -51,7 +51,6 @@ public class ClientSessionNew implements TraderStatusListener {
 			String info = loginJson.toString();
 			String wrapInfo = String.valueOf(info.length()) + info;
 			mSocketHandler.sendMessage(wrapInfo);
-			mState = Loging;
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -71,8 +70,6 @@ public class ClientSessionNew implements TraderStatusListener {
 			String info = loginJson.toString();
 			String wrapInfo = String.valueOf(info.length()) + info;
 			mSocketHandler.sendMessage(wrapInfo);
-			mState = LogOut;
-			
 			mSocketHandler.shutDown();
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
@@ -94,7 +91,6 @@ public class ClientSessionNew implements TraderStatusListener {
 			String info = loginJson.toString();
 			String wrapInfo = String.valueOf(info.length()) + info;
 			mSocketHandler.sendMessage(wrapInfo);
-			mState = StartTrading;
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -116,6 +112,22 @@ public class ClientSessionNew implements TraderStatusListener {
 		Message msg = Message.obtain();
 		msg.obj = info;
 		msg.what = TraderStatusListener.Logined;
+		mHandler.sendMessage(msg);
+	}
+
+	@Override
+	public void onStartTrade() {
+		// TODO Auto-generated method stub
+		Message msg = Message.obtain();
+		msg.what = TraderStatusListener.TradeStarting;
+		mHandler.sendMessage(msg);		
+	}
+
+	@Override
+	public void onStopTrade() {
+		// TODO Auto-generated method stub
+		Message msg = Message.obtain();
+		msg.what = TraderStatusListener.TradeStarting;
 		mHandler.sendMessage(msg);
 	}
 

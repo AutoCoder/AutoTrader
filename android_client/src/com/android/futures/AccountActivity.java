@@ -77,6 +77,10 @@ public class AccountActivity extends Activity implements Handler.Callback {
 					android.R.layout.simple_spinner_item, sts);
 			mStrategyList.setAdapter(adapter2);
 		}
+		else if (msg.what == TraderStatusListener.TradeStarting){
+		    Intent intent = new Intent(AccountActivity.this, MyFragmentActivity.class);  
+            startActivity(intent);
+		}
 		return false;
 	}
 }
