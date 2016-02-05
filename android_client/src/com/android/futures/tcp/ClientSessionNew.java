@@ -55,6 +55,28 @@ public class ClientSessionNew implements TraderStatusListener {
 		}
 	}
 	
+	public void LogOut(){
+		JSONObject meta = new JSONObject();
+		
+		try {
+			meta.put("BrokerId", mBrokerId);
+			meta.put("UserName", mAccount);
+			meta.put("Password", mPassword);
+			JSONObject loginJson = new JSONObject(); 
+			loginJson.put("Action", "LogOut");
+			loginJson.put("Arguments", meta);
+			String info = loginJson.toString();
+			String wrapInfo = String.valueOf(info.length()) + info;
+			mSocketHandler.sendMessage(wrapInfo);
+			mState = LogOut;
+			
+			mSocketHandler.shutDown();
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
+	}
+	
 	public void StartTrade(String strategyName, String instrument){
 		//{"ActionType":"StartTrade","Arguments":{"InstrumentId":"rb1604","StrategyName":"Pos20Precent_3_5_MACrossStratgy"}}
 		try {

@@ -75,3 +75,7 @@ include "boost/asio.hpp"报错，error LNK2019: unresolved external symbol "clas
 [2016-2-3]
 connection refused.
 用android的模拟器只能连接10.0.2.2这个地址，于是把server的地址改成这个
+
+[2016-2-5]
+Critical Bug: android登陆成功进入Account页面，然后后退，然后再次登陆，服务器crash在ctp的dll中。
+Critical Bug: 两次socket通信中，session通过map缓存起来，但是却发现每次通信都建立了新的session。

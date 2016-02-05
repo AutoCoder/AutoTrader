@@ -124,6 +124,9 @@ public class ReaderTask extends Thread {
 					} else if (actionType == "StartTrade") {
 
 					}
+					else{
+						boolean elsebranch = true;
+					}
 				} else if (obj.has("Info")) {
 					String infoType = obj.getString("Info");
 					TradeEntity temp;
@@ -143,22 +146,22 @@ public class ReaderTask extends Thread {
 					// "Vol":125,"ORDER_ID":11156, "TIMESTAMP": 111111.5}}
 					// {"Info":"ACCOUNT_INFO","Details":{"Blance":122313,"Position":20,
 					// "Instrument":"rb1605", "Price":2555}}
-					if (infoType == "MD") {
+					if (infoType.equals("MD")) {
 						temp = new TradeEntity(details.getInt("OpenPrice"), details.getInt("ClosePrice"),
 								details.getInt("HighPrice"), details.getInt("LowPrice"), details.getInt("Vol"),
 								details.getDouble("TIMESTAMP"));
-					} else if (infoType == "ORDER") {
+					} else if (infoType.equals("ORDER")) {
 						t = TradeEntity.type.Order;
-					} else if (infoType == "CANCELL_ORDER") {
+					} else if (infoType.equals("CANCELL_ORDER")) {
 						t = TradeEntity.type.Cancell_Order;
-					} else if (infoType == "TRADE") {
+					} else if (infoType.equals("TRADE")) {
 						t = TradeEntity.type.Trade;
-					} else if (infoType == "ACCOUNT_STATUS") {
+					} else if (infoType.equals("ACCOUNT_STATUS")) {
 						AccountStatus status = new AccountStatus(details.getDouble("Balance"),
 								details.getInt("Position"), details.getInt("Price"), details.getString("Instrument"));
 						if (statusChangeHandler != null)
 							statusChangeHandler.onAccountInited(status);
-					} else if (infoType == "ACCOUNT_INFO") {
+					} else if (infoType.equals("ACCOUNT_INFO")) {
 						JSONArray instrus = details.getJSONArray("Instruments");
 						JSONArray sts = details.getJSONArray("Strategies");
 						ArrayList<String> instru_list = new ArrayList<String>();
@@ -173,7 +176,7 @@ public class ReaderTask extends Thread {
 						if (statusChangeHandler != null)
 							statusChangeHandler.onAccountLogined(info);
 					} else {
-
+			
 					}
 				}
 			} catch (JSONException e) {

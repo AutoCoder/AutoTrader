@@ -7,16 +7,16 @@
 
     <LinearLayout
         android:layout_width="fill_parent"
-        android:layout_height="80dp"
+        android:layout_height="40dp"
         android:background="@drawable/bg_title"
         android:gravity="center_vertical"
         android:orientation="horizontal" >
 
         <Button
-            android:id="@+id/back"
+            android:id="@+id/logout"
             android:layout_width="65.83dp"
             android:layout_height="40dp"
-            android:text="返回"
+            android:text="退出"
             android:textColor="#ffffff" />
 
         <TextView
@@ -37,159 +37,150 @@
             android:textColor="#ffffff" />
     </LinearLayout>
 
-    <LinearLayout
+    <RelativeLayout
+        android:id="@+id/tradeRel"
         android:layout_width="fill_parent"
-        android:layout_height="30dp"
-        android:background="@drawable/bg_title"
-        android:gravity="center_vertical"
-        android:orientation="horizontal" >
+        android:layout_height="wrap_content" >
 
-        <TextView
-            android:id="@+id/account_label"
-            android:layout_width="wrap_content"
-            android:layout_height="30dip"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="账户："
-            android:textColor="#ffffff"
-            android:textSize="20sp" />
-
-        <TextView
-            android:id="@+id/account_val"
-            android:layout_width="wrap_content"
-            android:layout_height="30dip"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:textColor="#ffffff"
-            android:textSize="20sp" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="30dp"
-        android:background="@drawable/bg_title"
-        android:gravity="center_vertical"
-        android:orientation="horizontal" >
-
-        <TextView
-            android:id="@+id/balance_label"
-            android:layout_width="wrap_content"
+        <RelativeLayout
+            android:id="@+id/accountRel"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="可用金额："
-            android:textColor="#ffffff"
-            android:textSize="20sp" />
+            android:layout_marginTop="14dp"
+            android:clickable="true"
+            android:gravity="center_vertical" >
 
-        <TextView
-            android:id="@+id/balance_val"
-            android:layout_width="wrap_content"
+            <TextView
+                android:id="@+id/account"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="账户："
+                android:textColor="#000"
+                android:textSize="17sp" />
+
+            <TextView
+                android:id="@+id/account_val"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="2dip"
+                android:layout_toRightOf="@id/account"
+                android:text="021510"
+                android:textColor="#000"
+                android:textSize="15sp" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/balanceRel"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:textColor="#ffffff"
-            android:textSize="20sp" />
-    </LinearLayout>
+            android:layout_below="@id/accountRel"
+            android:clickable="true"
+            android:gravity="center_vertical" >
 
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="30dp"
-        android:background="@drawable/bg_title"
-        android:gravity="center_vertical"
-        android:orientation="horizontal" >
+            <TextView
+                android:id="@+id/balance_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="可用金额："
+                android:textColor="#000"
+                android:textSize="17sp" />
 
-        <TextView
-            android:id="@+id/position_label"
-            android:layout_width="wrap_content"
+            <TextView
+                android:id="@+id/balance_val"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="2dip"
+                android:layout_toRightOf="@id/balance_label"
+                android:text="10000.0"
+                android:textColor="#000"
+                android:textSize="15sp" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/positionRel"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="当前仓位："
-            android:textColor="#ffffff"
-            android:textSize="20sp" />
+            android:layout_below="@id/balanceRel"
+            android:clickable="true"
+            android:gravity="center_vertical" >
 
-        <TextView
-            android:id="@+id/instrument_val"
-            android:layout_width="wrap_content"
+            <TextView
+                android:id="@+id/position_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="仓位："
+                android:textColor="#000"
+                android:textSize="17sp" />
+
+            <TextView
+                android:id="@+id/position_val"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="2dip"
+                android:layout_toRightOf="@id/position_label"
+                android:textColor="#000"
+                android:text="[rb1605] : (10 * 2556)"
+                android:textSize="12sp" />
+
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/InstrumentRel"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:textColor="#ffffff"
-            android:textSize="20sp" />
+            android:layout_below="@id/positionRel"
+            android:clickable="true"
+            android:gravity="center_vertical" >
 
-        <TextView
-            android:id="@+id/position_val"
-            android:layout_width="wrap_content"
+            <TextView
+                android:id="@+id/instruments_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="可选合约："
+                android:textColor="#000"
+                android:textSize="17sp" />
+
+            <Spinner
+                android:id="@+id/instrument_List"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#000"
+                android:layout_marginLeft="2dip"
+                android:layout_toRightOf="@id/instruments_label" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/strategyRel"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:textColor="#ffffff"
-            android:textSize="20sp" />
+            android:layout_below="@id/InstrumentRel"
+            android:clickable="true"
+            android:gravity="center_vertical" >
 
-        <TextView
-            android:id="@+id/price_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="成本价："
-            android:textColor="#ffffff"
-            android:textSize="20sp" />
+            <TextView
+                android:id="@+id/strategy_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="可选策略："
+                android:textColor="#000"
+                android:textSize="17sp" />
 
-        <TextView
-            android:id="@+id/price_val"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:textColor="#ffffff"
-            android:textSize="20sp" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="30dp"
-        android:background="@drawable/bg_title"
-        android:gravity="center_vertical"
-        android:orientation="horizontal" >
-
-        <TextView
-            android:id="@+id/instruments_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="可选合约："
-            android:textColor="#ffffff"
-            android:textSize="20sp" />
-
-        <Spinner
-            android:id="@+id/instrument_List"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="30dp"
-        android:background="@drawable/bg_title"
-        android:gravity="center_vertical"
-        android:orientation="horizontal" >
-
-        <TextView
-            android:id="@+id/strategy_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="可选策略："
-            android:textColor="#ffffff"
-            android:textSize="20sp" />
-
-        <Spinner
-            android:id="@+id/strategy_list"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-    </LinearLayout>
+            <Spinner
+                android:id="@+id/strategy_list"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="#000"
+                android:layout_marginLeft="2dip"
+                android:layout_toRightOf="@id/strategy_label" />
+        </RelativeLayout>
+    </RelativeLayout>
 
 </LinearLayout>
