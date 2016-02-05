@@ -20,5 +20,12 @@ namespace Transmission{
 		else
 			return false;
 	}
-
+	
+	bool socket_session::operator == (const socket_session& rhs) const{
+		if (rhs.session_impl_.expired() || session_impl_.expired())
+			return false;
+		auto rhs_sp = rhs.session_impl_.lock();
+		auto sp = session_impl_.lock();
+		return rhs_sp.get() == sp.get();
+	}
 }

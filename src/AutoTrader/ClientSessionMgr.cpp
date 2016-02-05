@@ -5,6 +5,8 @@
 #include "AccountMgr.h"
 #include "TriggerFactory.h"
 #include "Utils.h"
+#include <algorithm>
+#include "Transmission.h"
 
 ClientSessionMgr* ClientSessionMgr::_instance = NULL;
 
@@ -26,16 +28,14 @@ void ClientSessionMgr::LoginAccount(const std::string& userId, const std::string
 	if (isExisted){
 		bool success = Account::Manager::Instance().CheckPassword(userId, pw);
 		if (success){
-			if (m_client_sessions.find(session) == m_client_sessions.end()){
-				m_client_sessions[session] = std::make_shared<ClientSession>(userId, session, m_pTradeUserApi);
+			std::shared_ptr<ClientSession> clientSessionSp = GetClientSession(session);
+			if (!clientSessionSp)
+			{
+				clientSessionSp = std::make_shared<ClientSession>(userId, session, m_pTradeUserApi);
+				m_client_sessions[session] = clientSessionSp;
 				Transmission::Utils::SendLoginResultInfo(session, Transmission::Succeed);
-				const std::vector<std::string>& instu = Account::Manager::Instance().GetMeta(userId).m_Instruments;
-				const std::vector<std::string>& strategies = TriggerFactory::Instance()->GetStrategies(userId);
-				Transmission::Utils::SendAccountInfo(session, instu, strategies);
 			}
-			else{
-				Transmission::Utils::SendLoginResultInfo(session, Transmission::LoginRepeatedly);
-			}
+			clientSessionSp->OnLoginRequest();
 		}
 		else{
 			Transmission::Utils::SendLoginResultInfo(session, Transmission::LoginFailed_PW);
@@ -47,39 +47,43 @@ void ClientSessionMgr::LoginAccount(const std::string& userId, const std::string
 }
 
 void ClientSessionMgr::StartTrade(const std::string& instru, const std::string& strategyName, const std::shared_ptr<Transmission::socket_session>& session){
-	if (m_client_sessions.find(session) != m_client_sessions.end()){
-		if (m_client_sessions[session]->IsTrading()){
-			Transmission::Utils::SendStartTradeResultInfo(session, Transmission::TradingNow);
-		}
-		else{
-			Transmission::ErrorCode code;
-			if (m_client_sessions[session]->StartTrade(instru, strategyName, code)){
-				Transmission::Utils::SendStartTradeResultInfo(session, Transmission::Succeed);
-			}
-			else{
-				Transmission::Utils::SendStartTradeResultInfo(session, code);
-			}
-		}
-
+	std::shared_ptr<ClientSession> clientSessionSp = GetClientSession(session);
+	if (clientSessionSp){
+		clientSessionSp->OnStartTradeRequest(instru, strategyName);
 	}
 	else{
 		Transmission::Utils::SendStartTradeResultInfo(session, Transmission::LoginNeeded);
 	}
 }
 
-
 void ClientSessionMgr::LogoutAccount(const std::shared_ptr<Transmission::socket_session>& session){
-	auto AccountIter = m_client_sessions.find(session);
-	if (AccountIter != m_client_sessions.end())// logged
+	std::shared_ptr<ClientSession> clientSessionSp = GetClientSession(session);
+	auto pair = std::find_if(m_client_sessions.begin(), m_client_sessions.end(), [&session](const std::pair<std::shared_ptr<Transmission::socket_session>, std::shared_ptr<ClientSession> >& item){
+		return (*session.get()) == (*item.first.get());
+	});
+
+	if (pair != m_client_sessions.end())// logged
 	{
 		m_client_sessions.erase(session);
 	}
+	Transmission::Utils::SendLogOutResultInfo(session, Transmission::Succeed);
 }
 
 void ClientSessionMgr::StopTrade(const std::shared_ptr<Transmission::socket_session>& session){
-	auto AccountIter = m_client_sessions.find(session);
-	if (AccountIter != m_client_sessions.end())// logged
-	{
-		AccountIter->second->StopTrade();
+	std::shared_ptr<ClientSession> clientSessionSp = GetClientSession(session);
+	if (clientSessionSp){
+		clientSessionSp->StopTrade();
+	}
+}
+
+std::shared_ptr<ClientSession> ClientSessionMgr::GetClientSession(const std::shared_ptr<Transmission::socket_session>& session){
+	auto iter = std::find_if(m_client_sessions.begin(), m_client_sessions.end(), [&](const std::pair<std::shared_ptr<Transmission::socket_session>, std::shared_ptr<ClientSession> >& pair){
+		return (*session.get()) == (*pair.first.get());
+	});
+	if (iter != m_client_sessions.end()){
+		return m_client_sessions[session];
+	}
+	else{
+		return nullptr;
 	}
 }

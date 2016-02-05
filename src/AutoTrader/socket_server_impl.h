@@ -23,8 +23,10 @@ namespace Transmission{
 		private:
 			void do_read();
 			void on_socket_error() { 
-				// todo: close socket
-				// remove session from server
+				// todo: 1)close socket
+				// 2)remove session from server 
+				//## [2016-2-5] for now, the expired session have no way to removed from session manager. but it doesn't affect a lot about feature
+				socket_.close();
 			};
 
 		private:

@@ -143,3 +143,27 @@ void ClientSession::OnRtnTrade(CThostFtdcTradeField* pTrade){
 void ClientSession::OnCancelOrder(CThostFtdcInputOrderActionField *pInputOrderAction, CThostFtdcRspInfoField *pRspInfo){
 
 }
+
+void ClientSession::OnLoginRequest()
+{
+	//if the ClientSession is created which mean login already, just send Account Info back.
+	const std::vector<std::string>& instu = Account::Manager::Instance().GetMeta(m_userId).m_Instruments;
+	const std::vector<std::string>& strategies = TriggerFactory::Instance()->GetStrategies(m_userId);
+	Transmission::Utils::SendAccountInfo(m_session, instu, strategies);
+}
+
+void ClientSession::OnStartTradeRequest(const std::string& instru, const std::string& strategyName)
+{
+	if (IsTrading()){
+		Transmission::Utils::SendStartTradeResultInfo(m_session, Transmission::TradingNow);
+	}
+	else{
+		Transmission::ErrorCode err_code;
+		if (StartTrade(instru, strategyName, err_code)){
+			Transmission::Utils::SendStartTradeResultInfo(m_session, Transmission::Succeed);
+		}
+		else{
+			Transmission::Utils::SendStartTradeResultInfo(m_session, err_code);
+		}
+	}
+}

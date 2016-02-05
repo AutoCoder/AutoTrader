@@ -21,6 +21,9 @@ public class ClientSessionNew implements TraderStatusListener {
 	
 	public void ConnectServer(String brokerId, String account, String pwd, String host, int port)
 	{
+		if (mSocketHandler != null)//if socket is connected, skip this function.
+			return;
+		
 		mBrokerId = brokerId;
 		mAccount = account;
 		mPassword = pwd;

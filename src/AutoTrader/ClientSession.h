@@ -41,18 +41,23 @@ public:
 
 	void ExecutePendingOrder();
 
+	void InformClientViewer(const TickWrapper& tick);
+
+	void OnLoginRequest();
+
+	void OnStartTradeRequest(const std::string& instru, const std::string& strategyName);
+
+	void StopTrade();
+
 	bool IsTrading() const { return m_isTrading.load(); }
+
+	~ClientSession();
+private:
 
 	bool Logout(); //identify User By session
 
 	bool StartTrade(const std::string& instru, const std::string& strategyName, Transmission::ErrorCode& errcode);
 
-	void StopTrade();
-
-	void InformClientViewer(const TickWrapper& tick);
-
-	~ClientSession();
-private:
 	void WaitAndPopCurrentOrder(Order& ord);//multi-thread notice
 
 	//send out Account status to fifo, finally got by client
@@ -66,6 +71,8 @@ private:
 
 	//send out Account status to fifo, finally got by client
 	void OnCancelOrder(CThostFtdcInputOrderActionField *pInputOrderAction, CThostFtdcRspInfoField *pRspInfo);
+
+
 
 private:
 	std::atomic<bool>                               m_isTrading;

@@ -13,7 +13,7 @@ namespace Transmission{
 	public:
 		explicit socket_session(const std::shared_ptr<Detail::session>& impl_ptr);
 		bool do_write(const char* reply, size_t size);
-
+		bool operator==(const socket_session& rhs) const;
 	private:
 		// don't own the inner session, it's should be clean when the session recursive reading stop.
 		std::weak_ptr<Detail::session> session_impl_;

@@ -38,6 +38,9 @@ private:
 	static ClientSessionMgr *_instance;
 
 private:
+	std::shared_ptr<ClientSession> GetClientSession(const std::shared_ptr<Transmission::socket_session>& session);
+
+private:
 	CThostFtdcTraderApi*																		m_pTradeUserApi;
 	std::map<std::shared_ptr<Transmission::socket_session>, std::shared_ptr<ClientSession>>		m_client_sessions;
 
