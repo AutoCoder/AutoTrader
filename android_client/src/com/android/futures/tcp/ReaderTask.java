@@ -122,7 +122,16 @@ public class ReaderTask extends Thread {
 					if (actionType == "Login") {
 
 					} else if (actionType == "StartTrade") {
-
+						boolean sucess = (obj.getInt("ErrorCode") == 0);
+						if (statusChangeHandler != null){
+							if (sucess)
+								statusChangeHandler.onStartTradeSuccess();
+							else
+							{
+								String err_str = obj.getString("ErrorMsg");
+								statusChangeHandler.onStartTradeFailed(err_str);
+							}
+						}
 					}
 					else{
 						boolean elsebranch = true;

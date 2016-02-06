@@ -159,7 +159,7 @@ void ClientSession::OnStartTradeRequest(const std::string& instru, const std::st
 	}
 	else{
 		Transmission::ErrorCode err_code;
-		if (StartTrade(instru, strategyName, err_code)){
+		if (StartTrade(instru, strategyName, err_code) && false){
 			Transmission::Utils::SendStartTradeResultInfo(m_session, Transmission::Succeed);
 		}
 		else{

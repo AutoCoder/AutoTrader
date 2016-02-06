@@ -1,13 +1,18 @@
 package com.android.futures;
 
+import com.android.futures.tcp.ClientSessionNew;
+import com.android.futures.tcp.TraderStatusListener;
+
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTabHost;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -15,8 +20,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 public class MyFragmentActivity extends FragmentActivity implements OnClickListener, Handler.Callback {
-	private static final Integer[] TABS = new Integer[] { R.layout.tab_times, R.layout.tab_kcharts, R.layout.tab_guide,
-			R.layout.tab_about };
+	private static final Integer[] TABS = new Integer[] { R.layout.tab_times, R.layout.tab_kcharts};
 	private static final int WHAT = 1987;
 	private Button mBack;
 	private Button mLeft;
@@ -24,6 +28,11 @@ public class MyFragmentActivity extends FragmentActivity implements OnClickListe
 	private Button mRefresh;
 	private ProgressDialog mProgressDialog;
 	private long mExitTime;
+	private Handler mHandler = null;
+	private ClientSessionNew mSession = null;
+	private String mTradingInstrument = null;
+	private String mTradingStrategy = null;
+
 
 	@Override
 	protected void onCreate(Bundle bundle) {
@@ -40,12 +49,17 @@ public class MyFragmentActivity extends FragmentActivity implements OnClickListe
 		tabHost.addTab(
 				tabHost.newTabSpec(String.valueOf(TABS[1])).setIndicator(getLayoutInflater().inflate(TABS[1], null)),
 				KChartsFragment.class, null);
-		tabHost.addTab(
-				tabHost.newTabSpec(String.valueOf(TABS[2])).setIndicator(getLayoutInflater().inflate(TABS[2], null)),
-				GuideFragment.class, null);
-		tabHost.addTab(
-				tabHost.newTabSpec(String.valueOf(TABS[3])).setIndicator(getLayoutInflater().inflate(TABS[3], null)),
-				AboutFragment.class, null);
+		
+		mHandler = new Handler(this);
+		MyApp app = (MyApp) getApplication();
+		mSession = app.GetSession();
+		mSession.SetHandler(mHandler);
+		
+		Intent intent=getIntent(); 
+	    Bundle trade_data = intent.getExtras();
+	    mTradingInstrument = trade_data.getString("instrument");
+	    mTradingStrategy = trade_data.getString("strategy");
+		mSession.StartTrade(mTradingInstrument, mTradingStrategy);
 	}
 
 	private void initViews() {
@@ -125,6 +139,22 @@ public class MyFragmentActivity extends FragmentActivity implements OnClickListe
 				mProgressDialog.dismiss();
 				return true;
 			}
+		}
+		else if (msg.what == TraderStatusListener.Trading){
+			Toast toast = Toast.makeText(MyFragmentActivity.this, "开始交易。。",
+					Toast.LENGTH_LONG);
+			toast.setGravity(Gravity.CENTER, 0, 0);
+			toast.show();
+		}
+		else if (msg.what == TraderStatusListener.NoTrading){
+			String err_msg = (String)msg.obj;
+			Toast toast = Toast.makeText(MyFragmentActivity.this, "开始交失败：" + err_msg,
+					Toast.LENGTH_LONG);
+			toast.setGravity(Gravity.CENTER, 0, 0);
+			toast.show();	
+			
+		    Intent intent = new Intent(MyFragmentActivity.this, AccountActivity.class); 
+            startActivity(intent);
 		}
 		return false;
 	}

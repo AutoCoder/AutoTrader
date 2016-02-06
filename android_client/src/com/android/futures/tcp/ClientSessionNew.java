@@ -116,10 +116,18 @@ public class ClientSessionNew implements TraderStatusListener {
 	}
 
 	@Override
-	public void onStartTrade() {
+	public void onStartTradeSuccess() {
 		// TODO Auto-generated method stub
 		Message msg = Message.obtain();
-		msg.what = TraderStatusListener.TradeStarting;
+		msg.what = TraderStatusListener.Trading;
+		mHandler.sendMessage(msg);		
+	}
+	
+	@Override
+	public void onStartTradeFailed(String err_msg){
+		Message msg = Message.obtain();
+		msg.what = TraderStatusListener.NoTrading;
+		msg.obj = err_msg;
 		mHandler.sendMessage(msg);		
 	}
 

@@ -12,6 +12,7 @@ public interface TraderStatusListener {
 	
 	public void onAccountInited(AccountStatus status);
 	public void onAccountLogined(AccountInfo info);
-	public void onStartTrade();
+	public void onStartTradeSuccess();
+	public void onStartTradeFailed(String err_msg);
 	public void onStopTrade();
 }

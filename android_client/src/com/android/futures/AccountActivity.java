@@ -26,6 +26,7 @@ public class AccountActivity extends Activity implements Handler.Callback {
 	private Spinner mInstrumentList = null;
 	private Spinner mStrategyList = null;
 	private Button logOutBtn = null;
+	private Button tradeBtn = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +41,12 @@ public class AccountActivity extends Activity implements Handler.Callback {
 		mInstrumentList = (Spinner) this.findViewById(R.id.instrument_List);
 		mStrategyList = (Spinner) this.findViewById(R.id.strategy_list);
 		logOutBtn = (Button) this.findViewById(R.id.logout);
+		tradeBtn = (Button) this.findViewById(R.id.trade);
+		
+		MyApp app = (MyApp) getApplication();
+		mSession = app.GetSession();
+		mSession.SetHandler(mHandler);
+		mSession.Login();
 		
 		logOutBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -54,10 +61,15 @@ public class AccountActivity extends Activity implements Handler.Callback {
 			}
 		});
 		
-		MyApp app = (MyApp) getApplication();
-		mSession = app.GetSession();
-		mSession.SetHandler(mHandler);
-		mSession.Login();
+		tradeBtn.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+			    Intent intent = new Intent(AccountActivity.this, MyFragmentActivity.class); 
+			    intent.putExtra("instrument", (String) mInstrumentList.getSelectedItem());
+			    intent.putExtra("strategy", (String) mStrategyList.getSelectedItem());
+	            startActivity(intent);
+			}
+		});
 	}
 
 	@Override
