@@ -22,23 +22,18 @@ import android.widget.Toast;
 public class MyFragmentActivity extends FragmentActivity implements OnClickListener, Handler.Callback {
 	private static final Integer[] TABS = new Integer[] { R.layout.tab_times, R.layout.tab_kcharts};
 	private static final int WHAT = 1987;
-	private Button mBack;
-	private Button mLeft;
-	private Button mRight;
-	private Button mRefresh;
 	private ProgressDialog mProgressDialog;
 	private long mExitTime;
 	private Handler mHandler = null;
 	private ClientSessionNew mSession = null;
-	private String mTradingInstrument = null;
-	private String mTradingStrategy = null;
+//	private String mTradingInstrument = null;
+//	private String mTradingStrategy = null;
 
 
 	@Override
 	protected void onCreate(Bundle bundle) {
 		super.onCreate(bundle);
 		setContentView(R.layout.activity4fragment_my);
-		initViews();
 
 		FragmentTabHost tabHost = (FragmentTabHost) findViewById(android.R.id.tabhost);
 		tabHost.setup(this, getSupportFragmentManager(), R.id.frame_content);
@@ -55,23 +50,11 @@ public class MyFragmentActivity extends FragmentActivity implements OnClickListe
 		mSession = app.GetSession();
 		mSession.SetHandler(mHandler);
 		
-		Intent intent=getIntent(); 
-	    Bundle trade_data = intent.getExtras();
-	    mTradingInstrument = trade_data.getString("instrument");
-	    mTradingStrategy = trade_data.getString("strategy");
-		mSession.StartTrade(mTradingInstrument, mTradingStrategy);
-	}
-
-	private void initViews() {
-		mBack = (Button) findViewById(R.id.title_back_btn);
-		mBack.setOnClickListener(this);
-		mLeft = (Button) findViewById(R.id.title_left_btn);
-		mLeft.setOnClickListener(this);
-		mRight = (Button) findViewById(R.id.title_right_btn);
-		mRight.setOnClickListener(this);
-		mRefresh = (Button) findViewById(R.id.title_refresh_btn);
-		mRefresh.setOnClickListener(this);
-
+//		Intent intent=getIntent(); 
+//	    Bundle trade_data = intent.getExtras();
+//	    mTradingInstrument = trade_data.getString("instrument");
+//	    mTradingStrategy = trade_data.getString("strategy");
+//		mSession.StartTrade(mTradingInstrument, mTradingStrategy);
 	}
 
 	@Override
@@ -94,38 +77,6 @@ public class MyFragmentActivity extends FragmentActivity implements OnClickListe
 
 	public void onClick(View view) {
 		switch (view.getId()) {
-		case R.id.title_back_btn:
-			new AlertDialog.Builder(this).setTitle("退出").setMessage("确定要退出？")
-					.setPositiveButton("退出", new DialogInterface.OnClickListener() {
-
-						public void onClick(DialogInterface dialog, int which) {
-							finish();
-
-						}
-					}).setNegativeButton("取消", new DialogInterface.OnClickListener() {
-
-						public void onClick(DialogInterface dialog, int which) {
-
-						}
-					}).create().show();
-			break;
-
-		case R.id.title_left_btn:
-			Toast.makeText(this, "Left", Toast.LENGTH_SHORT).show();
-			break;
-
-		case R.id.title_right_btn:
-			Toast.makeText(this, "Right", Toast.LENGTH_SHORT).show();
-			break;
-
-		case R.id.title_refresh_btn:
-			mProgressDialog = new ProgressDialog(this);
-			mProgressDialog.setTitle("刷新");
-			mProgressDialog.setMessage("正在刷新，请稍候…");
-			mProgressDialog.show();
-			Handler handler = new Handler(this);
-			handler.sendEmptyMessageDelayed(WHAT, 3 * 1000);
-			break;
 
 		default:
 			break;

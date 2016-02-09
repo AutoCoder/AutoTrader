@@ -119,9 +119,9 @@ public class ReaderTask extends Thread {
 				JSONObject obj = new JSONObject(jsonStr);
 				if (obj.has("Action")) {
 					String actionType = obj.getString("Action");
-					if (actionType == "Login") {
+					if (actionType.equals("Login")) {
 
-					} else if (actionType == "StartTrade") {
+					} else if (actionType.equals("StartTrade")) {
 						boolean sucess = (obj.getInt("ErrorCode") == 0);
 						if (statusChangeHandler != null){
 							if (sucess)
@@ -131,6 +131,10 @@ public class ReaderTask extends Thread {
 								String err_str = obj.getString("ErrorMsg");
 								statusChangeHandler.onStartTradeFailed(err_str);
 							}
+						}
+					} else if (actionType.equals("StopTrade")) {
+						if (statusChangeHandler != null){
+							statusChangeHandler.onStopTrade();
 						}
 					}
 					else{

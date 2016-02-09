@@ -16,8 +16,10 @@ namespace Transmission{
 		LoginFailed_PW = 2,
 		LoginFailed_AC = 3,
 		TradingNow = 4,
-		LoginNeeded = 5,
-		InvalidTradeArguments = 6,
+		NoTradingNow = 5,
+		LoginNeeded = 6,
+		InvalidTradeArguments = 7,
+		Unknown = 8,
 	};
 }
 

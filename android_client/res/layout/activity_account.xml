@@ -13,10 +13,10 @@
         android:orientation="horizontal" >
 
         <Button
-            android:id="@+id/logout"
-            android:layout_width="65.83dp"
+            android:id="@+id/trade_btn"
+            android:layout_width="wrap_content"
             android:layout_height="40dp"
-            android:text="退出"
+            android:text="Stop"
             android:textColor="#ffffff" />
 
         <TextView
@@ -30,10 +30,10 @@
             android:textSize="20sp" />
 
         <Button
-            android:id="@+id/trade"
-            android:layout_width="65.83dp"
+            android:id="@+id/monitor_btn"
+            android:layout_width="wrap_content"
             android:layout_height="40dp"
-            android:text="交易"
+            android:text="监视"
             android:textColor="#ffffff" />
     </LinearLayout>
 
@@ -180,6 +180,25 @@
                 android:textColor="#000"
                 android:layout_marginLeft="2dip"
                 android:layout_toRightOf="@id/strategy_label" />
+        </RelativeLayout>
+        
+        <RelativeLayout
+            android:id="@+id/LogOutRel"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/strategyRel"
+            android:clickable="true"
+            android:gravity="center_vertical" >
+
+            <Button
+                android:id="@+id/LogOut"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="退出"
+                android:background="@drawable/bg_title"
+                android:textColor="#ffffff"
+                android:textSize="25sp" />
         </RelativeLayout>
     </RelativeLayout>
 

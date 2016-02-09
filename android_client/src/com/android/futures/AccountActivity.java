@@ -25,8 +25,10 @@ public class AccountActivity extends Activity implements Handler.Callback {
 	private ClientSessionNew mSession = null;
 	private Spinner mInstrumentList = null;
 	private Spinner mStrategyList = null;
-	private Button logOutBtn = null;
 	private Button tradeBtn = null;
+	private Button monitorBtn = null;
+	private Button logOutBtn = null;
+	private boolean mIsTrading = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -40,28 +42,27 @@ public class AccountActivity extends Activity implements Handler.Callback {
 		mHandler = new Handler(this);
 		mInstrumentList = (Spinner) this.findViewById(R.id.instrument_List);
 		mStrategyList = (Spinner) this.findViewById(R.id.strategy_list);
-		logOutBtn = (Button) this.findViewById(R.id.logout);
-		tradeBtn = (Button) this.findViewById(R.id.trade);
+		tradeBtn = (Button) this.findViewById(R.id.trade_btn);
+		monitorBtn = (Button) this.findViewById(R.id.monitor_btn);
+		logOutBtn = (Button) this.findViewById(R.id.LogOut);
 		
 		MyApp app = (MyApp) getApplication();
 		mSession = app.GetSession();
 		mSession.SetHandler(mHandler);
 		mSession.Login();
 		
+		updateTradeStatus();
+		
 		logOutBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				
-				MyApp app = (MyApp) getApplication();
-				ClientSessionNew session = app.GetSession();
-				session.LogOut();
-				
+				mSession.LogOut();
 			    Intent intent = new Intent(AccountActivity.this, LoginActivity.class);  
                 startActivity(intent);
 			}
 		});
 		
-		tradeBtn.setOnClickListener(new View.OnClickListener() {
+		monitorBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 			    Intent intent = new Intent(AccountActivity.this, MyFragmentActivity.class); 
@@ -70,6 +71,30 @@ public class AccountActivity extends Activity implements Handler.Callback {
 	            startActivity(intent);
 			}
 		});
+		
+		tradeBtn.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				if (mIsTrading){
+					mSession.StopTrade();
+				}else{
+					mSession.StartTrade((String) mInstrumentList.getSelectedItem(), (String) mStrategyList.getSelectedItem());
+				}
+			}
+			
+		});
+	}
+	
+
+	private void updateTradeStatus(){
+		monitorBtn.setEnabled(mIsTrading);
+		if (mIsTrading){
+			tradeBtn.setText(R.string.StopTrade);
+		}else{
+			tradeBtn.setText(R.string.Trade);
+		}
 	}
 
 	@Override
@@ -89,9 +114,13 @@ public class AccountActivity extends Activity implements Handler.Callback {
 					android.R.layout.simple_spinner_item, sts);
 			mStrategyList.setAdapter(adapter2);
 		}
-		else if (msg.what == TraderStatusListener.TradeStarting){
-		    Intent intent = new Intent(AccountActivity.this, MyFragmentActivity.class);  
-            startActivity(intent);
+		else if (msg.what == TraderStatusListener.Trading){
+			mIsTrading = true;
+			updateTradeStatus();
+		}
+		else if (msg.what == TraderStatusListener.NoTrading){
+			mIsTrading = false;
+			updateTradeStatus();
 		}
 		return false;
 	}

@@ -1,4 +1,4 @@
-研究计划&进展
+﻿研究计划&进展
 
 [2015.06.07] 
 
@@ -79,3 +79,8 @@ connection refused.
 [2016-2-5]
 Critical Bug: android登陆成功进入Account页面，然后后退，然后再次登陆，服务器crash在ctp的dll中。
 Critical Bug: 两次socket通信中，session通过map缓存起来，但是却发现每次通信都建立了新的session。
+
+[2016-2-8]
+在另外电脑搭建开发环境时，发现boost链接出现
+1>socket_server.obj : error LNK2019: 无法解析的外部符号 "class boost::system::error_category const & __cdecl boost::system::system_category(void)" (?system_category@system@boost@@YAAEBVerror_category@12@XZ)，该符号在函数 "public: __cdecl boost::system::error_code::error_code(void)" (??0error_code@system@boost@@QEAA@XZ) 中被引用
+这个是由于boost默认编译32bit，需要编译64bit

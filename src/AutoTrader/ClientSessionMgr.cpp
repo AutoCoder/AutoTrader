@@ -73,6 +73,7 @@ void ClientSessionMgr::StopTrade(const std::shared_ptr<Transmission::socket_sess
 	std::shared_ptr<ClientSession> clientSessionSp = GetClientSession(session);
 	if (clientSessionSp){
 		clientSessionSp->StopTrade();
+		Transmission::Utils::SendStopTradeResultInfo(session, Transmission::Succeed);
 	}
 }
 

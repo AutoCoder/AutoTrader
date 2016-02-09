@@ -183,4 +183,27 @@ namespace Transmission{
 		ret = str(boost::format("%1%%2%") % ret.length() % ret);
 		Transmission::GetFIFOActionQueue().Push_back(Transmission::RemoteServerAction(session, ret));
 	}
+
+	void Utils::SendStopTradeResultInfo(const std::shared_ptr<Transmission::socket_session>& session, ErrorCode code){
+		std::string err_msg;
+		int err_code = code;
+		switch (code){
+		case Succeed:
+			err_msg = "Succeed";
+			break;
+		default:
+		{
+			err_code = -1;
+			err_msg = "Unknown.";
+		}
+		}
+		Json::Value root;
+		root["Action"] = "StopTrade";
+		root["ErrorCode"] = code;
+		root["ErrorMsg"] = err_msg;
+		Json::FastWriter writer;
+		std::string ret = writer.write(root);
+		ret = str(boost::format("%1%%2%") % ret.length() % ret);
+		Transmission::GetFIFOActionQueue().Push_back(Transmission::RemoteServerAction(session, ret));
+	}
 }

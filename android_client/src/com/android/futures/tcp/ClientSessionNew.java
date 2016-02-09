@@ -14,6 +14,7 @@ public class ClientSessionNew implements TraderStatusListener {
 	private int mPort;
 	private Handler mHandler;
 	private SocketHandler mSocketHandler = null;
+	public int State = LogOut;
 	
 	public void SetHandler(Handler handler){
 		mHandler = handler;
@@ -51,6 +52,7 @@ public class ClientSessionNew implements TraderStatusListener {
 			String info = loginJson.toString();
 			String wrapInfo = String.valueOf(info.length()) + info;
 			mSocketHandler.sendMessage(wrapInfo);
+			State = Logined;
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -71,6 +73,8 @@ public class ClientSessionNew implements TraderStatusListener {
 			String wrapInfo = String.valueOf(info.length()) + info;
 			mSocketHandler.sendMessage(wrapInfo);
 			mSocketHandler.shutDown();
+			mSocketHandler = null;
+			State = LogOut;
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -91,12 +95,27 @@ public class ClientSessionNew implements TraderStatusListener {
 			String info = loginJson.toString();
 			String wrapInfo = String.valueOf(info.length()) + info;
 			mSocketHandler.sendMessage(wrapInfo);
+			State = Trading;
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
 	}
-
+	public void StopTrade(){
+		//{"ActionType":"StopTrade"}
+		try {
+			
+			JSONObject json = new JSONObject(); 
+			json.put("Action", "StopTrade");
+			String info = json.toString();
+			String wrapInfo = String.valueOf(info.length()) + info;
+			mSocketHandler.sendMessage(wrapInfo);
+			State = Trading;
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+	}
 	@Override
 	public void onAccountInited(AccountStatus status) {
 		// TODO Auto-generated method stub
@@ -135,7 +154,7 @@ public class ClientSessionNew implements TraderStatusListener {
 	public void onStopTrade() {
 		// TODO Auto-generated method stub
 		Message msg = Message.obtain();
-		msg.what = TraderStatusListener.TradeStarting;
+		msg.what = TraderStatusListener.NoTrading;
 		mHandler.sendMessage(msg);
 	}
 
