@@ -70,6 +70,7 @@
                 android:layout_toRightOf="@id/account"
                 android:hint="账户"
                 android:text="021510"
+                android:textColor="#000"
                 android:textSize="15sp" />
         </RelativeLayout>
 
@@ -100,6 +101,7 @@
                 android:hint="密码"
                 android:password="true" 
                 android:text="wodemima"
+                android:textColor="#000"
                 android:textSize="15sp" />
         </RelativeLayout>
 
@@ -129,6 +131,7 @@
                 android:layout_toRightOf="@id/brokerId"
                 android:hint="brokerId"
                 android:text="9999"
+                android:textColor="#000"
                 android:textSize="15sp" />
         </RelativeLayout>
 
@@ -158,6 +161,7 @@
                 android:layout_toRightOf="@id/host_label"
                 android:hint="127.0.0.1"
                 android:text="10.0.2.2"
+                android:textColor="#000"
                 android:textSize="15sp" />
         </RelativeLayout>
 
@@ -187,6 +191,7 @@
                 android:layout_toRightOf="@id/port_label"
                 android:hint="2007"
                 android:text="2007"
+                android:textColor="#000"
                 android:textSize="15sp" />
         </RelativeLayout>
     </RelativeLayout>

@@ -15,6 +15,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Paint.Style;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.Surface;
@@ -43,6 +44,20 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 
 	private boolean showDetails;
 	private float touchX;
+	
+	private float mMargin = 5;
+	private float mTimeRectLeft;
+	private float mTimeRectRight;
+	private float mTimeRectTop;
+	private float mTimeRectBottom;
+	private double mHighPrice;
+	private double mLowPrice;
+	private double mhighestVolume;
+	private double mRatioRange;
+	private float mFontHeight;
+	private float mVolumeRectBottom;
+	private float mVolumeRectTop;
+	private float mTimeSpacing;
 	
 	public QuickTimesView(Context context) {
 		super(context);
@@ -82,9 +97,23 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 			e.printStackTrace();
 		}
 		
-		TimesEntity fenshiData = mTimesList.get(0);
-		double weightedIndex = fenshiData.getWeightedIndex();
-		initialWeightedIndex = weightedIndex;
+		mHighPrice = mTimesList.get(0).getNonWeightedIndex();
+		mLowPrice = mTimesList.get(0).getNonWeightedIndex();
+		mhighestVolume = mTimesList.get(0).getVolume();
+		
+		for (int i = 0; i < mTimesList.size() && i < DATA_MAX_COUNT; i++) {
+			TimesEntity fenshiData = mTimesList.get(i);
+			if (mHighPrice < fenshiData.getNonWeightedIndex())
+				mHighPrice = fenshiData.getNonWeightedIndex();
+			if (mLowPrice > fenshiData.getNonWeightedIndex())
+				mLowPrice = fenshiData.getNonWeightedIndex();
+			if (mhighestVolume < fenshiData.getVolume())
+				mhighestVolume = fenshiData.getVolume();
+		}
+		
+//		TimesEntity fenshiData = mTimesList.get(0);
+//		double weightedIndex = fenshiData.getWeightedIndex();
+//		initialWeightedIndex = weightedIndex;
 	}
 
 	private class DrawThread extends Thread {
@@ -120,7 +149,11 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 		            synchronized (mHolder) {
 		                canvas = mHolder.lockCanvas();
 		                //todo:draw lines 
-		                drawLines(canvas);
+		                //drawLines(canvas);
+		                drawMDFrame(canvas);
+		                drawTicks(canvas);
+		                drawVolumes(canvas);
+		                
 	                }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -140,6 +173,69 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
                 }
                 tickTime = System.currentTimeMillis();
 			}
+		}
+	}
+	
+	private void drawMDFrame(Canvas canvas){
+		Paint paint = new Paint();
+		paint.setStyle(Style.STROKE);
+		paint.setColor(Color.DKGRAY);
+		String high = String.valueOf(mHighPrice);
+		String low = String.valueOf(mLowPrice);
+
+		canvas.drawRect(mTimeRectLeft, mTimeRectTop, mTimeRectRight, mTimeRectBottom, paint);
+		mVolumeRectTop = mTimeRectBottom + 2 * mMargin + mFontHeight;
+		canvas.drawRect(mTimeRectLeft, mVolumeRectTop, mTimeRectRight, mVolumeRectBottom, paint);
+		
+		mRatioRange = (mHighPrice - mLowPrice) / 200.0;
+		String ratio = mRatioRange + "%";
+		float ratioWidth = paint.measureText(high);
+		paint.setColor(Color.RED);
+		canvas.drawText(high, 0, mTimeRectTop + mFontHeight + 1, paint);
+		canvas.drawText(ratio, mTimeRectRight - ratioWidth, mTimeRectTop + mFontHeight + 1, paint);
+		
+		paint.setColor(Color.GREEN);
+		canvas.drawText(low, 0, mTimeRectBottom-1, paint);
+		canvas.drawText(ratio, mTimeRectRight - ratioWidth, mTimeRectBottom-1, paint);
+		
+		paint.setColor(Color.WHITE);
+		String volumeTitle = "量:1215  现手:1215  额:163.4万";
+		canvas.drawText(volumeTitle, mTimeRectLeft, mVolumeRectTop - mMargin, paint);
+	}
+	
+	private void drawVolumes(Canvas canvas){
+		float ratio;
+		Paint paint = new Paint();
+		for (int i = 0; i < mTimesList.size() && i < DATA_MAX_COUNT; i++) {
+			TimesEntity fenshiData = mTimesList.get(i);
+			ratio = (float) (fenshiData.getVolume() / mhighestVolume);
+			float curY = mVolumeRectBottom - (mVolumeRectBottom - mVolumeRectTop) * ratio;
+			float curX = mTimeRectLeft + mTimeSpacing * i;
+			
+			if (fenshiData.getBuy() > fenshiData.getSell()){
+				paint.setColor(Color.RED);
+			}else{
+				paint.setColor(Color.GREEN);
+			}
+			canvas.drawLine(curX, mVolumeRectBottom, curX, curY, paint);	
+		}
+	}
+	
+	private void drawTicks(Canvas canvas){
+		Paint paint = new Paint();
+		paint.setColor(Color.WHITE);
+		TimesEntity first = mTimesList.get(0);
+  		float ratio = (float) ((first.getNonWeightedIndex() - mLowPrice) / (float)(mHighPrice - mLowPrice));
+		float curY = mTimeRectBottom - (mTimeRectBottom - mTimeRectTop) * ratio;
+		float curX = mTimeRectLeft;
+		for (int i = 1; i < mTimesList.size() && i < DATA_MAX_COUNT; i++) {
+			TimesEntity fenshiData = mTimesList.get(i);
+			ratio = (float) (((float)(fenshiData.getNonWeightedIndex() - mLowPrice)) / (mHighPrice - mLowPrice));
+			float nextY = mTimeRectBottom - (mTimeRectBottom - mTimeRectTop) * ratio;
+			float nextX = mTimeRectLeft + mTimeSpacing * i;
+			canvas.drawLine(curX, curY, nextX, nextY, paint);
+			curY = nextY;
+			curX = nextX;
 		}
 	}
 	
@@ -201,6 +297,23 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 
 	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
+		float viewWith = getWidth();
+		float viewHeight = getHeight();
+		
+		Paint paint = new Paint();
+		String high = String.valueOf(mHighPrice);
+		Rect textRect = new Rect();
+		paint.getTextBounds(high, 0, 1, textRect);
+		mFontHeight = textRect.height();
+		float strWidth = paint.measureText(high);
+		mTimeRectLeft = mMargin + strWidth;
+		mTimeRectRight = viewWith - mTimeRectLeft - mMargin;		
+		
+		mTimeRectTop = mMargin;
+		mTimeRectBottom = mTimeRectTop + viewHeight * 2 / 3;
+		mTimeSpacing = (mTimeRectRight - mTimeRectLeft) / DATA_MAX_COUNT;
+		mVolumeRectBottom = viewHeight - mMargin;
+		
 		// TODO Auto-generated method stub
 		mThread = new DrawThread();
 		mThread.start();
