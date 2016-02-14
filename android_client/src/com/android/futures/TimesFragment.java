@@ -7,6 +7,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -16,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.android.futures.entity.TimesEntity;
+import com.android.futures.tcp.ClientSessionNew;
 import com.android.futures.view.QuickTimesView;
 import com.android.futures.view.TimesView;
 
@@ -24,6 +26,7 @@ public class TimesFragment extends Fragment {
 	private QuickTimesView mTimesView;
 	private JSONArray mDatas;
 	private Context mContext;
+	private ClientSessionNew mSession;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -55,8 +58,15 @@ public class TimesFragment extends Fragment {
 		}
 
 		mTimesView = (QuickTimesView) view.findViewById(R.id.my_fenshi_view);
-		//mTimesView.setTimesList(timesList);
-
+		mTimesView.setTimeSequence(mSession.mMdSequence);
 		return view;
+	}
+	
+	@Override
+	public void onAttach(Activity activity){
+        super.onAttach(activity);
+        MyFragmentActivity my_activity = (MyFragmentActivity)activity;
+        MyApp app = (MyApp) my_activity.getApplication();
+        mSession = app.GetSession();
 	}
 }

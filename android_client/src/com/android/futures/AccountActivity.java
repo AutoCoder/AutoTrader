@@ -80,13 +80,11 @@ public class AccountActivity extends Activity implements Handler.Callback {
 				if (mIsTrading){
 					mSession.StopTrade();
 				}else{
-					mSession.StartTrade((String) mInstrumentList.getSelectedItem(), (String) mStrategyList.getSelectedItem());
+					mSession.StartTrade((String) mStrategyList.getSelectedItem(), (String) mInstrumentList.getSelectedItem());
 				}
 			}
-			
 		});
 	}
-	
 
 	private void updateTradeStatus(){
 		monitorBtn.setEnabled(mIsTrading);

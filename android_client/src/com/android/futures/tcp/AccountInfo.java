@@ -16,15 +16,15 @@ public class AccountInfo {
 		return mStrategies;
 	}
 
-	public void setStrategies(ArrayList<String> mStrategies) {
-		this.mStrategies = mStrategies;
+	public void setStrategies(ArrayList<String> Strategies) {
+		this.mStrategies = Strategies;
 	}
 
 	public ArrayList<String> getInstrumentList() {
 		return mInstrumentList;
 	}
 
-	public void setInstrumentList(ArrayList<String> mInstrumentList) {
-		this.mInstrumentList = mInstrumentList;
+	public void setInstrumentList(ArrayList<String> InstrumentList) {
+		this.mInstrumentList = InstrumentList;
 	}
 }

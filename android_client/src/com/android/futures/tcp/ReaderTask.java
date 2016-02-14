@@ -161,8 +161,9 @@ public class ReaderTask extends Thread {
 					// "Instrument":"rb1605", "Price":2555}}
 					if (infoType.equals("MD")) {
 						temp = new TradeEntity(details.getInt("OpenPrice"), details.getInt("ClosePrice"),
-								details.getInt("HighPrice"), details.getInt("LowPrice"), details.getInt("Vol"),
+								details.getInt("HighPrice"), details.getInt("LowPrice"), details.getInt("Volume"),
 								details.getDouble("TIMESTAMP"));
+						statusChangeHandler.onMDReturn(temp);
 					} else if (infoType.equals("ORDER")) {
 						t = TradeEntity.type.Order;
 					} else if (infoType.equals("CANCELL_ORDER")) {

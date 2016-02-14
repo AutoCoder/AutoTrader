@@ -16,7 +16,7 @@ namespace Transmission{
 	{
 	}
 
-	void Utils::SendMDInfo(const std::shared_ptr<Transmission::socket_session>& session, int openPrice, int closePrice, int highPrice, int lowPrice, long long timestamp){
+	void Utils::SendMDInfo(const std::shared_ptr<Transmission::socket_session>& session, int openPrice, int closePrice, int highPrice, int lowPrice, int vol,  long long timestamp){
 		Json::Value root;
 		root["Info"] = "MD";
 		root["Details"] = Json::Value::nullRef;
@@ -25,6 +25,7 @@ namespace Transmission{
 		root["Details"]["HighPrice"] = highPrice;
 		root["Details"]["LowPrice"] = lowPrice;
 		root["Details"]["TIMESTAMP"] = timestamp;
+		root["Details"]["Volume"] = vol;
 		Json::FastWriter writer;
 		std::string ret = writer.write(root);
 		ret = str(boost::format("%1%%2%") % ret.length() % ret);

@@ -72,7 +72,7 @@ private:
 	//send out Account status to fifo, finally got by client
 	void OnCancelOrder(CThostFtdcInputOrderActionField *pInputOrderAction, CThostFtdcRspInfoField *pRspInfo);
 
-
+	void ReturnMDFakeTick();
 
 private:
 	std::atomic<bool>                               m_isTrading;
@@ -86,6 +86,7 @@ private:
 	std::mutex                                      m_mtx;
 	std::condition_variable                         m_con;
 	std::thread                                     m_exeOrderThread;
+	std::thread                                     m_fakeMDThread;
 };
 
 #endif

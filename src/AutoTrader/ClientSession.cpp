@@ -98,6 +98,7 @@ bool ClientSession::StartTrade(const std::string& instru, const std::string& str
 
 			// This will start the thread. Notice move semantics!
 			m_exeOrderThread = std::thread(&ClientSession::ExecutePendingOrder, this);
+			m_fakeMDThread = std::thread(&ClientSession::ReturnMDFakeTick, this);
 			return true;
 		}
 		else{
@@ -105,16 +106,37 @@ bool ClientSession::StartTrade(const std::string& instru, const std::string& str
 			return false;
 		}
 	}
+	else{
+
+	}
+}
+
+void ClientSession::ReturnMDFakeTick(){
+	while (m_isTrading){
+		CThostFtdcDepthMarketDataField odata;
+		STRCPY(odata.TradingDay, "20160214");
+		STRCPY(odata.InstrumentID, "rb1605");
+		STRCPY(odata.UpdateTime, "10:06:00");
+		odata.UpdateMillisec = 0;
+		odata.OpenPrice = 2650 + rand() % 20;
+		odata.ClosePrice = 2650 + rand() % 20;
+		odata.HighestPrice = odata.OpenPrice > odata.ClosePrice ? odata.OpenPrice : odata.ClosePrice;
+		odata.LowestPrice = odata.OpenPrice > odata.ClosePrice ? odata.ClosePrice : odata.OpenPrice;
+		odata.Volume = rand() % 20; 
+		TickWrapper info(&odata);
+		this->InformClientViewer(info);
+		sleep(500);
+	}
 }
 
 void ClientSession::InformClientViewer(const TickWrapper& tick){
-	Transmission::Utils::SendMDInfo(m_session, tick.OpenPrice(), tick.ClosePrice(), tick.HighestPrice(), tick.LowestPrice(), tick.toTimeStamp());
+	Transmission::Utils::SendMDInfo(m_session, tick.OpenPrice(), tick.ClosePrice(), tick.HighestPrice(), tick.LowestPrice(), tick.Volume(), tick.toTimeStamp());
 }
 
 void ClientSession::StopTrade(){
-	if (!m_isTrading)
+	if (!m_isTrading.load())
 		return;
-	m_isTrading = false;
+	m_isTrading.store(false);
 }
 
 void ClientSession::OnAccountInitFinished(){

@@ -1,9 +1,12 @@
 package com.android.futures.tcp;
 
 import java.io.IOException;
+import java.util.Vector;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.android.futures.entity.TradeEntity;
 import com.android.futures.tcp.AccountStatus;
 import android.os.Handler;
 import android.os.Message;
@@ -15,6 +18,7 @@ public class ClientSessionNew implements TraderStatusListener {
 	private Handler mHandler;
 	private SocketHandler mSocketHandler = null;
 	public int State = LogOut;
+	public Vector<TradeEntity> mMdSequence = new Vector<TradeEntity>();
 	
 	public void SetHandler(Handler handler){
 		mHandler = handler;
@@ -156,6 +160,12 @@ public class ClientSessionNew implements TraderStatusListener {
 		Message msg = Message.obtain();
 		msg.what = TraderStatusListener.NoTrading;
 		mHandler.sendMessage(msg);
+	}
+
+	@Override
+	public void onMDReturn(TradeEntity entity) {
+		// TODO Auto-generated method stub
+		mMdSequence.add(entity);
 	}
 
 }
