@@ -15,26 +15,28 @@ public class TradeEntity {
 	private int mHighPrice;
 	private int mLowPrice;
 	private int   mVol;
-	private double mTime;
-	private int   mOrderId;
+	private long mTimeStamp;
+	private String mOrderId;
 	private int mPrice;
+	private int mDirection; // 0 sell, 1 buy
 
-	public TradeEntity(int openPrice, int closePrice, int highPrice, int lowPrice, int vol, double time){
+	public TradeEntity(int openPrice, int closePrice, int highPrice, int lowPrice, int vol, long time){
 		mType = type.MD;
 		mOpenPrice = openPrice; 
 		mClosePrice = closePrice; 
 		mHighPrice = highPrice;
 		mLowPrice = lowPrice;
 		mVol = vol;
-		mTime = time;
+		mTimeStamp = time;
 	}
 	
-	public TradeEntity(type t, int price, int vol, int ord_id, double time){
+	public TradeEntity(type t, int direction, int price, int vol, String ord_id, long time){
 		mType = t;
 		mVol = vol;
-		mTime = time;
+		mTimeStamp = time;
 		mPrice = price;
 		mOrderId = ord_id;
+		mDirection = direction;
 	}
 	
 	public type getType() {
@@ -85,19 +87,19 @@ public class TradeEntity {
 		this.mVol = vol;
 	}
 
-	public double getTime() {
-		return mTime;
+	public long getTimeStamp() {
+		return mTimeStamp;
 	}
 
-	public void setTime(double time) {
-		this.mTime = time;
+	public void setTimeStamp(long time) {
+		this.mTimeStamp = time;
 	}
 
-	public int getOrderId() {
+	public String getOrderId() {
 		return mOrderId;
 	}
 
-	public void setOrderId(int orderId) {
+	public void setOrderId(String orderId) {
 		this.mOrderId = orderId;
 	}
 
@@ -107,6 +109,14 @@ public class TradeEntity {
 
 	public void setPrice(int price) {
 		this.mPrice = price;
+	}
+
+	public int getDirection() {
+		return mDirection;
+	}
+
+	public void setDirection(int mDirection) {
+		this.mDirection = mDirection;
 	}
 	
 }

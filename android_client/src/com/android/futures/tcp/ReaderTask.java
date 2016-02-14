@@ -162,14 +162,8 @@ public class ReaderTask extends Thread {
 					if (infoType.equals("MD")) {
 						temp = new TradeEntity(details.getInt("OpenPrice"), details.getInt("ClosePrice"),
 								details.getInt("HighPrice"), details.getInt("LowPrice"), details.getInt("Volume"),
-								details.getDouble("TIMESTAMP"));
-						statusChangeHandler.onMDReturn(temp);
-					} else if (infoType.equals("ORDER")) {
-						t = TradeEntity.type.Order;
-					} else if (infoType.equals("CANCELL_ORDER")) {
-						t = TradeEntity.type.Cancell_Order;
-					} else if (infoType.equals("TRADE")) {
-						t = TradeEntity.type.Trade;
+								details.getLong("TIMESTAMP"));
+						statusChangeHandler.onCTPCallback(temp);
 					} else if (infoType.equals("ACCOUNT_STATUS")) {
 						AccountStatus status = new AccountStatus(details.getDouble("Balance"),
 								details.getInt("Position"), details.getInt("Price"), details.getString("Instrument"));
@@ -190,7 +184,19 @@ public class ReaderTask extends Thread {
 						if (statusChangeHandler != null)
 							statusChangeHandler.onAccountLogined(info);
 					} else {
-			
+						if (infoType.equals("ORDER")) {
+							t = TradeEntity.type.Order;
+						}
+						else if (infoType.equals("CANCELL_ORDER")){
+							t = TradeEntity.type.Cancell_Order;
+						}
+						else if (infoType.equals("TRADE")){
+							t = TradeEntity.type.Trade;
+						}else{
+							throw new Exception("unexpected ctp return");
+						}
+						temp = new TradeEntity(t, details.getInt("Direction"), details.getInt("Price"), details.getInt("Vol"), details.getString("ORDER_ID"), details.getLong("TIMESTAMP"));
+						statusChangeHandler.onCTPCallback(temp);
 					}
 				}
 			} catch (JSONException e) {

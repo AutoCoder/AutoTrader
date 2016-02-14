@@ -179,10 +179,11 @@ public class ClientSession extends Application {
 						TradeEntity.type t = TradeEntity.type.MD;
 						JSONObject details = obj.getJSONObject("Details");
 						if (obj.getString("Type") == "MD"){
-							temp = new TradeEntity(details.getInt("OpenPrice"), details.getInt("ClosePrice"), details.getInt("HighPrice"), details.getInt("LowPrice"), details.getInt("Vol"), details.getDouble("TIMESTAMP"));
+							temp = new TradeEntity(details.getInt("OpenPrice"), details.getInt("ClosePrice"), details.getInt("HighPrice"), details.getInt("LowPrice"), details.getInt("Vol"), details.getLong("TIMESTAMP"));
 						}else {
 							if (obj.getString("Type") == "ORDER"){
 								t = TradeEntity.type.Order;
+								temp = new TradeEntity(t, details.getInt("Direction"), details.getInt("Price"), details.getInt("Vol"), details.getString("ORDER_ID"), details.getLong("TIMESTAMP"));
 							}else if (obj.getString("Type") == "CANCELL_ORDER"){
 								t = TradeEntity.type.Cancell_Order;
 							}else if (obj.getString("Type") == "TRADE"){
@@ -196,7 +197,6 @@ public class ClientSession extends Application {
 							}else{
 								
 							}
-							temp = new TradeEntity(t, details.getInt("Price"), details.getInt("Vol"), details.getInt("ORDER_ID"), details.getDouble("TIMESTAMP"));
 						}
 						
 					}

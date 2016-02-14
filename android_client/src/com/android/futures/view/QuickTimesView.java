@@ -47,6 +47,7 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 	private double mhighestVolume;
 	private double mLowestVolume;
 	private int m_beginIdx;
+	private long m_dtimestamp;//double milliscond
 
 	public QuickTimesView(Context context) {
 		super(context);
@@ -72,16 +73,18 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 		float viewWith = getWidth();
 		float viewHeight = getHeight();
 
-
-
 		m_beginIdx = mTimesList.size() > DATA_MAX_COUNT ? (mTimesList.size() - DATA_MAX_COUNT) : 0;
+		m_dtimestamp = mTimesList.get(m_beginIdx).getTimeStamp();
 		mHighPrice = mTimesList.size() > 0 ? mTimesList.get(m_beginIdx).getHighPrice() : 0.0;
 		mLowPrice = mTimesList.size() > 0 ? mTimesList.get(m_beginIdx).getLowPrice() : 0.0;
 		mhighestVolume = mTimesList.size() > 0 ? mTimesList.get(m_beginIdx).getVol() : 0.0;
 		mLowestVolume = mTimesList.size() > 0 ? mTimesList.get(m_beginIdx).getVol() : 0.0;
 
 		for (int i = m_beginIdx; i < m_beginIdx + DATA_MAX_COUNT && i < mTimesList.size(); ++i) {
+			
 			TradeEntity fenshiData = mTimesList.get(i);
+			if (fenshiData.getType() != TradeEntity.type.MD)
+				continue;
 
 			if (mHighPrice < fenshiData.getHighPrice())
 				mHighPrice = fenshiData.getHighPrice();
@@ -235,19 +238,44 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 	private void drawTicks(Canvas canvas) {
 		Paint paint = new Paint();
 		paint.setAntiAlias(true);
-		paint.setColor(Color.WHITE);
+		
 		TradeEntity first = mTimesList.get(m_beginIdx);
 		float ratio = (float) ((first.getClosePrice() - mLowPrice) / (float) (mHighPrice - mLowPrice));
 		float curY = mTimeRectBottom - (mTimeRectBottom - mTimeRectTop) * ratio;
 		float curX = mTimeRectLeft;
 		for (int i = m_beginIdx + 1; i < m_beginIdx + DATA_MAX_COUNT && i < mTimesList.size(); i++) {
 			TradeEntity fenshiData = mTimesList.get(i);
-			ratio = (float) (((float) (fenshiData.getClosePrice() - mLowPrice)) / (mHighPrice - mLowPrice));
-			float nextY = mTimeRectBottom - (mTimeRectBottom - mTimeRectTop) * ratio;
-			float nextX = mTimeRectLeft + mTimeSpacing * (i - m_beginIdx);
-			canvas.drawLine(curX, curY, nextX, nextY, paint);
-			curY = nextY;
-			curX = nextX;
+			if (fenshiData.getType() == TradeEntity.type.MD){
+				ratio = (float) (((float) (fenshiData.getClosePrice() - mLowPrice)) / (mHighPrice - mLowPrice));
+				float nextY = mTimeRectBottom - (mTimeRectBottom - mTimeRectTop) * ratio;
+				float nextX = mTimeRectLeft + mTimeSpacing * (i - m_beginIdx);
+				paint.setColor(Color.WHITE);
+				canvas.drawLine(curX, curY, nextX, nextY, paint);
+				curY = nextY;
+				curX = nextX;
+			}else{
+				int idx = (int) (fenshiData.getTimeStamp() - m_dtimestamp);
+				float x_pos = mTimeRectLeft + mTimeSpacing * (i - m_beginIdx);
+				ratio = (float) ((fenshiData.getPrice() - mLowPrice)/(mHighPrice - mLowPrice));
+				float y_pos = mTimeRectBottom - (mTimeRectBottom - mTimeRectTop) * ratio;
+				
+				if (fenshiData.getDirection() == 0)
+					paint.setColor(Color.GREEN);
+				else
+					paint.setColor(Color.RED);
+				
+				if (fenshiData.getType() == TradeEntity.type.Order){
+					paint.setStyle(Paint.Style.FILL);
+					canvas.drawCircle(x_pos, y_pos, mFontHeight/2, paint);
+				}
+				else if (fenshiData.getType() == TradeEntity.type.Cancell_Order){
+					paint.setStyle(Paint.Style.STROKE);
+					canvas.drawCircle(x_pos, y_pos, mFontHeight/2, paint);
+				}else if (fenshiData.getType() == TradeEntity.type.Trade){
+					paint.setStyle(Paint.Style.FILL);
+					canvas.drawRect(x_pos - mFontHeight/2, y_pos - mFontHeight/2, x_pos + mFontHeight/2, y_pos + mFontHeight/2, paint);
+				}
+			}
 		}
 	}
 

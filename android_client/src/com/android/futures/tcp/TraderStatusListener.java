@@ -17,5 +17,5 @@ public interface TraderStatusListener {
 	public void onStartTradeSuccess();
 	public void onStartTradeFailed(String err_msg);
 	public void onStopTrade();
-	public void onMDReturn(TradeEntity entity);
+	public void onCTPCallback(TradeEntity entity);
 }

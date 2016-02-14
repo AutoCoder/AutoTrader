@@ -163,7 +163,7 @@ public class ClientSessionNew implements TraderStatusListener {
 	}
 
 	@Override
-	public void onMDReturn(TradeEntity entity) {
+	public void onCTPCallback(TradeEntity entity) {
 		// TODO Auto-generated method stub
 		mMdSequence.add(entity);
 	}
