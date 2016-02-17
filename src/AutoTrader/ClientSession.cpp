@@ -98,7 +98,9 @@ bool ClientSession::StartTrade(const std::string& instru, const std::string& str
 
 			// This will start the thread. Notice move semantics!
 			m_exeOrderThread = std::thread(&ClientSession::ExecutePendingOrder, this);
+#ifdef FAKE_MD
 			m_fakeMDThread = std::thread(&ClientSession::ReturnMDFakeTick, this);
+#endif
 			return true;
 		}
 		else{
@@ -110,7 +112,7 @@ bool ClientSession::StartTrade(const std::string& instru, const std::string& str
 
 	}
 }
-
+#ifdef FAKE_MD
 void ClientSession::ReturnMDFakeTick(){
 	while (m_isTrading){
 		CThostFtdcDepthMarketDataField odata;
@@ -128,9 +130,10 @@ void ClientSession::ReturnMDFakeTick(){
 		sleep(500);
 	}
 }
+#endif
 
 void ClientSession::InformClientViewer(const TickWrapper& tick){
-	Transmission::Utils::SendMDInfo(m_session, tick.OpenPrice(), tick.ClosePrice(), tick.HighestPrice(), tick.LowestPrice(), tick.Volume(), tick.toTimeStamp());
+	Transmission::Utils::SendMDInfo(m_session, tick.LastPrice(), tick.LastPrice(), tick.LastPrice(), tick.LastPrice(), tick.Volume(), tick.toTimeStamp());
 }
 
 void ClientSession::StopTrade(){
