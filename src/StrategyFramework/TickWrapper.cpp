@@ -2,6 +2,7 @@
 #include <sstream>
 #include <assert.h>
 #include <time.h>
+#include <cstring>
 #include "Config.h"
 #include "TickWrapper.h"
 #include "TechVec.h"

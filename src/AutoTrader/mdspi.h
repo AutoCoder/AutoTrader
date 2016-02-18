@@ -27,11 +27,11 @@ class CtpMdSpi : public CThostFtdcMdSpi
 		}
 
 	private:
+		CtpMdSpi*                 m_MdUserSpiPtr;
 		std::string               m_brokerId;
 		std::string               m_userID;
 		std::string               m_password;
 		std::vector<std::string>  m_instruments;
-		CtpMdSpi*                 m_MdUserSpiPtr;
 	};
 
 public:

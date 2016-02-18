@@ -28,8 +28,11 @@ class OrderTrigger : public OrderTriggerBase
 public:
 	OrderTrigger(Args ... args)
 	{
-		m_positionCtl = std::make_unique<P>();
-		m_strategy = std::make_unique<S>(args...);
+		//m_positionCtl = std::make_unique<P>();
+		//m_strategy = std::make_unique<S>(args...);
+		//to pass build in Clang 3.6
+		m_positionCtl = std::unique_ptr<P>(new P());
+		m_strategy = std::unique_ptr<S>(new S(args...));
 	}
 	virtual ~OrderTrigger(){}
 

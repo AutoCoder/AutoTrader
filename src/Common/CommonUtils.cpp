@@ -2,6 +2,7 @@
 #include "CommonUtils.h"
 #include <assert.h>
 #include <sstream>
+#include <cstring>
 #include "ThostFtdcUserApiStruct.h"
 
 CommonUtils::CommonUtils()

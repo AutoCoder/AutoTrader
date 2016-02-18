@@ -43,6 +43,8 @@ Temporary Items
 .apdisk
 *.suo
 /ipch
+/bin
+/build
 *.pdb
 *.sdf
 /x64

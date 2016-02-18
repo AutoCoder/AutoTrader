@@ -33,7 +33,7 @@ struct StrategyPluginsLoader
 #ifdef WIN32
 				DLLPTR handle = OpenDLL(file_itr->path().wstring().c_str());
 #else
-				DLLPTR handle = OpenDLL(file_itr->path().string().c_str());
+				DLLPTR handle = OpenDLL(file_itr->path().string().c_str(), RTLD_GLOBAL | RTLD_NOW);
 #endif
 				m_handles.push_back(handle);
 			}

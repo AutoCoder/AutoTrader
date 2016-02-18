@@ -3,7 +3,7 @@
 #include "ThreadSafeQueue.h"
 #include "Order.h"
 #include "ThostFtdcTraderApi.h"
-#include "config.h"
+#include "Config.h"
 #include <condition_variable>
 #include "spdlog/spdlog.h"
 #include "CommonUtils.h"

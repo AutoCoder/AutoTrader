@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include <string>
-#include <string.h>
+#include <cstring>
 #include <stddef.h>
 
 #ifdef WIN32

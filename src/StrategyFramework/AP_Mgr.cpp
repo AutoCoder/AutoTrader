@@ -1,6 +1,7 @@
 #include <memory>
 #include <sstream>
 #include <algorithm>
+#include <cstring>
 
 #include "AP_Mgr.h"
 #include "Order.h"

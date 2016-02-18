@@ -3,8 +3,8 @@
 
 namespace Transmission{
 	RemoteServerAction::RemoteServerAction(const std::shared_ptr<socket_session>& session, const std::string& data)
-		: session_(session)
-		, original_data_(data)
+		: original_data_(data)
+		, session_(session)
 	{
 	}
 

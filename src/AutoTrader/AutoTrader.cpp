@@ -12,7 +12,6 @@
 #include "unittest.h"
 
 #include "DBWrapper.h"
-#include "config.h"
 #include "Config.h"
 #include "tradespi.h"
 #include "mdspi.h"

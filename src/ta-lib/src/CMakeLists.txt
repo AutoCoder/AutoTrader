@@ -1,4 +1,5 @@
-SET(LIBRARY_OUTPUT_PATH ${ta-lib_SOURCE_DIR}/lib)
+
+SET(LIBRARY_OUTPUT_PATH ${AUTOTRADE_SOURCE_DIR}/bin)
 
 SET(SRC_LIST	./ta_common/ta_global.c
 				./ta_common/ta_retcode.c
@@ -195,6 +196,6 @@ SET(SRC_LIST	./ta_common/ta_global.c
 				./ta_func/ta_WILLR.c
 				./ta_func/ta_WMA.c )
 
-INCLUDE_DIRECTORIES(${HEADER_INCLUDE_DIR} ta_abstract ta_common ta_func)
+INCLUDE_DIRECTORIES(${TA-LIB-HEADER} ta_abstract ta_common ta_func)
 
 ADD_LIBRARY(ta-lib STATIC ${SRC_LIST})

@@ -20,17 +20,18 @@ namespace AP{
 
 namespace Transmission{
 	class socket_session;
-	enum ErrorCode;
 };
 
 namespace Account{
-	class Meta;
+	struct Meta;
 }
 
 struct CThostFtdcOrderField;
 struct CThostFtdcTradeField;
 struct CThostFtdcInputOrderActionField;
 struct CThostFtdcRspInfoField;
+
+typedef int TransmissionErrorCode;
 
 class ClientSession
 {
@@ -56,7 +57,7 @@ private:
 
 	bool Logout(); //identify User By session
 
-	bool StartTrade(const std::string& instru, const std::string& strategyName, Transmission::ErrorCode& errcode);
+	bool StartTrade(const std::string& instru, const std::string& strategyName, TransmissionErrorCode& errcode);
 
 	void WaitAndPopCurrentOrder(Order& ord);//multi-thread notice
 
@@ -80,8 +81,8 @@ private:
 	std::unique_ptr<Order>                          m_pending_order;
 	std::unique_ptr<CtpTradeSpi>                    m_trade_spi;
 	std::shared_ptr<RealTimeDataProcessor>          m_realtimedata_processor;
-	std::unique_ptr<AP::AccountDetailMgr>           m_detailMgr;
 	std::shared_ptr<Transmission::socket_session>   m_session;
+	std::unique_ptr<AP::AccountDetailMgr>           m_detailMgr;
 
 	std::mutex                                      m_mtx;
 	std::condition_variable                         m_con;

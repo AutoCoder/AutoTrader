@@ -6,7 +6,7 @@
 #include "ThreadSafeQueue.h"
 #include <iostream>
 #include <assert.h>
-#include "config.h"
+#include "Config.h"
 #include "DBWrapper.h"
 #include "CommonUtils.h"
 #include "spdlog/spdlog.h"

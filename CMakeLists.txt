@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 2.8)
 
 PROJECT(AUTOTRADE)
 
+SET(BOOST_DIR ${AUTOTRADE_SOURCE_DIR}/boost_1_60_0)
+
 if(UNIX)
 
 message(STATUS "ON Unix")
@@ -20,7 +22,7 @@ message(STATUS "ON Windows")
 
 set(LINK_LIB_DIR ${AUTOTRADE_SOURCE_DIR}/lib)
 
-SET(HEADER_INCLUDE_DIR ${AUTOTRADE_SOURCE_DIR}/linux_include)
+SET(HEADER_INCLUDE_DIR ${AUTOTRADE_SOURCE_DIR}/include)
 
 endif()
 

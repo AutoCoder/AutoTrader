@@ -4,6 +4,8 @@
 #include "Common.h"
 #include <vector>
 #include <set>
+#include <cstring>
+#include <string>
 
 class COMMON_API Config {
 public:

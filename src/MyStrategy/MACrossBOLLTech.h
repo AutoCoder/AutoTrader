@@ -56,17 +56,16 @@ protected:
 	static bool IsTableCreated;
 
 private:
-	BOLLTech m_bollTech;
-	MATech m_maTech;
-
-	char m_instrumentId[32];
-	char m_time[64];// for check result 
-	double m_lastprice; // for check result
-	long long m_id; //time_stamp * 2  (unit : 500ms)
 	StratgyType::MACrossStratgyType m_type;
+	long long m_id; //time_stamp * 2  (unit : 500ms)
 	TickType m_ticktype;
+	double m_lastprice; // for check result
 	size_t m_shortMA;
 	size_t m_longMA;
+	char m_instrumentId[32];
+	char m_time[64];// for check result 
+	MATech m_maTech;	
+	BOLLTech m_bollTech;
 };
 
 #endif

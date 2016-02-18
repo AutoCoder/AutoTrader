@@ -1,4 +1,4 @@
-﻿#include "string.h"
+﻿#include <cstring>
 #include "math.h"
 #include "windows.h"
 #include "FtdcRiskUserApi.h"

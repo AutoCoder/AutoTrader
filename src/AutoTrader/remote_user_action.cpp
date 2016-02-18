@@ -148,7 +148,7 @@ namespace Transmission{
 				//parse actiontype first
 				const std::string& actionType = ReadActionType(original_data_);
 				if (actionType == "Login"){
-					login_meta_ = std::make_unique<LoginActionMeta>();
+					login_meta_ = std::unique_ptr<LoginActionMeta>(new LoginActionMeta());
 					if (login_meta_->Parse(original_data_)){
 						action_type_ = ActionType::Login;
 						return Parse_Result::Good;
@@ -159,7 +159,7 @@ namespace Transmission{
 					}
 				}
 				else if (actionType == "StartTrade"){
-					trade_meta_ = std::make_unique<TradeActionMeta>();
+					trade_meta_ = std::unique_ptr<TradeActionMeta>(new TradeActionMeta());
 					if (trade_meta_->Parse(original_data_)){
 						action_type_ = ActionType::StartTrade;
 						return Parse_Result::Good;

@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include <functional>
+#include <algorithm>
 
 #include "ThostFtdcTraderApi.h"
 #include "ClientSession.h"
@@ -22,7 +23,7 @@
 ClientSession::ClientSession(const std::string& userId, const std::shared_ptr<Transmission::socket_session>& s, CThostFtdcTraderApi* api)
 : m_userId(userId)
 , m_session(s)
-, m_detailMgr(std::make_unique<AP::AccountDetailMgr>())
+, m_detailMgr(std::unique_ptr<AP::AccountDetailMgr>(new AP::AccountDetailMgr()))
 {
 	assert(api);
 	Account::Meta meta = Account::Manager::Instance().GetMeta(m_userId);
@@ -31,9 +32,9 @@ ClientSession::ClientSession(const std::string& userId, const std::shared_ptr<Tr
 	RtnTradeCallback OnRtnTrade_Callback = std::bind(&ClientSession::OnRtnTrade, this, std::placeholders::_1);
 	CancelOrderCallback OnCancelOrder_Callback = std::bind(&ClientSession::OnCancelOrder, this, std::placeholders::_1, std::placeholders::_2);
 
-	m_trade_spi = std::make_unique<CtpTradeSpi>(api, meta.m_BrokerId.c_str(), meta.m_UserId.c_str(), meta.m_Password.c_str(), \
+	m_trade_spi = std::unique_ptr<CtpTradeSpi>(new CtpTradeSpi(api, meta.m_BrokerId.c_str(), meta.m_UserId.c_str(), meta.m_Password.c_str(), \
 		Config::Instance()->ProductName().c_str(), *(m_detailMgr.get()), \
-		accountInitFinished_Callback, onRtnOrder_Callback, OnRtnTrade_Callback, OnCancelOrder_Callback);
+		accountInitFinished_Callback, onRtnOrder_Callback, OnRtnTrade_Callback, OnCancelOrder_Callback));
 
 	api->RegisterSpi((CThostFtdcTraderSpi*)(m_trade_spi.get()));
 	api->SubscribePublicTopic(THOST_TERT_RESTART);
@@ -80,7 +81,7 @@ void ClientSession::ExecutePendingOrder(){
 	}
 }
 
-bool ClientSession::StartTrade(const std::string& instru, const std::string& strategyName, Transmission::ErrorCode& errcode){
+bool ClientSession::StartTrade(const std::string& instru, const std::string& strategyName, TransmissionErrorCode& errcode){
 	if (m_isTrading){
 		errcode = Transmission::TradingNow;
 		return false;
@@ -109,7 +110,8 @@ bool ClientSession::StartTrade(const std::string& instru, const std::string& str
 		}
 	}
 	else{
-
+		errcode = Transmission::InvalidTradeArguments;
+		return false;
 	}
 }
 #ifdef FAKE_MD
@@ -183,12 +185,12 @@ void ClientSession::OnStartTradeRequest(const std::string& instru, const std::st
 		Transmission::Utils::SendStartTradeResultInfo(m_session, Transmission::TradingNow);
 	}
 	else{
-		Transmission::ErrorCode err_code;
+		TransmissionErrorCode err_code;
 		if (StartTrade(instru, strategyName, err_code)){
 			Transmission::Utils::SendStartTradeResultInfo(m_session, Transmission::Succeed);
 		}
 		else{
-			Transmission::Utils::SendStartTradeResultInfo(m_session, err_code);
+			Transmission::Utils::SendStartTradeResultInfo(m_session, (Transmission::ErrorCode)err_code);
 		}
 	}
 }

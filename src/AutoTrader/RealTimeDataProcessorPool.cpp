@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Strategy.h"
 #include "RealTimeDataProcessorPool.h"
-#include "config.h"
+#include "Config.h"
 #include "DBWrapper.h"
 #include "tradespi.h"
 #include "TickWrapper.h"

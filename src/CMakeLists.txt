@@ -2,3 +2,11 @@
 ADD_SUBDIRECTORY(AutoTrader)
 
 ADD_SUBDIRECTORY(lib_json)
+
+ADD_SUBDIRECTORY(Common)
+
+ADD_SUBDIRECTORY(StrategyFramework)
+
+ADD_SUBDIRECTORY(MyStrategy)
+
+ADD_SUBDIRECTORY(ta-lib)
