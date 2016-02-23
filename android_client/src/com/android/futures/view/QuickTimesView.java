@@ -222,7 +222,7 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 		paint.setAntiAlias(true);
 		for (int i = m_beginIdx; i < m_beginIdx + DATA_MAX_COUNT && i < mTimesList.size(); i++) {
 			TradeEntity fenshiData = mTimesList.get(i);
-			ratio = (float) (fenshiData.getVol() / mhighestVolume);
+			ratio = (float) ((fenshiData.getVol() - mLowestVolume) / mhighestVolume);
 			float curY = mVolumeRectBottom - (mVolumeRectBottom - mVolumeRectTop) * ratio;
 			float curX = mTimeRectLeft + mTimeSpacing * (i - m_beginIdx);
 

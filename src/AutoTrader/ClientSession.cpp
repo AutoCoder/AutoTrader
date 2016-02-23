@@ -136,7 +136,7 @@ void ClientSession::ReturnMDFakeTick(){
 #endif
 
 void ClientSession::InformClientViewer(const TickWrapper& tick){
-	Transmission::Utils::SendMDInfo(m_session, tick.LastPrice(), tick.LastPrice(), tick.LastPrice(), tick.LastPrice(), tick.Volume(), tick.toTimeStamp());
+	Transmission::Utils::SendMDInfo(m_session, tick.OpenPrice(), tick.LastPrice(), tick.LastPrice(), tick.LastPrice(), tick.Volume(), tick.toTimeStamp());
 }
 
 void ClientSession::StopTrade(){
