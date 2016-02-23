@@ -25,6 +25,7 @@ ClientSession::ClientSession(const std::string& userId, const std::shared_ptr<Tr
 , m_session(s)
 , m_detailMgr(std::unique_ptr<AP::AccountDetailMgr>(new AP::AccountDetailMgr()))
 {
+	m_isTrading.store(false);
 	assert(api);
 	Account::Meta meta = Account::Manager::Instance().GetMeta(m_userId);
 	InitedAccountCallback accountInitFinished_Callback = std::bind(&ClientSession::OnAccountInitFinished, this);
@@ -176,7 +177,7 @@ void ClientSession::OnLoginRequest()
 	//if the ClientSession is created which mean login already, just send Account Info back.
 	const std::vector<std::string>& instu = Account::Manager::Instance().GetMeta(m_userId).m_Instruments;
 	const std::vector<std::string>& strategies = TriggerFactory::Instance()->GetStrategies(m_userId);
-	Transmission::Utils::SendAccountInfo(m_session, instu, strategies);
+	Transmission::Utils::SendAccountInfo(m_session, instu, strategies, IsTrading());
 }
 
 void ClientSession::OnStartTradeRequest(const std::string& instru, const std::string& strategyName)

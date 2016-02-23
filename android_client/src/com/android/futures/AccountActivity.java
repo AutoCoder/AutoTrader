@@ -111,6 +111,8 @@ public class AccountActivity extends Activity implements Handler.Callback {
 			ArrayAdapter<String> adapter2 = new ArrayAdapter<String>(AccountActivity.this,
 					android.R.layout.simple_spinner_item, sts);
 			mStrategyList.setAdapter(adapter2);
+			mIsTrading = info.getIsTrading();
+			updateTradeStatus();
 		}
 		else if (msg.what == TraderStatusListener.Trading){
 			mIsTrading = true;

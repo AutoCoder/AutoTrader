@@ -48,7 +48,7 @@ namespace Transmission{
 		Transmission::GetFIFOActionQueue().Push_back(Transmission::RemoteServerAction(session, ret));
 	}
 
-	void Utils::SendAccountInfo(const std::shared_ptr<Transmission::socket_session>& session, const std::vector<std::string>& instruments, const std::vector<std::string>& strategies){
+	void Utils::SendAccountInfo(const std::shared_ptr<Transmission::socket_session>& session, const std::vector<std::string>& instruments, const std::vector<std::string>& strategies, bool isTrading){
 		Json::Value root;
 		root["Info"] = "ACCOUNT_INFO";
 		Json::Value details;
@@ -62,6 +62,7 @@ namespace Transmission{
 		}
 		details["Instruments"] = arrayInstru;
 		details["Strategies"] = arrayStrategy;
+		details["IsTrading"] = isTrading;
 
 		root["Details"] = details;
 		Json::FastWriter writer;

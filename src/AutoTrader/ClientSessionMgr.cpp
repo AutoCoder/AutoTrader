@@ -29,12 +29,16 @@ void ClientSessionMgr::LoginAccount(const std::string& userId, const std::string
 		bool success = Account::Manager::Instance().CheckPassword(userId, pw);
 		if (success){
 			std::shared_ptr<ClientSession> clientSessionSp = GetClientSession(session);
+
+			if (!clientSessionSp) // if user logout, and the clientSession is lost, rebind the socket session with client session
+				clientSessionSp = TryBindToSession(userId, session);
+
 			if (!clientSessionSp)
 			{
 				clientSessionSp = std::make_shared<ClientSession>(userId, session, m_pTradeUserApi);
 				m_client_sessions[session] = clientSessionSp;
-				Transmission::Utils::SendLoginResultInfo(session, Transmission::Succeed);
 			}
+			Transmission::Utils::SendLoginResultInfo(session, Transmission::Succeed);
 			clientSessionSp->OnLoginRequest();
 		}
 		else{
@@ -77,12 +81,30 @@ void ClientSessionMgr::StopTrade(const std::shared_ptr<Transmission::socket_sess
 	}
 }
 
-std::shared_ptr<ClientSession> ClientSessionMgr::GetClientSession(const std::shared_ptr<Transmission::socket_session>& session){
+std::shared_ptr<ClientSession> ClientSessionMgr::GetClientSession(const std::shared_ptr<Transmission::socket_session>& session, const std::string& userId){
 	auto iter = std::find_if(m_client_sessions.begin(), m_client_sessions.end(), [&](const std::pair<std::shared_ptr<Transmission::socket_session>, std::shared_ptr<ClientSession> >& pair){
 		return (*session.get()) == (*pair.first.get());
 	});
 	if (iter != m_client_sessions.end()){
 		return m_client_sessions[session];
+	}
+	else{
+		return nullptr;	
+	}
+}
+
+std::shared_ptr<ClientSession> ClientSessionMgr::TryBindToSession(const std::string& userId, const std::shared_ptr<Transmission::socket_session>& session){
+	auto foundIter = std::find_if(m_client_sessions.begin(), m_client_sessions.end(), [&userId](const std::pair<std::shared_ptr<Transmission::socket_session>, std::shared_ptr<ClientSession> >& pair){
+		return pair.second->UserId() == userId;
+	});
+
+	if (foundIter != m_client_sessions.end())
+	{
+		auto clientSession = foundIter->second;
+		m_client_sessions.erase(foundIter);
+		clientSession->UpdateSocketSession(session);
+		m_client_sessions[session] = clientSession;
+		return clientSession;
 	}
 	else{
 		return nullptr;

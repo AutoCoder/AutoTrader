@@ -52,6 +52,10 @@ public:
 
 	bool IsTrading() const { return m_isTrading.load(); }
 
+	std::string UserId() const { return m_userId; };
+
+	void UpdateSocketSession(const std::shared_ptr<Transmission::socket_session>& s) { m_session = s;  }
+
 	~ClientSession();
 private:
 

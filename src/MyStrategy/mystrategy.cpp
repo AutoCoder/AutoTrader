@@ -16,7 +16,7 @@ std::string AccountId(){
 }
 
 void RegisterAccountMeta(){
-	Account::Meta m("9999", "021510", "wodemima", { "rb1604", "rb1605" });
+	Account::Meta m("9999", "021510", "wodemima", { "rb1605", "rb1606" });
 	Account::Manager::Instance().AddAccontMeta(m);
 }
 void UnRegisterAccountMeta(){
