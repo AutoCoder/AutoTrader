@@ -17,24 +17,24 @@ public class TradeEntity {
 	private int   mVol;
 	private long mTimeStamp;
 	private String mOrderId;
-	private int mPrice;
+	private int mLastPrice;
 	private int mDirection; // 0 sell, 1 buy
 
-	public TradeEntity(int openPrice, int closePrice, int highPrice, int lowPrice, int vol, long time){
+	public TradeEntity(int openPrice, int lastPrice, int highPrice, int lowPrice, int vol, long time){
 		mType = type.MD;
 		mOpenPrice = openPrice; 
-		mClosePrice = closePrice; 
+		mLastPrice = lastPrice; 
 		mHighPrice = highPrice;
 		mLowPrice = lowPrice;
 		mVol = vol;
 		mTimeStamp = time;
 	}
 	
-	public TradeEntity(type t, int direction, int price, int vol, String ord_id, long time){
+	public TradeEntity(type t, int direction, int lastprice, int vol, String ord_id, long time){
 		mType = t;
 		mVol = vol;
 		mTimeStamp = time;
-		mPrice = price;
+		mLastPrice = lastprice;
 		mOrderId = ord_id;
 		mDirection = direction;
 	}
@@ -103,12 +103,12 @@ public class TradeEntity {
 		this.mOrderId = orderId;
 	}
 
-	public float getPrice() {
-		return mPrice;
+	public float getLastPrice() {
+		return mLastPrice;
 	}
 
-	public void setPrice(int price) {
-		this.mPrice = price;
+	public void setLastPrice(int price) {
+		this.mLastPrice = price;
 	}
 
 	public int getDirection() {

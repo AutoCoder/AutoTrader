@@ -24,6 +24,7 @@ ClientSession::ClientSession(const std::string& userId, const std::shared_ptr<Tr
 : m_userId(userId)
 , m_session(s)
 , m_detailMgr(std::unique_ptr<AP::AccountDetailMgr>(new AP::AccountDetailMgr()))
+, m_total_vol(0)
 {
 	m_isTrading.store(false);
 	assert(api);
@@ -136,7 +137,10 @@ void ClientSession::ReturnMDFakeTick(){
 #endif
 
 void ClientSession::InformClientViewer(const TickWrapper& tick){
-	Transmission::Utils::SendMDInfo(m_session, tick.OpenPrice(), tick.LastPrice(), tick.LastPrice(), tick.LastPrice(), tick.Volume(), tick.toTimeStamp());
+	if (m_total_vol != 0)
+		Transmission::Utils::SendMDInfo(m_session, tick.OpenPrice(), tick.LastPrice(), tick.HighestPrice(), tick.LowestPrice(), tick.Volume() - m_total_vol, tick.toTimeStamp());
+	
+	m_total_vol = tick.Volume();
 }
 
 void ClientSession::StopTrade(){

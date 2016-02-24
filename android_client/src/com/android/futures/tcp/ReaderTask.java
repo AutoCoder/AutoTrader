@@ -160,7 +160,7 @@ public class ReaderTask extends Thread {
 					// {"Info":"ACCOUNT_INFO","Details":{"Blance":122313,"Position":20,
 					// "Instrument":"rb1605", "Price":2555}}
 					if (infoType.equals("MD")) {
-						temp = new TradeEntity(details.getInt("OpenPrice"), details.getInt("ClosePrice"),
+						temp = new TradeEntity(details.getInt("OpenPrice"), details.getInt("LastPrice"),
 								details.getInt("HighPrice"), details.getInt("LowPrice"), details.getInt("Volume"),
 								details.getLong("TIMESTAMP"));
 						statusChangeHandler.onCTPCallback(temp);

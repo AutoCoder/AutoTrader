@@ -88,6 +88,7 @@ private:
 	std::shared_ptr<Transmission::socket_session>   m_session;
 	std::unique_ptr<AP::AccountDetailMgr>           m_detailMgr;
 
+	int                                             m_total_vol;
 	std::mutex                                      m_mtx;
 	std::condition_variable                         m_con;
 	std::thread                                     m_exeOrderThread;

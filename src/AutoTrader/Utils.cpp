@@ -21,7 +21,7 @@ namespace Transmission{
 		root["Info"] = "MD";
 		root["Details"] = Json::Value::nullRef;
 		root["Details"]["OpenPrice"] = openPrice;
-		root["Details"]["ClosePrice"] = closePrice;
+		root["Details"]["LastPrice"] = closePrice;
 		root["Details"]["HighPrice"] = highPrice;
 		root["Details"]["LowPrice"] = lowPrice;
 		root["Details"]["TIMESTAMP"] = timestamp;
