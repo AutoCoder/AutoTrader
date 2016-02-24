@@ -87,3 +87,17 @@ Critical Bug: 两次socket通信中，session通过map缓存起来，但是却�
 
 [2016-02-18]
 to use dlopen(..), we should link dl with target.
+
+[2016-02-24]
+出现crash, thread移动语义出错
+	thread& _Move_thread(thread& _Other)
+		{	// move from _Other
+		if (joinable())
+			_XSTD terminate();
+		_Thr = _Other._Thr;
+		_Thr_set_null(_Other._Thr);
+		return (*this);
+		}
+
+	_Thrd_t _Thr;
+	};

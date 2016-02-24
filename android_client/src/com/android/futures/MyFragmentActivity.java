@@ -26,9 +26,6 @@ public class MyFragmentActivity extends FragmentActivity implements OnClickListe
 	private long mExitTime;
 	private Handler mHandler = null;
 	private ClientSessionNew mSession = null;
-//	private String mTradingInstrument = null;
-//	private String mTradingStrategy = null;
-
 
 	@Override
 	protected void onCreate(Bundle bundle) {
@@ -49,24 +46,19 @@ public class MyFragmentActivity extends FragmentActivity implements OnClickListe
 		MyApp app = (MyApp) getApplication();
 		mSession = app.GetSession();
 		mSession.SetHandler(mHandler);
-		
-//		Intent intent=getIntent(); 
-//	    Bundle trade_data = intent.getExtras();
-//	    mTradingInstrument = trade_data.getString("instrument");
-//	    mTradingStrategy = trade_data.getString("strategy");
-//		mSession.StartTrade(mTradingInstrument, mTradingStrategy);
 	}
 
 	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		switch (keyCode) {
 		case KeyEvent.KEYCODE_BACK:
-			if ((System.currentTimeMillis() - mExitTime) > 2000) {
-				Toast.makeText(getApplicationContext(), "More once back key to exit", Toast.LENGTH_SHORT).show();
-				mExitTime = System.currentTimeMillis();
-			} else {
-				finish();
-			}
+//			if ((System.currentTimeMillis() - mExitTime) > 2000) {
+//				Toast.makeText(getApplicationContext(), "More once back key to exit", Toast.LENGTH_SHORT).show();
+//				mExitTime = System.currentTimeMillis();
+//			} else {
+//				finish();
+//			}
+			finish();
 			break;
 
 		default:
@@ -109,4 +101,9 @@ public class MyFragmentActivity extends FragmentActivity implements OnClickListe
 		}
 		return false;
 	}
+	
+//	@Override
+//	public void onBackPressed(){
+//		finish();
+//	}
 }

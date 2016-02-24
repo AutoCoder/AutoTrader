@@ -13,7 +13,7 @@ import com.android.futures.tcp.ClientSessionNew;;
 public class LoginActivity extends Activity{
 	
 	private Button loginBtn;
-	//private Button cancelBtn;
+	private Button cancelBtn;
 	private EditText accountEdit;
 	private EditText pwdEdit;
 	private EditText brokerIdEdit;
@@ -25,7 +25,7 @@ public class LoginActivity extends Activity{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_login);
 		loginBtn = (Button) this.findViewById(R.id.login_in);
-		//cancelBtn = (Button) this.findViewById(R.id.cancel);
+		cancelBtn = (Button) this.findViewById(R.id.cancel);
 		accountEdit = (EditText) this.findViewById(R.id.accountEdittext);
 		pwdEdit = (EditText) this.findViewById(R.id.pwdEdittext);
 		brokerIdEdit = (EditText) this.findViewById(R.id.brokerIdtext);
@@ -42,6 +42,13 @@ public class LoginActivity extends Activity{
 			    Intent intent = new Intent(LoginActivity.this,  
 			    		AccountActivity.class);  
                 startActivity(intent);  
+			}
+		});
+		
+		cancelBtn.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				finish(); 
 			}
 		});
 	}

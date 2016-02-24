@@ -144,6 +144,9 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 			long tickTime = 0;
 			tickTime = System.currentTimeMillis();
 			while (isRunning) {
+				if (mTimesList.isEmpty())
+					continue;
+				
 				Canvas canvas = null;
 				try {
 					synchronized (mHolder) {

@@ -57,8 +57,9 @@ public class AccountActivity extends Activity implements Handler.Callback {
 			@Override
 			public void onClick(View v) {
 				mSession.LogOut();
-			    Intent intent = new Intent(AccountActivity.this, LoginActivity.class);  
-                startActivity(intent);
+//			    Intent intent = new Intent(AccountActivity.this, LoginActivity.class);  
+//                startActivity(intent);
+                finish();
 			}
 		});
 		
