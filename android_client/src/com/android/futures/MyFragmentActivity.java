@@ -97,7 +97,7 @@ public class MyFragmentActivity extends FragmentActivity implements OnClickListe
 		}
 		else if (msg.what == TraderStatusListener.NoTrading){
 			String err_msg = (String)msg.obj;
-			Toast toast = Toast.makeText(MyFragmentActivity.this, "开始交易失败：" + err_msg,
+			Toast toast = Toast.makeText(MyFragmentActivity.this, "交易停止。。" + err_msg,
 					Toast.LENGTH_LONG);
 			toast.setGravity(Gravity.CENTER, 0, 0);
 			toast.show();	

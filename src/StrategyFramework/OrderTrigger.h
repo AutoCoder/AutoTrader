@@ -51,8 +51,7 @@ public:
 		if (m_strategy->tryInvoke(tickdata, data, curmindata, info))
 		{
 			order = m_strategy->GetCurOrder();
-			m_positionCtl->completeOrder(order);
-			return true;
+			return m_positionCtl->completeOrder(order);
 		}
 		else
 			return false;

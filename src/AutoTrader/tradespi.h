@@ -44,6 +44,7 @@ class CtpTradeSpi : public CThostFtdcTraderSpi
 
 		//step 3 
 		void OnConfirmedSettlementInfo(){
+			sleep(1000);
 			m_TradeUserSpiPtr->ReqQryOrder();
 		}
 
