@@ -29,6 +29,7 @@ ClientSession::ClientSession(const std::string& userId, const std::shared_ptr<Tr
 , m_session(s)
 , m_detailMgr(std::unique_ptr<AP::AccountDetailMgr>(new AP::AccountDetailMgr()))
 , m_total_vol(0)
+, m_exeOrderThread_running(false)
 {
 	m_isTrading.store(false);
 	assert(api);
@@ -60,7 +61,7 @@ bool ClientSession::AppendOrder(const Order& order){
 		return false;
 	}
 	else{
-		//m_pending_order.swap(std::make_unique<Order>(order));
+		m_pending_order.swap(std::make_unique<Order>(order));
 		m_pending_order.reset(new Order(order));
 		m_con.notify_all();
 		return true;
@@ -78,17 +79,22 @@ void ClientSession::WaitAndPopCurrentOrder(Order& ord){
 }
 
 void ClientSession::ExecutePendingOrder(){
-	while (m_isTrading){
+	while (m_isTrading.load()){
 		Order ord;
-		WaitAndPopCurrentOrder(ord);
+		m_exeOrderThread_running = true;
+		WaitAndPopCurrentOrder(ord);//blocking
 
-		m_trade_spi->CancelOrder(ord.GetTriggerTick(), 6, ord.GetInstrumentId());
-		m_trade_spi->ReqOrderInsert(ord);
+		//if socket command set m_isTrading = false here. this function will quit.
+		if (m_isTrading.load()){ //Check this bool var again, prevent to execute new pushed order after user stop trade.
+			m_trade_spi->CancelOrder(ord.GetTriggerTick(), 6, ord.GetInstrumentId());
+			m_trade_spi->ReqOrderInsert(ord);
+		}
 	}
+	m_exeOrderThread_running = false;
 }
 
 bool ClientSession::StartTrade(const std::string& instru, const std::string& strategyName, TransmissionErrorCode& errcode){
-	if (m_isTrading){
+	if (m_isTrading.load()){
 		errcode = Transmission::TradingNow;
 		return false;
 	}
@@ -103,10 +109,16 @@ bool ClientSession::StartTrade(const std::string& instru, const std::string& str
 			RealTimeDataProcessorPool::getInstance()->AddProcessor(m_realtimedata_processor);
 			m_isTrading.store(true);
 
-			// This will start the thread. Notice move semantics!
-			m_exeOrderThread = std::thread(&ClientSession::ExecutePendingOrder, this);
+			if (m_exeOrderThread_running == false) // if thread is not started or finished rarely.
+				std::async(std::launch::async, std::bind(&ClientSession::ExecutePendingOrder, this));
+				//!!!!Note: if thread is finished, this->joinable() still == true.
+				//m_exeOrderThread = std::thread(&ClientSession::ExecutePendingOrder, this);// This will start the thread. Notice move semantics!
+			//else{   //if m_exeOrderThread is running, should not call move ctor
+			//}
+
+			
 #ifdef FAKE_MD
-			m_fakeMDThread = std::thread(&ClientSession::ReturnFakeCTPMessage, this);
+			std::async(std::launch::async, std::bind(&ClientSession::ReturnFakeCTPMessage, this));
 #endif
 			return true;
 		}
@@ -121,7 +133,7 @@ bool ClientSession::StartTrade(const std::string& instru, const std::string& str
 	}
 }
 #ifdef FAKE_MD
-void ClientSession::ReturnFakeCTPMessage(){
+bool ClientSession::ReturnFakeCTPMessage(){
 
 	int volume= 0;
 	time_t now_time;
@@ -131,7 +143,7 @@ void ClientSession::ReturnFakeCTPMessage(){
 	int idx = 0;
 	int OrderSysID = 1;
 	int direction = 0;
-	while (m_isTrading){
+	while (m_isTrading.load()){
 		idx++;
 		now_time = time(NULL);
 		int lastPrice = 2000 + rand() % 20;
@@ -155,6 +167,7 @@ void ClientSession::ReturnFakeCTPMessage(){
 		}
 		sleep(500);
 	}
+	return false;
 }
 #endif
 

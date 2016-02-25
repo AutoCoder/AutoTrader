@@ -1,13 +1,17 @@
 #ifndef ACCOUNT_H
 #define ACCOUNT_H
 
+#define FAKE_MD
+
 #include <string>
 #include <memory>
 #include <mutex>
+#include <future>
+#include <chrono>
 #include <thread>
 #include <atomic>
 #include <condition_variable>
-#define FAKE_MD
+
 class Order;
 class TickWrapper;
 class CtpTradeSpi;
@@ -77,7 +81,7 @@ private:
 	//send out Account status to fifo, finally got by client
 	void OnCancelOrder(CThostFtdcInputOrderActionField *pInputOrderAction, CThostFtdcRspInfoField *pRspInfo);
 #ifdef FAKE_MD
-	void ReturnFakeCTPMessage();
+	bool ReturnFakeCTPMessage();
 #endif
 private:
 	std::atomic<bool>                               m_isTrading;
@@ -92,9 +96,7 @@ private:
 	std::mutex                                      m_mtx;
 	std::condition_variable                         m_con;
 	std::thread                                     m_exeOrderThread;
-#ifdef FAKE_MD
-	std::thread                                     m_fakeMDThread;
-#endif
+	bool											m_exeOrderThread_running;
 };
 
 #endif
