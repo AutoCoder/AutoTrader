@@ -8,63 +8,6 @@
         android:id="@+id/titles"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
-
-        <TextView
-            android:id="@+id/instrumentID_val"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_centerVertical="true"
-            android:text="rb1605"
-            android:textSize="10sp" />
-        
-        <TextView
-            android:id="@+id/strategy_val"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:layout_centerVertical="true"
-            android:layout_toRightOf="@id/instrumentID_val"
-            android:text="cross_3_5"
-            android:textSize="10sp" />
-        
-        <TextView
-            android:id="@+id/price_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="10dp"
-            android:layout_toRightOf="@id/strategy_val"
-            android:text="现价："
-            android:textSize="10sp" />
-        
-        <TextView
-            android:id="@+id/price_val"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_toRightOf="@id/price_label"
-            android:text="2566"
-            android:textSize="10sp" />
-        
-        <TextView
-            android:id="@+id/volume_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="10dp"
-            android:layout_toRightOf="@id/price_val"
-            android:text="量："
-            android:textSize="10sp"  />       
-             
-        <TextView
-            android:id="@+id/volume_val"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_toRightOf="@id/volume_label"
-            android:text="600"
-            android:textSize="10sp"  />
     </RelativeLayout>
 
     <TextView

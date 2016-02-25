@@ -12,6 +12,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTabHost;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -23,15 +24,20 @@ public class MyFragmentActivity extends FragmentActivity implements OnClickListe
 	private static final Integer[] TABS = new Integer[] { R.layout.tab_times, R.layout.tab_kcharts};
 	private static final int WHAT = 1987;
 	private ProgressDialog mProgressDialog;
-	private long mExitTime;
 	private Handler mHandler = null;
 	private ClientSessionNew mSession = null;
 
 	@Override
 	protected void onCreate(Bundle bundle) {
-		super.onCreate(bundle);
-		setContentView(R.layout.activity4fragment_my);
-
+		//super.onCreate(bundle);
+		//setContentView(R.layout.activity4fragment_my);
+		try {
+			super.onCreate(bundle);
+			setContentView(R.layout.activity4fragment_my);
+		} catch (Exception e) {
+			Log.e("ERROR", "ERROR IN CODE: " + e.toString());
+			e.printStackTrace();
+		}
 		FragmentTabHost tabHost = (FragmentTabHost) findViewById(android.R.id.tabhost);
 		tabHost.setup(this, getSupportFragmentManager(), R.id.frame_content);
 
@@ -91,7 +97,7 @@ public class MyFragmentActivity extends FragmentActivity implements OnClickListe
 		}
 		else if (msg.what == TraderStatusListener.NoTrading){
 			String err_msg = (String)msg.obj;
-			Toast toast = Toast.makeText(MyFragmentActivity.this, "开始交失败：" + err_msg,
+			Toast toast = Toast.makeText(MyFragmentActivity.this, "开始交易失败：" + err_msg,
 					Toast.LENGTH_LONG);
 			toast.setGravity(Gravity.CENTER, 0, 0);
 			toast.show();	

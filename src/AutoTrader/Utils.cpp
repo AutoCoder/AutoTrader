@@ -83,6 +83,7 @@ namespace Transmission{
 			break;
 		case TRADE:
 			root["Info"] = "TRADE";
+			break;
 		default:
 			assert(false);
 			break;

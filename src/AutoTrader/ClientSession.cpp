@@ -20,6 +20,10 @@
 #include "Utils.h"
 #include "CommonUtils.h"
 
+#ifdef FAKE_MD
+#include<ctime>
+#endif
+
 ClientSession::ClientSession(const std::string& userId, const std::shared_ptr<Transmission::socket_session>& s, CThostFtdcTraderApi* api)
 : m_userId(userId)
 , m_session(s)
@@ -102,7 +106,7 @@ bool ClientSession::StartTrade(const std::string& instru, const std::string& str
 			// This will start the thread. Notice move semantics!
 			m_exeOrderThread = std::thread(&ClientSession::ExecutePendingOrder, this);
 #ifdef FAKE_MD
-			m_fakeMDThread = std::thread(&ClientSession::ReturnMDFakeTick, this);
+			m_fakeMDThread = std::thread(&ClientSession::ReturnFakeCTPMessage, this);
 #endif
 			return true;
 		}
@@ -117,20 +121,38 @@ bool ClientSession::StartTrade(const std::string& instru, const std::string& str
 	}
 }
 #ifdef FAKE_MD
-void ClientSession::ReturnMDFakeTick(){
+void ClientSession::ReturnFakeCTPMessage(){
+
+	int volume= 0;
+	time_t now_time;
+	int openPrice = 2000 + rand() % 20;
+	int highestPrice = openPrice;
+	int lowestPrice = openPrice;
+	int idx = 0;
+	int OrderSysID = 1;
+	int direction = 0;
 	while (m_isTrading){
-		CThostFtdcDepthMarketDataField odata;
-		STRCPY(odata.TradingDay, "20160214");
-		STRCPY(odata.InstrumentID, "rb1605");
-		STRCPY(odata.UpdateTime, "10:06:00");
-		odata.UpdateMillisec = 0;
-		odata.OpenPrice = 2650 + rand() % 20;
-		odata.ClosePrice = 2650 + rand() % 20;
-		odata.HighestPrice = odata.OpenPrice > odata.ClosePrice ? odata.OpenPrice : odata.ClosePrice;
-		odata.LowestPrice = odata.OpenPrice > odata.ClosePrice ? odata.ClosePrice : odata.OpenPrice;
-		odata.Volume = rand() % 20; 
-		TickWrapper info(&odata);
-		this->InformClientViewer(info);
+		idx++;
+		now_time = time(NULL);
+		int lastPrice = 2000 + rand() % 20;
+		if (highestPrice < lastPrice)
+			highestPrice = lastPrice;
+		if (lowestPrice > lastPrice)
+			lowestPrice = lastPrice;
+		volume = rand() % 100; 
+		Transmission::Utils::SendMDInfo(m_session, openPrice, lastPrice, highestPrice, lowestPrice, volume, now_time*2);
+
+		direction = rand() & 1;  // 0 or 1 randomly
+		OrderSysID++;
+		char orderId[256] = { 0 };
+		SPRINTF(orderId, "%d", OrderSysID);
+		if (idx % 10 == 0){
+			Transmission::Utils::SendDealInfo(m_session, Transmission::INSERT_ORDER, direction, lastPrice, volume, orderId, now_time * 2);
+			if (idx % 15 == 0)
+				Transmission::Utils::SendDealInfo(m_session, Transmission::TRADE, direction, lastPrice, volume, orderId, now_time * 2 + 2);
+			else
+				Transmission::Utils::SendDealInfo(m_session, Transmission::CANCELL_ORDER, direction, lastPrice, volume, orderId, now_time * 2 + 2);
+		}
 		sleep(500);
 	}
 }
@@ -169,7 +191,7 @@ void ClientSession::OnRtnOrder(CThostFtdcOrderField* pOrder){
 
 void ClientSession::OnRtnTrade(CThostFtdcTradeField* pTrade){
 	long long timeStamp = CommonUtils::DateTimeToTimestamp(pTrade->TradeDate, pTrade->TradeTime) * 2;
-	Transmission::Utils::SendDealInfo(m_session, Transmission::INSERT_ORDER, pTrade->Direction, pTrade->Price, pTrade->Volume, pTrade->OrderSysID, timeStamp);
+	Transmission::Utils::SendDealInfo(m_session, Transmission::TRADE, pTrade->Direction, pTrade->Price, pTrade->Volume, pTrade->OrderSysID, timeStamp);
 }
 
 void ClientSession::OnCancelOrder(CThostFtdcInputOrderActionField *pInputOrderAction, CThostFtdcRspInfoField *pRspInfo){

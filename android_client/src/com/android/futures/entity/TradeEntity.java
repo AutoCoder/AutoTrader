@@ -3,7 +3,7 @@ package com.android.futures.entity;
 public class TradeEntity {
 	public enum type{
 		MD,
-		Order,
+		Insert_Order,
 		Cancell_Order,
 		Trade,
 		AccountInit,

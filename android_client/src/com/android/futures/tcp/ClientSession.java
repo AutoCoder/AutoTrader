@@ -181,8 +181,8 @@ public class ClientSession extends Application {
 						if (obj.getString("Type") == "MD"){
 							temp = new TradeEntity(details.getInt("OpenPrice"), details.getInt("ClosePrice"), details.getInt("HighPrice"), details.getInt("LowPrice"), details.getInt("Vol"), details.getLong("TIMESTAMP"));
 						}else {
-							if (obj.getString("Type") == "ORDER"){
-								t = TradeEntity.type.Order;
+							if (obj.getString("Type") == "INSERT_ORDER"){
+								t = TradeEntity.type.Insert_Order;
 								temp = new TradeEntity(t, details.getInt("Direction"), details.getInt("Price"), details.getInt("Vol"), details.getString("ORDER_ID"), details.getLong("TIMESTAMP"));
 							}else if (obj.getString("Type") == "CANCELL_ORDER"){
 								t = TradeEntity.type.Cancell_Order;

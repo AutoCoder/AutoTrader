@@ -185,8 +185,8 @@ public class ReaderTask extends Thread {
 						if (statusChangeHandler != null)
 							statusChangeHandler.onAccountLogined(info);
 					} else {
-						if (infoType.equals("ORDER")) {
-							t = TradeEntity.type.Order;
+						if (infoType.equals("INSERT_ORDER")) {
+							t = TradeEntity.type.Insert_Order;
 						}
 						else if (infoType.equals("CANCELL_ORDER")){
 							t = TradeEntity.type.Cancell_Order;

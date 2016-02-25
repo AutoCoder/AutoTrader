@@ -58,7 +58,7 @@ public class TimesFragment extends Fragment {
 		}
 
 		mTimesView = (QuickTimesView) view.findViewById(R.id.my_fenshi_view);
-		mTimesView.setTimeSequence(mSession.mMdSequence);
+		mTimesView.setTimeSequence(mSession.mMdSequence, mSession.getCurrentInstrument(), mSession.getStrategyName());
 		return view;
 	}
 	

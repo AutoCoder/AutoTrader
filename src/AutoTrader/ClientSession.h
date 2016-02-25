@@ -7,7 +7,7 @@
 #include <thread>
 #include <atomic>
 #include <condition_variable>
-
+#define FAKE_MD
 class Order;
 class TickWrapper;
 class CtpTradeSpi;
@@ -77,7 +77,7 @@ private:
 	//send out Account status to fifo, finally got by client
 	void OnCancelOrder(CThostFtdcInputOrderActionField *pInputOrderAction, CThostFtdcRspInfoField *pRspInfo);
 #ifdef FAKE_MD
-	void ReturnMDFakeTick();
+	void ReturnFakeCTPMessage();
 #endif
 private:
 	std::atomic<bool>                               m_isTrading;

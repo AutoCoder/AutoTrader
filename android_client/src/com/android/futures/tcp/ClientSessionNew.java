@@ -13,8 +13,9 @@ import android.os.Message;
 
 public class ClientSessionNew implements TraderStatusListener {
 
-	private String mBrokerId, mAccount, mPassword, mHost;
-	private int mPort;
+	private String mBrokerId, mAccount, mPassword;
+	private String mCurrentInstrument = new String("");
+	private String mStrategyName = new String("");
 	private Handler mHandler;
 	private SocketHandler mSocketHandler = null;
 	public int State = LogOut;
@@ -32,8 +33,6 @@ public class ClientSessionNew implements TraderStatusListener {
 		mBrokerId = brokerId;
 		mAccount = account;
 		mPassword = pwd;
-		mHost = host;
-		mPort = port;
 		try {
 			mSocketHandler = new SocketHandler(host, port, this);
 			mSocketHandler.listen(true);
@@ -99,7 +98,8 @@ public class ClientSessionNew implements TraderStatusListener {
 			String info = loginJson.toString();
 			String wrapInfo = String.valueOf(info.length()) + info;
 			mSocketHandler.sendMessage(wrapInfo);
-			State = Trading;
+			setCurrentInstrument(instrument);
+			setStrategyName(strategyName);
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -114,7 +114,8 @@ public class ClientSessionNew implements TraderStatusListener {
 			String info = json.toString();
 			String wrapInfo = String.valueOf(info.length()) + info;
 			mSocketHandler.sendMessage(wrapInfo);
-			State = Trading;
+			setCurrentInstrument("");
+			setStrategyName("");
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -144,6 +145,7 @@ public class ClientSessionNew implements TraderStatusListener {
 		Message msg = Message.obtain();
 		msg.what = TraderStatusListener.Trading;
 		mHandler.sendMessage(msg);		
+		State = Trading;
 	}
 	
 	@Override
@@ -151,21 +153,43 @@ public class ClientSessionNew implements TraderStatusListener {
 		Message msg = Message.obtain();
 		msg.what = TraderStatusListener.NoTrading;
 		msg.obj = err_msg;
-		mHandler.sendMessage(msg);		
+		mHandler.sendMessage(msg);	
+		State = NoTrading;
 	}
 
 	@Override
 	public void onStopTrade() {
-		// TODO Auto-generated method stub
+		//if stop trade action is success replied from socket server
+		// send message to update Activity
 		Message msg = Message.obtain();
 		msg.what = TraderStatusListener.NoTrading;
 		mHandler.sendMessage(msg);
+		
+		// update state, clear current tick queue.
+		State = NoTrading;
+		mMdSequence.clear();
 	}
 
 	@Override
 	public void onCTPCallback(TradeEntity entity) {
 		// TODO Auto-generated method stub
 		mMdSequence.add(entity);
+	}
+
+	public String getCurrentInstrument() {
+		return mCurrentInstrument;
+	}
+
+	public void setCurrentInstrument(String mCurrentInstrument) {
+		this.mCurrentInstrument = mCurrentInstrument;
+	}
+
+	public String getStrategyName() {
+		return mStrategyName;
+	}
+
+	public void setStrategyName(String mStrategyName) {
+		this.mStrategyName = mStrategyName;
 	}
 
 }

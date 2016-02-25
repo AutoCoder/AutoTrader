@@ -30,6 +30,8 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 	private SurfaceHolder mHolder;
 	private DrawThread mThread;
 	public Vector<TradeEntity> mTimesList = null;
+	private String mInstrument = new String("");
+	private String mStrategy = new String("");
 
 	private float mMargin = 5;
 	private float mTimeRectLeft;
@@ -47,7 +49,7 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 	private double mhighestVolume;
 	private double mLowestVolume;
 	private int m_beginIdx;
-	private long m_dtimestamp;//double milliscond
+	private long m_dtimestamp;//unit: 0.5s
 
 	public QuickTimesView(Context context) {
 		super(context);
@@ -65,8 +67,10 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 		init();
 	}
 
-	public void setTimeSequence(Vector<TradeEntity> seqRef) {
+	public void setTimeSequence(Vector<TradeEntity> seqRef, String instrument, String strategy) {
 		mTimesList = seqRef;
+		mInstrument = instrument;
+		mStrategy = strategy;
 	}
 
 	private void UpdateBoundary() {
@@ -106,7 +110,7 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 		mTimeRectLeft = mMargin + strWidth;
 		mTimeRectRight = viewWith - mTimeRectLeft - mMargin;
 		
-		mTimeRectTop = mMargin;
+		mTimeRectTop = 2* mMargin + mFontHeight;
 		mTimeRectBottom = mTimeRectTop + viewHeight * 2 / 3;
 		mTimeSpacing = (mTimeRectRight - mTimeRectLeft) / DATA_MAX_COUNT;
 		mVolumeRectBottom = viewHeight - mMargin;
@@ -192,7 +196,11 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 		paint.setColor(Color.DKGRAY);
 		String high = String.valueOf(mHighPrice);
 		String low = String.valueOf(mLowPrice);
-
+		
+		TradeEntity lastItem = mTimesList.lastElement();
+		paint.setColor(Color.WHITE);
+		canvas.drawText(String.format("%s %s Price:%5.0f Volume:%d", mInstrument, mStrategy, lastItem.getLastPrice(), lastItem.getVol()), mTimeRectLeft, mMargin + mFontHeight , paint);
+		paint.setColor(Color.DKGRAY);
 		canvas.drawRect(mTimeRectLeft, mTimeRectTop, mTimeRectRight, mTimeRectBottom, paint);
 		mVolumeRectTop = mTimeRectBottom + 2 * mMargin + mFontHeight;
 		canvas.drawRect(mTimeRectLeft, mVolumeRectTop, mTimeRectRight, mVolumeRectBottom, paint);
@@ -226,9 +234,11 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 		for (int i = m_beginIdx; i < m_beginIdx + DATA_MAX_COUNT && i < mTimesList.size(); i++) {
 			TradeEntity preData = i > 1 ? mTimesList.get(i-1) : mTimesList.get(0);
 			TradeEntity fenshiData = mTimesList.get(i);
+			int timestamp_offset = (int) (fenshiData.getTimeStamp() - m_dtimestamp);
+			
 			ratio = (float) ((fenshiData.getVol() - mLowestVolume) / (mhighestVolume - mLowestVolume));
 			float curY = mVolumeRectBottom - (mVolumeRectBottom - mVolumeRectTop) * ratio;
-			float curX = mTimeRectLeft + mTimeSpacing * (i - m_beginIdx);
+			float curX = mTimeRectLeft + mTimeSpacing * timestamp_offset;//(i - m_beginIdx);
 
 			if (fenshiData.getLastPrice() > preData.getLastPrice()) {
 				paint.setColor(Color.RED);
@@ -253,17 +263,19 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 		float curX = mTimeRectLeft;
 		for (int i = m_beginIdx + 1; i < m_beginIdx + DATA_MAX_COUNT && i < mTimesList.size(); i++) {
 			TradeEntity fenshiData = mTimesList.get(i);
+			int timestamp_offset = (int) (fenshiData.getTimeStamp() - m_dtimestamp);
+			
 			if (fenshiData.getType() == TradeEntity.type.MD){
 				ratio = (float) (((float) (fenshiData.getLastPrice() - mLowPrice)) / (mHighPrice - mLowPrice));
 				float nextY = mTimeRectBottom - (mTimeRectBottom - mTimeRectTop) * ratio;
-				float nextX = mTimeRectLeft + mTimeSpacing * (i - m_beginIdx);
+				float nextX = mTimeRectLeft + mTimeSpacing * timestamp_offset;//(i - m_beginIdx);
 				paint.setColor(Color.WHITE);
 				canvas.drawLine(curX, curY, nextX, nextY, paint);
 				curY = nextY;
 				curX = nextX;
 			}else{
-				int idx = (int) (fenshiData.getTimeStamp() - m_dtimestamp);
-				float x_pos = mTimeRectLeft + mTimeSpacing * (i - m_beginIdx);
+				
+				float x_pos = mTimeRectLeft + mTimeSpacing * timestamp_offset;//(i - m_beginIdx);
 				ratio = (float) ((fenshiData.getLastPrice() - mLowPrice)/(mHighPrice - mLowPrice));
 				float y_pos = mTimeRectBottom - (mTimeRectBottom - mTimeRectTop) * ratio;
 				
@@ -272,16 +284,19 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 				else
 					paint.setColor(Color.RED);
 				
-				if (fenshiData.getType() == TradeEntity.type.Order){
-					paint.setStyle(Paint.Style.FILL);
-					canvas.drawCircle(x_pos, y_pos, mFontHeight/2, paint);
+				float radius = mFontHeight / 3;
+				
+				if (fenshiData.getType() == TradeEntity.type.Insert_Order){
+					paint.setStyle(Paint.Style.STROKE);
+					canvas.drawCircle(x_pos, y_pos, radius, paint);
 				}
 				else if (fenshiData.getType() == TradeEntity.type.Cancell_Order){
-					paint.setStyle(Paint.Style.STROKE);
-					canvas.drawCircle(x_pos, y_pos, mFontHeight/2, paint);
+					paint.setStyle(Paint.Style.FILL);
+					paint.setColor(Color.GRAY);
+					canvas.drawCircle(x_pos, y_pos, radius, paint);
 				}else if (fenshiData.getType() == TradeEntity.type.Trade){
 					paint.setStyle(Paint.Style.FILL);
-					canvas.drawRect(x_pos - mFontHeight/2, y_pos - mFontHeight/2, x_pos + mFontHeight/2, y_pos + mFontHeight/2, paint);
+					canvas.drawCircle(x_pos, y_pos, radius, paint);
 				}
 			}
 		}
