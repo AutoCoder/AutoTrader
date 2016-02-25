@@ -34,6 +34,8 @@ bool Pos20Precent::completeOrder(Order& ord){
 		else{
 			double purchaseMoney = available*0.2 - posMoney;
 			int vol = purchaseMoney / ord.GetRefExchangePrice();
+			if (vol == 0)
+				return false;
 
 			ord.SetCombOffsetFlagType(THOST_FTDC_OF_Open);
 			ord.SetVolume(vol);
