@@ -79,6 +79,22 @@ void ClientSessionMgr::StopTrade(const std::shared_ptr<Transmission::socket_sess
 		clientSessionSp->StopTrade();
 		Transmission::Utils::SendStopTradeResultInfo(session, Transmission::Succeed);
 	}
+	else{
+		Transmission::Utils::SendStartTradeResultInfo(session, Transmission::LoginNeeded);
+	}
+}
+
+void ClientSessionMgr::QueryPosition(const std::shared_ptr<Transmission::socket_session>& session){
+	std::shared_ptr<ClientSession> clientSessionSp = GetClientSession(session);
+	if (clientSessionSp){
+		if (clientSessionSp->IsPositionInfoReady())
+			clientSessionSp->SendPostionInfoToClient();
+		else
+			Transmission::Utils::SendQueryPositionResultInfo(session, Transmission::PositionInfoIsNotReady);
+	}
+	else{
+		Transmission::Utils::SendStartTradeResultInfo(session, Transmission::LoginNeeded);
+	}
 }
 
 std::shared_ptr<ClientSession> ClientSessionMgr::GetClientSession(const std::shared_ptr<Transmission::socket_session>& session, const std::string& userId){

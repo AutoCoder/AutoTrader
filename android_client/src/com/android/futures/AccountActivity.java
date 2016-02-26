@@ -1,5 +1,6 @@
 package com.android.futures;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
@@ -17,17 +19,20 @@ import java.util.ArrayList;
 //import android.view.MenuItem;
 import com.android.futures.MyApp;
 import com.android.futures.tcp.AccountInfo;
-import com.android.futures.tcp.ClientSessionNew;
+import com.android.futures.tcp.PositionInfo;
+import com.android.futures.tcp.ClientSession;
 import com.android.futures.tcp.TraderStatusListener;
 
 public class AccountActivity extends Activity implements Handler.Callback {
 	private Handler mHandler = null;
-	private ClientSessionNew mSession = null;
+	private ClientSession mSession = null;
 	private Spinner mInstrumentList = null;
 	private Spinner mStrategyList = null;
 	private Button tradeBtn = null;
 	private Button monitorBtn = null;
 	private Button logOutBtn = null;
+	private TextView balanceView = null;
+	private TextView positionView = null;
 	private boolean mIsTrading = false;
 
 	@Override
@@ -40,6 +45,8 @@ public class AccountActivity extends Activity implements Handler.Callback {
 			e.printStackTrace();
 		}
 		mHandler = new Handler(this);
+		balanceView = (TextView) this.findViewById(R.id.balance_val);
+		positionView = (TextView) this.findViewById(R.id.position_val);
 		mInstrumentList = (Spinner) this.findViewById(R.id.instrument_List);
 		mStrategyList = (Spinner) this.findViewById(R.id.strategy_list);
 		tradeBtn = (Button) this.findViewById(R.id.trade_btn);
@@ -95,12 +102,20 @@ public class AccountActivity extends Activity implements Handler.Callback {
 			tradeBtn.setText(R.string.Trade);
 		}
 	}
+	
+	@Override
+	protected void onRestart(){
+		super.onRestart();
+		mSession.QueryPosition();
+	}
 
 	@Override
 	public boolean handleMessage(Message msg) {
-		// TODO Auto-generated method stub
-		if (msg.what == TraderStatusListener.AccountInited) {
-			System.out.println("AccountInited");
+		if (msg.what == TraderStatusListener.PositionUpdated) {
+			PositionInfo status = (PositionInfo) msg.obj;
+			balanceView.setText(Double.toString(status.getBalance()));
+			String pos_text = String.format("[%s]: (%d * %d)", status.getInstrument(), status.getPrice(), status.getPosition());
+			positionView.setText(pos_text);
 		} else if (msg.what == TraderStatusListener.Logined) {
 			AccountInfo info = (AccountInfo) msg.obj;
 			ArrayList<String> instrus = info.getInstrumentList();

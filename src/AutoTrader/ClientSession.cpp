@@ -28,6 +28,7 @@ ClientSession::ClientSession(const std::string& userId, const std::shared_ptr<Tr
 : m_userId(userId)
 , m_session(s)
 , m_detailMgr(std::unique_ptr<AP::AccountDetailMgr>(new AP::AccountDetailMgr()))
+, m_PositionInfo_ready(false)
 , m_total_vol(0)
 , m_exeOrderThread_running(false)
 {
@@ -52,6 +53,8 @@ ClientSession::ClientSession(const std::string& userId, const std::shared_ptr<Tr
 
 ClientSession::~ClientSession()
 {
+
+
 }
 
 //may access by mdThread and m_exeOrderThread
@@ -171,11 +174,24 @@ bool ClientSession::ReturnFakeCTPMessage(){
 }
 #endif
 
-void ClientSession::InformClientViewer(const TickWrapper& tick){
+void ClientSession::SendTickToClient(const TickWrapper& tick){
 	if (m_total_vol != 0)
 		Transmission::Utils::SendMDInfo(m_session, tick.OpenPrice(), tick.LastPrice(), tick.HighestPrice(), tick.LowestPrice(), tick.Volume() - m_total_vol, tick.toTimeStamp());
 	
 	m_total_vol = tick.Volume();
+}
+
+void ClientSession::SendPostionInfoToClient(){
+	double posMoney = 0.0;
+	double balance = 0.0;
+	AP::Direction posDirection = AP::Long;
+	m_detailMgr->getPosition(posMoney, posDirection, balance);
+	std::string instru = m_detailMgr->getInstrumentList();
+	int todayPos = 0;    AP::Direction todayDirection = AP::Long;
+	int ydPos = 0;       AP::Direction ydDirection = AP::Long;
+
+	int posVol = m_detailMgr->getPositionVolume(instru, todayDirection, todayPos, ydDirection, ydPos);
+	Transmission::Utils::SendPositionInfo(m_session, balance, posVol, m_detailMgr->getInstrumentList(), (int)(posMoney / posVol));
 }
 
 void ClientSession::StopTrade(){
@@ -185,16 +201,8 @@ void ClientSession::StopTrade(){
 }
 
 void ClientSession::OnAccountInitFinished(){
-	double posMoney = 0.0;
-	double balance = 0.0;
-	AP::Direction posDirection = AP::Long;
-	m_detailMgr->getPosition(posMoney, posDirection, balance);
-	std::string instru = m_detailMgr->getInstrumentList();
-	int todayPos = 0;    AP::Direction todayDirection = AP::Long;
-	int ydPos = 0;       AP::Direction ydDirection = AP::Long;
-	
-	int posVol = m_detailMgr->getPositionVolume(instru, todayDirection, todayPos, ydDirection, ydPos);
-	Transmission::Utils::SendAccountStatus(m_session, balance, posVol, m_detailMgr->getInstrumentList(), (int)(posMoney / posVol));
+	m_PositionInfo_ready = true;
+	SendPostionInfoToClient();
 }
 
 void ClientSession::OnRtnOrder(CThostFtdcOrderField* pOrder){

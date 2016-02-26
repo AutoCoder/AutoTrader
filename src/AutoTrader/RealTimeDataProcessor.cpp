@@ -84,7 +84,7 @@ void RealTimeDataProcessor::AppendRealTimeData(TickWrapper& info){
 		}
 	}
 	if (m_owner)
-		m_owner->InformClientViewer(info);
+		m_owner->SendTickToClient(info);
 
 	m_DataSeq.push_front(info);
 

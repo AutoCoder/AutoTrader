@@ -1,94 +1,87 @@
 package com.android.futures.tcp;
 
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.io.Reader;
-import java.net.InetAddress;
-import java.net.Socket;
-import java.net.UnknownHostException;
-import java.nio.CharBuffer;
+import java.util.Vector;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.android.futures.entity.TradeEntity;
-import com.android.futures.tcp.AccountStatus;
-import android.app.Application;
+import com.android.futures.tcp.PositionInfo;
 import android.os.Handler;
 import android.os.Message;
 
-public class ClientSession extends Application {
-	private Socket mSocket = null;
-	private Thread mReceiveThread = null;
-	private String mBrokerId, mAccount, mPassword, mHost;
-	private int mPort;
-	private Handler mHandler;
-	public final int LogOut = 1;
-	public final int Loging = 2;
-	public final int Logined = 3;
-	public final int AccountInited = 4;
-	public final int NoTrading = 5;
-	public final int StartTrading = 6;
-	public final int Trading = 7;
-	private int mState;
+public class ClientSession implements TraderStatusListener {
 
+	private String mBrokerId, mAccount, mPassword;
+	private String mCurrentInstrument = new String("");
+	private String mStrategyName = new String("");
+	private Handler mHandler;
+	private SocketHandler mSocketHandler = null;
+	public int State = LogOut;
+	public Vector<TradeEntity> mMdSequence = new Vector<TradeEntity>();
+	
 	public void SetHandler(Handler handler){
 		mHandler = handler;
 	}
 	
-	public void SetLoginMeta(String brokerId, String account, String pwd, String host, int port)
+	public void ConnectServer(String brokerId, String account, String pwd, String host, int port)
 	{
+		if (mSocketHandler != null)//if socket is connected, skip this function.
+			return;
+
 		mBrokerId = brokerId;
 		mAccount = account;
 		mPassword = pwd;
-		mHost = host;
-		mPort = port;
-	}
-	
-	private void Send(String data){
 		try {
-			PrintWriter writer = new PrintWriter(new OutputStreamWriter(mSocket.getOutputStream()));
-	        writer.write(data);  
-	        writer.flush();
+			mSocketHandler = new SocketHandler(host, port, this);
+			mSocketHandler.listen(true);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}  
+		}
 	}
 	
 	public void Login(){
-		mReceiveThread = new ReceiveThread();
-		mReceiveThread.start();
+		JSONObject meta = new JSONObject();
 		
-		//96{"ActionType":"Login","Arguments":{"BrokerId":"9999","UserName":"021510","Password":"wodemima"}}
-		Thread login_thread = new Thread(  
-                new Runnable(){  
-                    @Override  
-                    public void run() {  
-            			try {
-							JSONObject meta = new JSONObject();
-							meta.put("BrokerId", mBrokerId);
-							meta.put("UserName", mAccount);
-							meta.put("Password", mPassword);
-							
-							JSONObject loginJson = new JSONObject(); 
-							loginJson.put("ActionType", "Login");
-							loginJson.put("Arguments", meta);
-							
-							String info = loginJson.toString();
-							String wrapInfo = String.valueOf(info.length()) + info;
-							Send(wrapInfo);
-							mState = Loging;
-						} catch (JSONException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}                       
-                    }  
-                }  
-        );  
-		login_thread.start();  
+		try {
+			meta.put("BrokerId", mBrokerId);
+			meta.put("UserName", mAccount);
+			meta.put("Password", mPassword);
+			JSONObject loginJson = new JSONObject(); 
+			loginJson.put("Action", "Login");
+			loginJson.put("Arguments", meta);
+			String info = loginJson.toString();
+			String wrapInfo = String.valueOf(info.length()) + info;
+			mSocketHandler.sendMessage(wrapInfo);
+			State = Logined;
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void LogOut(){
+		JSONObject meta = new JSONObject();
+		
+		try {
+			meta.put("BrokerId", mBrokerId);
+			meta.put("UserName", mAccount);
+			meta.put("Password", mPassword);
+			JSONObject loginJson = new JSONObject(); 
+			loginJson.put("Action", "LogOut");
+			loginJson.put("Arguments", meta);
+			String info = loginJson.toString();
+			String wrapInfo = String.valueOf(info.length()) + info;
+			mSocketHandler.sendMessage(wrapInfo);
+			mSocketHandler.shutDown();
+			mSocketHandler = null;
+			State = LogOut;
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}		
 	}
 	
 	public void StartTrade(String strategyName, String instrument){
@@ -99,116 +92,119 @@ public class ClientSession extends Application {
 			meta.put("StrategyName", strategyName);
 			
 			JSONObject loginJson = new JSONObject(); 
-			loginJson.put("ActionType", "StartTrade");
+			loginJson.put("Action", "StartTrade");
 			loginJson.put("Arguments", meta);
 			
 			String info = loginJson.toString();
 			String wrapInfo = String.valueOf(info.length()) + info;
-			Send(wrapInfo);
-			mState = StartTrading;
+			mSocketHandler.sendMessage(wrapInfo);
+			setCurrentInstrument(instrument);
+			setStrategyName(strategyName);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+	}
+	public void StopTrade(){
+		//{"ActionType":"StopTrade"}
+		try {
+			
+			JSONObject json = new JSONObject(); 
+			json.put("Action", "StopTrade");
+			String info = json.toString();
+			String wrapInfo = String.valueOf(info.length()) + info;
+			mSocketHandler.sendMessage(wrapInfo);
+			setCurrentInstrument("");
+			setStrategyName("");
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} 
 	}
 	
-	
-	class ReceiveThread extends Thread{  
-  
-        @Override  
-        public void run() {  
-            try {
-            	if (mSocket == null)
-            		mSocket = new Socket(mHost, mPort);
-			} catch (UnknownHostException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-            while(true){  
-                try {                     
-                    Reader reader = new InputStreamReader(mSocket.getInputStream());  
-                    CharBuffer charBuffer = CharBuffer.allocate(8192); 
-                    int index = -1;  
-                    while((index=reader.read(charBuffer))!=-1){  
-                        charBuffer.flip();
-                        ParseCharBuffer(charBuffer);
-                        charBuffer.clear();
-                    }  
-                } catch (Exception e) {  
-                    e.printStackTrace();  
-                }  
-            }  
-        }  
-    }  
-	
-	private void ParseCharBuffer(CharBuffer charBuffer){
-		int charCount = 0;
-		while (true){
-			char input = charBuffer.get();
-			if (Character.isDigit(input)){
-				int num = Integer.valueOf(input+"");
-				charCount = charCount * 10 + num;
-			}else{
-				break;
-			}
-		}
-		if (charCount != 0){
-			char jsonstr[] = new char[charCount];
-			charBuffer.get(jsonstr);
-			
-			try {
-				JSONObject obj = new JSONObject(String.valueOf(jsonstr));
-				if (obj.has("ActionType")){
-					if (obj.getString("ActionType")=="Login" && mState == Loging){
-						mState = obj.getInt("ErrorCode") == 0 ? Logined : LogOut;
-					}else if(obj.getString("ActionType")=="StartTrade" && mState == StartTrading){
-						mState = obj.getInt("ErrorCode") == 0 ? Trading : NoTrading;
-					}
-				}else{
-					//return md & trade
-					//{"Type":"MD","Details":{"OpenPrice":123,"ClosePrice":124, "HighPrice":125, "LowPrice":122,"Vol":500, "TIMESTAMP": 111111.5}}
-					//{"Type":"INSERT_ORDER","Details":{"Direction" : 1, Price":123,"Vol":124, "ORDER_ID":11156, "TIMESTAMP": 111111.5}}
-					//{"Type":"CANCELL_ORDER","Details":{"Direction" : 1, "Price":123,"Vol":124, "ORDER_ID":11156, "TIMESTAMP": 111111.5}}
-					//{"Type":"TRADE","Details":{"Direction" : 1, "Price":124, "Vol":125,"ORDER_ID":11156, "TIMESTAMP": 111111.5}}
-					//{"Type":"ACCOUNT_INFO","Details":{"Blance":122313,"Position":20, "Instrument":"rb1605", "Price":2555}}
-					if (obj.has("Type")){
-						TradeEntity temp;
-						TradeEntity.type t = TradeEntity.type.MD;
-						JSONObject details = obj.getJSONObject("Details");
-						if (obj.getString("Type") == "MD"){
-							temp = new TradeEntity(details.getInt("OpenPrice"), details.getInt("ClosePrice"), details.getInt("HighPrice"), details.getInt("LowPrice"), details.getInt("Vol"), details.getLong("TIMESTAMP"));
-						}else {
-							if (obj.getString("Type") == "INSERT_ORDER"){
-								t = TradeEntity.type.Insert_Order;
-								temp = new TradeEntity(t, details.getInt("Direction"), details.getInt("Price"), details.getInt("Vol"), details.getString("ORDER_ID"), details.getLong("TIMESTAMP"));
-							}else if (obj.getString("Type") == "CANCELL_ORDER"){
-								t = TradeEntity.type.Cancell_Order;
-							}else if (obj.getString("Type") == "TRADE"){
-								t = TradeEntity.type.Trade;
-							}else if (obj.getString("Type") == "ACCOUNT_INFO"){
-								AccountStatus info = new AccountStatus(details.getDouble("Balance"), details.getInt("Position"), details.getInt("Price"), details.getString("Instrument"));
-								Message msg = Message.obtain();
-								msg.obj = info;
-								msg.what = AccountInited;
-								mHandler.sendMessage(msg);
-							}else{
-								
-							}
-						}
-						
-					}
-				}
-			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-		else{
-			return;
-		}
+	public void QueryPosition(){
+		try {
+			JSONObject json = new JSONObject(); 
+			json.put("Action", "QueryPosition");
+			String info = json.toString();
+			String wrapInfo = String.valueOf(info.length()) + info;
+			mSocketHandler.sendMessage(wrapInfo);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 		
 	}
+	
+	@Override
+	public void onPositionUpdated(PositionInfo status) {
+		// TODO Auto-generated method stub
+		Message msg = Message.obtain();
+		msg.obj = status;
+		msg.what = TraderStatusListener.PositionUpdated;
+		mHandler.sendMessage(msg);
+	}
+
+	@Override
+	public void onAccountLogined(AccountInfo info) {
+		// TODO Auto-generated method stub
+		Message msg = Message.obtain();
+		msg.obj = info;
+		msg.what = TraderStatusListener.Logined;
+		mHandler.sendMessage(msg);
+	}
+
+	@Override
+	public void onStartTradeSuccess() {
+		// TODO Auto-generated method stub
+		Message msg = Message.obtain();
+		msg.what = TraderStatusListener.Trading;
+		mHandler.sendMessage(msg);		
+		State = Trading;
+	}
+	
+	@Override
+	public void onStartTradeFailed(String err_msg){
+		Message msg = Message.obtain();
+		msg.what = TraderStatusListener.NoTrading;
+		msg.obj = err_msg;
+		mHandler.sendMessage(msg);	
+		State = NoTrading;
+	}
+
+	@Override
+	public void onStopTrade() {
+		//if stop trade action is success replied from socket server
+		// send message to update Activity
+		Message msg = Message.obtain();
+		msg.what = TraderStatusListener.NoTrading;
+		mHandler.sendMessage(msg);
+		
+		// update state, clear current tick queue.
+		State = NoTrading;
+		mMdSequence.clear();
+	}
+
+	@Override
+	public void onCTPCallback(TradeEntity entity) {
+		// TODO Auto-generated method stub
+		mMdSequence.add(entity);
+	}
+
+	public String getCurrentInstrument() {
+		return mCurrentInstrument;
+	}
+
+	public void setCurrentInstrument(String mCurrentInstrument) {
+		this.mCurrentInstrument = mCurrentInstrument;
+	}
+
+	public String getStrategyName() {
+		return mStrategyName;
+	}
+
+	public void setStrategyName(String mStrategyName) {
+		this.mStrategyName = mStrategyName;
+	}
+
 }
   

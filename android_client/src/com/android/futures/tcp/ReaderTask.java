@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.net.SocketException;
-import java.nio.CharBuffer;
 import java.util.ArrayList;
 
 import org.json.JSONArray;
@@ -136,9 +135,11 @@ public class ReaderTask extends Thread {
 						if (statusChangeHandler != null){
 							statusChangeHandler.onStopTrade();
 						}
+					} else if (actionType.equals("QueryPosition")){
+						
 					}
 					else{
-						boolean elsebranch = true;
+
 					}
 				} else if (obj.has("Info")) {
 					String infoType = obj.getString("Info");
@@ -164,11 +165,11 @@ public class ReaderTask extends Thread {
 								details.getInt("HighPrice"), details.getInt("LowPrice"), details.getInt("Volume"),
 								details.getLong("TIMESTAMP"));
 						statusChangeHandler.onCTPCallback(temp);
-					} else if (infoType.equals("ACCOUNT_STATUS")) {
-						AccountStatus status = new AccountStatus(details.getDouble("Balance"),
+					} else if (infoType.equals("POSITION_INFO")) {
+						PositionInfo info = new PositionInfo(details.getDouble("Balance"),
 								details.getInt("Position"), details.getInt("Price"), details.getString("Instrument"));
 						if (statusChangeHandler != null)
-							statusChangeHandler.onAccountInited(status);
+							statusChangeHandler.onPositionUpdated(info);
 					} else if (infoType.equals("ACCOUNT_INFO")) {
 						JSONArray instrus = details.getJSONArray("Instruments");
 						JSONArray sts = details.getJSONArray("Strategies");

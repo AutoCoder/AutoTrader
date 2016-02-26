@@ -17,16 +17,15 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.android.futures.entity.TimesEntity;
-import com.android.futures.tcp.ClientSessionNew;
+import com.android.futures.tcp.ClientSession;
 import com.android.futures.view.QuickTimesView;
-import com.android.futures.view.TimesView;
 
 public class TimesFragment extends Fragment {
 	//private TimesView mTimesView;
 	private QuickTimesView mTimesView;
 	private JSONArray mDatas;
 	private Context mContext;
-	private ClientSessionNew mSession;
+	private ClientSession mSession;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {

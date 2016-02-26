@@ -45,7 +45,8 @@ namespace Transmission{
 			Login,
 			Logout,
 			StartTrade,
-			StopTrade
+			StopTrade,
+			QueryPosition,
 		};
 
 		Parse_Result Parse(char* begin, char* end);

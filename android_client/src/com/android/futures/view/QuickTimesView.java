@@ -1,16 +1,7 @@
 package com.android.futures.view;
 
 import java.util.Vector;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import com.android.futures.MyApp;
-import com.android.futures.R;
-import com.android.futures.entity.TimesEntity;
 import com.android.futures.entity.TradeEntity;
-
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -20,10 +11,8 @@ import android.graphics.PorterDuff.Mode;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.util.AttributeSet;
-import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.widget.Toast;
 
 public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callback {
 	private final int DATA_MAX_COUNT = 4 * 60;

@@ -46,7 +46,9 @@ public:
 
 	void ExecutePendingOrder();
 
-	void InformClientViewer(const TickWrapper& tick);
+	void SendTickToClient(const TickWrapper& tick);
+
+	void SendPostionInfoToClient();
 
 	void OnLoginRequest();
 
@@ -55,6 +57,8 @@ public:
 	void StopTrade();
 
 	bool IsTrading() const { return m_isTrading.load(); }
+
+	bool IsPositionInfoReady() const { return m_PositionInfo_ready; }
 
 	std::string UserId() const { return m_userId; };
 
@@ -84,13 +88,14 @@ private:
 	bool ReturnFakeCTPMessage();
 #endif
 private:
-	std::atomic<bool>                               m_isTrading;
+	std::atomic<bool>                               m_isTrading; // access by thread-OrderExecutor and thread-ActionQueueInvoker
 	std::string										m_userId;
 	std::unique_ptr<Order>                          m_pending_order;
 	std::unique_ptr<CtpTradeSpi>                    m_trade_spi;
 	std::shared_ptr<RealTimeDataProcessor>          m_realtimedata_processor;
 	std::shared_ptr<Transmission::socket_session>   m_session;
 	std::unique_ptr<AP::AccountDetailMgr>           m_detailMgr;
+	std::atomic<bool>                               m_PositionInfo_ready;//access by thread-tradespi and thread-ActionQueueInvoker
 
 	int                                             m_total_vol;
 	std::mutex                                      m_mtx;

@@ -32,9 +32,9 @@ namespace Transmission{
 		Transmission::GetFIFOActionQueue().Push_back(Transmission::RemoteServerAction(session, ret));
 	}
 
-	void Utils::SendAccountStatus(const std::shared_ptr<Transmission::socket_session>& session, double blance, int position, const std::string& instrument, int costPrice){
+	void Utils::SendPositionInfo(const std::shared_ptr<Transmission::socket_session>& session, double blance, int position, const std::string& instrument, int costPrice){
 		Json::Value root;
-		root["Info"] = "ACCOUNT_STATUS";
+		root["Info"] = "POSITION_INFO";
 		Json::Value details;
 		details["Balance"] = blance;
 		details["Position"] = position;
@@ -202,6 +202,32 @@ namespace Transmission{
 		}
 		Json::Value root;
 		root["Action"] = "StopTrade";
+		root["ErrorCode"] = code;
+		root["ErrorMsg"] = err_msg;
+		Json::FastWriter writer;
+		std::string ret = writer.write(root);
+		ret = str(boost::format("%1%%2%") % ret.length() % ret);
+		Transmission::GetFIFOActionQueue().Push_back(Transmission::RemoteServerAction(session, ret));
+	}
+
+	void Utils::SendQueryPositionResultInfo(const std::shared_ptr<Transmission::socket_session>& session, ErrorCode code){
+		std::string err_msg;
+		int err_code = code;
+		switch (code){
+		case Succeed:
+			err_msg = "Succeed";
+			break;
+		case PositionInfoIsNotReady:
+			err_msg = "The postion is not ready to return.";
+			break;
+		default:
+		{
+			err_code = -1;
+			err_msg = "Unknown.";
+		}
+		}
+		Json::Value root;
+		root["Action"] = "QueryPosition";
 		root["ErrorCode"] = code;
 		root["ErrorMsg"] = err_msg;
 		Json::FastWriter writer;

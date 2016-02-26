@@ -20,6 +20,7 @@ namespace Transmission{
 		LoginNeeded = 6,
 		InvalidTradeArguments = 7,
 		Unknown = 8,
+		PositionInfoIsNotReady = 11,
 	};
 }
 

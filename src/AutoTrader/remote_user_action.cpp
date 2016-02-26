@@ -177,6 +177,10 @@ namespace Transmission{
 					action_type_ = ActionType::StopTrade;
 					return Parse_Result::Good;
 				}
+				else if (actionType == "QueryPosition"){
+					action_type_ = ActionType::QueryPosition;
+					return Parse_Result::Good;
+				}
 				else{
 					action_type_ = ActionType::Invalid;
 					return Parse_Result::Bad;
@@ -218,12 +222,15 @@ namespace Transmission{
 				ClientSessionMgr::getInstance()->StopTrade(session_);
 			}
 			break;
+			case ActionType::QueryPosition:
+			{
+				ClientSessionMgr::getInstance()->QueryPosition(session_);
+			}
 			default:
 				break;
 		}
 
 	}
-
 
 	void RemoteUserAction::Reset(){
 		original_data_.clear();

@@ -31,6 +31,8 @@ public:
 
 	void StopTrade(const std::shared_ptr<Transmission::socket_session>& session);
 
+	void QueryPosition(const std::shared_ptr<Transmission::socket_session>& session);
+
 private:
 	ClientSessionMgr();
 	ClientSessionMgr(const ClientSessionMgr&) = delete;

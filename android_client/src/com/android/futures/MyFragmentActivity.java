@@ -1,11 +1,9 @@
 package com.android.futures;
 
-import com.android.futures.tcp.ClientSessionNew;
+import com.android.futures.tcp.ClientSession;
 import com.android.futures.tcp.TraderStatusListener;
 
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -17,7 +15,6 @@ import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Button;
 import android.widget.Toast;
 
 public class MyFragmentActivity extends FragmentActivity implements OnClickListener, Handler.Callback {
@@ -25,7 +22,7 @@ public class MyFragmentActivity extends FragmentActivity implements OnClickListe
 	private static final int WHAT = 1987;
 	private ProgressDialog mProgressDialog;
 	private Handler mHandler = null;
-	private ClientSessionNew mSession = null;
+	private ClientSession mSession = null;
 
 	@Override
 	protected void onCreate(Bundle bundle) {

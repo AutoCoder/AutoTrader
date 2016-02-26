@@ -101,3 +101,13 @@ to use dlopen(..), we should link dl with target.
 
 	_Thrd_t _Thr;
 	};
+
+
+[2016-02-25]
+BUG: 调用ReqQryOrder以后，OnRspQryOrder回调函数始终不进入。
+Solution： 原因simnow的ctp dll 6.3.6版本有问题，替换为6.3.5版本以后，问题消失。
+			同时，      
+-"MdFront":"tcp://218.202.237.33:10012",
+-"TradeFront":"tcp://218.202.237.33:10002",
++"MdFront":"tcp://180.168.146.187:10010",
++"TradeFront":"tcp://180.168.146.187:10000",
