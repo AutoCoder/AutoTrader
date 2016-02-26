@@ -55,6 +55,7 @@ Temporary Items
 *.log
 *.opensdf
 *.con
+*.apk
 AutoTrader/*.con
 AutoTrader/*.json
 AutoTrader/*.ini
