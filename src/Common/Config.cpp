@@ -12,7 +12,7 @@ Config::Config(const std::string& pathName)
 	Json::Value root;
 
 	std::ifstream is;
-	is.open(m_filepath, std::ios::binary);
+	is.open(m_filepath.c_str(), std::ios::binary);
 	if (reader.parse(is, root))
 	{
 		std::string code;

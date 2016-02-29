@@ -64,7 +64,6 @@ bool ClientSession::AppendOrder(const Order& order){
 		return false;
 	}
 	else{
-		m_pending_order.swap(std::make_unique<Order>(order));
 		m_pending_order.reset(new Order(order));
 		m_con.notify_all();
 		return true;

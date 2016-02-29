@@ -1,4 +1,4 @@
-//#include "stdafx.h"
+#include <cstdlib>
 #include "CommonUtils.h"
 #include <assert.h>
 #include <sstream>
