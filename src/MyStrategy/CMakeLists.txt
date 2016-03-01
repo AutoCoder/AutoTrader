@@ -13,7 +13,7 @@ SET(SRC_LIST AMACrossStratgy.cpp
 			 WMACrossStratgy.cpp
 			 mystrategy.cpp)
 
-INCLUDE_DIRECTORIES(${HEADER_INCLUDE_DIR} ${AUTOTRADE_SOURCE_DIR}/src/Common ${AUTOTRADE_SOURCE_DIR}/src/StrategyFramework)
+INCLUDE_DIRECTORIES(${HEADER_INCLUDE_DIR} ${AUTOTRADE_SOURCE_DIR}/src/Common ${AUTOTRADE_SOURCE_DIR}/src/StrategyFramework ${BOOST_DIR})
 
 ADD_DEPENDENCIES(StrategyFramework Common)
 

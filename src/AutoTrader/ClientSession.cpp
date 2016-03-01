@@ -30,7 +30,6 @@ ClientSession::ClientSession(const std::string& userId, const std::shared_ptr<Tr
 , m_detailMgr(std::unique_ptr<AP::AccountDetailMgr>(new AP::AccountDetailMgr()))
 , m_PositionInfo_ready(false)
 , m_total_vol(0)
-, m_exeOrderThread_running(false)
 {
 	m_isTrading.store(false);
 	assert(api);
@@ -83,7 +82,6 @@ void ClientSession::WaitAndPopCurrentOrder(Order& ord){
 void ClientSession::ExecutePendingOrder(){
 	while (m_isTrading.load()){
 		Order ord;
-		m_exeOrderThread_running = true;
 		WaitAndPopCurrentOrder(ord);//blocking
 
 		//if socket command set m_isTrading = false here. this function will quit.
@@ -92,7 +90,6 @@ void ClientSession::ExecutePendingOrder(){
 			m_trade_spi->ReqOrderInsert(ord);
 		}
 	}
-	m_exeOrderThread_running = false;
 }
 
 bool ClientSession::StartTrade(const std::string& instru, const std::string& strategyName, TransmissionErrorCode& errcode){
@@ -111,8 +108,10 @@ bool ClientSession::StartTrade(const std::string& instru, const std::string& str
 			RealTimeDataProcessorPool::getInstance()->AddProcessor(m_realtimedata_processor);
 			m_isTrading.store(true);
 
-			if (m_exeOrderThread_running == false) // if thread is not started or finished rarely.
-				std::async(std::launch::async, std::bind(&ClientSession::ExecutePendingOrder, this));
+			if (m_orderExecuteThreadF.wait_for(std::chrono::milliseconds(0)) == std::future_status::deferred || m_orderExecuteThreadF.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready) // if thread is not started or finished.
+				m_orderExecuteThreadF = std::async(std::launch::async, std::bind(&ClientSession::ExecutePendingOrder, this));
+			else if (m_orderExecuteThreadF.wait_for(std::chrono::milliseconds(0)) == std::future_status::timeout)
+				bool toRemoved = true;
 				//!!!!Note: if thread is finished, this->joinable() still == true.
 				//m_exeOrderThread = std::thread(&ClientSession::ExecutePendingOrder, this);// This will start the thread. Notice move semantics!
 			//else{   //if m_exeOrderThread is running, should not call move ctor
@@ -120,7 +119,10 @@ bool ClientSession::StartTrade(const std::string& instru, const std::string& str
 
 			
 #ifdef FAKE_MD
-			std::async(std::launch::async, std::bind(&ClientSession::ReturnFakeCTPMessage, this));
+			if (m_fakeMdThreadF.wait_for(std::chrono::milliseconds(0)) == std::future_status::deferred || m_fakeMdThreadF.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready)
+				m_fakeMdThreadF = std::async(std::launch::async, std::bind(&ClientSession::ReturnFakeCTPMessage, this));
+			else if (m_fakeMdThreadF.wait_for(std::chrono::milliseconds(0)) == std::future_status::timeout)
+				bool toRemoved = true;
 #endif
 			return true;
 		}

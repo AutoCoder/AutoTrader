@@ -101,7 +101,12 @@ private:
 	std::mutex                                      m_mtx;
 	std::condition_variable                         m_con;
 	std::thread                                     m_exeOrderThread;
-	bool											m_exeOrderThread_running;
+	
+	std::future<bool>                               m_orderExecuteThreadF;
+#ifdef FAKE_MD
+	std::future<bool>                               m_fakeMdThreadF;
+#endif
+
 };
 
 #endif
