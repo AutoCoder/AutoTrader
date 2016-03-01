@@ -109,7 +109,7 @@ bool ClientSession::StartTrade(const std::string& instru, const std::string& str
 			RealTimeDataProcessorPool::getInstance()->AddProcessor(m_realtimedata_processor);
 			m_isTrading.store(true);
 
-			if (m_orderExecuteThreadF.wait_for(std::chrono::milliseconds(0)) == std::future_status::deferred || m_orderExecuteThreadF.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready) // if thread is not started or finished.
+			if (m_orderExecuteThreadF.valid()==false || m_orderExecuteThreadF.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready) // if thread is not started or finished.
 				m_orderExecuteThreadF = std::async(std::launch::async, std::bind(&ClientSession::ExecutePendingOrder, this));
 			else if (m_orderExecuteThreadF.wait_for(std::chrono::milliseconds(0)) == std::future_status::timeout)
 				bool toRemoved = true;
@@ -120,7 +120,7 @@ bool ClientSession::StartTrade(const std::string& instru, const std::string& str
 
 			
 #ifdef FAKE_MD
-			if (m_fakeMdThreadF.wait_for(std::chrono::milliseconds(0)) == std::future_status::deferred || m_fakeMdThreadF.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready)
+			if (m_fakeMdThreadF.valid()==false || m_fakeMdThreadF.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready)
 				m_fakeMdThreadF = std::async(std::launch::async, std::bind(&ClientSession::ReturnFakeCTPMessage, this));
 			else if (m_fakeMdThreadF.wait_for(std::chrono::milliseconds(0)) == std::future_status::timeout)
 				bool toRemoved = true;
