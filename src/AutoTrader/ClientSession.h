@@ -44,7 +44,7 @@ public:
 
 	bool AppendOrder(const Order& order);//multi-thread notice
 
-	void ExecutePendingOrder();
+	bool ExecutePendingOrder();
 
 	void SendTickToClient(const TickWrapper& tick);
 

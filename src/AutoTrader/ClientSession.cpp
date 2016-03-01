@@ -79,7 +79,7 @@ void ClientSession::WaitAndPopCurrentOrder(Order& ord){
 	m_pending_order.reset();
 }
 
-void ClientSession::ExecutePendingOrder(){
+bool ClientSession::ExecutePendingOrder(){
 	while (m_isTrading.load()){
 		Order ord;
 		WaitAndPopCurrentOrder(ord);//blocking
@@ -90,6 +90,7 @@ void ClientSession::ExecutePendingOrder(){
 			m_trade_spi->ReqOrderInsert(ord);
 		}
 	}
+	return true;
 }
 
 bool ClientSession::StartTrade(const std::string& instru, const std::string& strategyName, TransmissionErrorCode& errcode){
