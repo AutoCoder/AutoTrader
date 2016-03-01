@@ -6,6 +6,7 @@
 #include <mutex>
 #include <vector>
 #include <map>
+#include <boost/format.hpp>
 
 class Order;
 
@@ -31,6 +32,10 @@ namespace AP{ // Account & Position
 			OpenProfit_short = 0.0;
 		}
 
+		std::string ToString(){
+			std::string ret = str(boost::format("%s Long:%d Short:%d") % InstId % Holding_long % Holding_short);
+			return ret;
+		}
 
 		std::string InstId;//合约代码
 		double LastPrice;//最新价，时刻保存合约的最新价，平仓用
@@ -106,6 +111,8 @@ namespace AP{ // Account & Position
 		CThostFtdcInstrumentField getInstrumentField(const std::string& instrId) const;
 
 		std::string getInstrumentList() const;
+
+		std::string getPositionOfInstruments() const;
 
 		double getPosition(double& pos, Direction& direction, double& available) const;
 		

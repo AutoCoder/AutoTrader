@@ -167,7 +167,7 @@ public class ReaderTask extends Thread {
 						statusChangeHandler.onCTPCallback(temp);
 					} else if (infoType.equals("POSITION_INFO")) {
 						PositionInfo info = new PositionInfo(details.getDouble("Balance"),
-								details.getInt("Position"), details.getInt("Price"), details.getString("Instrument"));
+								details.getDouble("PositionMoney"), details.getString("PositionOfInstruments"));
 						if (statusChangeHandler != null)
 							statusChangeHandler.onPositionUpdated(info);
 					} else if (infoType.equals("ACCOUNT_INFO")) {

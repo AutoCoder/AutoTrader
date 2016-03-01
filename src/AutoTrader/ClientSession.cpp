@@ -190,7 +190,7 @@ void ClientSession::SendPostionInfoToClient(){
 	int ydPos = 0;       AP::Direction ydDirection = AP::Long;
 
 	int posVol = m_detailMgr->getPositionVolume(instru, todayDirection, todayPos, ydDirection, ydPos);
-	Transmission::Utils::SendPositionInfo(m_session, balance, posVol, m_detailMgr->getInstrumentList(), (int)(posMoney / posVol));
+	Transmission::Utils::SendPositionInfo(m_session, balance, posMoney, m_detailMgr->getPositionOfInstruments());
 }
 
 void ClientSession::StopTrade(){

@@ -114,8 +114,8 @@ public class AccountActivity extends Activity implements Handler.Callback {
 		if (msg.what == TraderStatusListener.PositionUpdated) {
 			PositionInfo status = (PositionInfo) msg.obj;
 			balanceView.setText(Double.toString(status.getBalance()));
-			String pos_text = String.format("[%s]: (%d * %d)", status.getInstrument(), status.getPrice(), status.getPosition());
-			positionView.setText(pos_text);
+			//String pos_text = String.format("[%s]: (%d * %d)", status.getInstrument(), status.getPrice(), status.getPosition());
+			positionView.setText(status.getDetails());
 		} else if (msg.what == TraderStatusListener.Logined) {
 			AccountInfo info = (AccountInfo) msg.obj;
 			ArrayList<String> instrus = info.getInstrumentList();

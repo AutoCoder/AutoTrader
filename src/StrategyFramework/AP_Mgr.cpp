@@ -369,5 +369,14 @@ namespace AP{
 			return 0;
 		}
 	}
+
+	std::string AccountDetailMgr::getPositionOfInstruments() const{
+		std::string ret = "";
+		for (auto item : m_tradeMessage_dict){
+			ret += item.second.ToString();
+			ret += "\n";
+		}
+		return ret;
+	}
 }
 

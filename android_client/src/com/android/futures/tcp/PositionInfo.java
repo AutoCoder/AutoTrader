@@ -2,47 +2,38 @@ package com.android.futures.tcp;
 
 
 public class PositionInfo {
-	private String   mInstrument;
-	private double mBalance;
-	private int   mPosition;
-	private int mPrice;
+	private String Details;
+	private double Balance;
+	private double PositionMoney;
 	
-	PositionInfo(double balance, int position, int price, String instru){
+	PositionInfo(double balance, double positionMoney, String details){
 		setBalance(balance);
-		setPosition(position);
-		setPrice(price);
-		setInstrument(instru);
+		setPositionMoney(positionMoney);
+		setDetails(details);
+	}
+
+	public String getDetails() {
+		return Details;
+	}
+
+	public void setDetails(String details) {
+		Details = details;
 	}
 
 	public double getBalance() {
-		return mBalance;
+		return Balance;
 	}
 
-	public void setBalance(double mBalance) {
-		this.mBalance = mBalance;
+	public void setBalance(double balance) {
+		Balance = balance;
 	}
 
-	public String getInstrument() {
-		return mInstrument;
+	public double getPositionMoney() {
+		return PositionMoney;
 	}
 
-	public void setInstrument(String mInstrument) {
-		this.mInstrument = mInstrument;
+	public void setPositionMoney(double positionMoney) {
+		PositionMoney = positionMoney;
 	}
 
-	public int getPosition() {
-		return mPosition;
-	}
-
-	public void setPosition(int mPosition) {
-		this.mPosition = mPosition;
-	}
-
-	public int getPrice() {
-		return mPrice;
-	}
-
-	public void setPrice(int mPrice) {
-		this.mPrice = mPrice;
-	}
 }
