@@ -1,7 +1,7 @@
 package com.android.futures;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -33,7 +33,9 @@ public class AccountActivity extends Activity implements Handler.Callback {
 	private Button logOutBtn = null;
 	private TextView balanceView = null;
 	private TextView positionView = null;
-	private boolean mIsTrading = false;
+	private boolean IsTrading = false;
+	private boolean IsPositionUpdated = false;
+	private ProgressDialog progressDlg;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -57,8 +59,7 @@ public class AccountActivity extends Activity implements Handler.Callback {
 		mSession = app.GetSession();
 		mSession.SetHandler(mHandler);
 		mSession.Login();
-		
-		updateTradeStatus();
+		updateButtonStatus();
 		
 		logOutBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -85,18 +86,25 @@ public class AccountActivity extends Activity implements Handler.Callback {
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				if (mIsTrading){
+				if (IsTrading){
 					mSession.StopTrade();
 				}else{
 					mSession.StartTrade((String) mStrategyList.getSelectedItem(), (String) mInstrumentList.getSelectedItem());
 				}
 			}
 		});
+		
+		progressDlg = new ProgressDialog(this);
+		progressDlg.setTitle("提示");
+		progressDlg.setMessage("账户初始化中。。。");
+		progressDlg.setCancelable(false);
+		progressDlg.show();// 显示对话框
 	}
 
-	private void updateTradeStatus(){
-		monitorBtn.setEnabled(mIsTrading);
-		if (mIsTrading){
+	private void updateButtonStatus(){
+		monitorBtn.setEnabled(IsTrading);
+		tradeBtn.setEnabled(IsPositionUpdated);
+		if (IsTrading){
 			tradeBtn.setText(R.string.StopTrade);
 		}else{
 			tradeBtn.setText(R.string.Trade);
@@ -116,6 +124,9 @@ public class AccountActivity extends Activity implements Handler.Callback {
 			balanceView.setText(Double.toString(status.getBalance()));
 			//String pos_text = String.format("[%s]: (%d * %d)", status.getInstrument(), status.getPrice(), status.getPosition());
 			positionView.setText(status.getDetails());
+			IsPositionUpdated = true;
+			progressDlg.dismiss();
+			
 		} else if (msg.what == TraderStatusListener.Logined) {
 			AccountInfo info = (AccountInfo) msg.obj;
 			ArrayList<String> instrus = info.getInstrumentList();
@@ -127,16 +138,16 @@ public class AccountActivity extends Activity implements Handler.Callback {
 			ArrayAdapter<String> adapter2 = new ArrayAdapter<String>(AccountActivity.this,
 					android.R.layout.simple_spinner_item, sts);
 			mStrategyList.setAdapter(adapter2);
-			mIsTrading = info.getIsTrading();
-			updateTradeStatus();
+			IsTrading = info.getIsTrading();
+			updateButtonStatus();
 		}
 		else if (msg.what == TraderStatusListener.Trading){
-			mIsTrading = true;
-			updateTradeStatus();
+			IsTrading = true;
+			updateButtonStatus();
 		}
 		else if (msg.what == TraderStatusListener.NoTrading){
-			mIsTrading = false;
-			updateTradeStatus();
+			IsTrading = false;
+			updateButtonStatus();
 		}
 		return false;
 	}
