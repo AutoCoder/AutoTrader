@@ -376,7 +376,8 @@ namespace AP{
 			ret += item.second.ToString();
 			ret += "\n";
 		}
-		return ret;
+		
+		return ret.substr(0, ret.length() - 1);
 	}
 }
 
