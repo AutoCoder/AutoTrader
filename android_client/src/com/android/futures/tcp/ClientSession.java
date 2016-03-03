@@ -51,7 +51,7 @@ public class ClientSession implements TraderStatusListener {
 			String info = loginJson.toString();
 			String wrapInfo = String.valueOf(info.length()) + info;
 			mSocketHandler.sendMessage(wrapInfo);
-			State = Logined;
+			State = AccountInfoUpdated;
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -141,11 +141,11 @@ public class ClientSession implements TraderStatusListener {
 	}
 
 	@Override
-	public void onAccountLogined(AccountInfo info) {
+	public void onAccountInfoUpdated(AccountInfo info) {
 		// TODO Auto-generated method stub
 		Message msg = Message.obtain();
 		msg.obj = info;
-		msg.what = TraderStatusListener.Logined;
+		msg.what = TraderStatusListener.AccountInfoUpdated;
 		mHandler.sendMessage(msg);
 	}
 
@@ -200,6 +200,25 @@ public class ClientSession implements TraderStatusListener {
 
 	public void setStrategyName(String mStrategyName) {
 		this.mStrategyName = mStrategyName;
+	}
+
+	@Override
+	public void onLoginSuccess() {
+		// TODO Auto-generated method stub
+		Message msg = Message.obtain();
+		msg.what = TraderStatusListener.Logined;
+		mHandler.sendMessage(msg);		
+		State = Logined;		
+	}
+
+	@Override
+	public void onLoginFailed(String err_msg) {
+		// TODO Auto-generated method stub
+		Message msg = Message.obtain();
+		msg.what = TraderStatusListener.LoginFailed;
+		msg.obj = err_msg;
+		mHandler.sendMessage(msg);		
+		State = LoginFailed;			
 	}
 
 }

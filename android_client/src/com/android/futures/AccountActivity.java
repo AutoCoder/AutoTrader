@@ -94,7 +94,7 @@ public class AccountActivity extends Activity implements Handler.Callback {
 		
 		progressDlg = new ProgressDialog(this);
 		progressDlg.setTitle("提示");
-		progressDlg.setMessage("账户初始化中。。。");
+		progressDlg.setMessage("登陆中。。。");
 		progressDlg.setCancelable(false);
 		progressDlg.show();// 显示对话框
 	}
@@ -117,16 +117,26 @@ public class AccountActivity extends Activity implements Handler.Callback {
 
 	@Override
 	public boolean handleMessage(Message msg) {
-		if (msg.what == TraderStatusListener.PositionUpdated) {
+		if (msg.what == TraderStatusListener.Logined){
+			progressDlg.setMessage("登陆成功，账户初始化中。。。");
+			
+		}else if (msg.what == TraderStatusListener.LoginFailed){
+			String err_str = (String) msg.obj;
+			progressDlg.setMessage("登陆失败，Reason:" + err_str);
+			progressDlg.dismiss();
+			finish();
+			
+		} else if (msg.what == TraderStatusListener.PositionUpdated) {
 			PositionInfo status = (PositionInfo) msg.obj;
 			balanceView.setText(Double.toString(status.getBalance()));
 			//String pos_text = String.format("[%s]: (%d * %d)", status.getInstrument(), status.getPrice(), status.getPosition());
 			positionView.setText(status.getDetails());
 			IsPositionUpdated = true;
+			progressDlg.setMessage("账户初始化完毕。");
 			progressDlg.dismiss();
 			updateButtonStatus();
 			
-		} else if (msg.what == TraderStatusListener.Logined) {
+		} else if (msg.what == TraderStatusListener.AccountInfoUpdated) {
 			AccountInfo info = (AccountInfo) msg.obj;
 			ArrayList<String> instrus = info.getInstrumentList();
 			ArrayAdapter<String> adapter1 = new ArrayAdapter<String>(AccountActivity.this,
@@ -139,6 +149,7 @@ public class AccountActivity extends Activity implements Handler.Callback {
 			mStrategyList.setAdapter(adapter2);
 			IsTrading = info.getIsTrading();
 			updateButtonStatus();
+			progressDlg.setMessage("登陆成功，账户初始化中。。。");
 		}
 		else if (msg.what == TraderStatusListener.Trading){
 			IsTrading = true;

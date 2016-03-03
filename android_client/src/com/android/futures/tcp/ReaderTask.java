@@ -119,7 +119,16 @@ public class ReaderTask extends Thread {
 				if (obj.has("Action")) {
 					String actionType = obj.getString("Action");
 					if (actionType.equals("Login")) {
-
+						boolean sucess = (obj.getInt("ErrorCode") == 0);
+						if (statusChangeHandler != null){
+							if (sucess)
+								statusChangeHandler.onLoginSuccess();
+							else
+							{
+								String err_str = obj.getString("ErrorMsg");
+								statusChangeHandler.onLoginFailed(err_str);
+							}							
+						}
 					} else if (actionType.equals("StartTrade")) {
 						boolean sucess = (obj.getInt("ErrorCode") == 0);
 						if (statusChangeHandler != null){
@@ -184,7 +193,7 @@ public class ReaderTask extends Thread {
 						}
 						AccountInfo info = new AccountInfo(instru_list, st_list, is_trading);
 						if (statusChangeHandler != null)
-							statusChangeHandler.onAccountLogined(info);
+							statusChangeHandler.onAccountInfoUpdated(info);
 					} else {
 						if (infoType.equals("INSERT_ORDER")) {
 							t = TradeEntity.type.Insert_Order;

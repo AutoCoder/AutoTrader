@@ -6,14 +6,18 @@ public interface TraderStatusListener {
 	public static final int LogOut = 1;
 	public static final int Loging = 2;
 	public static final int Logined = 3;
-	public static final int PositionUpdated = 4;
-	public static final int NoTrading = 5;
-	public static final int TradeStarting = 6;
-	public static final int Trading = 7;
-	public static final int TradeStopping = 8;
+	public static final int LoginFailed = 4;
+	public static final int AccountInfoUpdated = 5;
+	public static final int PositionUpdated = 6;
+	public static final int NoTrading = 7;
+	public static final int TradeStarting = 8;
+	public static final int Trading = 9;
+	public static final int TradeStopping = 10;
 	
 	public void onPositionUpdated(PositionInfo status);
-	public void onAccountLogined(AccountInfo info);
+	public void onAccountInfoUpdated(AccountInfo info);
+	public void onLoginSuccess();
+	public void onLoginFailed(String err_msg);
 	public void onStartTradeSuccess();
 	public void onStartTradeFailed(String err_msg);
 	public void onStopTrade();
