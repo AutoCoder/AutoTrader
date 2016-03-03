@@ -25,7 +25,7 @@ public class ClientSession implements TraderStatusListener {
 		mHandler = handler;
 	}
 	
-	public void ConnectServer(String brokerId, String account, String pwd, String host, int port)
+	public void ConnectServer(String brokerId, String account, String pwd, String host, int port) throws IOException
 	{
 		if (mSocketHandler != null)//if socket is connected, skip this function.
 			return;
@@ -33,13 +33,9 @@ public class ClientSession implements TraderStatusListener {
 		mBrokerId = brokerId;
 		mAccount = account;
 		mPassword = pwd;
-		try {
-			mSocketHandler = new SocketHandler(host, port, this);
-			mSocketHandler.listen(true);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+
+		mSocketHandler = new SocketHandler(host, port, this);
+		mSocketHandler.listen(true);
 	}
 	
 	public void Login(){

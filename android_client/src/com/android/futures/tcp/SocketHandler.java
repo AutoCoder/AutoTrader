@@ -1,15 +1,19 @@
 package com.android.futures.tcp;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import com.android.futures.util.SubThreadException;
 
 public  class SocketHandler implements SocketStatusListener {
- 
+		private final int CONNECT_TIME_OUT = 1500;
         private Socket socket=null;
         private ReaderTask reader;
         private WriterTask writer;
         private String address;
         private int port;
+        private boolean IsConnected = false;
+        private String  SocketErrString = "";
         
          
         public SocketHandler(String add, int p, TraderStatusListener delegate) throws IOException {
@@ -19,23 +23,29 @@ public  class SocketHandler implements SocketStatusListener {
             Thread init_thread = new Thread(  
                     new Runnable(){  
                         @Override  
-                        public void run() {  
-                			try {
-                				socket = new Socket(address, port);
-    						} catch (Exception e) {
-    							// TODO Auto-generated catch block
-    							e.printStackTrace();
-    						}                       
+                        public void run() {              				
+							try {
+								socket = new Socket();
+								socket.connect(new InetSocketAddress(address, port), CONNECT_TIME_OUT);
+								IsConnected = true;
+							} catch (IOException e) {
+								e.printStackTrace();
+								IsConnected = false;
+								SocketErrString = e.getMessage();
+							}							 
                         }  
                     }  
             );  
             init_thread.start();
             try {
 				init_thread.join();
+				if (IsConnected == false){
+					throw new SubThreadException(SocketErrString);
+				}
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+
             reader = new ReaderTask(socket, delegate);
             writer = new WriterTask(socket);
             onSocketStatusChanged(socket, STATUS_OPEN, null);

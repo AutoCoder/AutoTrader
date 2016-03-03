@@ -2,6 +2,8 @@ package com.android.futures.view;
 
 import java.util.Vector;
 import com.android.futures.entity.TradeEntity;
+import com.android.futures.util.VisualizationSetting;
+
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -16,6 +18,7 @@ import android.view.SurfaceView;
 
 public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callback {
 	private final int DATA_MAX_COUNT = 4 * 60;
+	private final float Text_Size = VisualizationSetting.TEXT_SMALL;
 	private SurfaceHolder mHolder;
 	private DrawThread mThread;
 	public Vector<TradeEntity> mTimesList = null;
@@ -91,6 +94,7 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 		}
 		
 		Paint paint = new Paint();
+		paint.setTextSize(Text_Size);
 		String high = String.valueOf(mHighPrice);
 		Rect textRect = new Rect();
 		paint.getTextBounds(high, 0, 1, textRect);
@@ -183,6 +187,7 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 		paint.setAntiAlias(true);
 		paint.setStyle(Style.STROKE);
 		paint.setColor(Color.DKGRAY);
+		paint.setTextSize(Text_Size);
 		String high = String.valueOf(mHighPrice);
 		String low = String.valueOf(mLowPrice);
 		
@@ -206,6 +211,7 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 		canvas.drawText(ratio, mTimeRectRight - ratioWidth, mTimeRectBottom - 1, paint);
 
 		paint.setColor(Color.WHITE);
+		paint.setTextSize(VisualizationSetting.TEXT_LARGE);
 		String volumeTitle = "量:1215  现手:1215  额:163.4万";
 		canvas.drawText(volumeTitle, mTimeRectLeft, mVolumeRectTop - mMargin, paint);
 		

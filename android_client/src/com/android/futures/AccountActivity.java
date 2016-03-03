@@ -65,8 +65,6 @@ public class AccountActivity extends Activity implements Handler.Callback {
 			@Override
 			public void onClick(View v) {
 				mSession.LogOut();
-//			    Intent intent = new Intent(AccountActivity.this, LoginActivity.class);  
-//                startActivity(intent);
                 finish();
 			}
 		});
@@ -126,6 +124,7 @@ public class AccountActivity extends Activity implements Handler.Callback {
 			positionView.setText(status.getDetails());
 			IsPositionUpdated = true;
 			progressDlg.dismiss();
+			updateButtonStatus();
 			
 		} else if (msg.what == TraderStatusListener.Logined) {
 			AccountInfo info = (AccountInfo) msg.obj;
