@@ -526,7 +526,7 @@ bool CtpTradeSpi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo)
 }
 
 void CtpTradeSpi::ReqOrderInsert(Order ord){
-	SYNC_PRINT << ("Execute Order (") << ord.GetInstrumentId() << ", " \
+	SYNC_PRINT << ("Insert Order (") << ord.GetInstrumentId() << ", " \
 		<< ord.GetRefExchangePrice() << ", " \
 		<< (ord.GetExchangeDirection() == THOST_FTDC_D_Buy ? "Buy)" : "Sell)");
 

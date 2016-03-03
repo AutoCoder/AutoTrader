@@ -31,6 +31,7 @@ public class AccountActivity extends Activity implements Handler.Callback {
 	private Button tradeBtn = null;
 	private Button monitorBtn = null;
 	private Button logOutBtn = null;
+	private TextView accountView = null;
 	private TextView balanceView = null;
 	private TextView positionView = null;
 	private boolean IsTrading = false;
@@ -47,6 +48,7 @@ public class AccountActivity extends Activity implements Handler.Callback {
 			e.printStackTrace();
 		}
 		mHandler = new Handler(this);
+		accountView = (TextView) this.findViewById(R.id.account_val);
 		balanceView = (TextView) this.findViewById(R.id.balance_val);
 		positionView = (TextView) this.findViewById(R.id.position_val);
 		mInstrumentList = (Spinner) this.findViewById(R.id.instrument_List);
@@ -55,6 +57,10 @@ public class AccountActivity extends Activity implements Handler.Callback {
 		monitorBtn = (Button) this.findViewById(R.id.monitor_btn);
 		logOutBtn = (Button) this.findViewById(R.id.LogOut);
 		
+		Intent intent =getIntent();
+        String account_str = intent.getStringExtra("AccountId");
+        accountView.setText(account_str.toCharArray(), 0, account_str.length());
+
 		MyApp app = (MyApp) getApplication();
 		mSession = app.GetSession();
 		mSession.SetHandler(mHandler);

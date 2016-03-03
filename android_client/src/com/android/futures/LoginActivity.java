@@ -46,6 +46,7 @@ public class LoginActivity extends Activity{
 					session.ConnectServer(brokerIdEdit.getText().toString(),accountEdit.getText().toString(),pwdEdit.getText().toString(), hostEdit.getText().toString(), port);
 				    Intent intent = new Intent(LoginActivity.this,  
 				    		AccountActivity.class);  
+				    intent.putExtra("AccountId", accountEdit.getText().toString());
 	                startActivity(intent); 	
 				}
 				catch (SubThreadException e){

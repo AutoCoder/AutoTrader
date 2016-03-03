@@ -26,8 +26,6 @@ public class MyFragmentActivity extends FragmentActivity implements OnClickListe
 
 	@Override
 	protected void onCreate(Bundle bundle) {
-		//super.onCreate(bundle);
-		//setContentView(R.layout.activity4fragment_my);
 		try {
 			super.onCreate(bundle);
 			setContentView(R.layout.activity4fragment_my);
