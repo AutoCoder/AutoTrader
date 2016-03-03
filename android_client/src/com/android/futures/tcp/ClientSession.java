@@ -20,6 +20,7 @@ public class ClientSession implements TraderStatusListener {
 	private SocketHandler mSocketHandler = null;
 	public int State = LogOut;
 	public Vector<TradeEntity> mMdSequence = new Vector<TradeEntity>();
+	public Vector<TradeEntity> mTradeSequence = new Vector<TradeEntity>();
 	
 	public void SetHandler(Handler handler){
 		mHandler = handler;
@@ -184,6 +185,9 @@ public class ClientSession implements TraderStatusListener {
 	public void onCTPCallback(TradeEntity entity) {
 		// TODO Auto-generated method stub
 		mMdSequence.add(entity);
+		if (entity.getType() != TradeEntity.type.MD){
+			mTradeSequence.add(entity);
+		}
 	}
 
 	public String getCurrentInstrument() {
