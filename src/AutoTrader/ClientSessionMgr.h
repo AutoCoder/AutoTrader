@@ -18,9 +18,6 @@ public:
 	static ClientSessionMgr* getInstance();
 
 public:
-
-	CThostFtdcTraderApi* TradeApiPtr() const { return m_pTradeUserApi; }
-
 	void AddClientSession(const std::shared_ptr<ClientSession>& newAcc);
 
 	void LoginAccount(const std::string& userId, const std::string& pw, const std::shared_ptr<Transmission::socket_session>& session);
@@ -44,7 +41,6 @@ private:
 	std::shared_ptr<ClientSession> TryBindToSession(const std::string& userId, const std::shared_ptr<Transmission::socket_session>& session);
 
 private:
-	CThostFtdcTraderApi*																		m_pTradeUserApi;
 	std::map<std::shared_ptr<Transmission::socket_session>, std::shared_ptr<ClientSession>>		m_client_sessions;
 };
 

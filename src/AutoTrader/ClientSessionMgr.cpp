@@ -19,7 +19,6 @@ ClientSessionMgr* ClientSessionMgr::getInstance(){
 }
 
 ClientSessionMgr::ClientSessionMgr()
-	:m_pTradeUserApi(CThostFtdcTraderApi::CreateFtdcTraderApi())
 {
 }
 
@@ -35,7 +34,7 @@ void ClientSessionMgr::LoginAccount(const std::string& userId, const std::string
 
 			if (!clientSessionSp)
 			{
-				clientSessionSp = std::make_shared<ClientSession>(userId, session, m_pTradeUserApi);
+				clientSessionSp = std::make_shared<ClientSession>(userId, session);
 				m_client_sessions[session] = clientSessionSp;
 			}else{
 				if (clientSessionSp->IsPositionInfoReady())

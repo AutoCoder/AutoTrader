@@ -40,7 +40,7 @@ typedef int TransmissionErrorCode;
 class ClientSession
 {
 public:
-	ClientSession(const std::string& userId, const std::shared_ptr<Transmission::socket_session>& s, CThostFtdcTraderApi* api);
+	ClientSession(const std::string& userId, const std::shared_ptr<Transmission::socket_session>& s);
 
 	bool AppendOrder(const Order& order);//multi-thread notice
 
@@ -91,7 +91,8 @@ private:
 	std::atomic<bool>                               m_isTrading; // access by thread-OrderExecutor and thread-ActionQueueInvoker
 	std::string										m_userId;
 	std::unique_ptr<Order>                          m_pending_order;
-	std::unique_ptr<CtpTradeSpi>                    m_trade_spi;
+	CtpTradeSpi*									m_trade_spi;
+	CThostFtdcTraderApi*                            m_trade_api;
 	std::shared_ptr<RealTimeDataProcessor>          m_realtimedata_processor;
 	std::shared_ptr<Transmission::socket_session>   m_session;
 	std::unique_ptr<AP::AccountDetailMgr>           m_detailMgr;

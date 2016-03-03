@@ -18,7 +18,7 @@ import android.view.SurfaceView;
 
 public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callback {
 	private final int DATA_MAX_COUNT = 4 * 60;
-	private final float Text_Size = VisualizationSetting.TEXT_SMALL;
+	private final float Text_Size = VisualizationSetting.TEXT_XLARGE;
 	private SurfaceHolder mHolder;
 	private DrawThread mThread;
 	public Vector<TradeEntity> mTimesList = null;
@@ -211,7 +211,6 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 		canvas.drawText(ratio, mTimeRectRight - ratioWidth, mTimeRectBottom - 1, paint);
 
 		paint.setColor(Color.WHITE);
-		paint.setTextSize(VisualizationSetting.TEXT_LARGE);
 		String volumeTitle = "量:1215  现手:1215  额:163.4万";
 		canvas.drawText(volumeTitle, mTimeRectLeft, mVolumeRectTop - mMargin, paint);
 		

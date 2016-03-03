@@ -49,7 +49,7 @@ public class LoginActivity extends Activity{
 	                startActivity(intent); 	
 				}
 				catch (SubThreadException e){
-					Toast toast = Toast.makeText(LoginActivity.this, "Can't connect to AutoTrader server... Reason::" + e.getMessage(),
+					Toast toast = Toast.makeText(LoginActivity.this, "Can't connect to AutoTrader server... Reason:" + e.getMessage(),
 							Toast.LENGTH_LONG);
 					toast.setGravity(Gravity.CENTER, 0, 0);
 					toast.show();

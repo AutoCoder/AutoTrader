@@ -24,7 +24,7 @@
 #include<ctime>
 #endif
 
-ClientSession::ClientSession(const std::string& userId, const std::shared_ptr<Transmission::socket_session>& s, CThostFtdcTraderApi* api)
+ClientSession::ClientSession(const std::string& userId, const std::shared_ptr<Transmission::socket_session>& s)
 : m_userId(userId)
 , m_session(s)
 , m_detailMgr(std::unique_ptr<AP::AccountDetailMgr>(new AP::AccountDetailMgr()))
@@ -32,28 +32,38 @@ ClientSession::ClientSession(const std::string& userId, const std::shared_ptr<Tr
 , m_total_vol(0)
 {
 	m_isTrading.store(false);
-	assert(api);
+	m_trade_api = CThostFtdcTraderApi::CreateFtdcTraderApi();
+	assert(m_trade_api);
 	Account::Meta meta = Account::Manager::Instance().GetMeta(m_userId);
 	InitedAccountCallback accountInitFinished_Callback = std::bind(&ClientSession::OnAccountInitFinished, this);
 	RtnOrderCallback onRtnOrder_Callback = std::bind(&ClientSession::OnRtnOrder, this, std::placeholders::_1);
 	RtnTradeCallback OnRtnTrade_Callback = std::bind(&ClientSession::OnRtnTrade, this, std::placeholders::_1);
 	CancelOrderCallback OnCancelOrder_Callback = std::bind(&ClientSession::OnCancelOrder, this, std::placeholders::_1, std::placeholders::_2);
 
-	m_trade_spi = std::unique_ptr<CtpTradeSpi>(new CtpTradeSpi(api, meta.m_BrokerId.c_str(), meta.m_UserId.c_str(), meta.m_Password.c_str(), \
+	m_trade_spi = new CtpTradeSpi(m_trade_api, meta.m_BrokerId.c_str(), meta.m_UserId.c_str(), meta.m_Password.c_str(), \
 		Config::Instance()->ProductName().c_str(), *(m_detailMgr.get()), \
-		accountInitFinished_Callback, onRtnOrder_Callback, OnRtnTrade_Callback, OnCancelOrder_Callback));
+		accountInitFinished_Callback, onRtnOrder_Callback, OnRtnTrade_Callback, OnCancelOrder_Callback);
 
-	api->RegisterSpi((CThostFtdcTraderSpi*)(m_trade_spi.get()));
-	api->SubscribePublicTopic(THOST_TERT_RESTART);
-	api->SubscribePrivateTopic(THOST_TERT_RESTART);
-	api->RegisterFront(const_cast<char*>(Config::Instance()->CtpTradeFront().c_str()));
-	api->Init();
+	m_trade_api->RegisterSpi((CThostFtdcTraderSpi*)m_trade_spi);
+	m_trade_api->SubscribePublicTopic(THOST_TERT_RESTART);
+	m_trade_api->SubscribePrivateTopic(THOST_TERT_RESTART);
+	m_trade_api->RegisterFront(const_cast<char*>(Config::Instance()->CtpTradeFront().c_str()));
+	m_trade_api->Init();
 }
 
 ClientSession::~ClientSession()
 {
+	if (m_trade_api)
+	{
+		m_trade_api->RegisterSpi(NULL);
+		m_trade_api->Release();
+		m_trade_api = nullptr;
+	}
 
-
+	if (m_trade_spi){
+		delete m_trade_spi;
+		m_trade_spi = nullptr;
+	}
 }
 
 //may access by mdThread and m_exeOrderThread
