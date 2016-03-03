@@ -58,8 +58,10 @@ public class AccountActivity extends Activity implements Handler.Callback {
 		logOutBtn = (Button) this.findViewById(R.id.LogOut);
 		
 		Intent intent =getIntent();
-        String account_str = intent.getStringExtra("AccountId");
-        accountView.setText(account_str.toCharArray(), 0, account_str.length());
+		if (intent.hasExtra("AccountId")){
+			String account_str = intent.getStringExtra("AccountId");
+			accountView.setText(account_str.toCharArray(), 0, account_str.length());
+		}
 
 		MyApp app = (MyApp) getApplication();
 		mSession = app.GetSession();
