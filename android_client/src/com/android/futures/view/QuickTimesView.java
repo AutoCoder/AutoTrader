@@ -164,7 +164,7 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 				} catch (Exception e) {
 					e.printStackTrace();
 				} finally {
-					if (null != mHolder) {
+					if (null != mHolder && canvas != null) {
 						mHolder.unlockCanvasAndPost(canvas);
 					}
 				}
