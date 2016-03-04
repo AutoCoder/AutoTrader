@@ -29,7 +29,7 @@ ClientSession::ClientSession(const std::string& userId, const std::shared_ptr<Tr
 , m_session(s)
 , m_detailMgr(std::unique_ptr<AP::AccountDetailMgr>(new AP::AccountDetailMgr()))
 , m_PositionInfo_ready(false)
-, m_total_vol(0),
+, m_total_vol(0)
 , m_ReleaseingCtpAccount(false)
 {
 	m_isTrading.store(false);

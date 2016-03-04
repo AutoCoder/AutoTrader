@@ -119,6 +119,7 @@ public class AccountActivity extends Activity implements Handler.Callback {
 	@Override
 	protected void onRestart(){
 		super.onRestart();
+		mSession.SetHandler(mHandler);
 		mSession.QueryPosition();
 	}
 

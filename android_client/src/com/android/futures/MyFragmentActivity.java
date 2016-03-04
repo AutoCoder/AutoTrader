@@ -1,28 +1,16 @@
 package com.android.futures;
 
-import com.android.futures.tcp.ClientSession;
-import com.android.futures.tcp.TraderStatusListener;
-
-import android.app.ProgressDialog;
-import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTabHost;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.Toast;
 
-public class MyFragmentActivity extends FragmentActivity implements OnClickListener, Handler.Callback {
+
+public class MyFragmentActivity extends FragmentActivity implements OnClickListener{
 	private static final Integer[] TABS = new Integer[] { R.layout.tab_times, R.layout.tab_kcharts};
-	private static final int WHAT = 1987;
-	private ProgressDialog mProgressDialog;
-	private Handler mHandler = null;
-	private ClientSession mSession = null;
 
 	@Override
 	protected void onCreate(Bundle bundle) {
@@ -42,11 +30,6 @@ public class MyFragmentActivity extends FragmentActivity implements OnClickListe
 		tabHost.addTab(
 				tabHost.newTabSpec(String.valueOf(TABS[1])).setIndicator(getLayoutInflater().inflate(TABS[1], null)),
 				KChartsFragment.class, null);
-		
-		mHandler = new Handler(this);
-		MyApp app = (MyApp) getApplication();
-		mSession = app.GetSession();
-		mSession.SetHandler(mHandler);
 	}
 
 	@Override
@@ -77,32 +60,6 @@ public class MyFragmentActivity extends FragmentActivity implements OnClickListe
 
 	}
 
-	public boolean handleMessage(Message msg) {
-		if (msg.what == WHAT) {
-			if (mProgressDialog != null) {
-				mProgressDialog.dismiss();
-				return true;
-			}
-		}
-		else if (msg.what == TraderStatusListener.Trading){
-			Toast toast = Toast.makeText(MyFragmentActivity.this, "开始交易。。",
-					Toast.LENGTH_LONG);
-			toast.setGravity(Gravity.CENTER, 0, 0);
-			toast.show();
-		}
-		else if (msg.what == TraderStatusListener.NoTrading){
-			String err_msg = (String)msg.obj;
-			Toast toast = Toast.makeText(MyFragmentActivity.this, "交易停止。。" + err_msg,
-					Toast.LENGTH_LONG);
-			toast.setGravity(Gravity.CENTER, 0, 0);
-			toast.show();	
-			
-		    Intent intent = new Intent(MyFragmentActivity.this, AccountActivity.class); 
-            startActivity(intent);
-		}
-		return false;
-	}
-	
 //	@Override
 //	public void onBackPressed(){
 //		finish();
