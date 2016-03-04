@@ -129,6 +129,12 @@ public class ReaderTask extends Thread {
 								statusChangeHandler.onLoginFailed(err_str);
 							}							
 						}
+					} else if (actionType.equals("LogOut")){
+						boolean sucess = (obj.getInt("ErrorCode") == 0);
+						if (statusChangeHandler != null){
+							if (sucess)
+								statusChangeHandler.onLogOutSuccess();
+						}
 					} else if (actionType.equals("StartTrade")) {
 						boolean sucess = (obj.getInt("ErrorCode") == 0);
 						if (statusChangeHandler != null){

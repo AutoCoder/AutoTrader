@@ -18,6 +18,7 @@ public interface TraderStatusListener {
 	public void onAccountInfoUpdated(AccountInfo info);
 	public void onLoginSuccess();
 	public void onLoginFailed(String err_msg);
+	public void onLogOutSuccess();
 	public void onStartTradeSuccess();
 	public void onStartTradeFailed(String err_msg);
 	public void onStopTrade();

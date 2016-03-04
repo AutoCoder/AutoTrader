@@ -73,7 +73,6 @@ public class AccountActivity extends Activity implements Handler.Callback {
 			@Override
 			public void onClick(View v) {
 				mSession.LogOut();
-                finish();
 			}
 		});
 		
@@ -128,12 +127,14 @@ public class AccountActivity extends Activity implements Handler.Callback {
 		if (msg.what == TraderStatusListener.Logined){
 			progressDlg.setMessage("登陆成功，账户初始化中。。。");
 			
-		}else if (msg.what == TraderStatusListener.LoginFailed){
+		} else if (msg.what == TraderStatusListener.LoginFailed){
 			String err_str = (String) msg.obj;
 			progressDlg.setMessage("登陆失败，Reason:" + err_str);
 			progressDlg.dismiss();
 			finish();
 			
+		} else if (msg.what == TraderStatusListener.LogOut){
+			finish();
 		} else if (msg.what == TraderStatusListener.PositionUpdated) {
 			PositionInfo status = (PositionInfo) msg.obj;
 			balanceView.setText(Double.toString(status.getBalance()));

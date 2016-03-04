@@ -72,9 +72,7 @@ public class ClientSession implements TraderStatusListener {
 			String info = loginJson.toString();
 			String wrapInfo = String.valueOf(info.length()) + info;
 			mSocketHandler.sendMessage(wrapInfo);
-			mSocketHandler.shutDown();
-			mSocketHandler = null;
-			State = LogOut;
+
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -223,6 +221,16 @@ public class ClientSession implements TraderStatusListener {
 		msg.obj = err_msg;
 		mHandler.sendMessage(msg);		
 		State = LoginFailed;			
+	}
+	
+	@Override
+	public void onLogOutSuccess(){
+		mSocketHandler.shutDown();
+		mSocketHandler = null;
+		State = LogOut;
+		Message msg = Message.obtain();
+		msg.what = TraderStatusListener.LogOut;
+		mHandler.sendMessage(msg);
 	}
 
 }
