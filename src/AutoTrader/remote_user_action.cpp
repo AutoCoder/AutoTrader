@@ -226,6 +226,7 @@ namespace Transmission{
 			{
 				ClientSessionMgr::getInstance()->QueryPosition(session_);
 			}
+			break;
 			default:
 				break;
 		}

@@ -67,7 +67,7 @@ public class ClientSession implements TraderStatusListener {
 			meta.put("UserName", mAccount);
 			meta.put("Password", mPassword);
 			JSONObject loginJson = new JSONObject(); 
-			loginJson.put("Action", "LogOut");
+			loginJson.put("Action", "Logout");
 			loginJson.put("Arguments", meta);
 			String info = loginJson.toString();
 			String wrapInfo = String.valueOf(info.length()) + info;

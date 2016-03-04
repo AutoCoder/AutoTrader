@@ -129,7 +129,7 @@ public class ReaderTask extends Thread {
 								statusChangeHandler.onLoginFailed(err_str);
 							}							
 						}
-					} else if (actionType.equals("LogOut")){
+					} else if (actionType.equals("Logout")){
 						boolean sucess = (obj.getInt("ErrorCode") == 0);
 						if (statusChangeHandler != null){
 							if (sucess)

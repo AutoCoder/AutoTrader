@@ -29,7 +29,8 @@ ClientSession::ClientSession(const std::string& userId, const std::shared_ptr<Tr
 , m_session(s)
 , m_detailMgr(std::unique_ptr<AP::AccountDetailMgr>(new AP::AccountDetailMgr()))
 , m_PositionInfo_ready(false)
-, m_total_vol(0)
+, m_total_vol(0),
+, m_ReleaseingCtpAccount(false)
 {
 	m_isTrading.store(false);
 	m_trade_api = CThostFtdcTraderApi::CreateFtdcTraderApi();
@@ -53,6 +54,8 @@ ClientSession::ClientSession(const std::string& userId, const std::shared_ptr<Tr
 
 ClientSession::~ClientSession()
 {
+	m_ReleaseingCtpAccount = true; 
+	m_con.notify_all();// notify stop executing thread if it's pending for new order.
 	if (m_trade_api)
 	{
 		m_trade_api->RegisterSpi(NULL);
@@ -84,7 +87,11 @@ void ClientSession::WaitAndPopCurrentOrder(Order& ord){
 
 	std::unique_lock<std::mutex> lk(m_mtx);
 
-	m_con.wait(lk, [this]{return m_pending_order.get(); });
+	m_con.wait(lk, [this]{return m_pending_order.get() || m_ReleaseingCtpAccount; });
+
+	if (m_ReleaseingCtpAccount)
+		return;
+
 	ord = *(m_pending_order.get());
 	m_pending_order.reset();
 }

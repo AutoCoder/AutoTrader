@@ -130,6 +130,11 @@ public class AccountActivity extends Activity implements Handler.Callback {
 		} else if (msg.what == TraderStatusListener.LoginFailed){
 			String err_str = (String) msg.obj;
 			progressDlg.setMessage("登陆失败，Reason:" + err_str);
+			try {
+				Thread.sleep(1000, 0);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 			progressDlg.dismiss();
 			finish();
 			
@@ -142,6 +147,11 @@ public class AccountActivity extends Activity implements Handler.Callback {
 			positionView.setText(status.getDetails());
 			IsPositionUpdated = true;
 			progressDlg.setMessage("账户初始化完毕。");
+			try {
+				Thread.sleep(1000, 0);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 			progressDlg.dismiss();
 			updateButtonStatus();
 			

@@ -104,6 +104,7 @@ private:
 	std::thread                                     m_exeOrderThread;
 	
 	std::future<bool>                               m_orderExecuteThreadF;
+	bool                                            m_ReleaseingCtpAccount;
 #ifdef FAKE_MD
 	std::future<bool>                               m_fakeMdThreadF;
 #endif
