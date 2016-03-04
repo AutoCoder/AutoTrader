@@ -177,7 +177,7 @@ namespace Transmission{
 			}
 		}
 		Json::Value root;
-		root["Action"] = "LogOut";
+		root["Action"] = "Logout";
 		root["ErrorCode"] = code;
 		root["ErrorMsg"] = err_msg;
 		Json::FastWriter writer;
