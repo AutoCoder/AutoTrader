@@ -191,8 +191,18 @@
             android:gravity="center_vertical" >
 
             <Button
+                android:id="@+id/ReleaseCtp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="关闭CTP账户"
+                android:background="@drawable/bg_title"
+                android:textColor="#ffffff"
+                android:textSize="25sp" />
+            
+            <Button
                 android:id="@+id/LogOut"
-                android:layout_width="fill_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="8dp"
                 android:text="退出"

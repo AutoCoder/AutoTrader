@@ -42,6 +42,7 @@ public class AccountActivity extends Activity implements Handler.Callback {
 	private Button tradeBtn = null;
 	private Button monitorBtn = null;
 	private Button logOutBtn = null;
+	private Button closeCtpBtn = null;
 	private TextView accountView = null;
 	private TextView balanceView = null;
 	private TextView positionView = null;
@@ -67,6 +68,7 @@ public class AccountActivity extends Activity implements Handler.Callback {
 		tradeBtn = (Button) this.findViewById(R.id.trade_btn);
 		monitorBtn = (Button) this.findViewById(R.id.monitor_btn);
 		logOutBtn = (Button) this.findViewById(R.id.LogOut);
+		closeCtpBtn = (Button) this.findViewById(R.id.ReleaseCtp);
 		
 		Intent intent =getIntent();
 		if (intent.hasExtra("AccountId")){
@@ -81,6 +83,13 @@ public class AccountActivity extends Activity implements Handler.Callback {
 		updateButtonStatus();
 		
 		logOutBtn.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				finish();
+			}
+		});
+		
+		closeCtpBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				mSession.LogOut();
