@@ -1,7 +1,11 @@
 package com.android.futures;
 
 import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -15,9 +19,16 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+
+
+
+
+
+
 //import android.view.Menu;
 //import android.view.MenuItem;
 import com.android.futures.MyApp;
+import com.android.futures.entity.TradeEntity;
 import com.android.futures.tcp.AccountInfo;
 import com.android.futures.tcp.PositionInfo;
 import com.android.futures.tcp.ClientSession;
@@ -103,7 +114,7 @@ public class AccountActivity extends Activity implements Handler.Callback {
 		progressDlg.setTitle("提示");
 		progressDlg.setMessage("登陆中。。。");
 		progressDlg.setCancelable(false);
-		progressDlg.show();// 显示对话框
+		progressDlg.show();
 	}
 
 	private void updateButtonStatus(){
@@ -179,6 +190,52 @@ public class AccountActivity extends Activity implements Handler.Callback {
 			IsTrading = false;
 			updateButtonStatus();
 		}
+		else if (msg.what == TraderStatusListener.TradeNotification){
+			sendTradeNotification(msg);  
+		}
 		return false;
+	}
+
+	private void sendTradeNotification(Message msg) {
+		TradeEntity tradeEntity = (TradeEntity)msg.obj;
+		String tradeType = "";
+		switch (tradeEntity.getType()){
+		case Insert_Order:
+			tradeType = "报单";
+			break;
+		case Cancell_Order:
+			tradeType = "撤单";
+			break;
+		case Trade:
+			tradeType = "成交";
+			break;
+		default:
+			tradeType = "未定义";
+			break;
+		}
+		String direction = "";
+		if (tradeEntity.getDirection() == 0){
+			direction = "多";
+		}else{
+			direction = "空";
+		}
+		String title = String.format("%s Price:%5.0f Volume:%d", direction, tradeEntity.getLastPrice(), tradeEntity.getVol());
+		String content = String.format("Order_Ref:%s, Trade Time:%d", tradeEntity.getOrderId(), tradeEntity.getTimeStamp());
+		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,  
+		        new Intent(this, TradeListActivity.class), 0);
+		
+		NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE); 
+		final int NOTIFICATION_FLAG = 1;  
+		Notification notify = new Notification.Builder(this)  
+		    .setSmallIcon(R.drawable.messages) 
+		    .setTicker(tradeType + "提醒！")                
+		    .setContentTitle(title)                               
+		    .setContentText(content)
+		    .setContentIntent(pendingIntent)
+		    .setNumber(1)
+		    .getNotification();
+		
+		notify.flags |= Notification.FLAG_AUTO_CANCEL;  
+		manager.notify(NOTIFICATION_FLAG, notify);
 	}
 }

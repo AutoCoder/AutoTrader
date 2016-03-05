@@ -1,6 +1,5 @@
 package com.android.futures.view;
 
-import java.util.List;
 import java.util.Vector;
 
 import com.android.futures.entity.TradeEntity;
@@ -75,7 +74,5 @@ public class ListAdapter extends BaseAdapter {
 		TextView volumeLabel;
 		TextView orderRefLabel;
 		TextView occur_time;
-		
-
 	}
 }

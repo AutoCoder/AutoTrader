@@ -184,7 +184,7 @@ public class ClientSession implements TraderStatusListener {
 		// TODO Auto-generated method stub
 		mMdSequence.add(entity);
 		if (entity.getType() != TradeEntity.type.MD){
-			mTradeSequence.add(entity);
+			onTradeNotification(entity);
 		}
 	}
 
@@ -230,6 +230,16 @@ public class ClientSession implements TraderStatusListener {
 		State = LogOut;
 		Message msg = Message.obtain();
 		msg.what = TraderStatusListener.LogOut;
+		mHandler.sendMessage(msg);
+	}
+
+	@Override
+	public void onTradeNotification(TradeEntity entity) {
+		// TODO Auto-generated method stub
+		mTradeSequence.add(entity);
+		Message msg = Message.obtain();
+		msg.what = TraderStatusListener.TradeNotification;
+		msg.obj = entity;
 		mHandler.sendMessage(msg);
 	}
 
