@@ -217,29 +217,9 @@ public class AccountActivity extends Activity implements Handler.Callback {
 
 	private void sendTradeNotification(Message msg) {
 		TradeEntity tradeEntity = (TradeEntity)msg.obj;
-		String tradeType = "";
-		switch (tradeEntity.getType()){
-		case Insert_Order:
-			tradeType = "报单";
-			break;
-		case Cancell_Order:
-			tradeType = "撤单";
-			break;
-		case Trade:
-			tradeType = "成交";
-			break;
-		default:
-			tradeType = "未定义";
-			break;
-		}
-		String direction = "";
-		if (tradeEntity.getDirection() == 0){
-			direction = "多";
-		}else{
-			direction = "空";
-		}
-		String title = String.format("%s Price:%5.0f Volume:%d", direction, tradeEntity.getLastPrice(), tradeEntity.getVol());
-		String content = String.format("Order_Ref:%s, Trade Time:%d", tradeEntity.getOrderId(), tradeEntity.getTimeStamp());
+
+		String title = String.format("%s Price:%5.0f Volume:%d", tradeEntity.getDirectionString(), tradeEntity.getLastPrice(), tradeEntity.getVol());
+		String content = String.format("Order_Ref:%s, Trade Time:%d", tradeEntity.getOrderId(), tradeEntity.getOccurTimeString());
 		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,  
 		        new Intent(this, TradeListActivity.class), 0);
 		
@@ -247,7 +227,7 @@ public class AccountActivity extends Activity implements Handler.Callback {
 		final int NOTIFICATION_FLAG = 1;  
 		Notification notify = new Notification.Builder(this)  
 		    .setSmallIcon(R.drawable.messages) 
-		    .setTicker(tradeType + "提醒！")                
+		    .setTicker(tradeEntity.getTypeString() + "提醒！")                
 		    .setContentTitle(title)                               
 		    .setContentText(content)
 		    .setContentIntent(pendingIntent)

@@ -18,7 +18,9 @@ public class TradeEntity {
 	private long mTimeStamp;
 	private String mOrderId;
 	private int mLastPrice;
-	private int mDirection; // 0 sell, 1 buy
+	private int mDirection; // 0 Long, 1 short
+	private String mInstrument;
+	
 
 	public TradeEntity(int openPrice, int lastPrice, int highPrice, int lowPrice, int vol, long time){
 		mType = type.MD;
@@ -41,6 +43,25 @@ public class TradeEntity {
 	
 	public type getType() {
 		return mType;
+	}
+	
+	public String getTypeString() {
+		String tradeType = "";
+		switch (mType){
+		case Insert_Order:
+			tradeType = "报单";
+			break;
+		case Cancell_Order:
+			tradeType = "撤单";
+			break;
+		case Trade:
+			tradeType = "成交";
+			break;
+		default:
+			tradeType = "未定义";
+			break;
+		}
+		return tradeType;
 	}
 
 	public void setType(type mType) {
@@ -117,6 +138,23 @@ public class TradeEntity {
 
 	public void setDirection(int mDirection) {
 		this.mDirection = mDirection;
+	}
+	
+	public String getDirectionString(){
+		return mDirection == 0 ? "Long" : "Short";
+	}
+	
+	public String getOccurTimeString(){
+		java.util.Date curTime =  new java.util.Date(mTimeStamp * 500);
+		return curTime.toString();
+	}
+
+	public String getInstrument() {
+		return mInstrument;
+	}
+
+	public void setInstrument(String mInstrument) {
+		this.mInstrument = mInstrument;
 	}
 	
 }

@@ -72,11 +72,11 @@ public class ListAdapter extends BaseAdapter implements Filterable{
 		}
 		
 		holder.InstrumentIdLabel.setText("rb1605");//list.get(position).
-		holder.directionLabel.setText(list.get(position).getDirection());
+		holder.directionLabel.setText(list.get(position).getDirectionString());
 		holder.priceLabel.setText(String.valueOf(list.get(position).getLastPrice()));
 		holder.volumeLabel.setText(list.get(position).getVol());
 		holder.orderRefLabel.setText(list.get(position).getOrderId());
-		holder.occur_time.setText(String.valueOf(list.get(position).getTimeStamp()));
+		holder.occur_time.setText(list.get(position).getOccurTimeString());
 		
 		return convertView;
 	}
