@@ -43,6 +43,7 @@ public class AccountActivity extends Activity implements Handler.Callback {
 	private Button monitorBtn = null;
 	private Button logOutBtn = null;
 	private Button closeCtpBtn = null;
+	private Button checkMsgBtn = null;
 	private TextView accountView = null;
 	private TextView balanceView = null;
 	private TextView positionView = null;
@@ -69,6 +70,7 @@ public class AccountActivity extends Activity implements Handler.Callback {
 		monitorBtn = (Button) this.findViewById(R.id.monitor_btn);
 		logOutBtn = (Button) this.findViewById(R.id.LogOut);
 		closeCtpBtn = (Button) this.findViewById(R.id.ReleaseCtp);
+		checkMsgBtn = (Button) this.findViewById(R.id.CheckMessage);
 		
 		Intent intent =getIntent();
 		if (intent.hasExtra("AccountId")){
@@ -93,6 +95,14 @@ public class AccountActivity extends Activity implements Handler.Callback {
 			@Override
 			public void onClick(View v) {
 				mSession.LogOut();
+			}
+		});
+		
+		checkMsgBtn.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(AccountActivity.this, TradeListActivity.class);
+				startActivity(intent);
 			}
 		});
 		
@@ -122,7 +132,7 @@ public class AccountActivity extends Activity implements Handler.Callback {
 		progressDlg = new ProgressDialog(this);
 		progressDlg.setTitle("提示");
 		progressDlg.setMessage("登陆中。。。");
-		progressDlg.setCancelable(false);
+		//progressDlg.setCancelable(false);
 		progressDlg.show();
 	}
 

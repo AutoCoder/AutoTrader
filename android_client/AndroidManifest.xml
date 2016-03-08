@@ -2,12 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.android.futures"
     android:versionCode="1"
-    android:versionName="V1.1.1003" >
+    android:versionName="V1.1.1004" >
 
     <uses-sdk
         android:minSdkVersion="14"
         android:targetSdkVersion="19" />
-	<uses-permission  android:name="android.permission.INTERNET"/>
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:name=".MyApp"
         android:allowBackup="true"
@@ -17,19 +19,27 @@
         <activity
             android:name=".LoginActivity"
             android:label="@string/app_name"
-            android:screenOrientation="portrait" >"
+            android:screenOrientation="portrait" >
+"
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MyFragmentActivity"
-            android:screenOrientation="landscape" />"
+        <activity
+            android:name=".MyFragmentActivity"
+            android:screenOrientation="landscape" />
+"
         <activity
             android:name=".AccountActivity"
-            android:screenOrientation="portrait"
-            android:label="@string/title_activity_account" >
+            android:label="@string/title_activity_account"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name=".TradeListActivity"
+            android:label="@string/title_activity_tradelist"
+            android:screenOrientation="portrait" >
         </activity>
     </application>
 
