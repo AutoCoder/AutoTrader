@@ -4,10 +4,43 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="20dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal" >
+
+        <CheckBox
+            android:id="@+id/trade_check"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="交易" >
+        </CheckBox>
+
+        <CheckBox
+            android:id="@+id/insertOrder_check"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="报单" >
+        </CheckBox>
+
+        <CheckBox
+            android:id="@+id/cancelOrder_check"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="撤单" >
+        </CheckBox>
+    </LinearLayout>
+
     <ListView
         android:id="@+id/listview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
-<!--  android:divider="@drawable/dividerimage" -->
+
+        <!-- android:divider="@drawable/dividerimage" -->
     </ListView>
+
 </LinearLayout>
