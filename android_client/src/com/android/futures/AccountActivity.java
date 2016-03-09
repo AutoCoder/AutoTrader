@@ -219,7 +219,7 @@ public class AccountActivity extends Activity implements Handler.Callback {
 		TradeEntity tradeEntity = (TradeEntity)msg.obj;
 
 		String title = String.format("%s Price:%5.0f Volume:%d", tradeEntity.getDirectionString(), tradeEntity.getLastPrice(), tradeEntity.getVol());
-		String content = String.format("Order_Ref:%s, Trade Time:%d", tradeEntity.getOrderId(), tradeEntity.getOccurTimeString());
+		String content = String.format("Order_Ref:%s Trade_Time:%s", tradeEntity.getOrderId(), tradeEntity.getOccurTimeString());
 		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,  
 		        new Intent(this, TradeListActivity.class), 0);
 		

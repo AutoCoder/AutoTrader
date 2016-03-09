@@ -60,6 +60,7 @@ public class ListAdapter extends BaseAdapter implements Filterable{
 			holder = new ViewHolder();
 			convertView = LayoutInflater.from(c).inflate(R.layout.trade_listview_item,
 					null);
+			holder.TradeType = (TextView) convertView.findViewById(R.id.entity_type);
 			holder.InstrumentIdLabel = (TextView) convertView.findViewById(R.id.instrument_id);
 			holder.directionLabel = (TextView) convertView.findViewById(R.id.direction);
 			holder.priceLabel = (TextView) convertView.findViewById(R.id.last_price);
@@ -71,10 +72,11 @@ public class ListAdapter extends BaseAdapter implements Filterable{
 			holder=(ViewHolder) convertView.getTag();
 		}
 		
+		holder.TradeType.setText(list.get(position).getTypeString());
 		holder.InstrumentIdLabel.setText(list.get(position).getInstrument());
 		holder.directionLabel.setText(list.get(position).getDirectionString());
 		holder.priceLabel.setText(String.valueOf(list.get(position).getLastPrice()));
-		holder.volumeLabel.setText(list.get(position).getVol());
+		holder.volumeLabel.setText(String.valueOf(list.get(position).getVol()));
 		holder.orderRefLabel.setText(list.get(position).getOrderId());
 		holder.occur_time.setText(list.get(position).getOccurTimeString());
 		
@@ -82,6 +84,7 @@ public class ListAdapter extends BaseAdapter implements Filterable{
 	}
 	
 	static class ViewHolder {
+		TextView TradeType;
 		TextView InstrumentIdLabel;
 		TextView directionLabel;
 		TextView priceLabel;
