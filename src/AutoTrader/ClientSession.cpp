@@ -100,7 +100,8 @@ bool ClientSession::ExecutePendingOrder(){
 	while (m_isTrading.load()){
 		Order ord;
 		WaitAndPopCurrentOrder(ord);//blocking
-
+		if (m_ReleaseingCtpAccount)
+			break;
 		//if socket command set m_isTrading = false here. this function will quit.
 		if (m_isTrading.load()){ //Check this bool var again, prevent to execute new pushed order after user stop trade.
 			m_trade_spi->CancelOrder(ord.GetTriggerTick(), 6, ord.GetInstrumentId());
