@@ -227,12 +227,12 @@ void ClientSession::OnAccountInitFinished(){
 
 void ClientSession::OnRtnOrder(CThostFtdcOrderField* pOrder){
 	long long timeStamp = CommonUtils::DateTimeToTimestamp(pOrder->InsertDate, pOrder->InsertTime) * 2;
-	Transmission::Utils::SendDealInfo(m_session, Transmission::INSERT_ORDER, pOrder->Direction, pOrder->LimitPrice, pOrder->VolumeTotalOriginal, pOrder->OrderSysID, timeStamp);
+	Transmission::Utils::SendDealInfo(m_session, Transmission::INSERT_ORDER, pOrder->Direction, pOrder->LimitPrice, pOrder->VolumeTotalOriginal, pOrder->OrderRef, timeStamp);
 }
 
 void ClientSession::OnRtnTrade(CThostFtdcTradeField* pTrade){
 	long long timeStamp = CommonUtils::DateTimeToTimestamp(pTrade->TradeDate, pTrade->TradeTime) * 2;
-	Transmission::Utils::SendDealInfo(m_session, Transmission::TRADE, pTrade->Direction, pTrade->Price, pTrade->Volume, pTrade->OrderSysID, timeStamp);
+	Transmission::Utils::SendDealInfo(m_session, Transmission::TRADE, pTrade->Direction, pTrade->Price, pTrade->Volume, pTrade->OrderRef, timeStamp);
 }
 
 void ClientSession::OnCancelOrder(CThostFtdcInputOrderActionField *pInputOrderAction, CThostFtdcRspInfoField *pRspInfo){
