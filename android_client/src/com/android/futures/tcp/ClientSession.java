@@ -182,6 +182,7 @@ public class ClientSession implements TraderStatusListener {
 	@Override
 	public void onCTPCallback(TradeEntity entity) {
 		// TODO Auto-generated method stub
+		entity.setInstrument(mCurrentInstrument);
 		mMdSequence.add(entity);
 		if (entity.getType() != TradeEntity.type.MD){
 			onTradeNotification(entity);
