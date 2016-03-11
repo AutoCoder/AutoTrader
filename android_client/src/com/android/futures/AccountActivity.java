@@ -50,6 +50,7 @@ public class AccountActivity extends Activity implements Handler.Callback {
 	private boolean IsTrading = false;
 	private boolean IsPositionUpdated = false;
 	private ProgressDialog progressDlg;
+	private int notificationID = 0;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -220,7 +221,7 @@ public class AccountActivity extends Activity implements Handler.Callback {
 
 		String title = String.format("%s Price:%5.0f Volume:%d", tradeEntity.getDirectionString(), tradeEntity.getLastPrice(), tradeEntity.getVol());
 		String content = String.format("Order_Ref:%s Trade_Time:%s", tradeEntity.getOrderId(), tradeEntity.getOccurTimeString());
-		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,  
+		PendingIntent pendingIntent = PendingIntent.getActivity(this, notificationID++,  
 		        new Intent(this, TradeListActivity.class), 0);
 		
 		NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE); 

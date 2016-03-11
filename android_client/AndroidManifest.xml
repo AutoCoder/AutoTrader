@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.android.futures"
     android:versionCode="1"
-    android:versionName="V1.1.1004" >
+    android:versionName="V1.1.1005" >
 
     <uses-sdk
         android:minSdkVersion="14"
@@ -20,7 +20,6 @@
             android:name=".LoginActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait" >
-"
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -30,7 +29,6 @@
         <activity
             android:name=".MyFragmentActivity"
             android:screenOrientation="landscape" />
-"
         <activity
             android:name=".AccountActivity"
             android:label="@string/title_activity_account"

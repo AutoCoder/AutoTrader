@@ -1,5 +1,8 @@
 package com.android.futures.entity;
 
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+
 public class TradeEntity {
 	public enum type{
 		MD,
@@ -146,7 +149,8 @@ public class TradeEntity {
 	
 	public String getOccurTimeString(){
 		java.util.Date curTime =  new java.util.Date(mTimeStamp * 500);
-		return curTime.toString();
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.CHINA);
+		return sdf.format(curTime);
 	}
 
 	public String getInstrument() {

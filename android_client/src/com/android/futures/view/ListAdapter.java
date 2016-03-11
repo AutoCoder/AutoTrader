@@ -14,37 +14,46 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.TextView;
 
-public class ListAdapter extends BaseAdapter implements Filterable{
-	private Vector<TradeEntity> list = null;
-	private Vector<TradeEntity> filteredData = null;
+public class ListAdapter extends BaseAdapter implements Filterable {
+	private Vector<TradeEntity> list;
+	private Vector<TradeEntity> filteredData;
 	private Context c;
 	private TradeTypeFilter filter = null;
 	private boolean include_trade = true;
 	private boolean include_insertOrder = true;
 	private boolean include_cancelOrder = true;
-	
+
+	@SuppressWarnings("unchecked")
 	public ListAdapter(Vector<TradeEntity> list, Context c) {
 		super();
 		this.list = list;
-		this.filteredData = list;
+		this.filteredData = (Vector<TradeEntity>) list.clone();
 		this.c = c;
 	}
-	
-	public void setFilter(boolean trade, boolean insertOrder, boolean cancelOrder){
+
+	public void setFilter(boolean trade, boolean insertOrder, boolean cancelOrder) {
 		include_trade = trade;
 		include_insertOrder = insertOrder;
 		include_cancelOrder = cancelOrder;
 	}
-	
+
 	@Override
 	public int getCount() {
 		// TODO Auto-generated method stub
-		return filteredData.size();
+		if (filteredData == null) {
+			return 0;
+		} else {
+			return (filteredData.size());
+		}
 	}
 
 	@Override
 	public Object getItem(int position) {
-		return filteredData.get(position);
+		if (filteredData == null) {
+			return null;
+		} else {
+			return filteredData.get(position);
+		}
 	}
 
 	@Override
@@ -58,8 +67,7 @@ public class ListAdapter extends BaseAdapter implements Filterable{
 		ViewHolder holder = null;
 		if (convertView == null) {
 			holder = new ViewHolder();
-			convertView = LayoutInflater.from(c).inflate(R.layout.trade_listview_item,
-					null);
+			convertView = LayoutInflater.from(c).inflate(R.layout.trade_listview_item, null);
 			holder.TradeType = (TextView) convertView.findViewById(R.id.entity_type);
 			holder.InstrumentIdLabel = (TextView) convertView.findViewById(R.id.instrument_id);
 			holder.directionLabel = (TextView) convertView.findViewById(R.id.direction);
@@ -68,21 +76,21 @@ public class ListAdapter extends BaseAdapter implements Filterable{
 			holder.orderRefLabel = (TextView) convertView.findViewById(R.id.order_ref);
 			holder.occur_time = (TextView) convertView.findViewById(R.id.occur_time);
 			convertView.setTag(holder);
-		}else{
-			holder=(ViewHolder) convertView.getTag();
+		} else {
+			holder = (ViewHolder) convertView.getTag();
 		}
-		
-		holder.TradeType.setText(list.get(position).getTypeString());
-		holder.InstrumentIdLabel.setText(list.get(position).getInstrument());
-		holder.directionLabel.setText(list.get(position).getDirectionString());
-		holder.priceLabel.setText(String.valueOf(list.get(position).getLastPrice()));
-		holder.volumeLabel.setText(String.valueOf(list.get(position).getVol()));
-		holder.orderRefLabel.setText(list.get(position).getOrderId());
-		holder.occur_time.setText(list.get(position).getOccurTimeString());
-		
+
+		holder.TradeType.setText(filteredData.get(position).getTypeString());
+		holder.InstrumentIdLabel.setText(filteredData.get(position).getInstrument());
+		holder.directionLabel.setText(filteredData.get(position).getDirectionString());
+		holder.priceLabel.setText(String.valueOf(filteredData.get(position).getLastPrice()));
+		holder.volumeLabel.setText(String.valueOf(filteredData.get(position).getVol()));
+		holder.orderRefLabel.setText(filteredData.get(position).getOrderId());
+		holder.occur_time.setText(filteredData.get(position).getOccurTimeString());
+
 		return convertView;
 	}
-	
+
 	static class ViewHolder {
 		TextView TradeType;
 		TextView InstrumentIdLabel;
@@ -100,37 +108,41 @@ public class ListAdapter extends BaseAdapter implements Filterable{
 			filter = new TradeTypeFilter();
 		return filter;
 	}
-	
+
 	private class TradeTypeFilter extends Filter {
-        @Override
-        protected FilterResults performFiltering(CharSequence constraint) {
+		@Override
+		protected FilterResults performFiltering(CharSequence constraint) {
 
-            FilterResults results = new FilterResults();
-            
-            for (int i =0; i < list.size(); i++){
-            	if (include_trade && list.get(i).getType() == TradeEntity.type.Trade){
-            		filteredData.add(list.get(i));
-            	}
-            	if (include_insertOrder && list.get(i).getType() == TradeEntity.type.Insert_Order){
-            		filteredData.add(list.get(i));
-            	}
-            	if(include_cancelOrder && list.get(i).getType() == TradeEntity.type.Cancell_Order){
-            		filteredData.add(list.get(i));
-            	}
-            }
-            
-            results.values = filteredData;
-            results.count = filteredData.size();
+			FilterResults results = new FilterResults();
+			filteredData.clear();
+			for (int i = 0; i < list.size(); i++) {
+				if (include_trade && list.get(i).getType() == TradeEntity.type.Trade) {
+					filteredData.add(list.get(i));
+				}
+				if (include_insertOrder && list.get(i).getType() == TradeEntity.type.Insert_Order) {
+					filteredData.add(list.get(i));
+				}
+				if (include_cancelOrder && list.get(i).getType() == TradeEntity.type.Cancell_Order) {
+					filteredData.add(list.get(i));
+				}
+			}
 
-            return results;
-        }
+			results.values = filteredData;
+			results.count = filteredData.size();
 
-        @SuppressWarnings("unchecked")
-        @Override
-        protected void publishResults(CharSequence constraint, FilterResults results) {
-            filteredData = (Vector<TradeEntity>) results.values;
-            notifyDataSetChanged();
-        }
+			return results;
+		}
 
-    }
+		@SuppressWarnings("unchecked")
+		@Override
+		protected void publishResults(CharSequence constraint, FilterResults results) {
+			filteredData = (Vector<TradeEntity>) results.values;
+			if (results.count > 0) {
+				notifyDataSetChanged();
+			} else {
+				notifyDataSetInvalidated();
+			}
+		}
+
+	}
 }
