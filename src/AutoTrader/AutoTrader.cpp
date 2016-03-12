@@ -27,6 +27,7 @@
 #include "RealTimeDataProcessor.h"
 #include "LoadStrategies.h"
 #include "AccountMgr.h"
+#include "crossplatform.h"
 
 int requestId = 0;
 
@@ -121,7 +122,9 @@ int main(int argc, const char* argv[]){
 	//int size = temp.length();
 	StrategyPluginsLoader loader; //must be top
 	auto console = spdlog::stdout_logger_mt("console");
-
+	auto file_logger = spdlog::rotating_logger_mt("file_logger", "logs/logfile", 1048576 * 5, 3);
+	SYNC_LOG << "----------------------------------";
+	SYNC_LOG << "Lanuch AutoTrader...";
 	//Test
 	//RunUnitTest();
 
@@ -185,5 +188,7 @@ int main(int argc, const char* argv[]){
 		//pool->FreeProcessors();
 	}
 
+	SYNC_LOG << "Shutdown AutoTrader...";
+	SYNC_LOG << "-------------------------------\n";
 	return 0;
 }

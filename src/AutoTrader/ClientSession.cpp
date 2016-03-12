@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include <functional>
 #include <algorithm>
+#include "spdlog/spdlog.h"
 
 #include "ThostFtdcTraderApi.h"
 #include "ClientSession.h"
@@ -19,6 +20,7 @@
 #include "Transmission.h"
 #include "Utils.h"
 #include "CommonUtils.h"
+#include "crossplatform.h"
 
 #ifdef FAKE_MD
 #include<ctime>
@@ -50,6 +52,7 @@ ClientSession::ClientSession(const std::string& userId, const std::shared_ptr<Tr
 	m_trade_api->SubscribePrivateTopic(THOST_TERT_RESTART);
 	m_trade_api->RegisterFront(const_cast<char*>(Config::Instance()->CtpTradeFront().c_str()));
 	m_trade_api->Init();
+	SYNC_LOG << "Account:" << m_userId << "setup-up...";
 }
 
 ClientSession::~ClientSession()
@@ -67,6 +70,8 @@ ClientSession::~ClientSession()
 		delete m_trade_spi;
 		m_trade_spi = nullptr;
 	}
+
+	SYNC_LOG << "Account:" << m_userId << "shutdown...";
 }
 
 //may access by mdThread and m_exeOrderThread

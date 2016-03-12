@@ -25,6 +25,7 @@
 
 #ifndef SYNC_PRINT
 #define SYNC_PRINT spdlog::get("console")->info()
+#define SYNC_LOG spdlog::get("file_logger")->info()
 #endif
 
 #endif
