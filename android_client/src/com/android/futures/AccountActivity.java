@@ -235,6 +235,8 @@ public class AccountActivity extends Activity implements Handler.Callback {
 		    .setNumber(1)
 		    .getNotification();
 		
+		notify.defaults |= Notification.DEFAULT_SOUND;  
+		notify.defaults |= Notification.DEFAULT_VIBRATE;  
 		notify.flags |= Notification.FLAG_AUTO_CANCEL;  
 		manager.notify(NOTIFICATION_FLAG, notify);
 	}
