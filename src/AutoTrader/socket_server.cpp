@@ -12,4 +12,8 @@ namespace Transmission{
 	void socket_server::run(){
 		server_impl_->run();
 	}
+
+	void socket_server::stop(){
+		server_impl_->stop();
+	}
 }

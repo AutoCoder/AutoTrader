@@ -16,6 +16,7 @@ namespace Transmission{
 	public:
 		socket_server(short port);
 		void run();/// Run the server's io_service loop.
+		void stop(); // stop io_service
 
 	private:
 		std::shared_ptr<Detail::server> server_impl_;

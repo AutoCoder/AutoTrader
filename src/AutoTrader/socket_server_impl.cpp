@@ -45,7 +45,7 @@ namespace Transmission{
 							GetFIFOActionQueue().Push_back(user_action_);
 						}
 						else if (result == RemoteUserAction::Parse_Result::Bad){
-							immediatelyReply = "Invalid Action is received, ignored...\n";	
+							immediatelyReply = "Invalid Action is received, ignored...\n";
 						}
 						do_write(immediatelyReply.c_str(), immediatelyReply.length());
 						user_action_.Reset();//start to receive new Action Request
@@ -88,6 +88,10 @@ namespace Transmission{
 
 		void server::run(){
 			io_service_.run();
+		}
+
+		void server::stop(){
+			io_service_.stop();
 		}
 
 		void server::do_accept()

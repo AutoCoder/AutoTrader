@@ -2,7 +2,7 @@
 #define ACTION_PROCESS_H
 
 
-void ProcessActionQueue();
+bool ProcessActionQueue();
 
 
 #endif

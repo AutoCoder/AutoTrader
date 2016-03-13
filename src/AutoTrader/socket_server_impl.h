@@ -42,6 +42,7 @@ namespace Transmission{
 		public:
 			explicit server(short port);
 			void run();
+			void stop();
 
 		private:
 			void do_accept();

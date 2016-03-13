@@ -28,12 +28,14 @@
 #include "LoadStrategies.h"
 #include "AccountMgr.h"
 #include "crossplatform.h"
+#include <signal.h>
 
 int requestId = 0;
 
 std::mutex mtx;
 std::condition_variable cv_md;
 std::condition_variable cv_trade;
+std::condition_variable cv_quit;
 std::atomic<bool> g_quit(false);
 std::atomic<bool> g_reply(false);
 threadsafe_queue<Order> order_queue;
@@ -112,19 +114,25 @@ void ReplayTickDataFromDB(const std::string& instrumentID, const std::string& st
 	pool->StoreStrategySequenceToDB(instrumentID, mark);
 }
 #endif
+
+Transmission::socket_server server(2007);
+
+void schedule_stop(int sig) {
+	g_quit = true;
+	server.stop();
+};
 /*
 Usage: 
    AutoTrade.exe
    AutoTrade.exe replay rb1510 table_mark
 */
 int main(int argc, const char* argv[]){
-	//std::string temp = "{\"ActionType\":\"StartTrade\",\"Arguments\":{\"InstrumentId\":\"rb1604\",\"StrategyName\":\"Pos20Precent_3_5_MACrossStratgy\"}}";
-	//int size = temp.length();
+	signal(SIGINT, schedule_stop);
 	StrategyPluginsLoader loader; //must be top
 	auto console = spdlog::stdout_logger_mt("console");
 	auto file_logger = spdlog::rotating_logger_mt("file_logger", "logs/logfile", 1048576 * 5, 3);
-	SYNC_LOG << "----------------------------------";
-	SYNC_LOG << "Lanuch AutoTrader...";
+	file_logger->info() << "----------------------------------";
+	file_logger->info() << "Lanuch AutoTrader...";
 	//Test
 	//RunUnitTest();
 
@@ -145,50 +153,24 @@ int main(int argc, const char* argv[]){
 		pMdUserApi->RegisterSpi(pMdUserSpi);
 		pMdUserApi->RegisterFront(const_cast<char*>(Config::Instance()->CtpMdFront().c_str()));
 		pMdUserApi->Init();
-		std::thread actionInvoker(ProcessActionQueue);
+		//std::thread actionInvoker(ProcessActionQueue);
 
-		Transmission::socket_server server(2007);
-		server.run();
-		//});
+		std::future<bool> actionInvoker_result = std::async(std::launch::async, ProcessActionQueue);
+		std::future<bool> server_result = std::async(std::launch::async, []() ->bool {
+			server.run();
+			return true;
+		});
+		
+		if (server_result.get() == true){
+			SYNC_LOG << "1) Shutdown Socket Server...Success";
+		}
 
-		////[Excute Order Thread] Excute the Order in Queue one by one looply.
-		//std::thread tradeThread(ExcuteOrderQueue, pTradeUserSpi);
-
-		////mdManagethread.join();
-		////tradeManagethread.join();
-		//tradeThread.join();
-
-		////[Main Thread]Release the resource and pointer.
-		//console->info() << "Start to release resource...";
-		//if (pMdUserApi)
-		//{
-		//	pMdUserApi->RegisterSpi(NULL);
-		//	pMdUserApi->Release();
-		//	pMdUserApi = NULL;
+		//if (actionInvoker_result.get() == true){
+		//	SYNC_LOG << "2) Shutdown Action Queue...Success";
 		//}
-		//if (pMdUserSpi)
-		//{
-		//	delete pMdUserSpi;
-		//	pMdUserSpi = NULL;
-		//}
-		//if (pTradeUserApi)
-		//{
-		//	pTradeUserApi->RegisterSpi(NULL);
-		//	pTradeUserApi->Release();
-		//	pTradeUserApi = NULL;
-		//}
-		//if (pTradeUserSpi)
-		//{
-		//	delete pTradeUserSpi;
-		//	pTradeUserSpi = NULL;
-		//}
-		//console->info() << "Quit ... ";
 
 		//write to db
 		//pool->FreeProcessors();
 	}
-
-	SYNC_LOG << "Shutdown AutoTrader...";
-	SYNC_LOG << "-------------------------------\n";
 	return 0;
 }
