@@ -2,7 +2,6 @@
 #define TRADE_SPI_H_
 
 #include "ThostFtdcTraderApi.h"
-//#include <future>
 #include <mutex>
 #include <condition_variable>
 #include "crossplatform.h"
@@ -13,8 +12,6 @@ class Order;
 namespace AP{
 	class AccountDetailMgr;
 };
-
-extern std::condition_variable cv_md;
 
 typedef std::function<void()>															InitedAccountCallback;
 typedef std::function<void(CThostFtdcOrderField*)>										RtnOrderCallback;
@@ -84,7 +81,6 @@ class CtpTradeSpi : public CThostFtdcTraderSpi
 		//step 9
 		void OnRspQryInstrument(){
 			//invoke md thread
-			//cv_md.notify_all();
 			//send Account init finish action to fifo
 		}
 

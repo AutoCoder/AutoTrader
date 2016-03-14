@@ -9,24 +9,19 @@
 #include <iostream>
 #include <condition_variable>
 #include <atomic>
+#include <csignal>
 
 #ifdef WIN32
 #pragma warning(disable : 4996)
 #endif
 
 extern int requestId;  
-extern std::condition_variable cv_md;
-extern std::condition_variable cv_trade;
-extern std::atomic<bool> g_quit;
 
 namespace {
 
-
 	void TryTerminate(const char * time){
-		if (!g_quit && /*strcmp(time, "10:55:00") == 0){ //*/CommonUtils::IsMarketingTime(time) == false){
-			g_quit = true;
-			cv_md.notify_all();
-			cv_trade.notify_all();
+		if (/*strcmp(time, "10:55:00") == 0){ //*/CommonUtils::IsMarketingTime(time) == false){
+			raise(SIGINT);
 		}
 	}
 }

@@ -11,8 +11,6 @@
 
 extern int requestId;
 
-extern std::condition_variable cv_trade;
-
 std::vector<CThostFtdcOrderField*> orderList;
 std::vector<CThostFtdcTradeField*> tradeList;
 

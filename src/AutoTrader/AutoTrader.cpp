@@ -32,11 +32,6 @@
 
 int requestId = 0;
 
-std::mutex mtx;
-std::condition_variable cv_md;
-std::condition_variable cv_trade;
-std::condition_variable cv_quit;
-std::atomic<bool> g_quit(false);
 std::atomic<bool> g_reply(false);
 threadsafe_queue<Order> order_queue;
 
@@ -118,7 +113,7 @@ void ReplayTickDataFromDB(const std::string& instrumentID, const std::string& st
 Transmission::socket_server server(2007);
 
 void schedule_stop(int sig) {
-	g_quit = true;
+	ActionQueueProcessor::Instance().Stop();
 	server.stop();
 };
 /*
@@ -153,21 +148,23 @@ int main(int argc, const char* argv[]){
 		pMdUserApi->RegisterSpi(pMdUserSpi);
 		pMdUserApi->RegisterFront(const_cast<char*>(Config::Instance()->CtpMdFront().c_str()));
 		pMdUserApi->Init();
-		//std::thread actionInvoker(ProcessActionQueue);
 
-		std::future<bool> actionInvoker_result = std::async(std::launch::async, ProcessActionQueue);
-		std::future<bool> server_result = std::async(std::launch::async, []() ->bool {
+		std::future<bool> future_action_queue = std::async(std::launch::async, []()->bool {
+			ActionQueueProcessor::Instance().Start();
+			return true;
+		}); 
+		std::future<bool> future_server = std::async(std::launch::async, []()->bool {
 			server.run();
 			return true;
 		});
-		
-		if (server_result.get() == true){
-			SYNC_LOG << "1) Shutdown Socket Server...Success";
-		}
 
-		//if (actionInvoker_result.get() == true){
-		//	SYNC_LOG << "2) Shutdown Action Queue...Success";
-		//}
+		if (future_action_queue.get() == true){
+			SYNC_LOG << "1) Shutdown Action Queue...Success";
+		}		
+
+		if (future_server.get() == true){
+			SYNC_LOG << "2) Shutdown Socket Server...Success";
+		}
 
 		//write to db
 		//pool->FreeProcessors();
