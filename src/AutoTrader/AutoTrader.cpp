@@ -122,7 +122,6 @@ Usage:
    AutoTrade.exe replay rb1510 table_mark
 */
 int main(int argc, const char* argv[]){
-	signal(SIGINT, schedule_stop);
 	StrategyPluginsLoader loader; //must be top
 	auto console = spdlog::stdout_logger_mt("console");
 	auto file_logger = spdlog::rotating_logger_mt("file_logger", "logs/logfile", 1048576 * 5, 3);
@@ -157,7 +156,7 @@ int main(int argc, const char* argv[]){
 			server.run();
 			return true;
 		});
-
+		signal(SIGINT, schedule_stop);
 		if (future_action_queue.get() == true){
 			SYNC_LOG << "1) Shutdown Action Queue...Success";
 		}		
