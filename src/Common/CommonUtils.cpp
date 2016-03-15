@@ -177,7 +177,7 @@ bool CommonUtils::IsMarketingTime(const char * time){
 
 	bool ret = (CommonUtils::TimeInRange("00:00:00", false, "01:00:00", true, time) \
 		|| CommonUtils::TimeInRange("08:55:00", false, "11:30:00", true, time) \
-		|| CommonUtils::TimeInRange("13:25:00", false, "15:00:00", true, time) \
+		|| CommonUtils::TimeInRange("12:55:00", false, "15:00:00", true, time) \
 		|| CommonUtils::TimeInRange("20:55:00", false, "23:59:59", false, time));
 
 	return ret;
