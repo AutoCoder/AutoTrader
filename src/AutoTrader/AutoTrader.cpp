@@ -6,6 +6,7 @@
 #include <atomic>
 #include <future>
 #include <condition_variable>
+#include <ctime>
 
 #include "spdlog/spdlog.h"
 #include "ThreadSafeQueue.h"
@@ -30,8 +31,9 @@
 #include "crossplatform.h"
 #include <signal.h>
 
-int requestId = 0;
+#pragma warning(disable:4996)
 
+int requestId = 0;
 std::atomic<bool> g_reply(false);
 threadsafe_queue<Order> order_queue;
 
@@ -110,12 +112,6 @@ void ReplayTickDataFromDB(const std::string& instrumentID, const std::string& st
 }
 #endif
 
-Transmission::socket_server server(2007);
-
-void schedule_stop(int sig) {
-	ActionQueueProcessor::Instance().Stop();
-	server.stop();
-};
 /*
 Usage: 
    AutoTrade.exe
@@ -151,12 +147,43 @@ int main(int argc, const char* argv[]){
 		std::future<bool> future_action_queue = std::async(std::launch::async, []()->bool {
 			ActionQueueProcessor::Instance().Start();
 			return true;
-		}); 
-		std::future<bool> future_server = std::async(std::launch::async, []()->bool {
+		});
+
+		Transmission::socket_server server(2007);
+		std::future<bool> future_server = std::async(std::launch::async, [&server]()->bool {
 			server.run();
 			return true;
 		});
-		signal(SIGINT, schedule_stop);
+
+		std::mutex q_mtx;
+		std::condition_variable q_cv;
+		std::atomic<bool> q_flag(false);
+		
+		//start schedule_stop function
+		std::async(std::launch::async, [&server, &q_mtx, &q_cv, &q_flag](){
+			std::unique_lock<std::mutex> lk(q_mtx);
+			q_cv.wait(lk, [&q_flag]{return q_flag.load(); });
+			ActionQueueProcessor::Instance().Stop();
+			server.stop();
+		});
+
+		//check if it's on trade available time periodically (15 min)
+		std::async(std::launch::async, [&q_flag, &q_cv](){
+			const int MilliSecondsPerQuarter = 15 * 60 * 1000;
+			sleep(MilliSecondsPerQuarter); // 允许在非交易时间 运行15分钟
+			while (q_flag.load() == false)
+			{
+				std::time_t result = std::time(nullptr);
+				struct tm * now_local = std::localtime(&result);
+				int second_elapse = now_local->tm_hour * 3600 + now_local->tm_min * 60 + now_local->tm_sec;
+				if (CommonUtils::IsMarketingTime(second_elapse) == false)
+				{
+					q_flag.store(true);
+					q_cv.notify_all();
+				}
+			}
+		});
+
 		if (future_action_queue.get() == true){
 			SYNC_LOG << "1) Shutdown Action Queue...Success";
 		}		

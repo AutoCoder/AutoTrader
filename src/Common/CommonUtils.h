@@ -23,7 +23,9 @@ public:
 	// |bopen = false & eopen = true| -> [begin, end)
 	// input_time belongTo [begin, end)
 	static bool TimeInRange(const char* begin, bool bopen, const char* end, bool eopen,  const char* input);
+	static bool TimeInRange(const char* begin, bool bopen, const char* end, bool eopen, seconds input_time_s);
 	static bool IsMarketingTime(const char * time);
+	static bool IsMarketingTime(seconds input_time_s);
 
 	static int StringtoInt(const std::string& str);
 	static double StringtoDouble(const std::string& str);

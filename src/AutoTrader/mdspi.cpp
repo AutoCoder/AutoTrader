@@ -17,14 +17,14 @@
 
 extern int requestId;  
 
-namespace {
-
-	void TryTerminate(const char * time){
-		if (/*strcmp(time, "10:55:00") == 0){ //*/CommonUtils::IsMarketingTime(time) == false){
-			raise(SIGINT);
-		}
-	}
-}
+//namespace {
+//
+//	void TryTerminate(const char * time){
+//		if (/*strcmp(time, "10:55:00") == 0){ //*/CommonUtils::IsMarketingTime(time) == false){
+//			raise(SIGINT);
+//		}
+//	}
+//}
 
 
 CtpMdSpi::CtpMdSpi(CThostFtdcMdApi* api, const std::vector<std::string>& instruments, const std::string& brokerId, const std::string& userID, const std::string& pw)
@@ -151,7 +151,7 @@ void CtpMdSpi::OnRtnDepthMarketData(
 	TickWrapper tem(pDepthMarketData);
 	pool->AppendRealTimeData(tem);
 
-	TryTerminate(pDepthMarketData->UpdateTime);
+	//TryTerminate(pDepthMarketData->UpdateTime);
 }
 
 bool CtpMdSpi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo)

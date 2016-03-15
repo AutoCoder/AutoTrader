@@ -149,10 +149,10 @@ seconds CommonUtils::TimeToSenconds(const char* time_src){
 	return ret;
 }
 
-bool CommonUtils::TimeInRange(const char* begin, bool bopen, const char* end, bool eopen, const char* input_time){
+bool CommonUtils::TimeInRange(const char* begin, bool bopen, const char* end, bool eopen, seconds input_time_s){
 	seconds begin_s = TimeToSenconds(begin);
 	seconds end_s = TimeToSenconds(end);
-	seconds input_time_s = TimeToSenconds(input_time);
+
 	bool leftIn = false;
 	bool RightIn = false;
 
@@ -170,6 +170,19 @@ bool CommonUtils::TimeInRange(const char* begin, bool bopen, const char* end, bo
 		RightIn = true;
 
 	return RightIn;
+}
+
+bool CommonUtils::TimeInRange(const char* begin, bool bopen, const char* end, bool eopen, const char* input_time){
+	return TimeInRange(begin, bopen, end, eopen, TimeToSenconds(input_time));
+}
+
+bool CommonUtils::IsMarketingTime(seconds time){
+	bool ret = (CommonUtils::TimeInRange("00:00:00", false, "01:00:00", true, time) \
+		|| CommonUtils::TimeInRange("08:55:00", false, "11:30:00", true, time) \
+		|| CommonUtils::TimeInRange("12:55:00", false, "15:00:00", true, time) \
+		|| CommonUtils::TimeInRange("20:55:00", false, "23:59:59", false, time));
+
+	return ret;
 }
 
 bool CommonUtils::IsMarketingTime(const char * time){
