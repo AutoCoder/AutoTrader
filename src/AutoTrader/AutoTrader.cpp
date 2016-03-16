@@ -160,7 +160,7 @@ int main(int argc, const char* argv[]){
 		std::atomic<bool> q_flag(false);
 		
 		//start schedule_stop function
-		std::async(std::launch::async, [&server, &q_mtx, &q_cv, &q_flag](){
+		auto schedule_stop = std::async(std::launch::async, [&server, &q_mtx, &q_cv, &q_flag](){
 			std::unique_lock<std::mutex> lk(q_mtx);
 			q_cv.wait(lk, [&q_flag]{return q_flag.load(); });
 			ActionQueueProcessor::Instance().Stop();
@@ -168,8 +168,8 @@ int main(int argc, const char* argv[]){
 		});
 
 		//check if it's on trade available time periodically (15 min)
-		std::async(std::launch::async, [&q_flag, &q_cv](){
-			const int MilliSecondsPerQuarter = 15 * 60 * 1000;
+		auto check_quit = std::async(std::launch::async, [&q_flag, &q_cv](){
+			const int MilliSecondsPerQuarter = 10 * 1000;
 			sleep(MilliSecondsPerQuarter); // 允许在非交易时间 运行15分钟
 			while (q_flag.load() == false)
 			{
@@ -190,6 +190,17 @@ int main(int argc, const char* argv[]){
 
 		if (future_server.get() == true){
 			SYNC_LOG << "2) Shutdown Socket Server...Success";
+		}
+
+		if (pMdUserSpi) {
+			delete pMdUserSpi;
+			pMdUserSpi = NULL;
+		}
+
+		if (pMdUserApi){
+			pMdUserApi->RegisterSpi(NULL);
+			pMdUserApi->Release();
+			pMdUserApi = NULL;
 		}
 
 		//write to db
