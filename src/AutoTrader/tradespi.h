@@ -191,6 +191,7 @@ private:
 	AP::AccountDetailMgr&								m_account_detail_mgr;
 	CThostFtdcTraderApi*								pUserApi;
 	TradeThreadStateChangedHandler						m_stateChangeHandler;
+	int              									m_requestId;
 };
 
 #endif 

@@ -33,8 +33,6 @@
 
 #pragma warning(disable:4996)
 
-int requestId = 0;
-
 //std::mutex g_OrderRunMtx;
 
 //void ExcuteOrderQueue(CtpTradeSpi* pUserSpi){

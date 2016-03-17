@@ -9,8 +9,6 @@
 #include "CommonUtils.h"
 #include "AP_Mgr.h"
 
-extern int requestId;
-
 std::vector<CThostFtdcOrderField*> orderList;
 std::vector<CThostFtdcTradeField*> tradeList;
 
@@ -31,6 +29,7 @@ CtpTradeSpi::CtpTradeSpi(CThostFtdcTraderApi* p, const char * brokerID, const ch
 	, m_OnRtnOrder_callback(onRtnOrderCallback)
 	, m_OnRtnTrade_callback(onRtnTradeCallback)
 	, m_OnCancelOrder_callback(onRtnCancellOrderCallback)
+	, m_requestId(0)
 {
 	STRCPY(m_brokerID, brokerID);
 	STRCPY(m_userID, userID);
@@ -56,7 +55,7 @@ void CtpTradeSpi::ReqUserLogin(){
 	STRCPY(req.UserID, m_userID);
 	STRCPY(req.Password, m_password);
 	STRCPY(req.UserProductInfo, m_productName);
-	int ret = pUserApi->ReqUserLogin(&req, ++requestId);
+	int ret = pUserApi->ReqUserLogin(&req, ++m_requestId);
 	SYNC_PRINT << "[Trade] Request | Login ..." << ((ret == 0) ? "Success" : "Fail");
 }
 
@@ -80,7 +79,7 @@ void CtpTradeSpi::ReqSettlementInfoConfirm(){
 	memset(&req, 0, sizeof(req));
 	STRCPY(req.BrokerID, m_brokerID);
 	STRCPY(req.InvestorID, m_userID);
-	int ret = pUserApi->ReqSettlementInfoConfirm(&req, ++requestId);
+	int ret = pUserApi->ReqSettlementInfoConfirm(&req, ++m_requestId);
 	SYNC_PRINT << "[Trade] Request | Send Settlement Confirm..." << ((ret == 0) ? "Success" : "Fail");
 }
 
@@ -100,7 +99,7 @@ void CtpTradeSpi::ReqQryOrder(){
 	memset(&req, 0, sizeof(req));
 
 	STRCPY(req.InvestorID, m_userID);//投资者代码,也是userId
-	int ret = pUserApi->ReqQryOrder(&req, ++requestId);
+	int ret = pUserApi->ReqQryOrder(&req, ++m_requestId);
 
 	SYNC_PRINT << "[Trade] Request | Query Order..." << ((ret == 0) ? "Success" : "Fail") << " ret:" << ret; //ret值为-3表示每秒发送请求数超过许可数
 }
@@ -144,7 +143,7 @@ void CtpTradeSpi::ReqQryTrade(){
 	memset(&req, 0, sizeof(req));
 
 	STRCPY(req.InvestorID, m_userID);//投资者代码,也是userId
-	int ret = pUserApi->ReqQryTrade(&req, ++requestId);
+	int ret = pUserApi->ReqQryTrade(&req, ++m_requestId);
 
 	SYNC_PRINT << "[Trade] Request | Query Trade..." << ((ret == 0) ? "Success" : "Fail") << " ret:" << ret;//ret值为-3表示每秒发送请求数超过许可数
 }
@@ -186,7 +185,7 @@ void CtpTradeSpi::ReqQryInvestorPositionDetail(){
 	STRCPY(req.InvestorID, m_userID);//投资者代码,也是userId
 
 	//strcpy(req.InstrumentID, "IF1402");
-	int ret = pUserApi->ReqQryInvestorPositionDetail(&req, ++requestId);
+	int ret = pUserApi->ReqQryInvestorPositionDetail(&req, ++m_requestId);
 
 	SYNC_PRINT << "[Trade] Request | Query Invester position details..." << ((ret == 0) ? "Success" : "Fail") << " ret:" << ret;//ret值为-3表示每秒发送请求数超过许可数
 }
@@ -269,7 +268,7 @@ void CtpTradeSpi::ReqQryTradingAccount()
 	STRCPY(req.InvestorID, m_userID);
 	int ret = -1;
 	while (true){
-		ret = pUserApi->ReqQryTradingAccount(&req, ++requestId);
+		ret = pUserApi->ReqQryTradingAccount(&req, ++m_requestId);
 		if (ret == 0){
 			SYNC_PRINT << "[Trade] Request | Query Trading Account...Sccuess";
 			break;
@@ -323,7 +322,7 @@ void CtpTradeSpi::ReqQryInvestorPosition_all()
 	//strcpy(req.BrokerID, appId);
 	//strcpy(req.InvestorID, userId);
 	//strcpy(req.InstrumentID, instId);
-	int ret = pUserApi->ReqQryInvestorPosition(&req, ++requestId);
+	int ret = pUserApi->ReqQryInvestorPosition(&req, ++m_requestId);
 	//SYNC_PRINT << "[Trade] 请求 | 发送持仓查询..." << ((ret == 0) ? "成功" : "失败");
 	SYNC_PRINT << "[Trade] Request | Query Investor Positon..." << ((ret == 0) ? "Sccuess" : "Fail");
 }
@@ -396,7 +395,7 @@ void CtpTradeSpi::OnRspQryInvestorPosition(
 void CtpTradeSpi::ReqQryInstrument_all(){
 	CThostFtdcQryInstrumentField req;
 	memset(&req, 0, sizeof(req));
-	int ret = pUserApi->ReqQryInstrument(&req, ++requestId);
+	int ret = pUserApi->ReqQryInstrument(&req, ++m_requestId);
 	SYNC_PRINT << "[Trade] Request | Query Instrument(All)..." << ((ret == 0) ? "Success" : "Fail") << " ret:" << ret;
 }
 
@@ -405,7 +404,7 @@ void CtpTradeSpi::ReqQryInstrument(TThostFtdcInstrumentIDType instId)
 	CThostFtdcQryInstrumentField req;
 	memset(&req, 0, sizeof(req));
 	STRCPY(req.InstrumentID, instId);
-	int ret = pUserApi->ReqQryInstrument(&req, ++requestId);
+	int ret = pUserApi->ReqQryInstrument(&req, ++m_requestId);
 	SYNC_PRINT << "[Trade] Request | Query Instrument(" << instId << ")..." << ((ret == 0) ? "Success" : "Fail") << " ret:" << ret;;
 }
 
@@ -456,7 +455,7 @@ void CtpTradeSpi::ReqOrderAction(const CThostFtdcOrderField& order)//TThostFtdcS
 	STRCPY(req.OrderSysID, order.OrderSysID);
 	req.ActionFlag = THOST_FTDC_AF_Delete;
 
-	int ret = pUserApi->ReqOrderAction(&req, ++requestId);
+	int ret = pUserApi->ReqOrderAction(&req, ++m_requestId);
 	//SYNC_PRINT << "[Trade] 请求 | 撤销报单..." << ((ret == 0) ? "成功" : "失败");
 	SYNC_PRINT << "[Trade] Request | Cancell Order...OrderSysID:" << order.OrderSysID << ((ret == 0) ? "Success" : "Fail");
 }
@@ -557,7 +556,7 @@ void CtpTradeSpi::ReqOrderInsert(Order ord){
 	if (success){
 		//SYNC_PRINT << "[Debug] 插入订单:" << CommonUtils::StringFromStruct(ordstruct);
 		SYNC_PRINT << "[Trade] Inserting Order:" << CommonUtils::StringFromStruct(ordstruct);
-		int ret = pUserApi->ReqOrderInsert(&ordstruct, ++requestId);
+		int ret = pUserApi->ReqOrderInsert(&ordstruct, ++m_requestId);
 		SYNC_PRINT << "[Trade] Insert Order..." << ((ret == 0) ? "Success" : "Fail");
 		//if (ret)
 		//	g_OrderRunMtx.unlock();

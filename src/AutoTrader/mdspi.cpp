@@ -15,8 +15,6 @@
 #pragma warning(disable : 4996)
 #endif
 
-extern int requestId;  
-
 //namespace {
 //
 //	void TryTerminate(const char * time){
@@ -29,6 +27,7 @@ extern int requestId;
 
 CtpMdSpi::CtpMdSpi(CThostFtdcMdApi* api, const std::vector<std::string>& instruments, const std::string& brokerId, const std::string& userID, const std::string& pw)
 	: pUserApi(api)
+	, m_requestId(0)
 	, m_stateChangeHandler(this, instruments, brokerId, userID, pw)
 {
 }
@@ -62,7 +61,7 @@ bool CtpMdSpi::ReqUserLogin(TThostFtdcBrokerIDType appId, TThostFtdcUserIDType u
 	strcpy(req.BrokerID, appId);
 	strcpy(req.UserID, userId);
 	strcpy(req.Password, passwd);
-	int ret = pUserApi->ReqUserLogin(&req, ++requestId);
+	int ret = pUserApi->ReqUserLogin(&req, ++m_requestId);
 	SYNC_PRINT << "[Md] Request | send login request ..." << ((ret == 0) ? "success" : "fail");
   return (ret == 0);
   //SetEvent(g_hEvent);

@@ -61,7 +61,7 @@ public:
 
 private:
   CThostFtdcMdApi* pUserApi;
-
+  int              m_requestId;
   MDThreadStateChangedHandler m_stateChangeHandler;
 };
 
