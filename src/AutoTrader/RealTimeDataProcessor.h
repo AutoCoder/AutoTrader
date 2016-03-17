@@ -16,7 +16,7 @@ class RealTimeDataProcessor
 {
 public:
 	//if strag == nullptr, that mean RealTimeDataProcessor is in data-recording mode. 
-	RealTimeDataProcessor(OrderTriggerBase* trigger, const std::string& InstrumentName, ClientSession* owner);
+	RealTimeDataProcessor(OrderTriggerBase* trigger, const std::string& InstrumentName, ClientSession* owner, bool replay = false);
 	~RealTimeDataProcessor();
 
 	void AppendRealTimeData(TickWrapper& info);

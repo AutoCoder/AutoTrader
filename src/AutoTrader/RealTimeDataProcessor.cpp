@@ -14,18 +14,15 @@
 #include "ClientSession.h"
 #include "OrderTrigger.h"
 
-extern std::atomic<bool> g_reply;
-extern threadsafe_queue<Order> order_queue;
-
 #define UseKDataToInvoke 1
 
-RealTimeDataProcessor::RealTimeDataProcessor(OrderTriggerBase* trigger, const std::string& InstrumentName, ClientSession* owner)
+RealTimeDataProcessor::RealTimeDataProcessor(OrderTriggerBase* trigger, const std::string& InstrumentName, ClientSession* owner, bool replay)
 	: m_Name(InstrumentName)
 	, m_trigger(trigger)
 	, m_owner(owner)
 	, m_dbptr(new DBWrapper)
 {
-	if (!g_reply)
+	if (!replay)
 		recoverHistoryData(600);
 }
   

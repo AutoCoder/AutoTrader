@@ -34,8 +34,6 @@
 #pragma warning(disable:4996)
 
 int requestId = 0;
-std::atomic<bool> g_reply(false);
-threadsafe_queue<Order> order_queue;
 
 //std::mutex g_OrderRunMtx;
 
@@ -75,7 +73,7 @@ void ReplayTickDataFromDB(const std::string& instrumentID, const std::string& st
 
 	//todo: get strategy pointer by strategyName, get IPositionCtl* by posCtlName
 	std::unique_ptr<MACrossStratgy> p = std::make_unique<MACrossStratgy>(3, 5, (IPositionControl*)NULL);
-	auto processor = std::make_shared<RealTimeDataProcessor>(p.get(), instrumentID, (Account*)NULL);
+	auto processor = std::make_shared<RealTimeDataProcessor>(p.get(), instrumentID, (Account*)NULL, true);
 
 	//Get the total count of table
 	char countquerybuf[512];
@@ -169,7 +167,7 @@ int main(int argc, const char* argv[]){
 
 		//check if it's on trade available time periodically (15 min)
 		auto check_quit = std::async(std::launch::async, [&q_flag, &q_cv](){
-			const int MilliSecondsPerQuarter = 10 * 1000;
+			const int MilliSecondsPerQuarter = 15 * 60 * 1000;
 			sleep(MilliSecondsPerQuarter); // 允许在非交易时间 运行15分钟
 			while (q_flag.load() == false)
 			{
