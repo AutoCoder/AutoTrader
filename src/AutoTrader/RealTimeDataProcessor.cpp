@@ -11,12 +11,12 @@
 #include "CommonUtils.h"
 #include "spdlog/spdlog.h"
 #include "crossplatform.h"
-#include "ClientSession.h"
+#include "BaseClientSession.h"
 #include "OrderTrigger.h"
 
 #define UseKDataToInvoke 1
 
-RealTimeDataProcessor::RealTimeDataProcessor(OrderTriggerBase* trigger, const std::string& InstrumentName, ClientSession* owner, bool replay)
+RealTimeDataProcessor::RealTimeDataProcessor(OrderTriggerBase* trigger, const std::string& InstrumentName, BaseClientSession* owner, bool replay)
 	: m_Name(InstrumentName)
 	, m_trigger(trigger)
 	, m_owner(owner)

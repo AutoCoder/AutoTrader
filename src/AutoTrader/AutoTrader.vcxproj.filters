@@ -111,6 +111,12 @@
     <ClInclude Include="Transmission.h">
       <Filter>Header Files\Transmission</Filter>
     </ClInclude>
+    <ClInclude Include="LocalClientSession.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseClientSession.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -162,6 +168,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Utils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="LocalClientSession.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BaseClientSession.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

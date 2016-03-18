@@ -1,50 +1,28 @@
-#ifndef ACCOUNT_H
-#define ACCOUNT_H
+#ifndef CLIENT_SESSION_H
+#define CLIENT_SESSION_H
 
 //#define FAKE_MD
 
-#include <string>
-#include <memory>
-#include <mutex>
-#include <future>
-#include <chrono>
-#include <thread>
-#include <atomic>
-#include <condition_variable>
+#include "BaseClientSession.h"
 
-class Order;
-class TickWrapper;
-class CtpTradeSpi;
-class RealTimeDataProcessor;
-class CThostFtdcTraderApi;
-
-namespace AP{
-	class AccountDetailMgr;
-};
 
 namespace Transmission{
 	class socket_session;
 };
-
-namespace Account{
-	struct Meta;
-}
 
 struct CThostFtdcOrderField;
 struct CThostFtdcTradeField;
 struct CThostFtdcInputOrderActionField;
 struct CThostFtdcRspInfoField;
 
-typedef int TransmissionErrorCode;
-
-class ClientSession
+class ClientSession : public BaseClientSession
 {
 public:
 	ClientSession(const std::string& userId, const std::shared_ptr<Transmission::socket_session>& s);
 
-	bool AppendOrder(const Order& order);//multi-thread notice
+	virtual bool Init_CTP();
 
-	bool ExecutePendingOrder();
+	bool StartTrade(const std::string& instru, const std::string& strategyName, ErrorCode& errcode);
 
 	void SendTickToClient(const TickWrapper& tick);
 
@@ -54,24 +32,10 @@ public:
 
 	void OnStartTradeRequest(const std::string& instru, const std::string& strategyName);
 
-	void StopTrade();
-
-	bool IsTrading() const { return m_isTrading.load(); }
-
-	bool IsPositionInfoReady() const { return m_PositionInfo_ready; }
-
-	std::string UserId() const { return m_userId; };
-
 	void UpdateSocketSession(const std::shared_ptr<Transmission::socket_session>& s) { m_session = s;  }
 
 	~ClientSession();
 private:
-
-	bool Logout(); //identify User By session
-
-	bool StartTrade(const std::string& instru, const std::string& strategyName, TransmissionErrorCode& errcode);
-
-	void WaitAndPopCurrentOrder(Order& ord);//multi-thread notice
 
 	//send out Account status to fifo, finally got by client
 	void OnAccountInitFinished();
@@ -87,24 +51,10 @@ private:
 #ifdef FAKE_MD
 	bool ReturnFakeCTPMessage();
 #endif
-private:
-	std::atomic<bool>                               m_isTrading; // access by thread-OrderExecutor and thread-ActionQueueInvoker
-	std::string										m_userId;
-	std::unique_ptr<Order>                          m_pending_order;
-	CtpTradeSpi*									m_trade_spi;
-	CThostFtdcTraderApi*                            m_trade_api;
-	std::shared_ptr<RealTimeDataProcessor>          m_realtimedata_processor;
-	std::shared_ptr<Transmission::socket_session>   m_session;
-	std::unique_ptr<AP::AccountDetailMgr>           m_detailMgr;
-	std::atomic<bool>                               m_PositionInfo_ready;//access by thread-tradespi and thread-ActionQueueInvoker
 
-	int                                             m_total_vol;
-	std::mutex                                      m_mtx;
-	std::condition_variable                         m_con;
-	std::thread                                     m_exeOrderThread;
-	
-	std::future<bool>                               m_orderExecuteThreadF;
-	bool                                            m_ReleaseingCtpAccount;
+private:
+	std::shared_ptr<Transmission::socket_session>   m_session;
+
 #ifdef FAKE_MD
 	std::future<bool>                               m_fakeMdThreadF;
 #endif

@@ -27,16 +27,21 @@
 #endif
 
 ClientSession::ClientSession(const std::string& userId, const std::shared_ptr<Transmission::socket_session>& s)
-: m_userId(userId)
+: BaseClientSession(userId) 
 , m_session(s)
-, m_detailMgr(std::unique_ptr<AP::AccountDetailMgr>(new AP::AccountDetailMgr()))
-, m_PositionInfo_ready(false)
-, m_total_vol(0)
-, m_ReleaseingCtpAccount(false)
 {
-	m_isTrading.store(false);
+
+}
+
+ClientSession::~ClientSession()
+{
+}
+
+bool ClientSession::Init_CTP()
+{
 	m_trade_api = CThostFtdcTraderApi::CreateFtdcTraderApi();
 	assert(m_trade_api);
+
 	Account::Meta meta = Account::Manager::Instance().GetMeta(m_userId);
 	InitedAccountCallback accountInitFinished_Callback = std::bind(&ClientSession::OnAccountInitFinished, this);
 	RtnOrderCallback onRtnOrder_Callback = std::bind(&ClientSession::OnRtnOrder, this, std::placeholders::_1);
@@ -52,114 +57,22 @@ ClientSession::ClientSession(const std::string& userId, const std::shared_ptr<Tr
 	m_trade_api->SubscribePrivateTopic(THOST_TERT_RESTART);
 	m_trade_api->RegisterFront(const_cast<char*>(Config::Instance()->CtpTradeFront().c_str()));
 	m_trade_api->Init();
-	SYNC_LOG << "Account:" << m_userId << "setup-up...";
-}
+	SYNC_LOG << "CTP Account of " << m_userId << "...Setup";
 
-ClientSession::~ClientSession()
-{
-	m_ReleaseingCtpAccount = true; 
-	m_con.notify_all();// notify stop executing thread if it's pending for new order.
-	if (m_trade_api)
-	{
-		m_trade_api->RegisterSpi(NULL);
-		m_trade_api->Release();
-		m_trade_api = nullptr;
-	}
-
-	if (m_trade_spi){
-		delete m_trade_spi;
-		m_trade_spi = nullptr;
-	}
-
-	SYNC_LOG << "Account:" << m_userId << "shutdown...";
-}
-
-//may access by mdThread and m_exeOrderThread
-bool ClientSession::AppendOrder(const Order& order){
-	std::lock_guard<std::mutex> lk(m_mtx);
-	if (m_pending_order.get()){
-		return false;
-	}
-	else{
-		m_pending_order.reset(new Order(order));
-		m_con.notify_all();
-		return true;
-	}
-}
-
-//may access by mdThread and m_exeOrderThread
-void ClientSession::WaitAndPopCurrentOrder(Order& ord){
-
-	std::unique_lock<std::mutex> lk(m_mtx);
-
-	m_con.wait(lk, [this]{return m_pending_order.get() || m_ReleaseingCtpAccount; });
-
-	if (m_ReleaseingCtpAccount)
-		return;
-
-	ord = *(m_pending_order.get());
-	m_pending_order.reset();
-}
-
-bool ClientSession::ExecutePendingOrder(){
-	while (m_isTrading.load()){
-		Order ord;
-		WaitAndPopCurrentOrder(ord);//blocking
-		if (m_ReleaseingCtpAccount)
-			break;
-		//if socket command set m_isTrading = false here. this function will quit.
-		if (m_isTrading.load()){ //Check this bool var again, prevent to execute new pushed order after user stop trade.
-			m_trade_spi->CancelOrder(ord.GetTriggerTick(), 6, ord.GetInstrumentId());
-			m_trade_spi->ReqOrderInsert(ord);
-		}
-	}
 	return true;
 }
 
-bool ClientSession::StartTrade(const std::string& instru, const std::string& strategyName, TransmissionErrorCode& errcode){
-	if (m_isTrading.load()){
-		errcode = Transmission::TradingNow;
-		return false;
-	}
-
-	Account::Meta meta = Account::Manager::Instance().GetMeta(m_userId);
-
-	if (std::find(meta.m_Instruments.begin(), meta.m_Instruments.end(), instru) != meta.m_Instruments.end()){
-		auto strategyPtr = TriggerFactory::Instance()->GetTrigger(m_userId, strategyName);
-		if (strategyPtr){
-			strategyPtr->BindWithAccount(m_detailMgr.get());
-			m_realtimedata_processor = std::make_shared<RealTimeDataProcessor>(strategyPtr, instru, this);
-			RealTimeDataProcessorPool::getInstance()->AddProcessor(m_realtimedata_processor);
-			m_isTrading.store(true);
-
-			if (m_orderExecuteThreadF.valid()==false || m_orderExecuteThreadF.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready) // if thread is not started or finished.
-				m_orderExecuteThreadF = std::async(std::launch::async, std::bind(&ClientSession::ExecutePendingOrder, this));
-			else if (m_orderExecuteThreadF.wait_for(std::chrono::milliseconds(0)) == std::future_status::timeout)
-				bool toRemoved = true;
-				//!!!!Note: if thread is finished, this->joinable() still == true.
-				//m_exeOrderThread = std::thread(&ClientSession::ExecutePendingOrder, this);// This will start the thread. Notice move semantics!
-			//else{   //if m_exeOrderThread is running, should not call move ctor
-			//}
-
-			
+bool ClientSession::StartTrade(const std::string& instru, const std::string& strategyName, ErrorCode& errcode){
 #ifdef FAKE_MD
-			if (m_fakeMdThreadF.valid()==false || m_fakeMdThreadF.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready)
-				m_fakeMdThreadF = std::async(std::launch::async, std::bind(&ClientSession::ReturnFakeCTPMessage, this));
-			else if (m_fakeMdThreadF.wait_for(std::chrono::milliseconds(0)) == std::future_status::timeout)
-				bool toRemoved = true;
+	if (m_fakeMdThreadF.valid()==false || m_fakeMdThreadF.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready)
+		m_fakeMdThreadF = std::async(std::launch::async, std::bind(&ClientSession::ReturnFakeCTPMessage, this));
+	else if (m_fakeMdThreadF.wait_for(std::chrono::milliseconds(0)) == std::future_status::timeout)
+		bool toRemoved = true;
+#else 
+	return BaseClientSession::StartTrade(instru, strategyName, errcode);
 #endif
-			return true;
-		}
-		else{
-			errcode = Transmission::InvalidTradeArguments;
-			return false;
-		}
-	}
-	else{
-		errcode = Transmission::InvalidTradeArguments;
-		return false;
-	}
 }
+
 #ifdef FAKE_MD
 bool ClientSession::ReturnFakeCTPMessage(){
 
@@ -219,12 +132,6 @@ void ClientSession::SendPostionInfoToClient(){
 	Transmission::Utils::SendPositionInfo(m_session, balance, posMoney, m_detailMgr->getPositionOfInstruments());
 }
 
-void ClientSession::StopTrade(){
-	if (!m_isTrading.load())
-		return;
-	m_isTrading.store(false);
-}
-
 void ClientSession::OnAccountInitFinished(){
 	m_PositionInfo_ready = true;
 	SendPostionInfoToClient();
@@ -258,8 +165,8 @@ void ClientSession::OnStartTradeRequest(const std::string& instru, const std::st
 		Transmission::Utils::SendStartTradeResultInfo(m_session, Transmission::TradingNow);
 	}
 	else{
-		TransmissionErrorCode err_code;
-		if (StartTrade(instru, strategyName, err_code)){
+		ErrorCode err_code;
+		if (Init_CTP() && StartTrade(instru, strategyName, err_code)){
 			Transmission::Utils::SendStartTradeResultInfo(m_session, Transmission::Succeed);
 		}
 		else{

@@ -111,3 +111,89 @@ Solution： 原因simnow的ctp dll 6.3.6版本有问题，替换为6.3.5版本�
 -"TradeFront":"tcp://218.202.237.33:10002",
 +"MdFront":"tcp://180.168.146.187:10010",
 +"TradeFront":"tcp://180.168.146.187:10000",
+
+[2016-03-18]
+Problem-1
+===============
+
+在用gdb调试程序的时候出现这样一种错误：
+
+Program received signal SIGTRAP, Trace/breakpoint trap.
+
+在网上查到解决方案了，在这mark一下，以后有时间好好研究。
+
+[plain] view plain copy print?在CODE上查看代码片派生到我的代码片
+找到解决问题的办法了  
+在kernel mode改写了watchpoint的值以后，cpu把eflags的TF位置1了，照理说gdb应该清0这一位，但由于未知原因，gdb没清0该位，  
+(gdb) info registers  
+eax            0x1      1  
+ecx            0xbfa4fc93       -1079706477  
+edx            0x1      1  
+ebx            0x0      0  
+esp            0xbfa4fc64       0xbfa4fc64  
+ebp            0xbfa4fc98       0xbfa4fc98  
+esi            0x92dca0 9624736  
+edi            0x0      0  
+eip            0x978402 0x978402 <__kernel_vsyscall+2>  
+eflags         0x200346 [ PF ZF TF IF ID ]  
+cs             0x73     115  
+ss             0x7b     123  
+ds             0x7b     123  
+es             0x7b     123  
+fs             0x0      0  
+gs             0x33     51  
+(gdb)  
+  
+只需手动清楚该位即可：  
+(gdb) set $ps&=~(1<<8)  【on x86-based machines $ps is an alias for the eflags register,TF is the 9th bit of eflags】  
+(gdb) info registers  
+eax            0x1      1  
+ecx            0xbf90f353       -1081019565  
+edx            0x1      1  
+ebx            0x0      0  
+esp            0xbf90f324       0xbf90f324  
+ebp            0xbf90f358       0xbf90f358  
+esi            0x92dca0 9624736  
+edi            0x0      0  
+eip            0xe66402 0xe66402 <__kernel_vsyscall+2>  
+eflags         0x200246 [ PF ZF IF ID ]  
+cs             0x73     115  
+ss             0x7b     123  
+ds             0x7b     123  
+es             0x7b     123  
+fs             0x0      0  
+gs             0x33     51  
+(gdb)  
+  
+再continue，gdb就不会不停收到SIGTRAP了  
+
+===============
+Problem-2
+===============
+avoiding gdb signal noise.
+
+Posted by peeterjoot on July 7, 2010
+
+A quick note for future reference (recorded elsewhere and subsequently lost).
+
+Suppose your program handles a signal that gdb intercepts by default, like the following example
+
+(gdb) c
+Continuing.
+
+Program received signal SIGUSR1, User defined signal 1.
+[Switching to Thread 47133440862528 (LWP 4833)]
+0x00002ade149d6baa in semtimedop () from /lib64/libc.so.6
+(gdb) c
+You can hit ‘c’ to continue at this point, but if it happens repeatedly in various threads (like when one thread is calling pthread_kill() to force each other thread in turn to dump its stack and stuff) this repeated ‘c’ing can be a bit of a pain.
+
+For the same SIGUSR1 example above, you can query the gdb handler rules like so:
+
+(gdb) info signal SIGUSR1
+Signal        Stop      Print   Pass to program Description
+SIGUSR1       Yes       Yes     Yes             User defined signal 1
+And if deemed to not be of interest, where you just want your program to continue without prompting or spamming, something like the following does the trick:
+
+(gdb) handle SIGUSR1 noprint nostop
+Signal        Stop      Print   Pass to program Description
+SIGUSR1       No        No      Yes             User defined signal 1
