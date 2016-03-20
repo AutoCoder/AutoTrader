@@ -29,6 +29,7 @@
 #include "LoadStrategies.h"
 #include "AccountMgr.h"
 #include "crossplatform.h"
+#include "LocalClientSession.h"
 #include <signal.h>
 
 #pragma warning(disable:4996)
@@ -108,6 +109,77 @@ void ReplayTickDataFromDB(const std::string& instrumentID, const std::string& st
 }
 #endif
 
+void StartTradeLocally(const std::string& userID, const std::string& instrumentID, const std::string& strategyName, const std::string& db_mark){
+
+	auto pool = RealTimeDataProcessorPool::getInstance();
+
+	//******setup Account Pool**********
+	auto config = Config::Instance();
+
+	//******Init md thread*******
+	CThostFtdcMdApi* pMdUserApi = CThostFtdcMdApi::CreateFtdcMdApi();
+	CtpMdSpi* pMdUserSpi = new CtpMdSpi(pMdUserApi, Account::Manager::Instance().Instruments(), config->DefaultCtpBrokerID(), config->DefaultCtpUserID(), config->DefaultCtpPassword());
+	pMdUserApi->RegisterSpi(pMdUserSpi);
+	pMdUserApi->RegisterFront(const_cast<char*>(Config::Instance()->CtpMdFront().c_str()));
+	pMdUserApi->Init();
+
+	std::future<bool> future_action_queue = std::async(std::launch::async, []()->bool {
+		ActionQueueProcessor::Instance().Start();
+		return true;
+	});
+
+	LocalClientSession session(userID);
+	if (session.Init_CTP()){
+		ErrorCode err;
+		session.StartTrade(instrumentID, strategyName, err);
+	}
+
+	std::mutex q_mtx;
+	std::condition_variable q_cv;
+	std::atomic<bool> q_flag(false);
+
+	//start schedule_stop function
+	auto schedule_stop = std::async(std::launch::async, [&q_mtx, &q_cv, &q_flag](){
+		std::unique_lock<std::mutex> lk(q_mtx);
+		q_cv.wait(lk, [&q_flag]{return q_flag.load(); });
+		ActionQueueProcessor::Instance().Stop();
+	});
+
+	//check if it's on trade available time periodically (15 min)
+	auto check_quit = std::async(std::launch::async, [&q_flag, &q_cv](){
+		const int MilliSecondsPerQuarter = 15 * 60 * 1000;
+		sleep(MilliSecondsPerQuarter); // 允许在非交易时间 运行15分钟
+		while (q_flag.load() == false)
+		{
+			std::time_t result = std::time(nullptr);
+			struct tm * now_local = std::localtime(&result);
+			int second_elapse = now_local->tm_hour * 3600 + now_local->tm_min * 60 + now_local->tm_sec;
+			if (CommonUtils::IsMarketingTime(second_elapse) == false)
+			{
+				q_flag.store(true);
+				q_cv.notify_all();
+			}
+		}
+	});
+
+	if (future_action_queue.get() == true){
+		SYNC_LOG << "1) Shutdown Action Queue...Success";
+	}
+
+	session.StopTrade();
+
+	if (pMdUserApi){
+		pMdUserApi->RegisterSpi(NULL);
+		pMdUserApi->Release();
+		pMdUserApi = NULL;
+	}
+
+	if (pMdUserSpi) {
+		delete pMdUserSpi;
+		pMdUserSpi = NULL;
+	}
+}
+
 /*
 Usage: 
    AutoTrade.exe
@@ -126,6 +198,10 @@ int main(int argc, const char* argv[]){
 #ifdef MUSTIMPL
 		ReplayTickDataFromDB(argv[2], argv[3], argv[4], argv[5]);
 #endif
+	}
+	else if (argc == 5 && strcmp(argv[1], "single") == 0){
+		//AutoTrader single 9999021510
+		StartTradeLocally(argv[2], argv[3], argv[4], "local");
 	}
 	else{
 		auto pool = RealTimeDataProcessorPool::getInstance();
@@ -188,17 +264,16 @@ int main(int argc, const char* argv[]){
 			SYNC_LOG << "2) Shutdown Socket Server...Success";
 		}
 
-		if (pMdUserSpi) {
-			delete pMdUserSpi;
-			pMdUserSpi = NULL;
-		}
-
 		if (pMdUserApi){
 			pMdUserApi->RegisterSpi(NULL);
 			pMdUserApi->Release();
 			pMdUserApi = NULL;
 		}
 
+		if (pMdUserSpi) {
+			delete pMdUserSpi;
+			pMdUserSpi = NULL;
+		}
 		//write to db
 		//pool->FreeProcessors();
 	}
