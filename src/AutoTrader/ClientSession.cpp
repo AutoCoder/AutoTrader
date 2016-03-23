@@ -30,7 +30,7 @@ ClientSession::ClientSession(const std::string& userId, const std::shared_ptr<Tr
 : BaseClientSession(userId) 
 , m_session(s)
 {
-
+	Init_CTP();
 }
 
 ClientSession::~ClientSession()
@@ -166,7 +166,7 @@ void ClientSession::OnStartTradeRequest(const std::string& instru, const std::st
 	}
 	else{
 		ErrorCode err_code;
-		if (Init_CTP() && StartTrade(instru, strategyName, err_code)){
+		if (StartTrade(instru, strategyName, err_code)){
 			Transmission::Utils::SendStartTradeResultInfo(m_session, Transmission::Succeed);
 		}
 		else{
