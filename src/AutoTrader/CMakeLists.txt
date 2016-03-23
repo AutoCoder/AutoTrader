@@ -7,6 +7,8 @@ SET(SRC_LIST	AP_Mgr.cpp
 			 	ActionProcessor.cpp 
 			 	AutoTrader.cpp 
 			 	ClientSession.cpp
+			 	BaseClientSession.cpp
+			 	LocalClientSession.cpp
 			 	LocalClientSession.cpp
 			 	ClientSessionMgr.cpp
 				InstrumentInfoMgr.cpp
