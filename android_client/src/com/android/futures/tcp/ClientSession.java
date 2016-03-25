@@ -237,6 +237,7 @@ public class ClientSession implements TraderStatusListener {
 	@Override
 	public void onTradeNotification(TradeEntity entity) {
 		// TODO Auto-generated method stub
+		entity.setInstrument(mCurrentInstrument);
 		mTradeSequence.add(0,entity);
 		Message msg = Message.obtain();
 		msg.what = TraderStatusListener.TradeNotification;
