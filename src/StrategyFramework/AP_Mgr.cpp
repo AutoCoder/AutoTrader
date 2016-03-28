@@ -218,14 +218,14 @@ namespace AP{
 		m_orderlist.push_back(orderField);
 	}
 
-	void AccountDetailMgr::pushImmediateOrder(const CThostFtdcOrderField& orderField){
+	bool AccountDetailMgr::pushImmediateOrder(const CThostFtdcOrderField& orderField){
 		auto orderIter = std::find_if(m_orderlist.begin(), m_orderlist.end(), IsSameOrder(orderField));
-		if (orderIter != m_orderlist.end()){
-			*orderIter = orderField;
-		}
-		else{
+
+		bool no_duplicated = (orderIter == m_orderlist.end());
+		if (no_duplicated)
 			m_orderlist.push_back(orderField);
-		}
+		
+		return no_duplicated;
 	}
 
 	std::string AccountDetailMgr::todayOrderToString() const{

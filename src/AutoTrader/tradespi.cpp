@@ -481,11 +481,13 @@ void CtpTradeSpi::OnRtnOrder(CThostFtdcOrderField *pOrder)
 	//SYNC_PRINT << "[Trade] 报单回报:前置编号FrontID:" << pOrder->FrontID << " 会话编号SessionID:" << pOrder->SessionID << " OrderRef:" << pOrder->OrderRef;
 	SYNC_PRINT << "[Trade] Response | Insert_Order Received...";
 
-	m_account_detail_mgr.pushImmediateOrder(*pOrder);
-	SYNC_PRINT << "[Trade] FrontID:" << pOrder->FrontID << ", SessionID: " << pOrder->SessionID << ", OrderRef:" << pOrder->OrderRef;
-	SYNC_PRINT << "[Trade] Order ID:" << pOrder->BrokerOrderSeq << ", OrderSubmitStatus:" << CommonUtils::InterpretOrderSubmitStatusCode(pOrder->OrderSubmitStatus);
-
-	m_OnRtnOrder_callback(pOrder);
+	//if it fails to push, whichi mean it is duplicated order
+	bool success = m_account_detail_mgr.pushImmediateOrder(*pOrder);
+	if (success){
+		SYNC_PRINT << "[Trade] FrontID:" << pOrder->FrontID << ", SessionID: " << pOrder->SessionID << ", OrderRef:" << pOrder->OrderRef;
+		SYNC_PRINT << "[Trade] Order ID:" << pOrder->BrokerOrderSeq << ", OrderSubmitStatus:" << CommonUtils::InterpretOrderSubmitStatusCode(pOrder->OrderSubmitStatus);
+		m_OnRtnOrder_callback(pOrder);
+	}
 }
 
 void CtpTradeSpi::OnRtnTrade(CThostFtdcTradeField *pTrade)

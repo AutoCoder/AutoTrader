@@ -80,7 +80,7 @@ namespace AP{ // Account & Position
 
 		void pushTodayOrder(const CThostFtdcOrderField& orderField);
 
-		void pushImmediateOrder(const CThostFtdcOrderField& orderField);
+		bool pushImmediateOrder(const CThostFtdcOrderField& orderField);
 
 		const std::vector< CThostFtdcOrderField >& getAllOrders() const { return m_orderlist; }
 
