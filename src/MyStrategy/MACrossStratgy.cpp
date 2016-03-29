@@ -28,7 +28,7 @@ Order MACrossStratgy::GetCurOrder() const{
 }
 
 // common MA 
-double MACrossStratgy::calculateK(const std::list<TickWrapper>& data, const TickWrapper& current, size_t seconds) const
+double MACrossStratgy::calculateK(const std::vector<TickWrapper>& data, const TickWrapper& current, size_t seconds) const
 {
 	return TechUtils::CalulateMA(data, current, seconds);
 }
@@ -41,7 +41,7 @@ MACrossTech* MACrossStratgy::generateTechVec(const TickWrapper& info) const{
 	return (new MACrossTech(CrossStratgyType::MA, m_shortMA, m_longMA, info.UUID(), info.InstrumentId(), info.Time(), info.LastPrice()));
 }
 
-bool MACrossStratgy::tryInvoke(const std::list<TickWrapper>& data, TickWrapper& info)
+bool MACrossStratgy::tryInvoke(const std::vector<TickWrapper>& data, TickWrapper& info)
 {
 	TickType direction = TickType::Commom;
 	const size_t breakthrough_confirm_duration = 100; //50ms
@@ -55,9 +55,9 @@ bool MACrossStratgy::tryInvoke(const std::list<TickWrapper>& data, TickWrapper& 
 	if (!data.empty()){
 		if (curPtr->IsTriggerPoint()){ // up
 			if (!data.empty() && data.size() > 500){
-				std::list<TickWrapper>::const_iterator stoper = data.begin();
+				std::vector<TickWrapper>::const_reverse_iterator stoper = data.rbegin();
 				std::advance(stoper, breakthrough_confirm_duration);
-				for (auto it = data.begin(); it != stoper; it++){
+				for (auto it = data.rbegin(); it != stoper; it++){
 					StrategyTech* prePtr = it->GetTechVec();
 					// if prePtr == NULL, mean it's recovered from db, so that md is not continuous. so it's should not be singal point.
 					if (prePtr == NULL || !prePtr->IsTriggerPoint())
@@ -81,9 +81,9 @@ bool MACrossStratgy::tryInvoke(const std::list<TickWrapper>& data, TickWrapper& 
 		}
 		else{ // down
 			if (!data.empty() && data.size() > 500){
-				std::list<TickWrapper>::const_iterator stoper = data.begin();
+				std::vector<TickWrapper>::const_reverse_iterator stoper = data.rbegin();
 				std::advance(stoper, breakthrough_confirm_duration);
-				for (auto it = data.begin(); it != stoper; it++){
+				for (auto it = data.rbegin(); it != stoper; it++){
 					StrategyTech* prePtr = it->GetTechVec();
 					if (prePtr == NULL || prePtr->IsTriggerPoint())
 					{
@@ -109,7 +109,7 @@ bool MACrossStratgy::tryInvoke(const std::list<TickWrapper>& data, TickWrapper& 
 	return orderSingal;
 }
 
-bool MACrossStratgy::tryInvoke(const std::list<TickWrapper>& tickdata, const std::vector<KData>& data, std::vector<TickWrapper> curmindata, TickWrapper& info){
+bool MACrossStratgy::tryInvoke(const std::vector<TickWrapper>& tickdata, const std::vector<KData>& data, std::vector<TickWrapper> curmindata, TickWrapper& info){
 	TickType direction = TickType::Commom;
 	const size_t breakthrough_confirm_duration = 100; //50ms
 	MACrossTech* curPtr = generateTechVec(info);
@@ -125,9 +125,9 @@ bool MACrossStratgy::tryInvoke(const std::list<TickWrapper>& tickdata, const std
 		if (curPtr->IsTriggerPoint())
 		{ // up
 			if (!tickdata.empty() && tickdata.size() > 500){
-				std::list<TickWrapper>::const_iterator stoper = tickdata.begin();
+				std::vector<TickWrapper>::const_reverse_iterator stoper = tickdata.rbegin();
 				std::advance(stoper, breakthrough_confirm_duration);
-				for (auto it = tickdata.begin(); it != stoper; it++){
+				for (auto it = tickdata.rbegin(); it != stoper; it++){
 					StrategyTech* prePtr = it->GetTechVec();
 					// if prePtr == NULL, mean it's recovered from db, so that md is not continuous. so it's should not be singal point.
 					if (prePtr == NULL || !prePtr->IsTriggerPoint())
@@ -152,9 +152,9 @@ bool MACrossStratgy::tryInvoke(const std::list<TickWrapper>& tickdata, const std
 		else
 		{ // down
 			if (!tickdata.empty() && tickdata.size() > 500){
-				std::list<TickWrapper>::const_iterator stoper = tickdata.begin();
+				std::vector<TickWrapper>::const_reverse_iterator stoper = tickdata.rbegin();
 				std::advance(stoper, breakthrough_confirm_duration);
-				for (auto it = tickdata.begin(); it != stoper; it++){
+				for (auto it = tickdata.rbegin(); it != stoper; it++){
 					StrategyTech* prePtr = it->GetTechVec();
 					if (prePtr == NULL || prePtr->IsTriggerPoint())
 					{

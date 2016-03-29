@@ -17,7 +17,7 @@ EMACrossStratgy::~EMACrossStratgy()
 EMA(X£¬1) = £Û2*X1 + (1 - 1)*Y¡¯£Ý / (1 + 1) = X1
 EMA(X, N) = [ 2*X + (N-1)*Y'] / (N+1) 
 */
-double EMACrossStratgy::calculateK(const std::list<TickWrapper>& data, const TickWrapper& current, size_t seconds) const
+double EMACrossStratgy::calculateK(const std::vector<TickWrapper>& data, const TickWrapper& current, size_t seconds) const
 {
 	return TechUtils::CalulateEMA(data, current, seconds);
 }

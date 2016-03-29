@@ -14,14 +14,14 @@ TechUtils::~TechUtils()
 }
 
 
-double TechUtils::CalulateMA(const std::list<TickWrapper>& data, const TickWrapper& current, size_t seconds)
+double TechUtils::CalulateMA(const std::vector<TickWrapper>& data, const TickWrapper& current, size_t seconds)
 {
 	//datetime to timestamp
 	double totalExchangeLastPrice = current.LastPrice();
 	long long count = 1;
 
 	long long leftedge = current.toTimeStamp() - seconds * 2;
-	for (auto it = data.begin(); it != data.end(); it++)
+	for (auto it = data.rbegin(); it != data.rend(); it++)
 	{
 		if (it->toTimeStamp() > leftedge){
 			totalExchangeLastPrice += it->LastPrice();
@@ -38,7 +38,7 @@ double TechUtils::CalulateMA(const std::list<TickWrapper>& data, const TickWrapp
 	return totalExchangeLastPrice / count;
 }
 
-double TechUtils::CalulateEMA(const std::list<TickWrapper>& data, const TickWrapper& current, size_t seconds)
+double TechUtils::CalulateEMA(const std::vector<TickWrapper>& data, const TickWrapper& current, size_t seconds)
 {
 	if (data.empty()){
 		return current.LastPrice();
@@ -46,7 +46,7 @@ double TechUtils::CalulateEMA(const std::list<TickWrapper>& data, const TickWrap
 
 	size_t N = seconds * 2;
 
-	TickWrapper preNode = data.front();
+	TickWrapper preNode = data.back();
 	MACrossTech* preTechVec = dynamic_cast<MACrossTech*>(preNode.m_techvec);
 	if (preTechVec){
 		if (seconds == 60 * preTechVec->ShortMA()){
@@ -67,7 +67,7 @@ double TechUtils::CalulateEMA(const std::list<TickWrapper>& data, const TickWrap
 	}
 }
 
-double TechUtils::CalulateWMA(const std::list<TickWrapper>& data, const TickWrapper& current, size_t seconds)
+double TechUtils::CalulateWMA(const std::vector<TickWrapper>& data, const TickWrapper& current, size_t seconds)
 {
 	//datetime to timestamp
 	size_t n = seconds * 2;
@@ -76,7 +76,7 @@ double TechUtils::CalulateWMA(const std::list<TickWrapper>& data, const TickWrap
 
 	long long leftedge = current.toTimeStamp() - seconds * 2;
 
-	for (auto it = data.begin(); it != data.end(); it++)
+	for (auto it = data.rbegin(); it != data.rend(); it++)
 	{
 		if (it->toTimeStamp() > leftedge){
 			totalExchangeLastPrice += (it->LastPrice() * n);
@@ -94,13 +94,13 @@ double TechUtils::CalulateWMA(const std::list<TickWrapper>& data, const TickWrap
 	return totalExchangeLastPrice / count;
 }
 
-double TechUtils::CalulateAMA(const std::list<TickWrapper>& data, const TickWrapper& current, size_t seconds)
+double TechUtils::CalulateAMA(const std::vector<TickWrapper>& data, const TickWrapper& current, size_t seconds)
 {
 	double totalExchangePrice = current.TurnOver();
 	long long totalVolume = current.Volume();
 
 	long long leftedge = current.toTimeStamp() - seconds * 2;
-	for (auto it = data.begin(); it != data.end(); it++)
+	for (auto it = data.rbegin(); it != data.rend(); it++)
 	{
 		if (it->toTimeStamp() > leftedge){
 			totalExchangePrice += it->TurnOver();

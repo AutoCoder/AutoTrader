@@ -9,6 +9,8 @@
 
 class DBWrapper;
 class CtpTradeSpi;
+class BaseClientSession;
+class CtpMdSpi;
 //not for multi-thread: this singleton should be called on main()
 class RealTimeDataProcessorPool
 {
@@ -17,8 +19,9 @@ public:
 	static RealTimeDataProcessorPool* getInstance();
 
 public:
+	void SetMdSpi(CtpMdSpi* p);
 	void StoreCachedData();
-	void AddProcessor(const std::shared_ptr<RealTimeDataProcessor>& processor);
+	void AddProcessor(const std::string& instrument, OrderTriggerBase* trigger, BaseClientSession* session);
 	void AppendRealTimeData(TickWrapper& info);
 	void StoreStrategySequenceToDB(const std::string& instrumentID, const std::string& mark);
 
@@ -47,6 +50,7 @@ private:
 private:
 	std::shared_ptr<DBWrapper> m_dbptr;
 	std::map<std::string/*instrument*/, std::vector<std::weak_ptr<RealTimeDataProcessor> > >  m_processorDict;
+	CtpMdSpi*                  m_mdspi;
 };
 
 #endif

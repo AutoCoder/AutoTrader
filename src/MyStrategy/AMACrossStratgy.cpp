@@ -23,7 +23,7 @@ TurnOver == t
 Volume == v
 y=ama(x,a)£¬y=(t0 + t1 + t2 + t3 .. + tn)/(v0 + v1 + v2 + ...vn)
 */
-double AMACrossStratgy::calculateK(const std::list<TickWrapper>& data, const TickWrapper& current, size_t seconds) const
+double AMACrossStratgy::calculateK(const std::vector<TickWrapper>& data, const TickWrapper& current, size_t seconds) const
 {
 	return TechUtils::CalulateAMA(data, current, seconds);
 }

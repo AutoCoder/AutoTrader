@@ -16,11 +16,12 @@
 
 #define UseKDataToInvoke 1
 
-RealTimeDataProcessor::RealTimeDataProcessor(OrderTriggerBase* trigger, const std::string& InstrumentName, BaseClientSession* owner, bool replay)
+RealTimeDataProcessor::RealTimeDataProcessor(OrderTriggerBase* trigger, const std::string& InstrumentName, BaseClientSession* owner, std::vector<TickWrapper>& tickVec, bool replay)
 	: m_Name(InstrumentName)
 	, m_trigger(trigger)
 	, m_owner(owner)
 	, m_dbptr(new DBWrapper)
+	, m_TickVec(tickVec)
 {
 	if (!replay)
 		recoverHistoryData(600);
@@ -33,11 +34,20 @@ RealTimeDataProcessor::~RealTimeDataProcessor()
 
 void RealTimeDataProcessor::StoreDataToDB()
 {
-	std::vector<TickWrapper> oneMinuteVec;
+	// std::vector<TickWrapper> oneMinuteVec;
+	// //store Tick data in memory into db
+	// for (auto iter = m_DataSeq.rbegin(); iter != m_DataSeq.rend(); iter++){
+	// 	iter->serializeToDB(*(m_dbptr.get()));
+	// }
+
+	// //store 1-Min K-data in memory into db
+	// for (auto iter = m_KDataVec.begin(); iter != m_KDataVec.end(); iter++){
+	// 	iter->serializeToDB(*(m_dbptr.get()));
+	// }
+
 	//store Tick data in memory into db
-	for (auto iter = m_DataSeq.rbegin(); iter != m_DataSeq.rend(); iter++){
+	for (auto iter = m_TickVec.begin(); iter != m_TickVec.end(); iter++)
 		iter->serializeToDB(*(m_dbptr.get()));
-	}
 
 	//store 1-Min K-data in memory into db
 	for (auto iter = m_KDataVec.begin(); iter != m_KDataVec.end(); iter++){
@@ -68,9 +78,9 @@ void RealTimeDataProcessor::AppendRealTimeData(TickWrapper& info){
 	if (m_trigger){
 		Order ord;
 #ifdef UseKDataToInvoke
-		bool triggered = m_trigger->tryInvoke(m_DataSeq, m_KDataVec, m_TickSet60, info, ord);
+		bool triggered = m_trigger->tryInvoke(m_TickVec, m_KDataVec, m_TickSet60, info, ord);
 #else
-		bool triggered = m_trigger->tryInvoke(m_DataSeq, info, ord);
+		bool triggered = m_trigger->tryInvoke(m_TickVec, info, ord);
 #endif
 		if (triggered){
 			ord.SetTriggerTick(info.toTimeStamp());
@@ -83,7 +93,7 @@ void RealTimeDataProcessor::AppendRealTimeData(TickWrapper& info){
 	if (m_owner)
 		m_owner->SendTickToClient(info);
 
-	m_DataSeq.push_front(info);
+	//m_DataSeq.push_front(info);
 
 	//construct 1-minutes k-line intermediate data
 	if (m_TickSet60.empty()){

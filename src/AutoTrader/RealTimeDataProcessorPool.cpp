@@ -4,6 +4,7 @@
 #include "Config.h"
 #include "DBWrapper.h"
 #include "tradespi.h"
+#include "mdspi.h"
 #include "TickWrapper.h"
 #include "RealTimeDataProcessor.h"
 
@@ -19,11 +20,20 @@ RealTimeDataProcessorPool* RealTimeDataProcessorPool::getInstance()
 }
 
 RealTimeDataProcessorPool::RealTimeDataProcessorPool()
+	:m_mdspi(nullptr)
 {
 }
 
-void RealTimeDataProcessorPool::AddProcessor(const std::shared_ptr<RealTimeDataProcessor>& processor){
-	auto& processorVec = m_processorDict[processor->Instrument()];
+void RealTimeDataProcessorPool::SetMdSpi(CtpMdSpi* p)
+{
+	m_mdspi = p;
+}
+
+void RealTimeDataProcessorPool::AddProcessor(const std::string& instrument, OrderTriggerBase* trigger, BaseClientSession* session){
+	assert(m_mdspi);
+	auto processor = std::make_shared<RealTimeDataProcessor>(trigger, instrument, session, m_mdspi->GetTickVec(instrument));
+
+	auto& processorVec = m_processorDict[instrument];
 	processorVec.push_back(processor);
 }
 

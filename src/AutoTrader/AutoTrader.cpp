@@ -215,6 +215,7 @@ int main(int argc, const char* argv[]){
 		pMdUserApi->RegisterSpi(pMdUserSpi);
 		pMdUserApi->RegisterFront(const_cast<char*>(Config::Instance()->CtpMdFront().c_str()));
 		pMdUserApi->Init();
+		pool->SetMdSpi(pMdUserSpi);
 
 		std::future<bool> future_action_queue = std::async(std::launch::async, []()->bool {
 			ActionQueueProcessor::Instance().Start();

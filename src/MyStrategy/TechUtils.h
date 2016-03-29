@@ -14,10 +14,10 @@ public:
 	TechUtils();
 	~TechUtils();
 
-	static double CalulateMA(const std::list<TickWrapper>& data, const TickWrapper& current, size_t seconds);
-	static double CalulateEMA(const std::list<TickWrapper>& data, const TickWrapper& current, size_t seconds);
-	static double CalulateWMA(const std::list<TickWrapper>& data, const TickWrapper& current, size_t seconds);
-	static double CalulateAMA(const std::list<TickWrapper>& data, const TickWrapper& current, size_t seconds);
+	static double CalulateMA(const std::vector<TickWrapper>& data, const TickWrapper& current, size_t seconds);
+	static double CalulateEMA(const std::vector<TickWrapper>& data, const TickWrapper& current, size_t seconds);
+	static double CalulateWMA(const std::vector<TickWrapper>& data, const TickWrapper& current, size_t seconds);
+	static double CalulateAMA(const std::vector<TickWrapper>& data, const TickWrapper& current, size_t seconds);
 
 	static double CalulateMA(const std::vector<KData>& data, const KData& current, size_t mins);
 	static double CalulateEMA(const std::vector<KData>& data, const KData& current, size_t mins);

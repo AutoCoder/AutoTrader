@@ -15,8 +15,8 @@ class STRATEGY_API OrderTriggerBase
 public:
 	OrderTriggerBase(){};
 	virtual ~OrderTriggerBase(){};
-	virtual bool tryInvoke(const std::list<TickWrapper>& data, TickWrapper& info, Order& order) = 0;
-	virtual bool tryInvoke(const std::list<TickWrapper>& tickdata, const std::vector<KData>& data, std::vector<TickWrapper> curmindata, TickWrapper& info, Order& order) = 0;
+	virtual bool tryInvoke(const std::vector<TickWrapper>& data, TickWrapper& info, Order& order) = 0;
+	virtual bool tryInvoke(const std::vector<TickWrapper>& tickdata, const std::vector<KData>& data, std::vector<TickWrapper> curmindata, TickWrapper& info, Order& order) = 0;
 
 	virtual void BindWithAccount(AP::AccountDetailMgr*) = 0;
 };
@@ -36,7 +36,7 @@ public:
 	}
 	virtual ~OrderTrigger(){}
 
-	virtual bool tryInvoke(const std::list<TickWrapper>& data, TickWrapper& info, Order& order){
+	virtual bool tryInvoke(const std::vector<TickWrapper>& data, TickWrapper& info, Order& order){
 		if (m_strategy->tryInvoke(data, info))
 		{
 			order = m_strategy->GetCurOrder();
@@ -47,7 +47,7 @@ public:
 			return false;
 	}
 
-	virtual bool tryInvoke(const std::list<TickWrapper>& tickdata, const std::vector<KData>& data, std::vector<TickWrapper> curmindata, TickWrapper& info, Order& order){
+	virtual bool tryInvoke(const std::vector<TickWrapper>& tickdata, const std::vector<KData>& data, std::vector<TickWrapper> curmindata, TickWrapper& info, Order& order){
 		if (m_strategy->tryInvoke(tickdata, data, curmindata, info))
 		{
 			order = m_strategy->GetCurOrder();
