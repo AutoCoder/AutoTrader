@@ -74,8 +74,6 @@ void RealTimeDataProcessorPool::StoreStrategySequenceToDB(const std::string& ins
 {
 	auto processorVec = m_processorDict[instrumentID]; 
 	for (auto proccessor : processorVec){
-		if (auto sp = proccessor.lock()){
-			sp->StoreStrategySequenceToDB(mark);
-		}
+		proccessor->StoreStrategySequenceToDB(mark);
 	}
 }
