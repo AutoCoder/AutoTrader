@@ -49,7 +49,7 @@ private:
 
 private:
 	std::shared_ptr<DBWrapper> m_dbptr;
-	std::map<std::string/*instrument*/, std::vector<std::weak_ptr<RealTimeDataProcessor> > >  m_processorDict;
+	std::map<std::string/*instrument*/, std::vector<std::shared_ptr<RealTimeDataProcessor> > >  m_processorDict;
 	CtpMdSpi*                  m_mdspi;
 };
 

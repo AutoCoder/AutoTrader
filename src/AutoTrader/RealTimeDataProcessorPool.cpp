@@ -65,10 +65,8 @@ void RealTimeDataProcessorPool::AppendRealTimeData(TickWrapper& info)
 {
 	auto processorVec = m_processorDict[info.InstrumentId()];
 	for (auto proccessor : processorVec){
-		if (auto sp = proccessor.lock()){
-			if (sp->IsTrading())
-				sp->AppendRealTimeData(info);
-		}
+		if (proccessor->IsTrading())
+			proccessor->AppendRealTimeData(info);
 	}
 }
 
