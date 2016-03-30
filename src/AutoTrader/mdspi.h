@@ -8,6 +8,8 @@
 #include <mutex>
 #include "ThostFtdcMdApi.h"
 #include "TickWrapper.h"
+#include "KData.h"
+#include <boost/lockfree/queue.hpp>
 
 class DBWrapper;
 
@@ -67,20 +69,20 @@ public:
 	void SubscribeMarketData(const std::vector<std::string>& instIdList);
 	bool IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo);
 	void SerializeToDb();
-	void CacheTick(TickWrapper tick);
+	void OnReceiveTick(const TickWrapper& tick);
 	std::vector<TickWrapper>& GetTickVec(const std::string& instrument);
-	
+	std::vector<TickWrapper>& GetTickVec60(const std::string& instrument);
+	std::vector<KData>&       GetKDataVec(const std::string& instrument);
 
 private:
-  CThostFtdcMdApi* 										pUserApi;
-  int              										m_requestId;
-  MDThreadStateChangedHandler 							m_stateChangeHandler;
-  std::map<std::string, std::vector<TickWrapper> >		m_TickMap;
-  std::map<std::string, std::vector<TickWrapper> >      m_tempMap; /*for serialization to db*/
-  std::thread                                           m_serilizeThread;
-  std::shared_ptr<DBWrapper>							m_dbptr;
-  bool                                                  m_quit;    
-  std::mutex                                            m_mtx; //sync the mdspi thread & serialize thread. lock the m_tempMap
+  CThostFtdcMdApi* 													pUserApi;
+  int              													m_requestId;
+  MDThreadStateChangedHandler 										m_stateChangeHandler;
+  std::map<std::string, std::vector<TickWrapper> >					m_TickMap;
+  std::map<std::string, std::vector<TickWrapper> >              	m_TickMap60;
+  std::map<std::string, std::vector<KData> >						m_KDataMap;
+
+  std::shared_ptr<DBWrapper>										m_dbptr;  
 };
 
 #endif

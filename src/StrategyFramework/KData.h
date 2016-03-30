@@ -33,6 +33,10 @@ public:
 		return m_timestamp;
 	}
 
+	std::string InstrumentId() const {
+		return m_InstrumentID;
+	}
+
 private:
 	static bool IsTableCreated;
 	static int CreateKDataTableIfNotExists(const std::string& dbname, const std::string& tableName);

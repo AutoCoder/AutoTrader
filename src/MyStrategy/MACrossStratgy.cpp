@@ -109,12 +109,11 @@ bool MACrossStratgy::tryInvoke(const std::vector<TickWrapper>& data, TickWrapper
 	return orderSingal;
 }
 
-bool MACrossStratgy::tryInvoke(const std::vector<TickWrapper>& tickdata, const std::vector<KData>& data, std::vector<TickWrapper> curmindata, TickWrapper& info){
+bool MACrossStratgy::tryInvoke(const std::vector<TickWrapper>& tickdata, const std::vector<KData>& data,  const std::vector<TickWrapper>& curmindata, TickWrapper& info){
 	TickType direction = TickType::Commom;
 	const size_t breakthrough_confirm_duration = 100; //50ms
 	MACrossTech* curPtr = generateTechVec(info);
 	bool orderSingal = false;
-	curmindata.push_back(info);
 	KData curkdata(curmindata, 60);
 	double short_ma = calculateK(data, curkdata, m_shortMA);
 	double long_ma = calculateK(data, curkdata, m_longMA);

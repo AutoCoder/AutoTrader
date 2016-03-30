@@ -20,7 +20,6 @@ public:
 
 public:
 	void SetMdSpi(CtpMdSpi* p);
-	void StoreCachedData();
 	void AddProcessor(const std::string& instrument, OrderTriggerBase* trigger, BaseClientSession* session);
 	void AppendRealTimeData(TickWrapper& info);
 	void StoreStrategySequenceToDB(const std::string& instrumentID, const std::string& mark);

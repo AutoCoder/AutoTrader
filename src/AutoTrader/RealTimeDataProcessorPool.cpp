@@ -31,7 +31,7 @@ void RealTimeDataProcessorPool::SetMdSpi(CtpMdSpi* p)
 
 void RealTimeDataProcessorPool::AddProcessor(const std::string& instrument, OrderTriggerBase* trigger, BaseClientSession* session){
 	assert(m_mdspi);
-	auto processor = std::make_shared<RealTimeDataProcessor>(trigger, instrument, session, m_mdspi->GetTickVec(instrument));
+	auto processor = std::make_shared<RealTimeDataProcessor>(trigger, instrument, session, m_mdspi);
 
 	auto& processorVec = m_processorDict[instrument];
 	processorVec.push_back(processor);
@@ -52,15 +52,6 @@ void RealTimeDataProcessorPool::recoverHistoryData(int beforeSeconds, const std:
 
 }
 
-
-void RealTimeDataProcessorPool::StoreCachedData()
-{
-	//for (auto item : m_processorDict){
-	//	item.second->StoreDataToDB();
-	//}
-
-}
-
 void RealTimeDataProcessorPool::AppendRealTimeData(TickWrapper& info)
 {
 	auto processorVec = m_processorDict[info.InstrumentId()];
@@ -70,10 +61,10 @@ void RealTimeDataProcessorPool::AppendRealTimeData(TickWrapper& info)
 	}
 }
 
-void RealTimeDataProcessorPool::StoreStrategySequenceToDB(const std::string& instrumentID, const std::string& mark)
-{
-	auto processorVec = m_processorDict[instrumentID]; 
-	for (auto proccessor : processorVec){
-		proccessor->StoreStrategySequenceToDB(mark);
-	}
-}
+// void RealTimeDataProcessorPool::StoreStrategySequenceToDB(const std::string& instrumentID, const std::string& mark)
+// {
+// 	auto processorVec = m_processorDict[instrumentID]; 
+// 	for (auto proccessor : processorVec){
+// 		proccessor->StoreStrategySequenceToDB(mark);
+// 	}
+// }

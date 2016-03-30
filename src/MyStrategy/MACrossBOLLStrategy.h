@@ -21,7 +21,7 @@ public:
 	virtual ~MACrossBOLLStrategy();
 
 	virtual bool tryInvoke(const std::vector<TickWrapper>& data, TickWrapper& info);
-	virtual bool tryInvoke(const std::vector<TickWrapper>& tickdata, const std::vector<KData>& data, std::vector<TickWrapper> curmindata, TickWrapper& info);
+	virtual bool tryInvoke(const std::vector<TickWrapper>& tickdata, const std::vector<KData>& data, const std::vector<TickWrapper>& curmindata, TickWrapper& info);
 
 	Order GetCurOrder() const;
 

@@ -9,8 +9,6 @@
 #include "CommonUtils.h"
 #include "crossplatform.h"
 
-bool TickWrapper::firstlanuch = true;
-
 TickWrapper::TickWrapper(CThostFtdcDepthMarketDataField* p)
 	: recoveryData(false)
 	, m_techvec(nullptr)

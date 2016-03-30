@@ -31,21 +31,17 @@ CtpMdSpi::CtpMdSpi(CThostFtdcMdApi* api, const std::vector<std::string>& instrum
 	, m_requestId(0)
 	, m_stateChangeHandler(this, instruments, brokerId, userID, pw)
 	, m_dbptr(new DBWrapper)
-	, m_quit(false)
 {
 	for (auto instru : instruments){
 		m_TickMap[instru] = {};
-		m_tempMap[instru] = {};
+		m_TickMap60[instru] = {};
+		m_KDataMap[instru] = {};
 	}
-
-	m_serilizeThread = std::thread(&CtpMdSpi::SerializeToDb, this);
 }
 
 CtpMdSpi::~CtpMdSpi()
 {
-	m_quit = true;
-	if (m_serilizeThread.joinable())
-		m_serilizeThread.join();
+	SerializeToDb();
 }
 
 void CtpMdSpi::OnRspError(CThostFtdcRspInfoField *pRspInfo,
@@ -165,11 +161,8 @@ void CtpMdSpi::OnRtnDepthMarketData(
 	auto pool = RealTimeDataProcessorPool::getInstance();
 	TickWrapper tem(pDepthMarketData);
 	
-
-	GetTickVec(tem.InstrumentId()).push_back(tem);
-	CacheTick(tem);
+	OnReceiveTick(tem);
 	pool->AppendRealTimeData(tem);
-	//TryTerminate(pDepthMarketData->UpdateTime);
 }
 
 bool CtpMdSpi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo)
@@ -182,30 +175,53 @@ bool CtpMdSpi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo)
 }
 
 std::vector<TickWrapper>& CtpMdSpi::GetTickVec(const std::string& instrument){
-	assert (m_TickMap.find(instrument) != m_TickMap.end());
+	assert(m_TickMap.find(instrument) != m_TickMap.end());
 	return m_TickMap[instrument];
 }
 
-void CtpMdSpi::CacheTick(TickWrapper tick){
-	std::lock_guard<std::mutex> lk(m_mtx);
-	m_tempMap[tick.InstrumentId()].push_back(tick);
+std::vector<TickWrapper>& CtpMdSpi::GetTickVec60(const std::string& instrument){
+	assert(m_TickMap60.find(instrument) != m_TickMap60.end());
+	return m_TickMap60[instrument];
+}
+
+std::vector<KData>& CtpMdSpi::GetKDataVec(const std::string& instrument){
+	assert(m_KDataMap.find(instrument) != m_KDataMap.end());
+	return m_KDataMap[instrument];
+}
+
+void CtpMdSpi::OnReceiveTick(const TickWrapper& tem){
+	GetTickVec(tem.InstrumentId()).push_back(tem);
+
+	if (m_TickMap60[tem.InstrumentId()].empty()){
+		m_TickMap60[tem.InstrumentId()].push_back(tem);
+	}
+	else{
+		if (CommonUtils::InSameMinute(tem.Time(), m_TickMap60[tem.InstrumentId()].front().Time())){
+			m_TickMap60[tem.InstrumentId()].push_back(tem);
+		}
+		else{ // the comming tick data is in next minutes
+			KData k1m(m_TickMap60[tem.InstrumentId()], 60);
+			m_KDataMap[tem.InstrumentId()].push_back(k1m);
+			m_TickMap60[tem.InstrumentId()].clear();
+		}
+	}
 }
 
 void CtpMdSpi::SerializeToDb(){
-	while (true){
-		{
-			std::lock_guard<std::mutex> lk(m_mtx);
-			for (auto& kv : m_tempMap){
-				for (auto iter = kv.second.begin(); iter != kv.second.end(); iter++)
-					iter->serializeToDB(*(m_dbptr.get()));
 
-				kv.second.clear();
-			}
+	SYNC_LOG << "Start to store MD Tick to db...";
+	for (auto& kv : m_TickMap){
+		for (auto tick : kv.second){
+			tick.serializeToDB(*(m_dbptr.get()));
 		}
-
-		if (m_quit)
-			break;
-
-		sleep(3000);
 	}
+	SYNC_LOG << "Finish...";
+
+	SYNC_LOG << "Start to store K-LINE to db...";
+	for (auto& kv : m_KDataMap){
+		for (auto kdata : kv.second){
+			kdata.serializeToDB(*(m_dbptr.get()));
+		}
+	}
+	SYNC_LOG << "Finish...";
 }
