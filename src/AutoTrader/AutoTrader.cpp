@@ -274,8 +274,8 @@ int main(int argc, const char* argv[]){
 			delete pMdUserSpi;
 			pMdUserSpi = NULL;
 		}
-		//write to db
-		//pool->FreeProcessors();
+		
+		exit(0);
 	}
 	return 0;
 }
