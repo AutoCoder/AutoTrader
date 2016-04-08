@@ -4,7 +4,7 @@
 #include "TechVec.h"
 #include "MATech.h"
 #include "Order.h"
-#include <list>
+#include <vector>
 #include "KData.h"
 #include "Strategy.h"
 
@@ -16,12 +16,12 @@ public:
 	MACrossStratgy(size_t short_ma, size_t long_ma);
 	virtual ~MACrossStratgy();
 
-	bool tryInvoke(const std::list<TickWrapper>& data, TickWrapper& info);
-	bool tryInvoke(const std::list<TickWrapper>& tickdata, const std::vector<KData>& data, std::vector<TickWrapper> curmindata, TickWrapper& info);
+	bool tryInvoke(const std::vector<TickWrapper>& data, TickWrapper& info);
+	bool tryInvoke(const std::vector<TickWrapper>& tickdata, const std::vector<KData>& data, const std::vector<TickWrapper>& curmindata, TickWrapper& info);
 
 	Order GetCurOrder() const;
 protected:
-	virtual double calculateK(const std::list<TickWrapper>& data, const TickWrapper& current, size_t seconds) const;
+	virtual double calculateK(const std::vector<TickWrapper>& data, const TickWrapper& current, size_t seconds) const;
 	virtual double calculateK(const std::vector<KData>& data, const KData& current, size_t mins) const;
 	virtual MACrossTech* generateTechVec(const TickWrapper& info) const; 
 

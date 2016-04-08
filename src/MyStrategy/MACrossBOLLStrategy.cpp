@@ -29,7 +29,7 @@ Order MACrossBOLLStrategy::GetCurOrder() const{
 	return *m_curOrder;
 }
 
-bool MACrossBOLLStrategy::tryInvoke(const std::list<TickWrapper>& data, TickWrapper& info){
+bool MACrossBOLLStrategy::tryInvoke(const std::vector<TickWrapper>& data, TickWrapper& info){
 	TickType direction = TickType::Commom;
 	const size_t breakthrough_confirm_duration = 100; //50ms
 	MACrossBOLLTech* curPtr = new MACrossBOLLTech(CrossStratgyType::MA, m_shortMA, m_longMA, info.UUID(), info.InstrumentId(), info.Time(), info.LastPrice());
@@ -45,9 +45,9 @@ bool MACrossBOLLStrategy::tryInvoke(const std::list<TickWrapper>& data, TickWrap
 	if (!data.empty()){
 		if (curPtr->IsTriggerPoint()){ // up
 			if (!data.empty() && data.size() > 500){
-				std::list<TickWrapper>::const_iterator stoper = data.begin();
+				std::vector<TickWrapper>::const_reverse_iterator stoper = data.rbegin();
 				std::advance(stoper, breakthrough_confirm_duration);
-				for (auto it = data.begin(); it != stoper; it++){
+				for (auto it = data.rbegin(); it != stoper; it++){
 					StrategyTech* prePtr = it->GetTechVec();
 					// if prePtr == NULL, mean it's recovered from db, so that md is not continuous. so it's should not be singal point.
 					if (prePtr == NULL || !prePtr->IsTriggerPoint())
@@ -71,9 +71,9 @@ bool MACrossBOLLStrategy::tryInvoke(const std::list<TickWrapper>& data, TickWrap
 		}
 		else{ // down
 			if (!data.empty() && data.size() > 500){
-				std::list<TickWrapper>::const_iterator stoper = data.begin();
+				std::vector<TickWrapper>::const_reverse_iterator stoper = data.rbegin();
 				std::advance(stoper, breakthrough_confirm_duration);
-				for (auto it = data.begin(); it != stoper; it++){
+				for (auto it = data.rbegin(); it != stoper; it++){
 					StrategyTech* prePtr = it->GetTechVec();
 					if (prePtr == NULL || prePtr->IsTriggerPoint())
 					{
@@ -100,12 +100,11 @@ bool MACrossBOLLStrategy::tryInvoke(const std::list<TickWrapper>& data, TickWrap
 	return orderSingal;
 }
 
-bool MACrossBOLLStrategy::tryInvoke(const std::list<TickWrapper>& tickdata, const std::vector<KData>& data, std::vector<TickWrapper> curmindata, TickWrapper& info){
+bool MACrossBOLLStrategy::tryInvoke(const std::vector<TickWrapper>& tickdata, const std::vector<KData>& data, const std::vector<TickWrapper>& curmindata, TickWrapper& info){
 	TickType direction = TickType::Commom;
 	const size_t breakthrough_confirm_duration = 100; //50ms
 	MACrossBOLLTech* curPtr = new MACrossBOLLTech(CrossStratgyType::MA, m_shortMA, m_longMA, info.UUID(), info.InstrumentId(), info.Time(), info.LastPrice());
 	bool orderSingal = false;
-	curmindata.push_back(info);
 	KData curkdata(curmindata, 60);
 	double short_ma = calculateK(data, curkdata, m_shortMA);
 	double long_ma = calculateK(data, curkdata, m_longMA);
@@ -118,9 +117,9 @@ bool MACrossBOLLStrategy::tryInvoke(const std::list<TickWrapper>& tickdata, cons
 		if (curPtr->IsTriggerPoint())
 		{ // up
 			if (!tickdata.empty() && tickdata.size() > 500){
-				std::list<TickWrapper>::const_iterator stoper = tickdata.begin();
+				std::vector<TickWrapper>::const_reverse_iterator stoper = tickdata.rbegin();
 				std::advance(stoper, breakthrough_confirm_duration);
-				for (auto it = tickdata.begin(); it != stoper; it++){
+				for (auto it = tickdata.rbegin(); it != stoper; it++){
 					StrategyTech* prePtr = it->GetTechVec();
 					// if prePtr == NULL, mean it's recovered from db, so that md is not continuous. so it's should not be singal point.
 					if (prePtr == NULL || !prePtr->IsTriggerPoint())
@@ -145,9 +144,9 @@ bool MACrossBOLLStrategy::tryInvoke(const std::list<TickWrapper>& tickdata, cons
 		else
 		{ // down
 			if (!tickdata.empty() && tickdata.size() > 500){
-				std::list<TickWrapper>::const_iterator stoper = tickdata.begin();
+				std::vector<TickWrapper>::const_reverse_iterator stoper = tickdata.rbegin();
 				std::advance(stoper, breakthrough_confirm_duration);
-				for (auto it = tickdata.begin(); it != stoper; it++){
+				for (auto it = tickdata.rbegin(); it != stoper; it++){
 					StrategyTech* prePtr = it->GetTechVec();
 					if (prePtr == NULL || prePtr->IsTriggerPoint())
 					{
@@ -173,7 +172,7 @@ bool MACrossBOLLStrategy::tryInvoke(const std::list<TickWrapper>& tickdata, cons
 	return orderSingal;
 }
 
-BOLLTech MACrossBOLLStrategy::calculateBoll(const std::list<TickWrapper>& data, const TickWrapper& current, size_t seconds) const{
+BOLLTech MACrossBOLLStrategy::calculateBoll(const std::vector<TickWrapper>& data, const TickWrapper& current, size_t seconds) const{
 	double ma = TechUtils::CalulateMA(data, current, seconds);
 	size_t tickCount = 2 * seconds;
 
@@ -220,7 +219,7 @@ BOLLTech MACrossBOLLStrategy::calculateBoll(const std::vector<KData>& data, cons
 	return BOLLTech(ma, var, current.LastPrice());
 }
 
-double MACrossBOLLStrategy::calculateK(const std::list<TickWrapper>& data, const TickWrapper& current, size_t seconds) const{
+double MACrossBOLLStrategy::calculateK(const std::vector<TickWrapper>& data, const TickWrapper& current, size_t seconds) const{
 	return TechUtils::CalulateMA(data, current, seconds);
 }
 

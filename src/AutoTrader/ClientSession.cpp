@@ -30,7 +30,7 @@ ClientSession::ClientSession(const std::string& userId, const std::shared_ptr<Tr
 : BaseClientSession(userId) 
 , m_session(s)
 {
-
+	Init_CTP();
 }
 
 ClientSession::~ClientSession()
@@ -139,16 +139,16 @@ void ClientSession::OnAccountInitFinished(){
 
 void ClientSession::OnRtnOrder(CThostFtdcOrderField* pOrder){
 	long long timeStamp = CommonUtils::DateTimeToTimestamp(pOrder->InsertDate, pOrder->InsertTime) * 2;
-	Transmission::Utils::SendDealInfo(m_session, Transmission::INSERT_ORDER, pOrder->Direction, pOrder->LimitPrice, pOrder->VolumeTotalOriginal, pOrder->OrderRef, timeStamp);
+	Transmission::Utils::SendDealInfo(m_session, Transmission::INSERT_ORDER, pOrder->Direction, pOrder->CombOffsetFlag[0], pOrder->LimitPrice, pOrder->VolumeTotalOriginal, pOrder->OrderRef, timeStamp);
 }
 
 void ClientSession::OnRtnTrade(CThostFtdcTradeField* pTrade){
 	long long timeStamp = CommonUtils::DateTimeToTimestamp(pTrade->TradeDate, pTrade->TradeTime) * 2;
-	Transmission::Utils::SendDealInfo(m_session, Transmission::TRADE, pTrade->Direction, pTrade->Price, pTrade->Volume, pTrade->OrderRef, timeStamp);
+	Transmission::Utils::SendDealInfo(m_session, Transmission::TRADE, pTrade->Direction, pTrade->OffsetFlag, pTrade->Price, pTrade->Volume, pTrade->OrderRef, timeStamp);
 }
 
 void ClientSession::OnCancelOrder(CThostFtdcInputOrderActionField *pInputOrderAction, CThostFtdcRspInfoField *pRspInfo){
-
+	Transmission::Utils::SendDealInfo(m_session, Transmission::CANCELL_ORDER, 0, 0, 0, 0, pInputOrderAction->OrderRef, 0);
 }
 
 void ClientSession::OnLoginRequest()
@@ -166,7 +166,7 @@ void ClientSession::OnStartTradeRequest(const std::string& instru, const std::st
 	}
 	else{
 		ErrorCode err_code;
-		if (Init_CTP() && StartTrade(instru, strategyName, err_code)){
+		if (StartTrade(instru, strategyName, err_code)){
 			Transmission::Utils::SendStartTradeResultInfo(m_session, Transmission::Succeed);
 		}
 		else{

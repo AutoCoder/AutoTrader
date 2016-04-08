@@ -71,6 +71,7 @@ public class ListAdapter extends BaseAdapter implements Filterable {
 			holder.TradeType = (TextView) convertView.findViewById(R.id.entity_type);
 			holder.InstrumentIdLabel = (TextView) convertView.findViewById(R.id.instrument_id);
 			holder.directionLabel = (TextView) convertView.findViewById(R.id.direction);
+			holder.offsetLabel = (TextView) convertView.findViewById(R.id.offsetFlag);
 			holder.priceLabel = (TextView) convertView.findViewById(R.id.last_price);
 			holder.volumeLabel = (TextView) convertView.findViewById(R.id.volume);
 			holder.orderRefLabel = (TextView) convertView.findViewById(R.id.order_ref);
@@ -83,6 +84,7 @@ public class ListAdapter extends BaseAdapter implements Filterable {
 		holder.TradeType.setText(filteredData.get(position).getTypeString());
 		holder.InstrumentIdLabel.setText(filteredData.get(position).getInstrument());
 		holder.directionLabel.setText(filteredData.get(position).getDirectionString());
+		holder.offsetLabel.setText(filteredData.get(position).getOffsetFlagString());
 		holder.priceLabel.setText(String.valueOf(filteredData.get(position).getLastPrice()));
 		holder.volumeLabel.setText(String.valueOf(filteredData.get(position).getVol()));
 		holder.orderRefLabel.setText(filteredData.get(position).getOrderId());
@@ -95,6 +97,7 @@ public class ListAdapter extends BaseAdapter implements Filterable {
 		TextView TradeType;
 		TextView InstrumentIdLabel;
 		TextView directionLabel;
+		TextView offsetLabel;
 		TextView priceLabel;
 		TextView volumeLabel;
 		TextView orderRefLabel;

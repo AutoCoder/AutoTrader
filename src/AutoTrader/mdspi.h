@@ -1,9 +1,17 @@
 ﻿#ifndef MD_SPI_H_
 #define MD_SPI_H_
 
-#include "ThostFtdcMdApi.h"
 #include <string>
 #include <vector>
+#include <map>
+#include <thread>
+#include <mutex>
+#include "ThostFtdcMdApi.h"
+#include "TickWrapper.h"
+#include "KData.h"
+#include <boost/lockfree/queue.hpp>
+
+class DBWrapper;
 
 class CtpMdSpi : public CThostFtdcMdSpi
 {
@@ -37,6 +45,8 @@ class CtpMdSpi : public CThostFtdcMdSpi
 public:
 	CtpMdSpi(CThostFtdcMdApi* api, const std::vector<std::string>& instruments, const std::string& brokerId, const std::string& userID, const std::string& pw);
 
+	virtual ~CtpMdSpi();
+
 	virtual void OnRspError(CThostFtdcRspInfoField *pRspInfo,
 		int nRequestID, bool bIsLast);
 
@@ -58,11 +68,21 @@ public:
 	bool ReqUserLogin(TThostFtdcBrokerIDType appId, TThostFtdcUserIDType userId, TThostFtdcPasswordType	passwd);
 	void SubscribeMarketData(const std::vector<std::string>& instIdList);
 	bool IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo);
+	void SerializeToDb();
+	void OnReceiveTick(const TickWrapper& tick);
+	std::vector<TickWrapper>& GetTickVec(const std::string& instrument);
+	std::vector<TickWrapper>& GetTickVec60(const std::string& instrument);
+	std::vector<KData>&       GetKDataVec(const std::string& instrument);
 
 private:
-  CThostFtdcMdApi* pUserApi;
-  int              m_requestId;
-  MDThreadStateChangedHandler m_stateChangeHandler;
+  CThostFtdcMdApi* 													pUserApi;
+  int              													m_requestId;
+  MDThreadStateChangedHandler 										m_stateChangeHandler;
+  std::map<std::string, std::vector<TickWrapper> >					m_TickMap;
+  std::map<std::string, std::vector<TickWrapper> >              	m_TickMap60;
+  std::map<std::string, std::vector<KData> >						m_KDataMap;
+
+  std::shared_ptr<DBWrapper>										m_dbptr;  
 };
 
 #endif

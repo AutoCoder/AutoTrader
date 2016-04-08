@@ -123,7 +123,6 @@ public:
 private:
 	CThostFtdcDepthMarketDataField m_MdData;
 	long long m_uuid;
-	static bool firstlanuch;
 	bool recoveryData;
 	//std::shared_ptr<TechVec> m_techvec;
 public:

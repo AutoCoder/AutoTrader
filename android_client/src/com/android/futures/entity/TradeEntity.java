@@ -22,6 +22,7 @@ public class TradeEntity {
 	private String mOrderId;
 	private int mLastPrice;
 	private int mDirection; // 0 Long, 1 short
+	private int mOffsetFlag; //开仓 '0' 平仓 '1' 强平 '2' 平今 '3' 平昨 '4' 强减 '5' 本地强平 '6'
 	private String mInstrument;
 	
 
@@ -35,13 +36,14 @@ public class TradeEntity {
 		mTimeStamp = time;
 	}
 	
-	public TradeEntity(type t, int direction, int lastprice, int vol, String ord_id, long time){
+	public TradeEntity(type t, int direction, int offsetFlag,  int lastprice, int vol, String ord_id, long time){
 		mType = t;
 		mVol = vol;
 		mTimeStamp = time;
 		mLastPrice = lastprice;
 		mOrderId = ord_id;
 		mDirection = direction;
+		mOffsetFlag = offsetFlag;
 	}
 	
 	public type getType() {
@@ -59,6 +61,37 @@ public class TradeEntity {
 			break;
 		case Trade:
 			tradeType = "成交";
+			break;
+		default:
+			tradeType = "未定义";
+			break;
+		}
+		return tradeType;
+	}
+	
+	public String getOffsetFlagString(){
+		String tradeType = "";
+		switch (mOffsetFlag){
+		case '0':
+			tradeType = "开仓";
+			break;
+		case '1':
+			tradeType = "平仓";
+			break;
+		case '2':
+			tradeType = "强平";
+			break;
+		case '3':
+			tradeType = "平今";
+			break;
+		case '4':
+			tradeType = "平昨";
+			break;
+		case '5':
+			tradeType = "强减";
+			break;
+		case '6':
+			tradeType = "本地强平 ";
 			break;
 		default:
 			tradeType = "未定义";

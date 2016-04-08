@@ -15,8 +15,8 @@ public:
 	Strategy(){}
 	~Strategy(){}
 
-	virtual bool tryInvoke(const std::list<TickWrapper>& data, TickWrapper& info) = 0;
-	virtual bool tryInvoke(const std::list<TickWrapper>& tickdata, const std::vector<KData>& data, std::vector<TickWrapper> curmindata, TickWrapper& info) = 0;
+	virtual bool tryInvoke(const std::vector<TickWrapper>& data, TickWrapper& info) = 0;
+	virtual bool tryInvoke(const std::vector<TickWrapper>& tickdata, const std::vector<KData>& data, std::vector<TickWrapper> curmindata, TickWrapper& info) = 0;
 
 	virtual bool generateOrder(Order& out) = 0;
 };

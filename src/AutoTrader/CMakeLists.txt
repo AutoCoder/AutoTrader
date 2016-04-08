@@ -3,8 +3,7 @@ message(STATUS "BoostDIR : ${BOOST_DIR}/stage/lib")
 
 SET(EXECUTABLE_OUTPUT_PATH ${AUTOTRADE_SOURCE_DIR}/bin)
 
-SET(SRC_LIST	AP_Mgr.cpp
-			 	ActionProcessor.cpp 
+SET(SRC_LIST    ActionProcessor.cpp 
 			 	AutoTrader.cpp 
 			 	ClientSession.cpp
 			 	BaseClientSession.cpp

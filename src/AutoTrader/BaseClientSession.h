@@ -60,7 +60,6 @@ protected:
 	std::unique_ptr<Order>                          m_pending_order;
 	CtpTradeSpi*									m_trade_spi;
 	CThostFtdcTraderApi*                            m_trade_api;
-	std::shared_ptr<RealTimeDataProcessor>          m_realtimedata_processor;
 	
 	std::mutex                                      m_mtx;
 	std::condition_variable                         m_con;

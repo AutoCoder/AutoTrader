@@ -5,6 +5,7 @@
 #include "spdlog/spdlog.h"
 #include "CommonUtils.h"
 #include "crossplatform.h"
+#include "DBWrapper.h"
 
 #include <iostream>
 #include <condition_variable>
@@ -29,7 +30,18 @@ CtpMdSpi::CtpMdSpi(CThostFtdcMdApi* api, const std::vector<std::string>& instrum
 	: pUserApi(api)
 	, m_requestId(0)
 	, m_stateChangeHandler(this, instruments, brokerId, userID, pw)
+	, m_dbptr(new DBWrapper)
 {
+	for (auto instru : instruments){
+		m_TickMap[instru] = {};
+		m_TickMap60[instru] = {};
+		m_KDataMap[instru] = {};
+	}
+}
+
+CtpMdSpi::~CtpMdSpi()
+{
+	SerializeToDb();
 }
 
 void CtpMdSpi::OnRspError(CThostFtdcRspInfoField *pRspInfo,
@@ -148,9 +160,9 @@ void CtpMdSpi::OnRtnDepthMarketData(
 	//2) can't define a local RealTimeDataProcessor variable here, otherwise it will plus the ref-count, so that it will not call destruction fucntion when exit(0)
 	auto pool = RealTimeDataProcessorPool::getInstance();
 	TickWrapper tem(pDepthMarketData);
+	
+	OnReceiveTick(tem);
 	pool->AppendRealTimeData(tem);
-
-	//TryTerminate(pDepthMarketData->UpdateTime);
 }
 
 bool CtpMdSpi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo)
@@ -160,4 +172,56 @@ bool CtpMdSpi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo)
 	  SYNC_PRINT << "[Md] Response | " << pRspInfo->ErrorMsg;
   }
   return ret;
+}
+
+std::vector<TickWrapper>& CtpMdSpi::GetTickVec(const std::string& instrument){
+	assert(m_TickMap.find(instrument) != m_TickMap.end());
+	return m_TickMap[instrument];
+}
+
+std::vector<TickWrapper>& CtpMdSpi::GetTickVec60(const std::string& instrument){
+	assert(m_TickMap60.find(instrument) != m_TickMap60.end());
+	return m_TickMap60[instrument];
+}
+
+std::vector<KData>& CtpMdSpi::GetKDataVec(const std::string& instrument){
+	assert(m_KDataMap.find(instrument) != m_KDataMap.end());
+	return m_KDataMap[instrument];
+}
+
+void CtpMdSpi::OnReceiveTick(const TickWrapper& tem){
+	GetTickVec(tem.InstrumentId()).push_back(tem);
+
+	if (m_TickMap60[tem.InstrumentId()].empty()){
+		m_TickMap60[tem.InstrumentId()].push_back(tem);
+	}
+	else{
+		if (CommonUtils::InSameMinute(tem.Time(), m_TickMap60[tem.InstrumentId()].front().Time())){
+			m_TickMap60[tem.InstrumentId()].push_back(tem);
+		}
+		else{ // the comming tick data is in next minutes
+			KData k1m(m_TickMap60[tem.InstrumentId()], 60);
+			m_KDataMap[tem.InstrumentId()].push_back(k1m);
+			m_TickMap60[tem.InstrumentId()].clear();
+		}
+	}
+}
+
+void CtpMdSpi::SerializeToDb(){
+
+	SYNC_LOG << "Start to store MD Tick to db...";
+	for (auto& kv : m_TickMap){
+		for (auto tick : kv.second){
+			tick.serializeToDB(*(m_dbptr.get()));
+		}
+	}
+	SYNC_LOG << "Finish...";
+
+	SYNC_LOG << "Start to store K-LINE to db...";
+	for (auto& kv : m_KDataMap){
+		for (auto kdata : kv.second){
+			kdata.serializeToDB(*(m_dbptr.get()));
+		}
+	}
+	SYNC_LOG << "Finish...";
 }

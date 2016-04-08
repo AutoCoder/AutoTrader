@@ -139,8 +139,7 @@ bool BaseClientSession::StartTrade(const std::string& instru, const std::string&
 		auto strategyPtr = TriggerFactory::Instance()->GetTrigger(m_userId, strategyName);
 		if (strategyPtr){
 			strategyPtr->BindWithAccount(m_detailMgr.get());
-			m_realtimedata_processor = std::make_shared<RealTimeDataProcessor>(strategyPtr, instru, this);
-			RealTimeDataProcessorPool::getInstance()->AddProcessor(m_realtimedata_processor);
+			RealTimeDataProcessorPool::getInstance()->AddProcessor(instru, strategyPtr, this);
 			m_isTrading.store(true);
 
 			if (m_orderExecuteThreadF.valid()==false || m_orderExecuteThreadF.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready) // if thread is not started or finished.
