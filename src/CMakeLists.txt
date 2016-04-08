@@ -9,4 +9,6 @@ ADD_SUBDIRECTORY(StrategyFramework)
 
 ADD_SUBDIRECTORY(MyStrategy)
 
+ADD_SUBDIRECTORY(MyStrategy2)
+
 ADD_SUBDIRECTORY(ta-lib)
