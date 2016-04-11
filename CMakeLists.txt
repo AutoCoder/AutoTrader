@@ -30,7 +30,7 @@ message(STATUS "CMAKE_C_COMPILER is " ${CMAKE_C_COMPILER} " AND " "CMAKE_CXX_COM
 
 if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -Wall -std=c++11 -pthread -m64") # don't add "-stdlib=libc++" let clang find it by itself
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -D_GLIBCXX_DEBUG -Wall -std=c++11 -pthread -m64") # don't add "-stdlib=libc++" let clang find it by itself
 
 message(STATUS "CMAKE_CXX_FLAGS is ${CMAKE_CXX_FLAGS}")
 

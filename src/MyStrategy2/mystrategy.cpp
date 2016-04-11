@@ -7,6 +7,8 @@
 #include <string>
 #include "AccountMgr.h"
 
+namespace {
+
 OrderTriggerBase* st1;
 
 
@@ -36,6 +38,8 @@ void UnRegisterAllStrategy(){
 	// factory->UnRegisterTrigger(AccountId());
 	// factory->UnRegisterTrigger(AccountId2());
 	// delete st1;
+}
+
 }
 
 void LoadPlugin(){

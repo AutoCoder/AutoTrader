@@ -4,7 +4,7 @@
 #include <limits>  
 #include <sstream>
 #include "crossplatform.h"
-std::map<std::string, bool> KData::TableIsCreatedMap = {};
+std::map<std::string, bool> KData::TableIsCreatedMap;
 
 KData::KData(const TickSet& tickset, size_t duration)
 : m_volume(0)

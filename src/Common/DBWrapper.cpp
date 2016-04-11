@@ -8,7 +8,7 @@
 #include "spdlog/spdlog.h"
 #include "crossplatform.h"
 
-std::map<std::string, bool> DBUtils::m_dict = {};
+std::map<std::string, bool> DBUtils::m_dict;
 
 int DBUtils::CreateTickTableIfNotExists(const std::string& dbname, const std::string& tableName){
 
