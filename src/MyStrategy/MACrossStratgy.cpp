@@ -106,6 +106,7 @@ bool MACrossStratgy::tryInvoke(const std::vector<TickWrapper>& data, TickWrapper
 	}
 
 	info.m_techvec = curPtr;
+	SYNC_DEBUG_LOG << "ShortMA:" <<curPtr->ShortMA() << "LongMA:" << curPtr->LongMA() << "Direction:" << (curPtr->IsTriggerPoint() ? "Up" : "Down") ;
 	return orderSingal;
 }
 

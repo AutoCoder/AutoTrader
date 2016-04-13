@@ -189,6 +189,7 @@ int main(int argc, const char* argv[]){
 	StrategyPluginsLoader loader; //must be top
 	auto console = spdlog::stdout_logger_mt("console");
 	auto file_logger = spdlog::rotating_logger_mt("file_logger", "logs/logfile", 1048576 * 5, 3);
+	auto file_debug_logger = spdlog::rotating_logger_mt("file_debug_logger", "logs/debug", 1048576 * 5, 3);
 	file_logger->info() << "----------------------------------";
 	file_logger->info() << "Lanuch AutoTrader...";
 	//Test
