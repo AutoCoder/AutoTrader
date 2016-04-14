@@ -557,9 +557,9 @@ void CtpTradeSpi::ReqOrderInsert(Order ord){
 	bool success = ord.GetOrderOriginStruct(ordstruct);
 	if (success){
 		//SYNC_PRINT << "[Debug] ²åÈë¶©µ¥:" << CommonUtils::StringFromStruct(ordstruct);
-		SYNC_PRINT << "[Trade] Inserting Order:" << CommonUtils::StringFromStruct(ordstruct);
+		SYNC_PRINT << "[Trade] Request | Inserting Order:\n" << CommonUtils::StringFromStruct(ordstruct);
 		int ret = pUserApi->ReqOrderInsert(&ordstruct, ++m_requestId);
-		SYNC_PRINT << "[Trade] Insert Order..." << ((ret == 0) ? "Success" : "Fail");
+		SYNC_PRINT << "[Trade] Request | Insert Order..." << ((ret == 0) ? "Success" : "Fail");
 		//if (ret)
 		//	g_OrderRunMtx.unlock();
 	}
