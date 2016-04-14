@@ -101,7 +101,7 @@ void CtpTradeSpi::ReqQryOrder(){
 	STRCPY(req.InvestorID, m_userID);//投资者代码,也是userId
 	int ret = pUserApi->ReqQryOrder(&req, ++m_requestId);
 
-	SYNC_PRINT << "[Trade] Request | Query Order..." << ((ret == 0) ? "Success" : "Fail") << " ret:" << ret; //ret值为-3表示每秒发送请求数超过许可数
+	SYNC_PRINT << "[Trade] Request | Query Order..." << ((ret == 0) ? "Success" : "Fail") << " ret:" << ret; //ret值为 0, 代表成功。 -1 , 表示网络连接失败; -2, 表示未处理请求超过许可数; -3表示每秒发送请求数超过许可数
 }
 
 ///请求查询报单响应
@@ -122,8 +122,8 @@ void CtpTradeSpi::OnRspQryOrder(CThostFtdcOrderField *pOrder, CThostFtdcRspInfoF
 				m_firstquery_order = false;
 				SYNC_PRINT << "[Trade] Inserted order count of all instruments today:" << m_account_detail_mgr.todayOrderCount();
 				SYNC_PRINT << m_account_detail_mgr.todayOrderToString();
+				m_stateChangeHandler.OnRspQryOrder();
 			}
-			m_stateChangeHandler.OnRspQryOrder();
 		}
 	}
 	else
