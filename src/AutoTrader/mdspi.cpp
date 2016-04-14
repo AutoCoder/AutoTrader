@@ -161,8 +161,8 @@ void CtpMdSpi::OnRtnDepthMarketData(
 	auto pool = RealTimeDataProcessorPool::getInstance();
 	TickWrapper tem(pDepthMarketData);
 	
-	OnReceiveTick(tem);
 	pool->AppendRealTimeData(tem);
+	UpdateCachedTickData(tem);
 }
 
 bool CtpMdSpi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo)
@@ -189,7 +189,7 @@ std::vector<KData>& CtpMdSpi::GetKDataVec(const std::string& instrument){
 	return m_KDataMap[instrument];
 }
 
-void CtpMdSpi::OnReceiveTick(const TickWrapper& tem){
+void CtpMdSpi::UpdateCachedTickData(const TickWrapper& tem){
 	GetTickVec(tem.InstrumentId()).push_back(tem);
 
 	if (m_TickMap60[tem.InstrumentId()].empty()){

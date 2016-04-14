@@ -69,7 +69,7 @@ public:
 	void SubscribeMarketData(const std::vector<std::string>& instIdList);
 	bool IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo);
 	void SerializeToDb();
-	void OnReceiveTick(const TickWrapper& tick);
+	void UpdateCachedTickData(const TickWrapper& tick); // OnReceiveTick
 	std::vector<TickWrapper>& GetTickVec(const std::string& instrument);
 	std::vector<TickWrapper>& GetTickVec60(const std::string& instrument);
 	std::vector<KData>&       GetKDataVec(const std::string& instrument);
