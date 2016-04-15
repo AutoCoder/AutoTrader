@@ -16,7 +16,7 @@
 #include "OrderTrigger.h"
 #include "mdspi.h"
 
-#define UseKDataToInvoke 1
+//#define UseKDataToInvoke 1
 
 RealTimeDataProcessor::RealTimeDataProcessor(OrderTriggerBase* trigger, const std::string& InstrumentName, BaseClientSession* owner, CtpMdSpi* spi, bool replay)
 	: m_Name(InstrumentName)
