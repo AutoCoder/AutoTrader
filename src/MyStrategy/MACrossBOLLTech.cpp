@@ -27,7 +27,7 @@ MACrossBOLLTech::~MACrossBOLLTech()
 
 bool MACrossBOLLTech::IsTriggerPoint() const
 {
-	return /*m_bollTech.IsTriggerPoint() &&*/ m_maTech.IsTriggerPoint();
+	return /*m_bollTech.IsTriggerPoint() &&*/ m_maTech.MAShortUpLong();
 }
 
 bool MACrossBOLLTech::IsTableCreated = false;

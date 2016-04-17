@@ -10,7 +10,7 @@ struct MATech{
 	double mLongMAVal; 
 	double mShortMAVal;
 
-	bool IsTriggerPoint() const;
+	bool MAShortUpLong() const;
 };
 
 #endif

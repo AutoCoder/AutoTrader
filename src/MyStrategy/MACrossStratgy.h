@@ -69,6 +69,8 @@ public:
 
 	virtual bool IsTriggerPoint() const;
 
+	bool MAShortUpLong() const;
+
 	virtual void serializeToDB(DBWrapper& db, const std::string& mark);
 
 protected:

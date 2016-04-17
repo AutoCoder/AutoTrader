@@ -1,6 +1,5 @@
 #include "MATech.h"
 
-
-bool MATech::IsTriggerPoint() const {
+bool MATech::MAShortUpLong() const {
 	return mShortMAVal > mLongMAVal;
 }

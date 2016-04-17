@@ -51,6 +51,8 @@ public:
 	virtual	void serializeToDB(DBWrapper& db, const std::string& mark);
 	virtual bool IsTriggerPoint() const;
 
+	bool MAShortUpLong() const { return m_maTech.MAShortUpLong(); }
+
 protected:
 	static int CreateTableIfNotExists(const std::string& dbname, const std::string& tableName);
 	static bool IsTableCreated;

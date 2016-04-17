@@ -43,14 +43,15 @@ bool MACrossBOLLStrategy::tryInvoke(const std::vector<TickWrapper>& data, TickWr
 
 
 	if (!data.empty()){
-		if (curPtr->IsTriggerPoint()){ // up
+		if (curPtr->MAShortUpLong()){ // up
 			if (!data.empty() && data.size() > 500){
 				std::vector<TickWrapper>::const_reverse_iterator stoper = data.rbegin();
 				std::advance(stoper, breakthrough_confirm_duration);
 				for (auto it = data.rbegin(); it != stoper; it++){
 					StrategyTech* prePtr = it->GetTechVec();
 					// if prePtr == NULL, mean it's recovered from db, so that md is not continuous. so it's should not be singal point.
-					if (prePtr == NULL || !prePtr->IsTriggerPoint())
+					auto prePtr_ = dynamic_cast<MACrossBOLLTech*>(prePtr);
+					if (prePtr_ == NULL || !prePtr_->MAShortUpLong())
 					{
 						// not special point
 						orderSingal = false;
@@ -75,7 +76,8 @@ bool MACrossBOLLStrategy::tryInvoke(const std::vector<TickWrapper>& data, TickWr
 				std::advance(stoper, breakthrough_confirm_duration);
 				for (auto it = data.rbegin(); it != stoper; it++){
 					StrategyTech* prePtr = it->GetTechVec();
-					if (prePtr == NULL || prePtr->IsTriggerPoint())
+					auto prePtr_ = dynamic_cast<MACrossBOLLTech*>(prePtr);
+					if (prePtr_ == NULL || prePtr_->MAShortUpLong())
 					{
 						// not special point
 						orderSingal = false;
@@ -114,7 +116,7 @@ bool MACrossBOLLStrategy::tryInvoke(const std::vector<TickWrapper>& tickdata, co
 	curPtr->setBollTech(bolltech);
 
 	if (!tickdata.empty()){
-		if (curPtr->IsTriggerPoint())
+		if (curPtr->MAShortUpLong())
 		{ // up
 			if (!tickdata.empty() && tickdata.size() > 500){
 				std::vector<TickWrapper>::const_reverse_iterator stoper = tickdata.rbegin();
@@ -122,7 +124,8 @@ bool MACrossBOLLStrategy::tryInvoke(const std::vector<TickWrapper>& tickdata, co
 				for (auto it = tickdata.rbegin(); it != stoper; it++){
 					StrategyTech* prePtr = it->GetTechVec();
 					// if prePtr == NULL, mean it's recovered from db, so that md is not continuous. so it's should not be singal point.
-					if (prePtr == NULL || !prePtr->IsTriggerPoint())
+					auto prePtr_ = dynamic_cast<MACrossBOLLTech*>(prePtr);
+					if (prePtr_ == NULL || !prePtr_->MAShortUpLong())
 					{
 						// not special point
 						orderSingal = false;
@@ -148,7 +151,8 @@ bool MACrossBOLLStrategy::tryInvoke(const std::vector<TickWrapper>& tickdata, co
 				std::advance(stoper, breakthrough_confirm_duration);
 				for (auto it = tickdata.rbegin(); it != stoper; it++){
 					StrategyTech* prePtr = it->GetTechVec();
-					if (prePtr == NULL || prePtr->IsTriggerPoint())
+					auto prePtr_ = dynamic_cast<MACrossBOLLTech*>(prePtr);
+					if (prePtr_ == NULL || prePtr_->MAShortUpLong())
 					{
 						// not special point
 						orderSingal = false;
