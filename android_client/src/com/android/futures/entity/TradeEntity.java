@@ -36,7 +36,7 @@ public class TradeEntity {
 		mTimeStamp = time;
 	}
 	
-	public TradeEntity(type t, int direction, int offsetFlag,  int lastprice, int vol, String ord_id, long time){
+	public TradeEntity(type t, String instrument, int direction, int offsetFlag,  int lastprice, int vol, String ord_id, long time){
 		mType = t;
 		mVol = vol;
 		mTimeStamp = time;
@@ -44,6 +44,7 @@ public class TradeEntity {
 		mOrderId = ord_id;
 		mDirection = direction;
 		mOffsetFlag = offsetFlag;
+		mInstrument = instrument;
 	}
 	
 	public type getType() {

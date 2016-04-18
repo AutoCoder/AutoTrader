@@ -212,7 +212,7 @@ public class ReaderTask extends Thread {
 						}else{
 							throw new Exception("unexpected ctp return");
 						}
-						temp = new TradeEntity(t, details.getInt("Direction"), details.getInt("OffsetFlag"), details.getInt("Price"), details.getInt("Vol"), details.getString("ORDER_ID"), details.getLong("TIMESTAMP"));
+						temp = new TradeEntity(t, details.getString("Instrument"), details.getInt("Direction"), details.getInt("OffsetFlag"), details.getInt("Price"), details.getInt("Vol"), details.getString("ORDER_ID"), details.getLong("TIMESTAMP"));
 						statusChangeHandler.onCTPCallback(temp);
 					}
 				}

@@ -54,8 +54,7 @@ void RealTimeDataProcessor::StoreStrategySequenceToDB(const std::string& mark)
 
 //main thread
 void RealTimeDataProcessor::AppendRealTimeData(TickWrapper& info){
-	//(in)front-------------back(out)
-	// if m_strategy == nullptr, that means RealTimeDataProcessor is in data-recording mode
+	// if m_trigger == nullptr, that means RealTimeDataProcessor is in data-recording mode
 	if (m_trigger){
 		Order ord;
 #ifdef UseKDataToInvoke
