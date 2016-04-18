@@ -88,7 +88,7 @@ namespace Transmission{
 			break;
 		}
 		root["Details"] = Json::Value::nullRef;
-		root["Details"]["Direction"] = direction;
+		root["Details"]["Direction"] = (direction == '0' ? 0 : 1) ;
 		root["Details"]["OffsetFlag"] = (int)combOffsetFlag;
 		root["Details"]["Price"] = price;
 		root["Details"]["Vol"] = vol;
