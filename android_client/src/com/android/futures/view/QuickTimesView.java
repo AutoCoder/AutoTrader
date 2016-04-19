@@ -72,7 +72,7 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 		m_beginIdx = mTimesList.size() > DATA_MAX_COUNT ? (mTimesList.size() - DATA_MAX_COUNT) : 0;
 		m_dtimestamp = mTimesList.get(m_beginIdx).getTimeStamp();
 		mHighPrice = mTimesList.size() > 0 ? mTimesList.get(m_beginIdx).getHighPrice() : 0.0;
-		mLowPrice = mTimesList.size() > 0 ? mTimesList.get(m_beginIdx).getLowPrice() : 0.0;
+		mLowPrice = mTimesList.size() > 0 ? mTimesList.get(m_beginIdx).getLowPrice() : 1000000000.0;
 		mhighestVolume = mTimesList.size() > 0 ? mTimesList.get(m_beginIdx).getVol() : 0.0;
 		mLowestVolume = mTimesList.size() > 0 ? mTimesList.get(m_beginIdx).getVol() : 0.0;
 
