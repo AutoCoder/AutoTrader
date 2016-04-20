@@ -280,6 +280,27 @@ std::string CommonUtils::StringFromStruct(const CThostFtdcInputOrderField& inner
 	return ss.str();
 }
 
+std::string CommonUtils::ConvertOrderToString(const CThostFtdcOrderField& order){
+	std::stringstream result;
+	result << "经纪公司代码:" << order.BrokerID << std::endl
+	<< " 投资者代码:" << order.InvestorID << std::endl
+	<< " 用户代码:" << order.UserID << std::endl
+	<< " 合约代码:" << order.InstrumentID << std::endl
+	<< " 买卖方向:" << order.Direction << std::endl
+	<< " 组合开平标志:" << order.CombOffsetFlag << std::endl
+	<< " 价格:" << order.LimitPrice << std::endl
+	<< " 数量:" << order.VolumeTotalOriginal << std::endl
+	<< " 报单引用:" << order.OrderRef << std::endl
+	<< " 客户代码:" << order.ClientID << std::endl
+	<< " 报单状态:" << order.OrderStatus << std::endl
+	<< " 委托时间:" << order.InsertTime << std::endl
+	<< " 报单编号:" << order.OrderSysID << std::endl
+	<< " GTD日期:" << order.GTDDate << std::endl
+	<< " 交易日:" << order.TradingDay << std::endl
+	<< " 报单日期:" << order.InsertDate << std::endl;
+	return result.str();
+}
+
 std::string CommonUtils::ConvertOrderListToString(const std::vector< CThostFtdcOrderField >& list){
 	if (list.empty())
 		return "";

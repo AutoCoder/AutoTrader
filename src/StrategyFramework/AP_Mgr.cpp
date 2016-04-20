@@ -6,6 +6,7 @@
 #include "AP_Mgr.h"
 #include "Order.h"
 #include "CommonUtils.h"
+#include "crossplatform.h"
 
 
 namespace AP{
@@ -224,6 +225,8 @@ namespace AP{
 		bool no_duplicated = (orderIter == m_orderlist.end());
 		if (no_duplicated)
 			m_orderlist.push_back(orderField);
+		else
+			SYNC_DEBUG_LOG << "Update_Exist_Order:" << CommonUtils::ConvertOrderToString(orderField);
 		
 		return no_duplicated;
 	}

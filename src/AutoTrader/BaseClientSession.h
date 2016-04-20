@@ -16,6 +16,7 @@ class TickWrapper;
 class CtpTradeSpi;
 class RealTimeDataProcessor;
 class CThostFtdcTraderApi;
+struct CThostFtdcOrderField;
 
 namespace AP{
 	class AccountDetailMgr;
@@ -49,13 +50,16 @@ public:
 protected:
 	bool ExecutePendingOrder();
 
+	//if Order insert success, update PositionInfoReady flag
+	void OnRtnOrder(CThostFtdcOrderField* pOrder);
+
 protected:
 	std::string										m_userId;
 	std::atomic<bool>                               m_isTrading; // access by thread-OrderExecutor and thread-ActionQueueInvoker
 	std::unique_ptr<AP::AccountDetailMgr>           m_detailMgr;
-	std::atomic<bool>                               m_PositionInfo_ready;//access by thread-tradespi and thread-ActionQueueInvoker
 	int                                             m_total_vol;
 	bool                                            m_ReleaseingCtpAccount;
+	std::atomic<bool>                               m_PositionInfo_ready;//access by thread-tradespi and thread-ActionQueueInvoker
 
 	std::unique_ptr<Order>                          m_pending_order;
 	CtpTradeSpi*									m_trade_spi;

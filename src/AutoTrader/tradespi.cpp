@@ -457,7 +457,7 @@ void CtpTradeSpi::ReqOrderAction(const CThostFtdcOrderField& order)//TThostFtdcS
 
 	int ret = pUserApi->ReqOrderAction(&req, ++m_requestId);
 	//SYNC_PRINT << "[Trade] 请求 | 撤销报单..." << ((ret == 0) ? "成功" : "失败");
-	SYNC_PRINT << "[Trade] Request | Cancell Order...OrderSysID:" << order.OrderSysID << ((ret == 0) ? "Success" : "Fail");
+	SYNC_DEBUG_LOG << "[Trade] Request | Cancell Order...OrderSysID:" << order.OrderSysID << ((ret == 0) ? "Success" : "Fail");
 }
 
 void CtpTradeSpi::OnRspOrderAction(
@@ -468,7 +468,7 @@ void CtpTradeSpi::OnRspOrderAction(
 		//SYNC_PRINT << "[Trade] 回复 | 撤单成功..."
 		//	<< "交易所代码:" << pInputOrderAction->ExchangeID
 		//	<< "报单编号:" << pInputOrderAction->OrderSysID;
-		SYNC_PRINT << "[Trade] Response | Cancell Order Success..."
+		SYNC_DEBUG_LOG << "[Trade] Response | Cancell Order Success..."
 			<< "ExchangeID:" << pInputOrderAction->ExchangeID
 			<< "OrderSysID:" << pInputOrderAction->OrderSysID;
 	}
@@ -709,7 +709,7 @@ void CtpTradeSpi::CancelOrder(long long MDtime, int aliveDuration, const std::st
 			if ((CommonUtils::TimeToSenconds(item.InsertTime) + aliveDuration) * 2 < MDtime) // unit = 0.5s
 			{
 				//SYNC_PRINT << "[Trade] 撤单...报单ID:" << item.BrokerOrderSeq;
-				SYNC_PRINT << "[Trade] Request | Cancel Order...OrderID:" << item.BrokerOrderSeq;
+				SYNC_DEBUG_LOG << "[Trade] Request | Cancel Order...OrderID:" << item.BrokerOrderSeq;
 				ReqOrderAction(item);
 			}
 

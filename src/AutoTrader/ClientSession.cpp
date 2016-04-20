@@ -138,6 +138,8 @@ void ClientSession::OnAccountInitFinished(){
 }
 
 void ClientSession::OnRtnOrder(CThostFtdcOrderField* pOrder){
+	BaseClientSession::OnRtnOrder(pOrder);
+	
 	long long timeStamp = CommonUtils::DateTimeToTimestamp(pOrder->InsertDate, pOrder->InsertTime) * 2;
 	Transmission::Utils::SendDealInfo(m_session, Transmission::INSERT_ORDER, pOrder->InstrumentID ,pOrder->Direction, pOrder->CombOffsetFlag[0], pOrder->LimitPrice, pOrder->VolumeTotalOriginal, pOrder->OrderRef, timeStamp);
 }

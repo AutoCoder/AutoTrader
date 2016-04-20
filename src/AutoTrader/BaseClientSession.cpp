@@ -28,9 +28,9 @@ BaseClientSession::BaseClientSession(const std::string& userId)
 : m_userId(userId)
 , m_isTrading(false)
 , m_detailMgr(std::unique_ptr<AP::AccountDetailMgr>(new AP::AccountDetailMgr()))
-, m_PositionInfo_ready(false)
 , m_total_vol(0)
 , m_ReleaseingCtpAccount(false)
+, m_PositionInfo_ready(false)
 {
 
 }
@@ -61,7 +61,7 @@ bool BaseClientSession::Init_CTP(){
 
 	Account::Meta meta = Account::Manager::Instance().GetMeta(m_userId);
 	InitedAccountCallback accountInitFinished_Callback = [](){};
-	RtnOrderCallback onRtnOrder_Callback = [](CThostFtdcOrderField* pOrder){};
+	RtnOrderCallback onRtnOrder_Callback = std::bind(&BaseClientSession::OnRtnOrder, this, std::placeholders::_1);
 	RtnTradeCallback OnRtnTrade_Callback = [](CThostFtdcTradeField* pTrade){};
 	CancelOrderCallback OnCancelOrder_Callback = [](CThostFtdcInputOrderActionField *pInputOrderAction, CThostFtdcRspInfoField *pRspInfo){};
 
@@ -112,13 +112,18 @@ bool BaseClientSession::ExecutePendingOrder(){
 		WaitAndPopCurrentOrder(ord);//blocking
 		if (m_ReleaseingCtpAccount)
 			break;
+
 		//if socket command set m_isTrading = false here. this function will quit.
 		if (m_isTrading.load()){ //Check this bool var again, prevent to execute new pushed order after user stop trade.
-			m_trade_spi->CancelOrder(ord.GetTriggerTick(), 6, ord.GetInstrumentId());
+			m_trade_spi->CancelOrder(ord.GetTriggerTick(), 0, ord.GetInstrumentId());
 			m_trade_spi->ReqOrderInsert(ord);
 		}
 	}
 	return true;
+}
+
+void BaseClientSession::OnRtnOrder(CThostFtdcOrderField* pOrder){
+
 }
 
 void BaseClientSession::StopTrade(){
