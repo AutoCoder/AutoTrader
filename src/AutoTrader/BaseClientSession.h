@@ -17,6 +17,7 @@ class CtpTradeSpi;
 class RealTimeDataProcessor;
 class CThostFtdcTraderApi;
 struct CThostFtdcOrderField;
+struct CThostFtdcTradeField;
 
 namespace AP{
 	class AccountDetailMgr;
