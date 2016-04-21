@@ -293,6 +293,7 @@ std::string CommonUtils::ConvertOrderToString(const CThostFtdcOrderField& order)
 	<< " 报单引用:" << order.OrderRef << std::endl
 	<< " 客户代码:" << order.ClientID << std::endl
 	<< " 报单状态:" << order.OrderStatus << std::endl
+	<< " 经纪公司报单编号" << order.BrokerOrderSeq << std::endl
 	<< " 委托时间:" << order.InsertTime << std::endl
 	<< " 报单编号:" << order.OrderSysID << std::endl
 	<< " GTD日期:" << order.GTDDate << std::endl
@@ -320,7 +321,8 @@ std::string CommonUtils::ConvertOrderListToString(const std::vector< CThostFtdcO
 			<< " 报单引用:" << iter->OrderRef << std::endl
 			<< " 客户代码:" << iter->ClientID << std::endl
 			<< " 报单状态:" << iter->OrderStatus << std::endl
-			<< " 委托时间:" << iter->InsertTime << std::endl
+			<< " 经纪公司报单编号" << iter->BrokerOrderSeq << std::endl
+ 			<< " 委托时间:" << iter->InsertTime << std::endl
 			<< " 报单编号:" << iter->OrderSysID << std::endl
 			<< " GTD日期:" << iter->GTDDate << std::endl
 			<< " 交易日:" << iter->TradingDay << std::endl

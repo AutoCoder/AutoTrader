@@ -223,8 +223,10 @@ namespace AP{
 		auto orderIter = std::find_if(m_orderlist.begin(), m_orderlist.end(), IsSameOrder(orderField));
 
 		bool no_duplicated = (orderIter == m_orderlist.end());
-		if (no_duplicated)
+		if (no_duplicated){
+			SYNC_DEBUG_LOG << "pushImmediateOrder:" << CommonUtils::ConvertOrderToString(orderField);
 			m_orderlist.push_back(orderField);
+		}
 		else
 			SYNC_DEBUG_LOG << "Update_Exist_Order:" << CommonUtils::ConvertOrderToString(orderField);
 		
