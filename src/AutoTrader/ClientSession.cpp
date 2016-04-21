@@ -158,7 +158,7 @@ void ClientSession::OnLoginRequest()
 	//if the ClientSession is created which mean login already, just send Account Info back.
 	const std::vector<std::string>& instu = Account::Manager::Instance().GetMeta(m_userId).m_Instruments;
 	const std::vector<std::string>& strategies = TriggerFactory::Instance()->GetStrategies(m_userId);
-	Transmission::Utils::SendAccountInfo(m_session, instu, strategies, IsTrading());
+	Transmission::Utils::SendAccountInfo(m_session, instu, strategies, IsTrading(), RunningInstrument(), RunningStrategy());
 }
 
 void ClientSession::OnStartTradeRequest(const std::string& instru, const std::string& strategyName)

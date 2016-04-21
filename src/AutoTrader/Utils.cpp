@@ -47,7 +47,7 @@ namespace Transmission{
 		Transmission::GetFIFOActionQueue().Push_back(Transmission::RemoteServerAction(session, ret));
 	}
 
-	void Utils::SendAccountInfo(const std::shared_ptr<Transmission::socket_session>& session, const std::vector<std::string>& instruments, const std::vector<std::string>& strategies, bool isTrading){
+	void Utils::SendAccountInfo(const std::shared_ptr<Transmission::socket_session>& session, const std::vector<std::string>& instruments, const std::vector<std::string>& strategies, bool isTrading, const std::string& runningInstru, const std::string& runningStrgy){
 		Json::Value root;
 		root["Info"] = "ACCOUNT_INFO";
 		Json::Value details;
@@ -62,11 +62,13 @@ namespace Transmission{
 		details["Instruments"] = arrayInstru;
 		details["Strategies"] = arrayStrategy;
 		details["IsTrading"] = isTrading;
+		details["RunningInstrument"] = runningInstru;
+		details["RunningStrategy"] = runningStrgy;
 
 		root["Details"] = details;
 		Json::FastWriter writer;
 		std::string ret = writer.write(root);
-		//{"Type":"ACCOUNT_INFO","Details":{"Instruments": [ "122313", "12233" ], "Strategies": [ "CROSS_3_5" ]}}
+		//{"Type":"ACCOUNT_INFO","Details":{"Instruments": [ "122313", "12233" ], "Strategies": [ "CROSS_3_5" ], "IsTrading" : true, "RunningInstrument" : "", "RunningStrategy" : ""}}
 		ret = str(boost::format("%1%%2%") % ret.length() % ret);
 		Transmission::GetFIFOActionQueue().Push_back(Transmission::RemoteServerAction(session, ret));
 	}

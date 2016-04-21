@@ -19,7 +19,7 @@ namespace Transmission{
 		static void SendLoginResultInfo(const std::shared_ptr<Transmission::socket_session>& session, ErrorCode code);
 		static void SendLogOutResultInfo(const std::shared_ptr<Transmission::socket_session>& session, ErrorCode code);
 		static void SendPositionInfo(const std::shared_ptr<Transmission::socket_session>& session, double blance, int posmoney, const std::string& details);
-		static void SendAccountInfo(const std::shared_ptr<Transmission::socket_session>& session, const std::vector<std::string>& instruments, const std::vector<std::string>& strategies, bool isTrading);
+		static void SendAccountInfo(const std::shared_ptr<Transmission::socket_session>& session, const std::vector<std::string>& instruments, const std::vector<std::string>& strategies, bool isTrading, const std::string& instru, const std::string& strategy);
 		static void SendStartTradeResultInfo(const std::shared_ptr<Transmission::socket_session>& session, ErrorCode code);
 		static void SendStopTradeResultInfo(const std::shared_ptr<Transmission::socket_session>& session, ErrorCode code);
 		static void SendQueryPositionResultInfo(const std::shared_ptr<Transmission::socket_session>& session, ErrorCode code);

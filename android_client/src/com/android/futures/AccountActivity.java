@@ -199,6 +199,8 @@ public class AccountActivity extends Activity implements Handler.Callback {
 					android.R.layout.simple_spinner_item, sts);
 			mStrategyList.setAdapter(adapter2);
 			IsTrading = info.getIsTrading();
+			mSession.setInstrument(info.getRunningInstrument());
+			mSession.setStrategyName(info.getRunningStrategy());
 			updateButtonStatus();
 			progressDlg.setMessage("登陆成功，账户初始化中。。。");
 		}

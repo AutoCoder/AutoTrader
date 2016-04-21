@@ -31,6 +31,8 @@ BaseClientSession::BaseClientSession(const std::string& userId)
 , m_total_vol(0)
 , m_ReleaseingCtpAccount(false)
 , m_PositionInfo_ready(false)
+, m_runningInstrument("")
+, m_runningStrategy("")
 {
 
 }
@@ -145,6 +147,8 @@ bool BaseClientSession::StartTrade(const std::string& instru, const std::string&
 		if (strategyPtr){
 			strategyPtr->BindWithAccount(m_detailMgr.get());
 			RealTimeDataProcessorPool::getInstance()->AddProcessor(instru, strategyPtr, this);
+			m_runningInstrument = instru;
+			m_runningStrategy = strategyName;
 			m_isTrading.store(true);
 
 			if (m_orderExecuteThreadF.valid()==false || m_orderExecuteThreadF.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready) // if thread is not started or finished.

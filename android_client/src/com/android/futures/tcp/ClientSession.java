@@ -14,7 +14,7 @@ import android.os.Message;
 public class ClientSession implements TraderStatusListener {
 
 	private String mBrokerId, mAccount, mPassword;
-	private String mCurrentInstrument = new String("");
+	private String mInstrument = new String("");
 	private String mStrategyName = new String("");
 	private Handler mHandler;
 	private SocketHandler mSocketHandler = null;
@@ -93,7 +93,7 @@ public class ClientSession implements TraderStatusListener {
 			String info = loginJson.toString();
 			String wrapInfo = String.valueOf(info.length()) + info;
 			mSocketHandler.sendMessage(wrapInfo);
-			setCurrentInstrument(instrument);
+			setInstrument(instrument);
 			setStrategyName(strategyName);
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
@@ -109,7 +109,7 @@ public class ClientSession implements TraderStatusListener {
 			String info = json.toString();
 			String wrapInfo = String.valueOf(info.length()) + info;
 			mSocketHandler.sendMessage(wrapInfo);
-			setCurrentInstrument("");
+			setInstrument("");
 			setStrategyName("");
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
@@ -188,12 +188,12 @@ public class ClientSession implements TraderStatusListener {
 		}
 	}
 
-	public String getCurrentInstrument() {
-		return mCurrentInstrument;
+	public String getInstrument() {
+		return mInstrument;
 	}
 
-	public void setCurrentInstrument(String mCurrentInstrument) {
-		this.mCurrentInstrument = mCurrentInstrument;
+	public void setInstrument(String instrument) {
+		this.mInstrument = instrument;
 	}
 
 	public String getStrategyName() {

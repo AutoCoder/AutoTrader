@@ -43,6 +43,8 @@ public:
 	bool IsTrading() const { return m_isTrading.load(); }
 	bool IsPositionInfoReady() const { return m_PositionInfo_ready.load(); }
 	std::string UserId() const { return m_userId; };
+	std::string RunningInstrument() const { return m_runningInstrument; }
+	std::string RunningStrategy() const { return m_runningStrategy; }
 
 	bool StartTrade(const std::string& instru, const std::string& strategyName, ErrorCode& errcode);
 	void StopTrade();
@@ -60,6 +62,8 @@ protected:
 	int                                             m_total_vol;
 	bool                                            m_ReleaseingCtpAccount;
 	std::atomic<bool>                               m_PositionInfo_ready;//access by thread-tradespi and thread-ActionQueueInvoker
+	std::string                                     m_runningInstrument;
+	std::string                                     m_runningStrategy;
 
 	std::unique_ptr<Order>                          m_pending_order;
 	CtpTradeSpi*									m_trade_spi;

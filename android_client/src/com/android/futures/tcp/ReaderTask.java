@@ -189,6 +189,9 @@ public class ReaderTask extends Thread {
 						JSONArray instrus = details.getJSONArray("Instruments");
 						JSONArray sts = details.getJSONArray("Strategies");
 						boolean  is_trading = details.getBoolean("IsTrading");
+						String running_instru = details.getString("RunningInstrument");
+						String running_st = details.getString("RunningStrategy");
+
 						ArrayList<String> instru_list = new ArrayList<String>();
 						ArrayList<String> st_list = new ArrayList<String>();
 						for (int i = 0; i < instrus.length(); ++i) {
@@ -197,7 +200,7 @@ public class ReaderTask extends Thread {
 						for (int i = 0; i < sts.length(); ++i) {
 							st_list.add(sts.getString(i));
 						}
-						AccountInfo info = new AccountInfo(instru_list, st_list, is_trading);
+						AccountInfo info = new AccountInfo(instru_list, st_list, is_trading, running_instru, running_st);
 						if (statusChangeHandler != null)
 							statusChangeHandler.onAccountInfoUpdated(info);
 					} else {
