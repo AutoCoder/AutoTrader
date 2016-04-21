@@ -28,6 +28,7 @@
 #define SYNC_PRINT spdlog::get("console")->info()
 #define SYNC_LOG spdlog::get("file_logger")->info()
 #define SYNC_DEBUG_LOG spdlog::get("file_debug_logger")->info()
+#define SYNC_TRADE_LOG spdlog::get("file_trade_logger")->info()
 #endif
 
 #endif

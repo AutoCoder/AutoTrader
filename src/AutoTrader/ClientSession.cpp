@@ -145,6 +145,8 @@ void ClientSession::OnRtnOrder(CThostFtdcOrderField* pOrder){
 }
 
 void ClientSession::OnRtnTrade(CThostFtdcTradeField* pTrade){
+	BaseClientSession::OnRtnTrade(pTrade);
+
 	long long timeStamp = CommonUtils::DateTimeToTimestamp(pTrade->TradeDate, pTrade->TradeTime) * 2;
 	Transmission::Utils::SendDealInfo(m_session, Transmission::TRADE, pTrade->InstrumentID, pTrade->Direction, pTrade->OffsetFlag, pTrade->Price, pTrade->Volume, pTrade->OrderRef, timeStamp);
 }

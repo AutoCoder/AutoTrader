@@ -52,8 +52,9 @@ public:
 protected:
 	bool ExecutePendingOrder();
 
-	//if Order insert success, update PositionInfoReady flag
 	void OnRtnOrder(CThostFtdcOrderField* pOrder);
+
+	void OnRtnTrade(CThostFtdcTradeField* pTrade);
 
 protected:
 	std::string										m_userId;

@@ -302,6 +302,31 @@ std::string CommonUtils::ConvertOrderToString(const CThostFtdcOrderField& order)
 	return result.str();
 }
 
+std::string CommonUtils::ConvertTradeToString(const CThostFtdcTradeField& trade){
+	std::stringstream result;
+	
+	result << "合约代码:" << trade.InstrumentID << std::endl
+		<< " 用户代码:" << trade.UserID << std::endl
+		<< " 成交编号:" << trade.TradeID << std::endl
+		<< " 买卖方向:" << trade.Direction << std::endl
+		<< " 开平标志:" << trade.OffsetFlag << std::endl
+		<< " 投机套保标志:" << trade.HedgeFlag << std::endl
+		<< " 价格:" << trade.Price << std::endl
+		<< " 数量:" << trade.Volume << std::endl
+		<< " 成交时间:" << trade.TradeTime << std::endl
+		<< " 成交类型:" << trade.TradeType << std::endl
+		<< " 报单编号:" << trade.OrderSysID << std::endl
+		<< " 报单引用:" << trade.OrderRef << std::endl
+		<< " 本地报单编号:" << trade.OrderLocalID << std::endl
+		<< " 业务单元:" << trade.BusinessUnit << std::endl
+		<< " 序号:" << trade.SequenceNo << std::endl
+		<< " 经纪公司报单编号:" << trade.BrokerOrderSeq << std::endl
+		<< " 成交时期:" << trade.TradeDate << std::endl
+		<< " 交易日:" << trade.TradingDay << std::endl;
+
+	return result.str();
+}
+
 std::string CommonUtils::ConvertOrderListToString(const std::vector< CThostFtdcOrderField >& list){
 	if (list.empty())
 		return "";
