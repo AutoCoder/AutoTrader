@@ -1,6 +1,8 @@
 package com.android.futures.view;
 
 import java.util.Vector;
+
+import com.android.futures.entity.MATechInfo;
 import com.android.futures.entity.TradeEntity;
 import com.android.futures.util.VisualizationSetting;
 
@@ -21,7 +23,8 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 	private final float Text_Size = VisualizationSetting.TEXT_XLARGE;
 	private SurfaceHolder mHolder;
 	private DrawThread mThread;
-	public Vector<TradeEntity> mTimesList = null;
+	public Vector<TradeEntity> mMDList = null;
+	public Vector<MATechInfo> mMAList = null;
 	private String mInstrument = new String("");
 	private String mStrategy = new String("");
 
@@ -59,8 +62,9 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 		init();
 	}
 
-	public void setTimeSequence(Vector<TradeEntity> seqRef, String instrument, String strategy) {
-		mTimesList = seqRef;
+	public void setSequenceData(Vector<TradeEntity> seqRef, Vector<MATechInfo> techseqRef, String instrument, String strategy) {
+		mMDList = seqRef;
+		mMAList = techseqRef;
 		mInstrument = instrument;
 		mStrategy = strategy;
 	}
@@ -69,22 +73,22 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 		float viewWith = getWidth();
 		float viewHeight = getHeight();
 
-		m_beginIdx = mTimesList.size() > DATA_MAX_COUNT ? (mTimesList.size() - DATA_MAX_COUNT) : 0;
-		m_dtimestamp = mTimesList.get(m_beginIdx).getTimeStamp();
-		mHighPrice = mTimesList.size() > 0 ? mTimesList.get(m_beginIdx).getLastPrice() : 0.0;
-		mLowPrice = mTimesList.size() > 0 ? mTimesList.get(m_beginIdx).getLastPrice() : 1000000000.0;
-		mhighestVolume = mTimesList.size() > 0 ? mTimesList.get(m_beginIdx).getVol() : 0.0;
-		mLowestVolume = mTimesList.size() > 0 ? mTimesList.get(m_beginIdx).getVol() : 0.0;
+		m_beginIdx = mMDList.size() > DATA_MAX_COUNT ? (mMDList.size() - DATA_MAX_COUNT) : 0;
+		m_dtimestamp = mMDList.get(m_beginIdx).getTimeStamp();
+		mHighPrice = mMDList.size() > 0 ? mMDList.get(m_beginIdx).getLastPrice() : 0.0;
+		mLowPrice = mMDList.size() > 0 ? mMDList.get(m_beginIdx).getLastPrice() : 1000000000.0;
+		mhighestVolume = mMDList.size() > 0 ? mMDList.get(m_beginIdx).getVol() : 0.0;
+		mLowestVolume = mMDList.size() > 0 ? mMDList.get(m_beginIdx).getVol() : 0.0;
 
-		for (int i = m_beginIdx; i < m_beginIdx + DATA_MAX_COUNT && i < mTimesList.size(); ++i) {
+		for (int i = m_beginIdx; i < m_beginIdx + DATA_MAX_COUNT && i < mMDList.size(); ++i) {
 			
-			TradeEntity fenshiData = mTimesList.get(i);
+			TradeEntity fenshiData = mMDList.get(i);
 			if (fenshiData.getType() != TradeEntity.type.MD)
 				continue;
 
 			if (mHighPrice < fenshiData.getLastPrice())
 				mHighPrice = fenshiData.getLastPrice();
-			if (mLowPrice > fenshiData.getLastPrice())
+			if (mLowPrice > fenshiData.getLastPrice()) 
 				mLowPrice = fenshiData.getLastPrice();
 
 			if (mhighestVolume < fenshiData.getVol())
@@ -141,7 +145,7 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 			long tickTime = 0;
 			tickTime = System.currentTimeMillis();
 			while (isRunning) {
-				if (mTimesList.isEmpty())
+				if (mMDList.isEmpty())
 					continue;
 				
 				Canvas canvas = null;
@@ -158,6 +162,7 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 							UpdateBoundary();
 							drawMDFrame(canvas);
 							drawTicks(canvas);
+							drawTech(canvas);
 							drawVolumes(canvas);
 						}
 					}
@@ -191,7 +196,7 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 		String high = String.valueOf(mHighPrice);
 		String low = String.valueOf(mLowPrice);
 		
-		TradeEntity lastItem = mTimesList.lastElement();
+		TradeEntity lastItem = mMDList.lastElement();
 		paint.setColor(Color.WHITE);
 		canvas.drawText(String.format("%s %s Price:%5.0f Volume:%d", mInstrument, mStrategy, lastItem.getLastPrice(), lastItem.getVol()), mTimeRectLeft, mMargin + mFontHeight , paint);
 		paint.setColor(Color.DKGRAY);
@@ -225,9 +230,9 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 		Paint paint = new Paint();
 
 		paint.setAntiAlias(true);
-		for (int i = m_beginIdx; i < m_beginIdx + DATA_MAX_COUNT && i < mTimesList.size(); i++) {
-			TradeEntity preData = i > 1 ? mTimesList.get(i-1) : mTimesList.get(0);
-			TradeEntity fenshiData = mTimesList.get(i);
+		for (int i = m_beginIdx; i < m_beginIdx + DATA_MAX_COUNT && i < mMDList.size(); i++) {
+			TradeEntity preData = i > 1 ? mMDList.get(i-1) : mMDList.get(0);
+			TradeEntity fenshiData = mMDList.get(i);
 			int timestamp_offset = (int) (fenshiData.getTimeStamp() - m_dtimestamp);
 			
 			ratio = (float) ((fenshiData.getVol() - mLowestVolume) / (mhighestVolume - mLowestVolume));
@@ -246,17 +251,23 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 			canvas.drawLine(curX, mVolumeRectBottom, curX, curY, paint);
 		}
 	}
+	
+	private void drawTech(Canvas canvas){
+		Paint paint = new Paint();
+		paint.setAntiAlias(true);	
+		//TradeEntity first = mMAList.get(m_beginIdx);
+	}
 
 	private void drawTicks(Canvas canvas) {
 		Paint paint = new Paint();
 		paint.setAntiAlias(true);
 		
-		TradeEntity first = mTimesList.get(m_beginIdx);
+		TradeEntity first = mMDList.get(m_beginIdx);
 		float ratio = (float) ((first.getLastPrice() - mLowPrice) / (float) (mHighPrice - mLowPrice));
 		float curY = mTimeRectBottom - (mTimeRectBottom - mTimeRectTop) * ratio;
 		float curX = mTimeRectLeft;
-		for (int i = m_beginIdx + 1; i < m_beginIdx + DATA_MAX_COUNT && i < mTimesList.size(); i++) {
-			TradeEntity fenshiData = mTimesList.get(i);
+		for (int i = m_beginIdx + 1; i < m_beginIdx + DATA_MAX_COUNT && i < mMDList.size(); i++) {
+			TradeEntity fenshiData = mMDList.get(i);
 			int timestamp_offset = (int) (fenshiData.getTimeStamp() - m_dtimestamp);
 			
 			if (fenshiData.getType() == TradeEntity.type.MD){
@@ -299,7 +310,7 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
 		// TODO Auto-generated method stub
-		if (mTimesList != null) {
+		if (mMDList != null) {
 			mThread = new DrawThread();
 			mThread.start();
 		}

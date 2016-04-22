@@ -1,8 +1,9 @@
 package com.android.futures.tcp;
 
+import com.android.futures.entity.MATechInfo;
 import com.android.futures.entity.TradeEntity;
 
-public interface TraderStatusListener {
+public interface ClientStatusListener {
 	public static final int LogOut = 1;
 	public static final int Loging = 2;
 	public static final int Logined = 3;
@@ -25,5 +26,6 @@ public interface TraderStatusListener {
 	public void onStartTradeFailed(String err_msg);
 	public void onStopTrade();
 	public void onCTPCallback(TradeEntity entity);
+	public void onTechCallback(MATechInfo tech);
 	public void onTradeNotification(TradeEntity entity);
 }

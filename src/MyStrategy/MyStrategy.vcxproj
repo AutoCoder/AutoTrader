@@ -88,13 +88,13 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)src\Common\;$(SolutionDir)src\StrategyFramework\;$(SolutionDir)include\;$(SolutionDir)boost_1_60_0\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)src\Common\;$(SolutionDir)src\StrategyFramework\;$(SolutionDir)include\;$(SolutionDir)boost_1_60_0\;$(SolutionDir)src\lib_json\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;MY_STRATEGY_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(OutDir);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>Common.lib;StrategyFramework.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Common.lib;StrategyFramework.lib;lib_json.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -118,7 +118,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)src\Common\;$(SolutionDir)src\StrategyFramework\;$(SolutionDir)include\;$(SolutionDir)boost_1_60_0\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)src\Common\;$(SolutionDir)src\StrategyFramework\;$(SolutionDir)include\;$(SolutionDir)boost_1_60_0\;$(SolutionDir)src\lib_json\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;MY_STRATEGY_EXPORT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -140,7 +140,6 @@
     <ClInclude Include="Pos20Precent.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="TechUtils.h" />
-    <ClInclude Include="TechVec.h" />
     <ClInclude Include="WMACrossStratgy.h" />
   </ItemGroup>
   <ItemGroup>

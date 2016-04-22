@@ -26,6 +26,8 @@ public:
 
 	void SendTickToClient(const TickWrapper& tick);
 
+	void SendTechToClient(const TickWrapper& tick);
+
 	void SendPostionInfoToClient();
 
 	void OnLoginRequest();

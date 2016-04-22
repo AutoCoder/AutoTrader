@@ -35,7 +35,8 @@ public:
 	BaseClientSession(const std::string& userId);
 	virtual ~BaseClientSession();
 	virtual bool Init_CTP();
-	virtual void SendTickToClient(const TickWrapper& tick) = 0;	
+	virtual void SendTickToClient(const TickWrapper& tick) {};
+	virtual void SendTechToClient(const TickWrapper& tick) {};
 
 	//These below two Functions should be syncd with one mutex, they may conflict with m_pending_order
 	bool AppendOrder(const Order& order);//multi-thread notice

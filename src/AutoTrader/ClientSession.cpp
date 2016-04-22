@@ -119,6 +119,11 @@ void ClientSession::SendTickToClient(const TickWrapper& tick){
 	m_total_vol = tick.Volume();
 }
 
+void ClientSession::SendTechToClient(const TickWrapper& tick){
+	if (auto tech_ptr = tick.GetTechVec())
+		Transmission::Utils::SendTechInfo(m_session, tech_ptr->ToJson(), tick.toTimeStamp());
+}
+
 void ClientSession::SendPostionInfoToClient(){
 	double posMoney = 0.0;
 	double balance = 0.0;

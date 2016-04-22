@@ -70,8 +70,11 @@ void RealTimeDataProcessor::AppendRealTimeData(TickWrapper& info){
 			}
 		}
 	}
-	if (m_owner)
+
+	if (m_owner){
 		m_owner->SendTickToClient(info);
+		m_owner->SendTechToClient(info);
+	}
 
 #ifdef SHOW_PROGRESS
 	SYNC_PRINT << "> Data queue size :" << m_DataSeq.size();

@@ -23,7 +23,7 @@ import com.android.futures.entity.TradeEntity;
 import com.android.futures.tcp.AccountInfo;
 import com.android.futures.tcp.PositionInfo;
 import com.android.futures.tcp.ClientSession;
-import com.android.futures.tcp.TraderStatusListener;
+import com.android.futures.tcp.ClientStatusListener;
 
 public class AccountActivity extends Activity implements Handler.Callback {
 	private Handler mHandler = null;
@@ -147,10 +147,10 @@ public class AccountActivity extends Activity implements Handler.Callback {
 
 	@Override
 	public boolean handleMessage(Message msg) {
-		if (msg.what == TraderStatusListener.Logined){
+		if (msg.what == ClientStatusListener.Logined){
 			progressDlg.setMessage("登陆成功，账户初始化中。。。");
 			
-		} else if (msg.what == TraderStatusListener.LoginFailed){
+		} else if (msg.what == ClientStatusListener.LoginFailed){
 			String err_str = (String) msg.obj;
 			progressDlg.setMessage("登陆失败，Reason:" + err_str);
 			try {
@@ -161,9 +161,9 @@ public class AccountActivity extends Activity implements Handler.Callback {
 			progressDlg.dismiss();
 			finish();
 			
-		} else if (msg.what == TraderStatusListener.LogOut){
+		} else if (msg.what == ClientStatusListener.LogOut){
 			finish();
-		} else if (msg.what == TraderStatusListener.PositionUpdated) {
+		} else if (msg.what == ClientStatusListener.PositionUpdated) {
 			PositionInfo status = (PositionInfo) msg.obj;
 			balanceView.setText(Double.toString(status.getBalance()));
 			//String pos_text = String.format("[%s]: (%d * %d)", status.getInstrument(), status.getPrice(), status.getPosition());
@@ -178,7 +178,7 @@ public class AccountActivity extends Activity implements Handler.Callback {
 			progressDlg.dismiss();
 			updateButtonStatus();
 			
-		} else if (msg.what == TraderStatusListener.AccountInfoUpdated) {
+		} else if (msg.what == ClientStatusListener.AccountInfoUpdated) {
 			AccountInfo info = (AccountInfo) msg.obj;
 			ArrayList<String> instrus = info.getInstrumentList();
 			ArrayAdapter<String> adapter1 = new ArrayAdapter<String>(AccountActivity.this,
@@ -195,15 +195,15 @@ public class AccountActivity extends Activity implements Handler.Callback {
 			updateButtonStatus();
 			progressDlg.setMessage("登陆成功，账户初始化中。。。");
 		}
-		else if (msg.what == TraderStatusListener.Trading){
+		else if (msg.what == ClientStatusListener.Trading){
 			IsTrading = true;
 			updateButtonStatus();
 		}
-		else if (msg.what == TraderStatusListener.NoTrading){
+		else if (msg.what == ClientStatusListener.NoTrading){
 			IsTrading = false;
 			updateButtonStatus();
 		}
-		else if (msg.what == TraderStatusListener.TradeNotification){
+		else if (msg.what == ClientStatusListener.TradeNotification){
 			sendTradeNotification(msg);  
 		}
 		return false;

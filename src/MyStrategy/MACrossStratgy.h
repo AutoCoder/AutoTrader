@@ -73,6 +73,8 @@ public:
 
 	virtual void serializeToDB(DBWrapper& db, const std::string& mark);
 
+	virtual std::string ToJson() const;
+
 protected:
 	static int CreateTableIfNotExists(const std::string& dbname, const std::string& tableName);
 	static bool IsTableCreated;

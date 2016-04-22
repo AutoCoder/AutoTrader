@@ -39,9 +39,6 @@
     <ClInclude Include="MATech.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="TechVec.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="MACrossBOLLTech.h">
       <Filter>头文件</Filter>
     </ClInclude>

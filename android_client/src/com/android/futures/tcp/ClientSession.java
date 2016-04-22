@@ -6,12 +6,13 @@ import java.util.Vector;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.android.futures.entity.MATechInfo;
 import com.android.futures.entity.TradeEntity;
 import com.android.futures.tcp.PositionInfo;
 import android.os.Handler;
 import android.os.Message;
 
-public class ClientSession implements TraderStatusListener {
+public class ClientSession implements ClientStatusListener {
 
 	private String mBrokerId, mAccount, mPassword;
 	private String mInstrument = new String("");
@@ -21,6 +22,7 @@ public class ClientSession implements TraderStatusListener {
 	public int State = LogOut;
 	public Vector<TradeEntity> mMdSequence = new Vector<TradeEntity>();
 	public Vector<TradeEntity> mTradeSequence = new Vector<TradeEntity>();
+	public Vector<MATechInfo>  mTechSequence = new Vector<MATechInfo>();
 	
 	public void SetHandler(Handler handler){
 		mHandler = handler;
@@ -135,7 +137,7 @@ public class ClientSession implements TraderStatusListener {
 		// TODO Auto-generated method stub
 		Message msg = Message.obtain();
 		msg.obj = status;
-		msg.what = TraderStatusListener.PositionUpdated;
+		msg.what = ClientStatusListener.PositionUpdated;
 		mHandler.sendMessage(msg);
 	}
 
@@ -144,7 +146,7 @@ public class ClientSession implements TraderStatusListener {
 		// TODO Auto-generated method stub
 		Message msg = Message.obtain();
 		msg.obj = info;
-		msg.what = TraderStatusListener.AccountInfoUpdated;
+		msg.what = ClientStatusListener.AccountInfoUpdated;
 		mHandler.sendMessage(msg);
 	}
 
@@ -152,7 +154,7 @@ public class ClientSession implements TraderStatusListener {
 	public void onStartTradeSuccess() {
 		// TODO Auto-generated method stub
 		Message msg = Message.obtain();
-		msg.what = TraderStatusListener.Trading;
+		msg.what = ClientStatusListener.Trading;
 		mHandler.sendMessage(msg);		
 		State = Trading;
 	}
@@ -160,7 +162,7 @@ public class ClientSession implements TraderStatusListener {
 	@Override
 	public void onStartTradeFailed(String err_msg){
 		Message msg = Message.obtain();
-		msg.what = TraderStatusListener.NoTrading;
+		msg.what = ClientStatusListener.NoTrading;
 		msg.obj = err_msg;
 		mHandler.sendMessage(msg);	
 		State = NoTrading;
@@ -171,7 +173,7 @@ public class ClientSession implements TraderStatusListener {
 		//if stop trade action is success replied from socket server
 		// send message to update Activity
 		Message msg = Message.obtain();
-		msg.what = TraderStatusListener.NoTrading;
+		msg.what = ClientStatusListener.NoTrading;
 		mHandler.sendMessage(msg);
 		
 		// update state, clear current tick queue.
@@ -187,7 +189,13 @@ public class ClientSession implements TraderStatusListener {
 			onTradeNotification(entity);
 		}
 	}
-
+	
+	@Override
+	public void onTechCallback(MATechInfo tech) {
+		// TODO Auto-generated method stub
+		mTechSequence.add(tech);
+	}
+	
 	public String getInstrument() {
 		return mInstrument;
 	}
@@ -208,7 +216,7 @@ public class ClientSession implements TraderStatusListener {
 	public void onLoginSuccess() {
 		// TODO Auto-generated method stub
 		Message msg = Message.obtain();
-		msg.what = TraderStatusListener.Logined;
+		msg.what = ClientStatusListener.Logined;
 		mHandler.sendMessage(msg);		
 		State = Logined;		
 	}
@@ -217,7 +225,7 @@ public class ClientSession implements TraderStatusListener {
 	public void onLoginFailed(String err_msg) {
 		// TODO Auto-generated method stub
 		Message msg = Message.obtain();
-		msg.what = TraderStatusListener.LoginFailed;
+		msg.what = ClientStatusListener.LoginFailed;
 		msg.obj = err_msg;
 		mHandler.sendMessage(msg);		
 		State = LoginFailed;			
@@ -229,7 +237,7 @@ public class ClientSession implements TraderStatusListener {
 		mSocketHandler = null;
 		State = LogOut;
 		Message msg = Message.obtain();
-		msg.what = TraderStatusListener.LogOut;
+		msg.what = ClientStatusListener.LogOut;
 		mHandler.sendMessage(msg);
 	}
 
@@ -238,10 +246,9 @@ public class ClientSession implements TraderStatusListener {
 		// TODO Auto-generated method stub
 		mTradeSequence.add(0,entity);
 		Message msg = Message.obtain();
-		msg.what = TraderStatusListener.TradeNotification;
+		msg.what = ClientStatusListener.TradeNotification;
 		msg.obj = entity;
 		mHandler.sendMessage(msg);
 	}
-
 }
   

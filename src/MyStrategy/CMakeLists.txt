@@ -13,9 +13,9 @@ SET(SRC_LIST AMACrossStratgy.cpp
 			 WMACrossStratgy.cpp
 			 mystrategy.cpp)
 
-INCLUDE_DIRECTORIES(${HEADER_INCLUDE_DIR} ${AUTOTRADE_SOURCE_DIR}/src/Common ${AUTOTRADE_SOURCE_DIR}/src/StrategyFramework ${BOOST_DIR})
+INCLUDE_DIRECTORIES(${HEADER_INCLUDE_DIR} ${AUTOTRADE_SOURCE_DIR}/src/Common ${AUTOTRADE_SOURCE_DIR}/src/StrategyFramework ${AUTOTRADE_SOURCE_DIR}/src/lib_json/include ${BOOST_DIR})
 
-ADD_DEPENDENCIES(StrategyFramework Common)
+ADD_DEPENDENCIES(StrategyFramework Common lib_json)
 
 ADD_LIBRARY(MyStrategy SHARED ${SRC_LIST})
 

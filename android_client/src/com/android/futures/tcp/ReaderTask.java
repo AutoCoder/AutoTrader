@@ -11,17 +11,18 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.android.futures.entity.MATechInfo;
 import com.android.futures.entity.TradeEntity;
 
 public class ReaderTask extends Thread {
 
 	private SocketStatusListener socketStatusListener;
-	private TraderStatusListener statusChangeHandler;
+	private ClientStatusListener statusChangeHandler;
 	private BufferedReader bufferedReader;
 	private Socket socket;
 	private boolean listening;
 
-	public ReaderTask(Socket socket, TraderStatusListener delegate) throws IOException {
+	public ReaderTask(Socket socket, ClientStatusListener delegate) throws IOException {
 		bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		statusChangeHandler = delegate;
 		this.socket = socket;
@@ -180,6 +181,12 @@ public class ReaderTask extends Thread {
 								details.getInt("HighPrice"), details.getInt("LowPrice"), details.getInt("Volume"),
 								details.getLong("TIMESTAMP"));
 						statusChangeHandler.onCTPCallback(temp);
+					} else if (infoType.equals("TECH")){
+						if (details.getString("Type").equals("MA")){
+							JSONObject inner_data = details.getJSONObject("Data");
+							MATechInfo tech = new MATechInfo(inner_data.getInt("Short"), inner_data.getInt("Long"), details.getLong("TIMESTAMP"));
+							statusChangeHandler.onTechCallback(tech);
+						}
 					} else if (infoType.equals("POSITION_INFO")) {
 						PositionInfo info = new PositionInfo(details.getDouble("Balance"),
 								details.getDouble("PositionMoney"), details.getString("PositionOfInstruments"));

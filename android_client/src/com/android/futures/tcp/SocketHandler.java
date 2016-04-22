@@ -16,7 +16,7 @@ public  class SocketHandler implements SocketStatusListener {
         private String  SocketErrString = "";
         
          
-        public SocketHandler(String add, int p, TraderStatusListener delegate) throws IOException {
+        public SocketHandler(String add, int p, ClientStatusListener delegate) throws IOException {
         	address = add;
         	port = p;
 

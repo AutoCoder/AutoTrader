@@ -1,3 +1,7 @@
+#include <sstream>
+#include <assert.h>
+#include "json/json.h"
+
 #include "Config.h"
 #include "DBWrapper.h"
 #include "Order.h"
@@ -5,8 +9,6 @@
 #include "TickWrapper.h"
 #include "KData.h"
 #include "TechUtils.h"
-#include <sstream>
-#include <assert.h>
 #include "crossplatform.h"
 
 MACrossStratgy::MACrossStratgy(size_t short_ma, size_t long_ma)
@@ -262,4 +264,15 @@ void MACrossTech::serializeToDB(DBWrapper& db, const std::string& mark)
 
 	//std::cerr << sql.str() << std::endl;
 	db.ExecuteNoResult(sql.str());
+}
+
+std::string MACrossTech::ToJson() const{
+	Json::Value root;
+	root["Type"] = "MA";
+	root["Data"] = Json::Value::nullRef;
+	root["Data"]["Long"] = m_longMA;
+	root["Data"]["Short"] = m_shortMA;
+	Json::FastWriter writer;
+	std::string ret = writer.write(root);
+	return ret;
 }

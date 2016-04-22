@@ -32,6 +32,17 @@ namespace Transmission{
 		Transmission::GetFIFOActionQueue().Push_back(Transmission::RemoteServerAction(session, ret));
 	}
 
+	void Utils::SendTechInfo(const std::shared_ptr<Transmission::socket_session>& session, const std::string& jsondata, long long timestamp){
+		Json::Value root;
+		root["Info"] = "TECH";
+		root["Details"] = jsondata;
+		root["Details"]["TIMESTAMP"] = timestamp;
+		Json::FastWriter writer;
+		std::string ret = writer.write(root);
+		ret = str(boost::format("%1%%2%") % ret.length() % ret);
+		Transmission::GetFIFOActionQueue().Push_back(Transmission::RemoteServerAction(session, ret));
+	}
+
 	void Utils::SendPositionInfo(const std::shared_ptr<Transmission::socket_session>& session, double blance, int posmoney, const std::string& detailList){
 		Json::Value root;
 		root["Info"] = "POSITION_INFO";
