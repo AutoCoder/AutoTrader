@@ -254,7 +254,28 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 	
 	private void drawTech(Canvas canvas){
 		Paint paint = new Paint();
-		paint.setAntiAlias(true);	
+		paint.setAntiAlias(true);
+		
+		MATechInfo first = mMAList.firstElement();
+		long beginIdx = m_dtimestamp - first.getTimeStamp();
+		float ratio_short = (float) ((first.getShort_MA() - mLowPrice) / (float) (mHighPrice - mLowPrice));
+		float ratio_long = (float) ((first.getLong_MA() - mLowPrice) / (float) (mHighPrice - mLowPrice));
+		float curY_short = mTimeRectBottom - (mTimeRectBottom - mTimeRectTop) * ratio_short;
+		float curY_long = mTimeRectBottom - (mTimeRectBottom - mTimeRectTop) * ratio_long;
+		float curX = mTimeRectLeft;
+		for (long i = beginIdx; i < beginIdx + DATA_MAX_COUNT && i < mMAList.size(); i++ ){
+			MATechInfo fenshiData = mMAList.get((int) i);
+			int timestamp_offset = (int) (fenshiData.getTimeStamp() - m_dtimestamp);
+			ratio_short = (float) (((float) (fenshiData.getShort_MA() - mLowPrice)) / (mHighPrice - mLowPrice));
+			ratio_long = (float) (((float) (fenshiData.getLong_MA() - mLowPrice)) / (mHighPrice - mLowPrice));
+			float nextY_short = mTimeRectBottom - (mTimeRectBottom - mTimeRectTop) * ratio_short;
+			float nextY_long = mTimeRectBottom - (mTimeRectBottom - mTimeRectTop) * ratio_long;
+			float nextX = mTimeRectLeft + mTimeSpacing * timestamp_offset;
+			paint.setColor(Color.YELLOW);
+			canvas.drawLine(curX, curY_short, nextX, nextY_short, paint);
+			paint.setColor(Color.MAGENTA);
+			canvas.drawLine(curX, curY_long, nextX, nextY_long, paint);
+		}
 		//TradeEntity first = mMAList.get(m_beginIdx);
 	}
 
