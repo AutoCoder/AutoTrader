@@ -200,23 +200,23 @@ std::string CommonUtils::InterpretOrderStatusCode(TThostFtdcOrderStatusType type
 {
 	switch (type){
 	case THOST_FTDC_OST_AllTraded:
-		return "Order is totally traded.";
+		return "AllTraded";
 	case THOST_FTDC_OST_PartTradedQueueing:
-		return "Order is partly traded. Other is in queue.";
+		return "PartTradedQueueing";
 	case THOST_FTDC_OST_PartTradedNotQueueing:
-		return "Order is partly traded. Other is abandoned.";
+		return "PartTradedNotQueueing";// "Order is partly traded. Other is abandoned.";
 	case THOST_FTDC_OST_NoTradeQueueing:
-		return "Order is not traded and is in queue.";
+		return "NoTradeQueueing";// "Order is not traded and is in queue.";
 	case THOST_FTDC_OST_NoTradeNotQueueing:
-		return "Order is not traded and is not in queue.";
+		return "NoTradeNotQueueing";// "Order is not traded and is not in queue.";
 	case THOST_FTDC_OST_Canceled:
-		return "Order is cancelled.";
+		return "Canceled";// "Order is cancelled.";
 	case THOST_FTDC_OST_Unknown:
-		return "Unknown status.";
+		return "Unknown";// "Unknown status.";
 	case THOST_FTDC_OST_NotTouched:
-		return "Not triggered.";
+		return "NotTouched";// "Not triggered.";
 	case THOST_FTDC_OST_Touched:
-		return "triggered.";
+		return "Touched";// "triggered.";
 	default:
 		return "Wrong TThostFtdcOrderStatusType passed.";
 	}
@@ -282,47 +282,71 @@ std::string CommonUtils::StringFromStruct(const CThostFtdcInputOrderField& inner
 
 std::string CommonUtils::ConvertOrderToString(const CThostFtdcOrderField& order){
 	std::stringstream result;
-	result << "经纪公司代码:" << order.BrokerID << std::endl
-	<< " 投资者代码:" << order.InvestorID << std::endl
-	<< " 用户代码:" << order.UserID << std::endl
-	<< " 合约代码:" << order.InstrumentID << std::endl
-	<< " 买卖方向:" << order.Direction << std::endl
-	<< " 组合开平标志:" << order.CombOffsetFlag << std::endl
-	<< " 价格:" << order.LimitPrice << std::endl
-	<< " 数量:" << order.VolumeTotalOriginal << std::endl
-	<< " 报单引用:" << order.OrderRef << std::endl
-	<< " 客户代码:" << order.ClientID << std::endl
-	<< " 报单状态:" << order.OrderStatus << std::endl
-	<< " 经纪公司报单编号" << order.BrokerOrderSeq << std::endl
-	<< " 委托时间:" << order.InsertTime << std::endl
-	<< " 报单编号:" << order.OrderSysID << std::endl
-	<< " GTD日期:" << order.GTDDate << std::endl
-	<< " 交易日:" << order.TradingDay << std::endl
-	<< " 报单日期:" << order.InsertDate << std::endl;
+	result << "BrokerID:" << order.BrokerID << std::endl
+	<< " InvestorID:" << order.InvestorID << std::endl
+	<< " UserID:" << order.UserID << std::endl
+	<< " InstrumentID:" << order.InstrumentID << std::endl
+	<< " Direction:" << order.Direction << std::endl
+	<< " CombOffsetFlag:" << order.CombOffsetFlag << std::endl
+	<< " LimitPrice:" << order.LimitPrice << std::endl
+	<< " VolumeTotalOriginal:" << order.VolumeTotalOriginal << std::endl
+	<< " OrderRef:" << order.OrderRef << std::endl
+	<< " ClientID:" << order.ClientID << std::endl
+	<< " OrderStatus:" << InterpretOrderStatusCode(order.OrderStatus) << std::endl
+	<< " BrokerOrderSeq:" << order.BrokerOrderSeq << std::endl
+	<< " InsertTime:" << order.InsertTime << std::endl
+	<< " OrderSysID:" << order.OrderSysID << std::endl
+	<< " GTDDate:" << order.GTDDate << std::endl
+	<< " TradingDay:" << order.TradingDay << std::endl
+	<< " InsertDate:" << order.InsertDate << std::endl;
 	return result.str();
+}
+
+std::string CommonUtils::OffsetFlagToString(char flag){	
+	std::string tradeType = "";
+	switch (flag)
+	{
+		case '0':
+			tradeType = "Open";
+			break;
+		case '1':
+			tradeType = "Close";
+			break;
+		case '2':
+			tradeType = "ForceClose";
+			break;
+		case '3':
+			tradeType = "CloseToday";
+			break;
+		case '4':
+			tradeType = "CloseYesterday";
+			break;
+		case '5':
+			tradeType = "ForceOff";
+			break;
+		case '6':
+			tradeType = "LocalForceClose";
+			break;
+		default:
+			tradeType = "Unknown";
+			break;
+	}
+
+	return tradeType;
 }
 
 std::string CommonUtils::ConvertTradeToString(const CThostFtdcTradeField& trade){
 	std::stringstream result;
 	
-	result << "合约代码:" << trade.InstrumentID << std::endl
-		<< " 用户代码:" << trade.UserID << std::endl
-		<< " 成交编号:" << trade.TradeID << std::endl
-		<< " 买卖方向:" << trade.Direction << std::endl
-		<< " 开平标志:" << trade.OffsetFlag << std::endl
-		<< " 投机套保标志:" << trade.HedgeFlag << std::endl
-		<< " 价格:" << trade.Price << std::endl
-		<< " 数量:" << trade.Volume << std::endl
-		<< " 成交时间:" << trade.TradeTime << std::endl
-		<< " 成交类型:" << trade.TradeType << std::endl
-		<< " 报单编号:" << trade.OrderSysID << std::endl
-		<< " 报单引用:" << trade.OrderRef << std::endl
-		<< " 本地报单编号:" << trade.OrderLocalID << std::endl
-		<< " 业务单元:" << trade.BusinessUnit << std::endl
-		<< " 序号:" << trade.SequenceNo << std::endl
-		<< " 经纪公司报单编号:" << trade.BrokerOrderSeq << std::endl
-		<< " 成交时期:" << trade.TradeDate << std::endl
-		<< " 交易日:" << trade.TradingDay << std::endl;
+	result << "InstrumentID:" << trade.InstrumentID << std::endl
+		<< " Direction:" << trade.Direction << std::endl
+		<< " OffsetFlag:" << OffsetFlagToString(trade.OffsetFlag) << std::endl
+		<< " Price:" << trade.Price << std::endl
+		<< " Volume:" << trade.Volume << std::endl
+		<< " TradeTime:" << trade.TradeTime << std::endl
+		<< " BrokerOrderSeq:" << trade.BrokerOrderSeq << std::endl
+		<< " TradeDate:" << trade.TradeDate << std::endl
+		<< " TradingDay:" << trade.TradingDay << std::endl;
 
 	return result.str();
 }
@@ -335,27 +359,28 @@ std::string CommonUtils::ConvertOrderListToString(const std::vector< CThostFtdcO
 	result << std::endl << "------------------------------------------------" << std::endl;
 
 	for (auto iter = list.begin(); iter != list.end(); iter++){
-		result << "经纪公司代码:" << iter->BrokerID << std::endl
-			<< " 投资者代码:" << iter->InvestorID << std::endl
-			<< " 用户代码:" << iter->UserID << std::endl
-			<< " 合约代码:" << iter->InstrumentID << std::endl
-			<< " 买卖方向:" << iter->Direction << std::endl
-			<< " 组合开平标志:" << iter->CombOffsetFlag << std::endl
-			<< " 价格:" << iter->LimitPrice << std::endl
-			<< " 数量:" << iter->VolumeTotalOriginal << std::endl
-			<< " 报单引用:" << iter->OrderRef << std::endl
-			<< " 客户代码:" << iter->ClientID << std::endl
-			<< " 报单状态:" << iter->OrderStatus << std::endl
-			<< " 经纪公司报单编号" << iter->BrokerOrderSeq << std::endl
- 			<< " 委托时间:" << iter->InsertTime << std::endl
-			<< " 报单编号:" << iter->OrderSysID << std::endl
-			<< " GTD日期:" << iter->GTDDate << std::endl
-			<< " 交易日:" << iter->TradingDay << std::endl
-			<< " 报单日期:" << iter->InsertDate << std::endl;
+		result << "BrokerID:" << iter->BrokerID << std::endl
+			<< " InvestorID:" << iter->InvestorID << std::endl
+			<< " UserID:" << iter->UserID << std::endl
+			<< " InstrumentID:" << iter->InstrumentID << std::endl
+			<< " Direction:" << iter->Direction << std::endl
+			<< " CombOffsetFlag:" << iter->CombOffsetFlag << std::endl
+			<< " LimitPrice:" << iter->LimitPrice << std::endl
+			<< " VolumeTotalOriginal:" << iter->VolumeTotalOriginal << std::endl
+			<< " OrderRef:" << iter->OrderRef << std::endl
+			<< " ClientID:" << iter->ClientID << std::endl
+			<< " OrderStatus:" << iter->OrderStatus << std::endl
+			<< " BrokerOrderSeq" << iter->BrokerOrderSeq << std::endl
+ 			<< " InsertTime:" << iter->InsertTime << std::endl
+			<< " OrderSysID:" << iter->OrderSysID << std::endl
+			<< " GTDDate:" << iter->GTDDate << std::endl
+			<< " TradingDay:" << iter->TradingDay << std::endl
+			<< " InsertDate:" << iter->InsertDate << std::endl;
 	}
 	result << "--------------------------------------------------" << std::endl;
 	return result.str();
 }
+
 
 std::string CommonUtils::ConvertTradeListToString(const std::vector< CThostFtdcTradeField >& list){
 	if (list.empty())
@@ -365,24 +390,24 @@ std::string CommonUtils::ConvertTradeListToString(const std::vector< CThostFtdcT
 	result << std::endl << "-----------------------" << std::endl;
 
 	for (auto iter = list.begin(); iter != list.end(); iter++){
-		result << "合约代码:" << iter->InstrumentID << std::endl
-			<< " 用户代码:" << iter->UserID << std::endl
-			<< " 成交编号:" << iter->TradeID << std::endl
-			<< " 买卖方向:" << iter->Direction << std::endl
-			<< " 开平标志:" << iter->OffsetFlag << std::endl
-			<< " 投机套保标志:" << iter->HedgeFlag << std::endl
-			<< " 价格:" << iter->Price << std::endl
-			<< " 数量:" << iter->Volume << std::endl
-			<< " 成交时间:" << iter->TradeTime << std::endl
-			<< " 成交类型:" << iter->TradeType << std::endl
-			<< " 报单编号:" << iter->OrderSysID << std::endl
-			<< " 报单引用:" << iter->OrderRef << std::endl
-			<< " 本地报单编号:" << iter->OrderLocalID << std::endl
-			<< " 业务单元:" << iter->BusinessUnit << std::endl
-			<< " 序号:" << iter->SequenceNo << std::endl
-			<< " 经纪公司报单编号:" << iter->BrokerOrderSeq << std::endl
-			<< " 成交时期:" << iter->TradeDate << std::endl
-			<< " 交易日:" << iter->TradingDay << std::endl;
+		result << "InstrumentID:" << iter->InstrumentID << std::endl
+			<< " UserID:" << iter->UserID << std::endl
+			<< " TradeID:" << iter->TradeID << std::endl
+			<< " Direction:" << iter->Direction << std::endl
+			<< " OffsetFlag:" << iter->OffsetFlag << std::endl
+			<< " HedgeFlag:" << iter->HedgeFlag << std::endl
+			<< " Price:" << iter->Price << std::endl
+			<< " Volume:" << iter->Volume << std::endl
+			<< " TradeTime:" << iter->TradeTime << std::endl
+			<< " TradeType:" << iter->TradeType << std::endl
+			<< " OrderSysID:" << iter->OrderSysID << std::endl
+			<< " OrderRef:" << iter->OrderRef << std::endl
+			<< " OrderLocalID:" << iter->OrderLocalID << std::endl
+			<< " BusinessUnit:" << iter->BusinessUnit << std::endl
+			<< " SequenceNo:" << iter->SequenceNo << std::endl
+			<< " BrokerOrderSeq:" << iter->BrokerOrderSeq << std::endl
+			<< " TradeDate:" << iter->TradeDate << std::endl
+			<< " TradingDay:" << iter->TradingDay << std::endl;
 	}
 	result << "-----------------------" << std::endl;
 	return result.str();
