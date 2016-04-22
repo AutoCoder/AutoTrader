@@ -224,11 +224,12 @@ namespace AP{
 
 		bool no_duplicated = (orderIter == m_orderlist.end());
 		if (no_duplicated){
-			SYNC_DEBUG_LOG << "pushImmediateOrder:" << CommonUtils::ConvertOrderToString(orderField);
 			m_orderlist.push_back(orderField);
 		}
-		else
-			SYNC_DEBUG_LOG << "Update_Exist_Order:" << CommonUtils::ConvertOrderToString(orderField);
+		else{
+			orderIter->OrderStatus = orderField.OrderStatus; //Update Order Status
+		}
+
 		
 		return no_duplicated;
 	}

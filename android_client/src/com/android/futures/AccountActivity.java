@@ -16,17 +16,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
-
 import java.util.ArrayList;
 
-
-
-
-
-
-
-//import android.view.Menu;
-//import android.view.MenuItem;
 import com.android.futures.MyApp;
 import com.android.futures.entity.TradeEntity;
 import com.android.futures.tcp.AccountInfo;
