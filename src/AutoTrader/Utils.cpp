@@ -16,7 +16,7 @@ namespace Transmission{
 	{
 	}
 
-	void Utils::SendMDInfo(const std::shared_ptr<Transmission::socket_session>& session, int openPrice, int closePrice, int highPrice, int lowPrice, int vol,  long long timestamp){
+	void Utils::SendMDInfo(const std::shared_ptr<Transmission::socket_session>& session, int openPrice, int closePrice, int highPrice, int lowPrice, int vol,  long long timestamp, const std::string& extradata){
 		Json::Value root;
 		root["Info"] = "MD";
 		root["Details"] = Json::Value::nullRef;
@@ -26,17 +26,7 @@ namespace Transmission{
 		root["Details"]["LowPrice"] = lowPrice;
 		root["Details"]["TIMESTAMP"] = timestamp;
 		root["Details"]["Volume"] = vol;
-		Json::FastWriter writer;
-		std::string ret = writer.write(root);
-		ret = str(boost::format("%1%%2%") % ret.length() % ret);
-		Transmission::GetFIFOActionQueue().Push_back(Transmission::RemoteServerAction(session, ret));
-	}
-
-	void Utils::SendTechInfo(const std::shared_ptr<Transmission::socket_session>& session, const std::string& jsondata, long long timestamp){
-		Json::Value root;
-		root["Info"] = "TECH";
-		root["Details"] = jsondata;
-		root["Details"]["TIMESTAMP"] = timestamp;
+		root["Details"]["ExtraData"] = extradata;
 		Json::FastWriter writer;
 		std::string ret = writer.write(root);
 		ret = str(boost::format("%1%%2%") % ret.length() % ret);

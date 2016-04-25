@@ -114,14 +114,9 @@ bool ClientSession::ReturnFakeCTPMessage(){
 
 void ClientSession::SendTickToClient(const TickWrapper& tick){
 	if (m_total_vol != 0)
-		Transmission::Utils::SendMDInfo(m_session, tick.OpenPrice(), tick.LastPrice(), tick.HighestPrice(), tick.LowestPrice(), tick.Volume() - m_total_vol, tick.toTimeStamp());
+		Transmission::Utils::SendMDInfo(m_session, tick.OpenPrice(), tick.LastPrice(), tick.HighestPrice(), tick.LowestPrice(), tick.Volume() - m_total_vol, tick.toTimeStamp(), tick.GetTechVec()->ToJson());
 	
 	m_total_vol = tick.Volume();
-}
-
-void ClientSession::SendTechToClient(const TickWrapper& tick){
-	if (auto tech_ptr = tick.GetTechVec())
-		Transmission::Utils::SendTechInfo(m_session, tech_ptr->ToJson(), tick.toTimeStamp());
 }
 
 void ClientSession::SendPostionInfoToClient(){
