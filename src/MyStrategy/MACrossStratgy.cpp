@@ -270,8 +270,8 @@ std::string MACrossTech::ToJson() const{
 	Json::Value root;
 	root["Type"] = "MA";
 	root["Data"] = Json::Value::nullRef;
-	root["Data"]["Long"] = m_longMA;
-	root["Data"]["Short"] = m_shortMA;
+	root["Data"]["Long"] = ShortMA();
+	root["Data"]["Short"] = LongMA();
 	Json::FastWriter writer;
 	std::string ret = writer.write(root);
 	return ret;

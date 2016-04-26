@@ -73,7 +73,6 @@ void RealTimeDataProcessor::AppendRealTimeData(TickWrapper& info){
 
 	if (m_owner){
 		m_owner->SendTickToClient(info);
-		m_owner->SendTechToClient(info);
 	}
 
 #ifdef SHOW_PROGRESS
