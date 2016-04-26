@@ -12,6 +12,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.android.futures.entity.MATechInfo;
+import com.android.futures.entity.MDEntity;
 import com.android.futures.entity.TradeEntity;
 
 public class ReaderTask extends Thread {
@@ -160,7 +161,7 @@ public class ReaderTask extends Thread {
 				} else if (obj.has("Info")) {
 					String infoType = obj.getString("Info");
 					TradeEntity temp;
-					TradeEntity.type t = TradeEntity.type.MD;
+					TradeEntity.type t;
 					JSONObject details = obj.getJSONObject("Details");
 					// return md & trade
 					// {"Info":"MD","Details":{"OpenPrice":123,"ClosePrice":124,
@@ -177,16 +178,9 @@ public class ReaderTask extends Thread {
 					// {"Info":"ACCOUNT_INFO","Details":{"Blance":122313,"Position":20,
 					// "Instrument":"rb1605", "Price":2555}}
 					if (infoType.equals("MD")) {
-						temp = new TradeEntity(details.getInt("OpenPrice"), details.getInt("LastPrice"),
-								details.getInt("HighPrice"), details.getInt("LowPrice"), details.getInt("Volume"),
-								details.getLong("TIMESTAMP"));
-						statusChangeHandler.onCTPCallback(temp);
-					} else if (infoType.equals("TECH")){
-						if (details.getString("Type").equals("MA")){
-							JSONObject inner_data = details.getJSONObject("Data");
-							MATechInfo tech = new MATechInfo(inner_data.getInt("Short"), inner_data.getInt("Long"), details.getLong("TIMESTAMP"));
-							statusChangeHandler.onTechCallback(tech);
-						}
+						MDEntity tick = new MDEntity();
+						tick.fromJson(details);
+						statusChangeHandler.onMDCallback(tick);
 					} else if (infoType.equals("POSITION_INFO")) {
 						PositionInfo info = new PositionInfo(details.getDouble("Balance"),
 								details.getDouble("PositionMoney"), details.getString("PositionOfInstruments"));
@@ -223,7 +217,7 @@ public class ReaderTask extends Thread {
 							throw new Exception("unexpected ctp return");
 						}
 						temp = new TradeEntity(t, details.getString("Instrument"), details.getInt("Direction"), details.getInt("OffsetFlag"), details.getInt("Price"), details.getInt("Vol"), details.getString("ORDER_ID"), details.getLong("TIMESTAMP"));
-						statusChangeHandler.onCTPCallback(temp);
+						statusChangeHandler.onTradeNotification(temp);
 					}
 				}
 			} catch (JSONException e) {

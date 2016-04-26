@@ -7,6 +7,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.android.futures.entity.MATechInfo;
+import com.android.futures.entity.MDEntity;
 import com.android.futures.entity.TradeEntity;
 import com.android.futures.tcp.PositionInfo;
 import android.os.Handler;
@@ -20,9 +21,8 @@ public class ClientSession implements ClientStatusListener {
 	private Handler mHandler;
 	private SocketHandler mSocketHandler = null;
 	public int State = LogOut;
-	public Vector<TradeEntity> mMdSequence = new Vector<TradeEntity>();
+	public Vector<MDEntity> mMdSequence = new Vector<MDEntity>();
 	public Vector<TradeEntity> mTradeSequence = new Vector<TradeEntity>();
-	public Vector<MATechInfo>  mTechSequence = new Vector<MATechInfo>();
 	
 	public void SetHandler(Handler handler){
 		mHandler = handler;
@@ -180,21 +180,6 @@ public class ClientSession implements ClientStatusListener {
 		State = NoTrading;
 		mMdSequence.clear();
 	}
-
-	@Override
-	public void onCTPCallback(TradeEntity entity) {
-		// TODO Auto-generated method stub
-		mMdSequence.add(entity);
-		if (entity.getType() != TradeEntity.type.MD){
-			onTradeNotification(entity);
-		}
-	}
-	
-	@Override
-	public void onTechCallback(MATechInfo tech) {
-		// TODO Auto-generated method stub
-		mTechSequence.add(tech);
-	}
 	
 	public String getInstrument() {
 		return mInstrument;
@@ -249,6 +234,12 @@ public class ClientSession implements ClientStatusListener {
 		msg.what = ClientStatusListener.TradeNotification;
 		msg.obj = entity;
 		mHandler.sendMessage(msg);
+	}
+
+	@Override
+	public void onMDCallback(MDEntity entity) {
+		// TODO Auto-generated method stub
+		mMdSequence.add(entity);
 	}
 }
   

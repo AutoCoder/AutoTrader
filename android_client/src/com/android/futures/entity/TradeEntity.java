@@ -5,18 +5,12 @@ import java.util.Locale;
 
 public class TradeEntity {
 	public enum type{
-		MD,
 		Insert_Order,
 		Cancell_Order,
 		Trade,
-		AccountInit,
 	}
 	
 	private type mType;
-	private int mOpenPrice;
-	private int mClosePrice;
-	private int mHighPrice;
-	private int mLowPrice;
 	private int   mVol;
 	private long mTimeStamp;
 	private String mOrderId;
@@ -24,17 +18,6 @@ public class TradeEntity {
 	private int mDirection; // 0 Long, 1 short
 	private int mOffsetFlag; //开仓 '0' 平仓 '1' 强平 '2' 平今 '3' 平昨 '4' 强减 '5' 本地强平 '6'
 	private String mInstrument;
-	
-
-	public TradeEntity(int openPrice, int lastPrice, int highPrice, int lowPrice, int vol, long time){
-		mType = type.MD;
-		mOpenPrice = openPrice; 
-		mLastPrice = lastPrice; 
-		mHighPrice = highPrice;
-		mLowPrice = lowPrice;
-		mVol = vol;
-		mTimeStamp = time;
-	}
 	
 	public TradeEntity(type t, String instrument, int direction, int offsetFlag,  int lastprice, int vol, String ord_id, long time){
 		mType = t;
@@ -103,38 +86,6 @@ public class TradeEntity {
 
 	public void setType(type mType) {
 		this.mType = mType;
-	}
-
-	public float getOpenPrice() {
-		return mOpenPrice;
-	}
-
-	public void setOpenPrice(int openPrice) {
-		this.mOpenPrice = openPrice;
-	}
-
-	public float getClosePrice() {
-		return mClosePrice;
-	}
-
-	public void setClosePrice(int closePrice) {
-		this.mClosePrice = closePrice;
-	}
-
-	public float getHighPrice() {
-		return mHighPrice;
-	}
-
-	public void setHighPrice(int highPrice) {
-		this.mHighPrice = highPrice;
-	}
-
-	public float getLowPrice() {
-		return mLowPrice;
-	}
-
-	public void setLowPrice(int lowPrice) {
-		this.mLowPrice = lowPrice;
 	}
 
 	public int getVol() {

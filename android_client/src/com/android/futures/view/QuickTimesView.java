@@ -2,7 +2,8 @@ package com.android.futures.view;
 
 import java.util.Vector;
 
-import com.android.futures.entity.MATechInfo;
+import com.android.futures.entity.MDEntity;
+import com.android.futures.entity.TechType;
 import com.android.futures.entity.TradeEntity;
 import com.android.futures.util.VisualizationSetting;
 
@@ -23,8 +24,8 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 	private final float Text_Size = VisualizationSetting.TEXT_XLARGE;
 	private SurfaceHolder mHolder;
 	private DrawThread mThread;
-	public Vector<TradeEntity> mMDList = null;
-	public Vector<MATechInfo> mMAList = null;
+	public Vector<MDEntity> mMDList = null;
+	public Vector<TradeEntity> mTradeList = null;
 	private String mInstrument = new String("");
 	private String mStrategy = new String("");
 
@@ -62,9 +63,9 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 		init();
 	}
 
-	public void setSequenceData(Vector<TradeEntity> seqRef, Vector<MATechInfo> techseqRef, String instrument, String strategy) {
+	public void setSequenceData(Vector<MDEntity> seqRef, Vector<TradeEntity> tradeseqRef, String instrument, String strategy) {
 		mMDList = seqRef;
-		mMAList = techseqRef;
+		mTradeList = tradeseqRef;
 		mInstrument = instrument;
 		mStrategy = strategy;
 	}
@@ -82,9 +83,7 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 
 		for (int i = m_beginIdx; i < m_beginIdx + DATA_MAX_COUNT && i < mMDList.size(); ++i) {
 			
-			TradeEntity fenshiData = mMDList.get(i);
-			if (fenshiData.getType() != TradeEntity.type.MD)
-				continue;
+			MDEntity fenshiData = mMDList.get(i);
 
 			if (mHighPrice < fenshiData.getLastPrice())
 				mHighPrice = fenshiData.getLastPrice();
@@ -196,7 +195,7 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 		String high = String.valueOf(mHighPrice);
 		String low = String.valueOf(mLowPrice);
 		
-		TradeEntity lastItem = mMDList.lastElement();
+		MDEntity lastItem = mMDList.lastElement();
 		paint.setColor(Color.WHITE);
 		canvas.drawText(String.format("%s %s Price:%5.0f Volume:%d", mInstrument, mStrategy, lastItem.getLastPrice(), lastItem.getVol()), mTimeRectLeft, mMargin + mFontHeight , paint);
 		paint.setColor(Color.DKGRAY);
@@ -231,8 +230,8 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 
 		paint.setAntiAlias(true);
 		for (int i = m_beginIdx; i < m_beginIdx + DATA_MAX_COUNT && i < mMDList.size(); i++) {
-			TradeEntity preData = i > 1 ? mMDList.get(i-1) : mMDList.get(0);
-			TradeEntity fenshiData = mMDList.get(i);
+			MDEntity preData = i > 1 ? mMDList.get(i-1) : mMDList.get(0);
+			MDEntity fenshiData = mMDList.get(i);
 			int timestamp_offset = (int) (fenshiData.getTimeStamp() - m_dtimestamp);
 			
 			ratio = (float) ((fenshiData.getVol() - mLowestVolume) / (mhighestVolume - mLowestVolume));
@@ -256,26 +255,26 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 		Paint paint = new Paint();
 		paint.setAntiAlias(true);
 		
-		MATechInfo first = mMAList.firstElement();
-		long beginIdx = m_dtimestamp - first.getTimeStamp();
-		float ratio_short = (float) ((first.getShort_MA() - mLowPrice) / (float) (mHighPrice - mLowPrice));
-		float ratio_long = (float) ((first.getLong_MA() - mLowPrice) / (float) (mHighPrice - mLowPrice));
-		float curY_short = mTimeRectBottom - (mTimeRectBottom - mTimeRectTop) * ratio_short;
-		float curY_long = mTimeRectBottom - (mTimeRectBottom - mTimeRectTop) * ratio_long;
-		float curX = mTimeRectLeft;
-		for (long i = beginIdx; i < beginIdx + DATA_MAX_COUNT && i < mMAList.size(); i++ ){
-			MATechInfo fenshiData = mMAList.get((int) i);
-			int timestamp_offset = (int) (fenshiData.getTimeStamp() - m_dtimestamp);
-			ratio_short = (float) (((float) (fenshiData.getShort_MA() - mLowPrice)) / (mHighPrice - mLowPrice));
-			ratio_long = (float) (((float) (fenshiData.getLong_MA() - mLowPrice)) / (mHighPrice - mLowPrice));
-			float nextY_short = mTimeRectBottom - (mTimeRectBottom - mTimeRectTop) * ratio_short;
-			float nextY_long = mTimeRectBottom - (mTimeRectBottom - mTimeRectTop) * ratio_long;
-			float nextX = mTimeRectLeft + mTimeSpacing * timestamp_offset;
-			paint.setColor(Color.YELLOW);
-			canvas.drawLine(curX, curY_short, nextX, nextY_short, paint);
-			paint.setColor(Color.MAGENTA);
-			canvas.drawLine(curX, curY_long, nextX, nextY_long, paint);
-		}
+//		MATechInfo first = mMAList.firstElement();
+//		long beginIdx = m_dtimestamp - first.getTimeStamp();
+//		float ratio_short = (float) ((first.getShort_MA() - mLowPrice) / (float) (mHighPrice - mLowPrice));
+//		float ratio_long = (float) ((first.getLong_MA() - mLowPrice) / (float) (mHighPrice - mLowPrice));
+//		float curY_short = mTimeRectBottom - (mTimeRectBottom - mTimeRectTop) * ratio_short;
+//		float curY_long = mTimeRectBottom - (mTimeRectBottom - mTimeRectTop) * ratio_long;
+//		float curX = mTimeRectLeft;
+//		for (long i = beginIdx; i < beginIdx + DATA_MAX_COUNT && i < mMAList.size(); i++ ){
+//			MATechInfo fenshiData = mMAList.get((int) i);
+//			int timestamp_offset = (int) (fenshiData.getTimeStamp() - m_dtimestamp);
+//			ratio_short = (float) (((float) (fenshiData.getShort_MA() - mLowPrice)) / (mHighPrice - mLowPrice));
+//			ratio_long = (float) (((float) (fenshiData.getLong_MA() - mLowPrice)) / (mHighPrice - mLowPrice));
+//			float nextY_short = mTimeRectBottom - (mTimeRectBottom - mTimeRectTop) * ratio_short;
+//			float nextY_long = mTimeRectBottom - (mTimeRectBottom - mTimeRectTop) * ratio_long;
+//			float nextX = mTimeRectLeft + mTimeSpacing * timestamp_offset;
+//			paint.setColor(Color.YELLOW);
+//			canvas.drawLine(curX, curY_short, nextX, nextY_short, paint);
+//			paint.setColor(Color.MAGENTA);
+//			canvas.drawLine(curX, curY_long, nextX, nextY_long, paint);
+//		}
 		//TradeEntity first = mMAList.get(m_beginIdx);
 	}
 
@@ -283,46 +282,83 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 		Paint paint = new Paint();
 		paint.setAntiAlias(true);
 		
-		TradeEntity first = mMDList.get(m_beginIdx);
+		MDEntity first = mMDList.get(m_beginIdx);
+		boolean bDrawMA = first.TechMA.IsEmpty() && first.Techtype == TechType.MA;
+		double curY_short = mLowPrice;
+		double curY_long = mLowPrice;
+		
 		float ratio = (float) ((first.getLastPrice() - mLowPrice) / (float) (mHighPrice - mLowPrice));
 		float curY = mTimeRectBottom - (mTimeRectBottom - mTimeRectTop) * ratio;
 		float curX = mTimeRectLeft;
+		
+		if (bDrawMA){
+			double ratio_short = ((first.TechMA.getShort_MA() - mLowPrice) /  (mHighPrice - mLowPrice));
+			double ratio_long = ((first.TechMA.getLong_MA() - mLowPrice) / (mHighPrice - mLowPrice));
+			curY_short = mTimeRectBottom - (mTimeRectBottom - mTimeRectTop) * ratio_short;
+			curY_long = mTimeRectBottom - (mTimeRectBottom - mTimeRectTop) * ratio_long;			
+		}
+		
+		//draw tick
 		for (int i = m_beginIdx + 1; i < m_beginIdx + DATA_MAX_COUNT && i < mMDList.size(); i++) {
-			TradeEntity fenshiData = mMDList.get(i);
+			MDEntity fenshiData = mMDList.get(i);
 			int timestamp_offset = (int) (fenshiData.getTimeStamp() - m_dtimestamp);
 			
-			if (fenshiData.getType() == TradeEntity.type.MD){
-				ratio = (float) (((float) (fenshiData.getLastPrice() - mLowPrice)) / (mHighPrice - mLowPrice));
-				float nextY = mTimeRectBottom - (mTimeRectBottom - mTimeRectTop) * ratio;
-				float nextX = mTimeRectLeft + mTimeSpacing * timestamp_offset;//(i - m_beginIdx);
-				paint.setColor(Color.WHITE);
-				canvas.drawLine(curX, curY, nextX, nextY, paint);
-				curY = nextY;
-				curX = nextX;
-			}else{
-				
-				float x_pos = mTimeRectLeft + mTimeSpacing * timestamp_offset;//(i - m_beginIdx);
-				ratio = (float) ((fenshiData.getLastPrice() - mLowPrice)/(mHighPrice - mLowPrice));
-				float y_pos = mTimeRectBottom - (mTimeRectBottom - mTimeRectTop) * ratio;
-				
-				if (fenshiData.getDirection() == 0)
-					paint.setColor(Color.GREEN);
-				else
-					paint.setColor(Color.RED);
-				
-				float radius = mFontHeight / 3;
-				
-				if (fenshiData.getType() == TradeEntity.type.Insert_Order){
-					paint.setStyle(Paint.Style.STROKE);
-					canvas.drawCircle(x_pos, y_pos, radius, paint);
-				}
-				else if (fenshiData.getType() == TradeEntity.type.Cancell_Order){
-					paint.setStyle(Paint.Style.FILL);
-					paint.setColor(Color.GRAY);
-					canvas.drawCircle(x_pos, y_pos, radius, paint);
-				}else if (fenshiData.getType() == TradeEntity.type.Trade){
-					paint.setStyle(Paint.Style.FILL);
-					canvas.drawCircle(x_pos, y_pos, radius, paint);
+			ratio = (float) (((float) (fenshiData.getLastPrice() - mLowPrice)) / (mHighPrice - mLowPrice));
+			float nextY = mTimeRectBottom - (mTimeRectBottom - mTimeRectTop) * ratio;
+			float nextX = mTimeRectLeft + mTimeSpacing * timestamp_offset;//(i - m_beginIdx);
+			paint.setColor(Color.WHITE);
+			canvas.drawLine(curX, curY, nextX, nextY, paint);
+			curY = nextY;
+			curX = nextX;
+			
+			//draw tech (MA-Short-Long)
+			if (bDrawMA){
+				float ratio_short = (float) (((float) (first.TechMA.getShort_MA() - mLowPrice)) / (mHighPrice - mLowPrice));
+				float ratio_long = (float) (((float) (first.TechMA.getLong_MA() - mLowPrice)) / (mHighPrice - mLowPrice));
+				float nextY_short = mTimeRectBottom - (mTimeRectBottom - mTimeRectTop) * ratio_short;
+				float nextY_long = mTimeRectBottom - (mTimeRectBottom - mTimeRectTop) * ratio_long;
+				paint.setColor(Color.YELLOW);
+				canvas.drawLine(curX, (float) curY_short, nextX, nextY_short, paint);
+				paint.setColor(Color.MAGENTA);
+				canvas.drawLine(curX, (float) curY_long, nextX, nextY_long, paint);	
+				curY_short = nextY_short;
+				curY_long = nextY_long;
+			}
+		}
+		
+		//draw trade signal
+		if (mTradeList.size() != 0){
+			int lastIdx = mTradeList.size() - 1;
+			while (lastIdx >= 0){
+				TradeEntity item = mTradeList.get(lastIdx);
+				long timestamp_offset = item.getTimeStamp() - m_dtimestamp;
+				if (timestamp_offset > 0){
+					float x_pos = mTimeRectLeft + mTimeSpacing * timestamp_offset;
+					ratio = (float) ((item.getLastPrice() - mLowPrice)/(mHighPrice - mLowPrice));
+					float y_pos = mTimeRectBottom - (mTimeRectBottom - mTimeRectTop) * ratio;
+					
+					if (item.getDirection() == 0)
+						paint.setColor(Color.GREEN);
+					else
+						paint.setColor(Color.RED);
+					
+					float radius = mFontHeight / 3;
+					
+					if (item.getType() == TradeEntity.type.Insert_Order){
+						paint.setStyle(Paint.Style.STROKE);
+						canvas.drawCircle(x_pos, y_pos, radius, paint);
+					}
+					else if (item.getType() == TradeEntity.type.Cancell_Order){
+						paint.setStyle(Paint.Style.FILL);
+						paint.setColor(Color.GRAY);
+						canvas.drawCircle(x_pos, y_pos, radius, paint);
+					}else if (item.getType() == TradeEntity.type.Trade){
+						paint.setStyle(Paint.Style.FILL);
+						canvas.drawCircle(x_pos, y_pos, radius, paint);
+					}					
+					lastIdx--;
+				}else{
+					break;
 				}
 			}
 		}

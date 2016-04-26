@@ -1,6 +1,6 @@
 package com.android.futures.tcp;
 
-import com.android.futures.entity.MATechInfo;
+import com.android.futures.entity.MDEntity;
 import com.android.futures.entity.TradeEntity;
 
 public interface ClientStatusListener {
@@ -25,7 +25,6 @@ public interface ClientStatusListener {
 	public void onStartTradeSuccess();
 	public void onStartTradeFailed(String err_msg);
 	public void onStopTrade();
-	public void onCTPCallback(TradeEntity entity);
-	public void onTechCallback(MATechInfo tech);
+	public void onMDCallback(MDEntity entity);
 	public void onTradeNotification(TradeEntity entity);
 }
