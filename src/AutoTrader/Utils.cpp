@@ -4,6 +4,7 @@
 #include <boost/format.hpp>
 #include "fifo_action_queue.h"
 #include "remote_server_action.h"
+#include "socket_session.h"
 
 namespace Transmission{
 
@@ -16,7 +17,7 @@ namespace Transmission{
 	{
 	}
 
-	void Utils::SendMDInfo(const std::shared_ptr<Transmission::socket_session>& session, int openPrice, int closePrice, int highPrice, int lowPrice, int vol,  long long timestamp, const std::string& instru, const std::string& extradata){
+	void Utils::SendMDInfo(const SockSessionSP& session, int openPrice, int closePrice, int highPrice, int lowPrice, int vol,  long long timestamp, const std::string& instru, const std::string& extradata){
 		Json::Value root;
 		root["Info"] = "MD";
 		root["Details"] = Json::Value::nullRef;
@@ -39,7 +40,7 @@ namespace Transmission{
 		Transmission::GetFIFOActionQueue().Push_back(Transmission::RemoteServerAction(session, ret));
 	}
 
-	void Utils::SendPositionInfo(const std::shared_ptr<Transmission::socket_session>& session, double blance, int posmoney, const std::string& detailList){
+	void Utils::SendPositionInfo(const SockSessionSP& session, double blance, int posmoney, const std::string& detailList){
 		Json::Value root;
 		root["Info"] = "POSITION_INFO";
 		Json::Value details;
@@ -54,7 +55,7 @@ namespace Transmission{
 		Transmission::GetFIFOActionQueue().Push_back(Transmission::RemoteServerAction(session, ret));
 	}
 
-	void Utils::SendAccountInfo(const std::shared_ptr<Transmission::socket_session>& session, const std::vector<std::string>& instruments, const std::vector<std::string>& strategies, bool isTrading, const std::string& runningInstru, const std::string& runningStrgy){
+	void Utils::SendAccountInfo(const SockSessionSP& session, const std::vector<std::string>& instruments, const std::vector<std::string>& strategies, bool isTrading, const std::string& runningInstru, const std::string& runningStrgy){
 		Json::Value root;
 		root["Info"] = "ACCOUNT_INFO";
 		Json::Value details;
@@ -80,7 +81,7 @@ namespace Transmission{
 		Transmission::GetFIFOActionQueue().Push_back(Transmission::RemoteServerAction(session, ret));
 	}
 
-	void Utils::SendDealInfo(const std::shared_ptr<Transmission::socket_session>& session, TradeEventType type, const char* instrument, int direction, char combOffsetFlag, int price, int vol, char* orderRef, long long timestamp){
+	void Utils::SendDealInfo(const SockSessionSP& session, TradeEventType type, const char* instrument, int direction, char combOffsetFlag, int price, int vol, char* orderRef, long long timestamp){
 		Json::Value root;
 		switch (type){
 		case INSERT_ORDER:
@@ -110,7 +111,7 @@ namespace Transmission{
 		Transmission::GetFIFOActionQueue().Push_back(Transmission::RemoteServerAction(session, ret));
 	}
 
-	void Utils::SendLoginResultInfo(const std::shared_ptr<Transmission::socket_session>& session, ErrorCode code){
+	void Utils::SendLoginResultInfo(const SockSessionSP& session, ErrorCode code){
 		std::string err_msg;
 		int err_code = code;
 		switch (code){
@@ -142,7 +143,7 @@ namespace Transmission{
 		Transmission::GetFIFOActionQueue().Push_back(Transmission::RemoteServerAction(session, ret));
 	}
 
-	void Utils::SendStartTradeResultInfo(const std::shared_ptr<Transmission::socket_session>& session, ErrorCode code){
+	void Utils::SendStartTradeResultInfo(const SockSessionSP& session, ErrorCode code){
 		std::string err_msg;
 		int err_code = code;
 		switch (code){
@@ -174,7 +175,7 @@ namespace Transmission{
 		Transmission::GetFIFOActionQueue().Push_back(Transmission::RemoteServerAction(session, ret));
 	}
 
-	void Utils::SendLogOutResultInfo(const std::shared_ptr<Transmission::socket_session>& session, ErrorCode code){
+	void Utils::SendLogOutResultInfo(const SockSessionSP& session, ErrorCode code){
 		std::string err_msg;
 		int err_code = code;
 		switch (code){
@@ -197,7 +198,7 @@ namespace Transmission{
 		Transmission::GetFIFOActionQueue().Push_back(Transmission::RemoteServerAction(session, ret));
 	}
 
-	void Utils::SendStopTradeResultInfo(const std::shared_ptr<Transmission::socket_session>& session, ErrorCode code){
+	void Utils::SendStopTradeResultInfo(const SockSessionSP& session, ErrorCode code){
 		std::string err_msg;
 		int err_code = code;
 		switch (code){
@@ -220,7 +221,7 @@ namespace Transmission{
 		Transmission::GetFIFOActionQueue().Push_back(Transmission::RemoteServerAction(session, ret));
 	}
 
-	void Utils::SendQueryPositionResultInfo(const std::shared_ptr<Transmission::socket_session>& session, ErrorCode code){
+	void Utils::SendQueryPositionResultInfo(const SockSessionSP& session, ErrorCode code){
 		std::string err_msg;
 		int err_code = code;
 		switch (code){

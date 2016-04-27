@@ -1,3 +1,5 @@
+#include <algorithm>
+
 #include "stdafx.h"
 #include "ClientSession.h"
 #include "ClientSessionMgr.h"
@@ -5,8 +7,8 @@
 #include "AccountMgr.h"
 #include "TriggerFactory.h"
 #include "Utils.h"
-#include <algorithm>
 #include "Transmission.h"
+#include "socket_session.h"
 
 ClientSessionMgr* ClientSessionMgr::_instance = NULL;
 
@@ -22,12 +24,12 @@ ClientSessionMgr::ClientSessionMgr()
 {
 }
 
-void ClientSessionMgr::LoginAccount(const std::string& userId, const std::string& pw, const std::shared_ptr<Transmission::socket_session>& session){
+void ClientSessionMgr::LoginAccount(const std::string& userId, const std::string& pw, const SockSessionSP& session){
 	bool isExisted = Account::Manager::Instance().IsAccountExisted(userId);
 	if (isExisted){
 		bool success = Account::Manager::Instance().CheckPassword(userId, pw);
 		if (success){
-			std::shared_ptr<ClientSession> clientSessionSp = GetClientSession(session);
+			ClientSessionSP clientSessionSp = GetClientSession(session);
 
 			if (!clientSessionSp) // if user logout, and the clientSession is lost, rebind the socket session with client session
 				clientSessionSp = TryBindToSession(userId, session);
@@ -52,8 +54,8 @@ void ClientSessionMgr::LoginAccount(const std::string& userId, const std::string
 	}
 }
 
-void ClientSessionMgr::StartTrade(const std::string& instru, const std::string& strategyName, const std::shared_ptr<Transmission::socket_session>& session){
-	std::shared_ptr<ClientSession> clientSessionSp = GetClientSession(session);
+void ClientSessionMgr::StartTrade(const std::string& instru, const std::string& strategyName, const SockSessionSP& session){
+	ClientSessionSP clientSessionSp = GetClientSession(session);
 	if (clientSessionSp){
 		clientSessionSp->OnStartTradeRequest(instru, strategyName);
 	}
@@ -62,9 +64,9 @@ void ClientSessionMgr::StartTrade(const std::string& instru, const std::string& 
 	}
 }
 
-void ClientSessionMgr::LogoutAccount(const std::shared_ptr<Transmission::socket_session>& session){
-	std::shared_ptr<ClientSession> clientSessionSp = GetClientSession(session);
-	auto pair = std::find_if(m_client_sessions.begin(), m_client_sessions.end(), [&session](const std::pair<std::shared_ptr<Transmission::socket_session>, std::shared_ptr<ClientSession> >& item){
+void ClientSessionMgr::LogoutAccount(const SockSessionSP& session){
+	ClientSessionSP clientSessionSp = GetClientSession(session);
+	auto pair = std::find_if(m_client_sessions.begin(), m_client_sessions.end(), [&session](const std::pair<SockSessionSP, ClientSessionSP >& item){
 		return (*session.get()) == (*item.first.get());
 	});
 
@@ -75,8 +77,8 @@ void ClientSessionMgr::LogoutAccount(const std::shared_ptr<Transmission::socket_
 	Transmission::Utils::SendLogOutResultInfo(session, Transmission::Succeed);
 }
 
-void ClientSessionMgr::StopTrade(const std::shared_ptr<Transmission::socket_session>& session){
-	std::shared_ptr<ClientSession> clientSessionSp = GetClientSession(session);
+void ClientSessionMgr::StopTrade(const SockSessionSP& session){
+	ClientSessionSP clientSessionSp = GetClientSession(session);
 	if (clientSessionSp){
 		clientSessionSp->StopTrade();
 		Transmission::Utils::SendStopTradeResultInfo(session, Transmission::Succeed);
@@ -86,8 +88,8 @@ void ClientSessionMgr::StopTrade(const std::shared_ptr<Transmission::socket_sess
 	}
 }
 
-void ClientSessionMgr::QueryPosition(const std::shared_ptr<Transmission::socket_session>& session){
-	std::shared_ptr<ClientSession> clientSessionSp = GetClientSession(session);
+void ClientSessionMgr::QueryPosition(const SockSessionSP& session){
+	ClientSessionSP clientSessionSp = GetClientSession(session);
 	if (clientSessionSp){
 		if (clientSessionSp->IsPositionInfoReady())
 			clientSessionSp->SendPostionInfoToClient();
@@ -99,8 +101,8 @@ void ClientSessionMgr::QueryPosition(const std::shared_ptr<Transmission::socket_
 	}
 }
 
-std::shared_ptr<ClientSession> ClientSessionMgr::GetClientSession(const std::shared_ptr<Transmission::socket_session>& session, const std::string& userId){
-	auto iter = std::find_if(m_client_sessions.begin(), m_client_sessions.end(), [&](const std::pair<std::shared_ptr<Transmission::socket_session>, std::shared_ptr<ClientSession> >& pair){
+ClientSessionSP ClientSessionMgr::GetClientSession(const SockSessionSP& session, const std::string& userId){
+	auto iter = std::find_if(m_client_sessions.begin(), m_client_sessions.end(), [&](const std::pair<SockSessionSP, ClientSessionSP >& pair){
 		return (*session.get()) == (*pair.first.get());
 	});
 	if (iter != m_client_sessions.end()){
@@ -111,8 +113,8 @@ std::shared_ptr<ClientSession> ClientSessionMgr::GetClientSession(const std::sha
 	}
 }
 
-std::shared_ptr<ClientSession> ClientSessionMgr::TryBindToSession(const std::string& userId, const std::shared_ptr<Transmission::socket_session>& session){
-	auto foundIter = std::find_if(m_client_sessions.begin(), m_client_sessions.end(), [&userId](const std::pair<std::shared_ptr<Transmission::socket_session>, std::shared_ptr<ClientSession> >& pair){
+ClientSessionSP ClientSessionMgr::TryBindToSession(const std::string& userId, const SockSessionSP& session){
+	auto foundIter = std::find_if(m_client_sessions.begin(), m_client_sessions.end(), [&userId](const std::pair<SockSessionSP, ClientSessionSP >& pair){
 		return pair.second->UserId() == userId;
 	});
 

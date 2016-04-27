@@ -27,7 +27,7 @@
 #include<ctime>
 #endif
 
-ClientSession::ClientSession(const std::string& userId, const std::shared_ptr<Transmission::socket_session>& s)
+ClientSession::ClientSession(const std::string& userId, const SockSessionSP& s)
 : BaseClientSession(userId) 
 , m_session(s)
 {

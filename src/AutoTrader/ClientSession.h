@@ -5,10 +5,12 @@
 
 #include "BaseClientSession.h"
 
-
 namespace Transmission{
 	class socket_session;
 };
+
+typedef Transmission::socket_session SockSession;
+typedef std::shared_ptr<SockSession> SockSessionSP;
 
 struct CThostFtdcOrderField;
 struct CThostFtdcTradeField;
@@ -18,7 +20,7 @@ struct CThostFtdcRspInfoField;
 class ClientSession : public BaseClientSession
 {
 public:
-	ClientSession(const std::string& userId, const std::shared_ptr<Transmission::socket_session>& s);
+	ClientSession(const std::string& userId, const SockSessionSP& s);
 
 	virtual bool Init_CTP();
 
@@ -32,7 +34,7 @@ public:
 
 	void OnStartTradeRequest(const std::string& instru, const std::string& strategyName);
 
-	void UpdateSocketSession(const std::shared_ptr<Transmission::socket_session>& s) { m_session = s;  }
+	void UpdateSocketSession(const SockSessionSP& s) { m_session = s;  }
 
 	~ClientSession();
 private:
@@ -53,7 +55,7 @@ private:
 #endif
 
 private:
-	std::shared_ptr<Transmission::socket_session>   m_session;
+	std::shared_ptr<SockSession>   m_session;
 
 #ifdef FAKE_MD
 	std::future<bool>                               m_fakeMdThreadF;
