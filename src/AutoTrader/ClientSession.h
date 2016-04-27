@@ -49,7 +49,7 @@ private:
 	//send out Account status to fifo, finally got by client
 	void OnCancelOrder(CThostFtdcInputOrderActionField *pInputOrderAction, CThostFtdcRspInfoField *pRspInfo);
 #ifdef FAKE_MD
-	bool ReturnFakeCTPMessage();
+	bool ReturnFakeCTPMessage(const std::string& instru);
 #endif
 
 private:

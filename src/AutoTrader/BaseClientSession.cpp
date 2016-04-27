@@ -156,7 +156,7 @@ bool BaseClientSession::StartTrade(const std::string& instru, const std::string&
 			m_isTrading.store(true);
 
 			if (m_orderExecuteThreadF.valid()==false || m_orderExecuteThreadF.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready) // if thread is not started or finished.
-				m_orderExecuteThreadF = std::async(std::launch::async, std::bind(&ClientSession::ExecutePendingOrder, this));
+				m_orderExecuteThreadF = std::async(std::launch::async, std::bind(&BaseClientSession::ExecutePendingOrder, this));
 			else if (m_orderExecuteThreadF.wait_for(std::chrono::milliseconds(0)) == std::future_status::timeout)
 				bool toRemoved = true;
 				//!!!!Note: if thread is finished, this->joinable() still == true.
@@ -164,13 +164,6 @@ bool BaseClientSession::StartTrade(const std::string& instru, const std::string&
 			//else{   //if m_exeOrderThread is running, should not call move ctor
 			//}
 
-			
-#ifdef FAKE_MD
-			if (m_fakeMdThreadF.valid()==false || m_fakeMdThreadF.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready)
-				m_fakeMdThreadF = std::async(std::launch::async, std::bind(&ClientSession::ReturnFakeCTPMessage, this));
-			else if (m_fakeMdThreadF.wait_for(std::chrono::milliseconds(0)) == std::future_status::timeout)
-				bool toRemoved = true;
-#endif
 			return true;
 		}
 		else{

@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include <functional>
 #include <algorithm>
+#include "json/json.h"
 #include "spdlog/spdlog.h"
 
 #include "ThostFtdcTraderApi.h"
@@ -30,7 +31,9 @@ ClientSession::ClientSession(const std::string& userId, const std::shared_ptr<Tr
 : BaseClientSession(userId) 
 , m_session(s)
 {
+#ifndef FAKE_MD
 	Init_CTP();
+#endif
 }
 
 ClientSession::~ClientSession()
@@ -64,17 +67,19 @@ bool ClientSession::Init_CTP()
 
 bool ClientSession::StartTrade(const std::string& instru, const std::string& strategyName, ErrorCode& errcode){
 #ifdef FAKE_MD
-	if (m_fakeMdThreadF.valid()==false || m_fakeMdThreadF.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready)
-		m_fakeMdThreadF = std::async(std::launch::async, std::bind(&ClientSession::ReturnFakeCTPMessage, this));
-	else if (m_fakeMdThreadF.wait_for(std::chrono::milliseconds(0)) == std::future_status::timeout)
-		bool toRemoved = true;
+	if (m_fakeMdThreadF.valid() == false || m_fakeMdThreadF.wait_for(std::chrono::milliseconds(0)) == std::future_status::ready){
+		m_isTrading.store(true);
+		m_fakeMdThreadF = std::async(std::launch::async, std::bind(&ClientSession::ReturnFakeCTPMessage, this, instru));
+	}
+
+	return true;
 #else 
 	return BaseClientSession::StartTrade(instru, strategyName, errcode);
 #endif
 }
 
 #ifdef FAKE_MD
-bool ClientSession::ReturnFakeCTPMessage(){
+bool ClientSession::ReturnFakeCTPMessage(const std::string& instru){
 
 	int volume= 0;
 	time_t now_time;
@@ -93,18 +98,26 @@ bool ClientSession::ReturnFakeCTPMessage(){
 		if (lowestPrice > lastPrice)
 			lowestPrice = lastPrice;
 		volume = rand() % 100; 
-		Transmission::Utils::SendMDInfo(m_session, openPrice, lastPrice, highestPrice, lowestPrice, volume, now_time*2);
+
+		Json::Value root;
+		root["Type"] = "MA";
+		root["Data"] = Json::Value::nullRef;
+		root["Data"]["Long"] = 2005;
+		root["Data"]["Short"] = 1995;
+		Json::FastWriter writer;
+		std::string extraData = writer.write(root);
+		Transmission::Utils::SendMDInfo(m_session, openPrice, lastPrice, highestPrice, lowestPrice, volume, now_time * 2, instru, extraData);
 
 		direction = rand() & 1;  // 0 or 1 randomly
 		OrderSysID++;
 		char orderId[256] = { 0 };
 		SPRINTF(orderId, "%d", OrderSysID);
 		if (idx % 10 == 0){
-			Transmission::Utils::SendDealInfo(m_session, Transmission::INSERT_ORDER, direction, lastPrice, volume, orderId, now_time * 2);
+			Transmission::Utils::SendDealInfo(m_session, Transmission::INSERT_ORDER, "rb1610", direction, '0', lastPrice, volume, orderId, now_time * 2);
 			if (idx % 15 == 0)
-				Transmission::Utils::SendDealInfo(m_session, Transmission::TRADE, direction, lastPrice, volume, orderId, now_time * 2 + 2);
+				Transmission::Utils::SendDealInfo(m_session, Transmission::TRADE, "rb1610", direction, '0', lastPrice, volume, orderId, now_time * 2 + 2);
 			else
-				Transmission::Utils::SendDealInfo(m_session, Transmission::CANCELL_ORDER, direction, lastPrice, volume, orderId, now_time * 2 + 2);
+				Transmission::Utils::SendDealInfo(m_session, Transmission::CANCELL_ORDER, "rb1610", direction, '0', lastPrice, volume, orderId, now_time * 2 + 2);
 		}
 		sleep(500);
 	}
@@ -114,7 +127,7 @@ bool ClientSession::ReturnFakeCTPMessage(){
 
 void ClientSession::SendTickToClient(const TickWrapper& tick){
 	if (m_total_vol != 0)
-		Transmission::Utils::SendMDInfo(m_session, tick.OpenPrice(), tick.LastPrice(), tick.HighestPrice(), tick.LowestPrice(), tick.Volume() - m_total_vol, tick.toTimeStamp(), tick.GetTechVec()->ToJson());
+		Transmission::Utils::SendMDInfo(m_session, tick.OpenPrice(), tick.LastPrice(), tick.HighestPrice(), tick.LowestPrice(), tick.Volume() - m_total_vol, tick.toTimeStamp(), tick.InstrumentId(), tick.GetTechVec()->ToJson());
 	
 	m_total_vol = tick.Volume();
 }

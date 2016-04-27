@@ -96,6 +96,10 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 				mLowestVolume = fenshiData.getVol();
 		}
 		
+		//Enlarge Price Range a little bit
+		mHighPrice += 10;
+		mLowPrice -= 10;
+		
 		Paint paint = new Paint();
 		paint.setTextSize(Text_Size);
 		String high = String.valueOf(mHighPrice);
@@ -161,7 +165,6 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 							UpdateBoundary();
 							drawMDFrame(canvas);
 							drawTicks(canvas);
-							drawTech(canvas);
 							drawVolumes(canvas);
 						}
 					}
@@ -197,7 +200,7 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 		
 		MDEntity lastItem = mMDList.lastElement();
 		paint.setColor(Color.WHITE);
-		canvas.drawText(String.format("%s %s Price:%5.0f Volume:%d", mInstrument, mStrategy, lastItem.getLastPrice(), lastItem.getVol()), mTimeRectLeft, mMargin + mFontHeight , paint);
+		canvas.drawText(String.format("%s %s Price:%5.0f Volume:%d", mInstrument, mStrategy, (float)lastItem.getLastPrice(), lastItem.getVol()), mTimeRectLeft, mMargin + mFontHeight , paint);
 		paint.setColor(Color.DKGRAY);
 		canvas.drawRect(mTimeRectLeft, mTimeRectTop, mTimeRectRight, mTimeRectBottom, paint);
 		mVolumeRectTop = mTimeRectBottom + 2 * mMargin + mFontHeight;
@@ -250,40 +253,13 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 			canvas.drawLine(curX, mVolumeRectBottom, curX, curY, paint);
 		}
 	}
-	
-	private void drawTech(Canvas canvas){
-		Paint paint = new Paint();
-		paint.setAntiAlias(true);
-		
-//		MATechInfo first = mMAList.firstElement();
-//		long beginIdx = m_dtimestamp - first.getTimeStamp();
-//		float ratio_short = (float) ((first.getShort_MA() - mLowPrice) / (float) (mHighPrice - mLowPrice));
-//		float ratio_long = (float) ((first.getLong_MA() - mLowPrice) / (float) (mHighPrice - mLowPrice));
-//		float curY_short = mTimeRectBottom - (mTimeRectBottom - mTimeRectTop) * ratio_short;
-//		float curY_long = mTimeRectBottom - (mTimeRectBottom - mTimeRectTop) * ratio_long;
-//		float curX = mTimeRectLeft;
-//		for (long i = beginIdx; i < beginIdx + DATA_MAX_COUNT && i < mMAList.size(); i++ ){
-//			MATechInfo fenshiData = mMAList.get((int) i);
-//			int timestamp_offset = (int) (fenshiData.getTimeStamp() - m_dtimestamp);
-//			ratio_short = (float) (((float) (fenshiData.getShort_MA() - mLowPrice)) / (mHighPrice - mLowPrice));
-//			ratio_long = (float) (((float) (fenshiData.getLong_MA() - mLowPrice)) / (mHighPrice - mLowPrice));
-//			float nextY_short = mTimeRectBottom - (mTimeRectBottom - mTimeRectTop) * ratio_short;
-//			float nextY_long = mTimeRectBottom - (mTimeRectBottom - mTimeRectTop) * ratio_long;
-//			float nextX = mTimeRectLeft + mTimeSpacing * timestamp_offset;
-//			paint.setColor(Color.YELLOW);
-//			canvas.drawLine(curX, curY_short, nextX, nextY_short, paint);
-//			paint.setColor(Color.MAGENTA);
-//			canvas.drawLine(curX, curY_long, nextX, nextY_long, paint);
-//		}
-		//TradeEntity first = mMAList.get(m_beginIdx);
-	}
 
 	private void drawTicks(Canvas canvas) {
 		Paint paint = new Paint();
 		paint.setAntiAlias(true);
 		
 		MDEntity first = mMDList.get(m_beginIdx);
-		boolean bDrawMA = first.TechMA.IsEmpty() && first.Techtype == TechType.MA;
+		boolean bDrawMA = !first.TechMA.IsEmpty() && first.Techtype == TechType.MA;
 		double curY_short = mLowPrice;
 		double curY_long = mLowPrice;
 		
@@ -309,12 +285,11 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 			paint.setColor(Color.WHITE);
 			canvas.drawLine(curX, curY, nextX, nextY, paint);
 			curY = nextY;
-			curX = nextX;
 			
 			//draw tech (MA-Short-Long)
 			if (bDrawMA){
-				float ratio_short = (float) (((float) (first.TechMA.getShort_MA() - mLowPrice)) / (mHighPrice - mLowPrice));
-				float ratio_long = (float) (((float) (first.TechMA.getLong_MA() - mLowPrice)) / (mHighPrice - mLowPrice));
+				float ratio_short = (float) (((float) (fenshiData.TechMA.getShort_MA() - mLowPrice)) / (mHighPrice - mLowPrice));
+				float ratio_long = (float) (((float) (fenshiData.TechMA.getLong_MA() - mLowPrice)) / (mHighPrice - mLowPrice));
 				float nextY_short = mTimeRectBottom - (mTimeRectBottom - mTimeRectTop) * ratio_short;
 				float nextY_long = mTimeRectBottom - (mTimeRectBottom - mTimeRectTop) * ratio_long;
 				paint.setColor(Color.YELLOW);
@@ -324,6 +299,8 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 				curY_short = nextY_short;
 				curY_long = nextY_long;
 			}
+			
+			curX = nextX;
 		}
 		
 		//draw trade signal

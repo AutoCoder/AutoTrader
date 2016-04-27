@@ -48,13 +48,15 @@ public class MDEntity {
 			HighPrice = jsonobj.getInt("HighPrice");
 			LowPrice = jsonobj.getInt("LowPrice");
 			Vol = jsonobj.getInt("Volume");
+			Instrument = jsonobj.getString("Instrument");
 			TimeStamp = jsonobj.getLong("TIMESTAMP");
 			
 			JSONObject extra = jsonobj.getJSONObject("ExtraData");
 			if (extra.has("Type")){
 				if (extra.getString("Type").equals("MA")){
-					TechMA.fromJson(extra.getJSONObject("Data"));
 					Techtype = TechType.MA;
+					TechMA = new MATechInfo();
+					TechMA.fromJson(extra.getJSONObject("Data"));
 				}else{
 					Techtype = TechType.Unknown;
 				}
