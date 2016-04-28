@@ -16,14 +16,14 @@ public:
 	bool tryInvoke(const std::vector<TickWrapper>& data, TickWrapper& info);
 	bool tryInvoke(const std::vector<TickWrapper>& tickdata, const std::vector<KData>& data, const std::vector<TickWrapper>& curmindata, TickWrapper& info);
 
-	Order GetCurOrder() const;
+	OrderVec pendingOrders() const;
 
 protected:
 	double _max_profit_ratio;
 	double _max_lose_ratio;
 	int    _threshold_volume;
 private:
-	Order* m_curOrder;
+	OrderVec m_pendingOrders;
 };
 
 

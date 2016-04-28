@@ -25,8 +25,8 @@ MACrossStratgy::~MACrossStratgy()
 	m_curOrder = nullptr;
 }
 
-Order MACrossStratgy::GetCurOrder() const{
-	return *m_curOrder;
+OrderVec MACrossStratgy::pendingOrders() const{
+	return { *m_curOrder };
 }
 
 // common MA 

@@ -15,8 +15,8 @@ class STRATEGY_API OrderTriggerBase
 public:
 	OrderTriggerBase(){};
 	virtual ~OrderTriggerBase(){};
-	virtual bool tryInvoke(const std::vector<TickWrapper>& data, TickWrapper& info, Order& order) = 0;
-	virtual bool tryInvoke(const std::vector<TickWrapper>& tickdata, const std::vector<KData>& data, const std::vector<TickWrapper>& curmindata, TickWrapper& info, Order& order) = 0;
+	virtual bool tryInvoke(const std::vector<TickWrapper>& data, TickWrapper& info, OrderVec& order) = 0;
+	virtual bool tryInvoke(const std::vector<TickWrapper>& tickdata, const std::vector<KData>& data, const std::vector<TickWrapper>& curmindata, TickWrapper& info, OrderVec& order) = 0;
 
 	virtual void BindWithAccount(AP::AccountDetailMgr*) = 0;
 };
@@ -36,21 +36,29 @@ public:
 	}
 	virtual ~OrderTrigger(){}
 
-	virtual bool tryInvoke(const std::vector<TickWrapper>& data, TickWrapper& info, Order& order){
+	virtual bool tryInvoke(const std::vector<TickWrapper>& data, TickWrapper& info, OrderVec& orders){
 		if (m_strategy->tryInvoke(data, info))
 		{
-			order = m_strategy->GetCurOrder();
-			return m_positionCtl->completeOrder(order);
+			orders = m_strategy->pendingOrders();
+			bool validOrderVec = true;
+			for (auto ord : orders){
+				validOrderVec = validOrderVec && m_positionCtl->completeOrder(ord);
+			}
+			return validOrderVec;
 		}
 		else
 			return false;
 	}
 
-	virtual bool tryInvoke(const std::vector<TickWrapper>& tickdata, const std::vector<KData>& data, const std::vector<TickWrapper>& curmindata, TickWrapper& info, Order& order){
+	virtual bool tryInvoke(const std::vector<TickWrapper>& tickdata, const std::vector<KData>& data, const std::vector<TickWrapper>& curmindata, TickWrapper& info, OrderVec& orders){
 		if (m_strategy->tryInvoke(tickdata, data, curmindata, info))
 		{
-			order = m_strategy->GetCurOrder();
-			return m_positionCtl->completeOrder(order);
+			orders = m_strategy->pendingOrders();
+			bool validOrderVec = true;
+			for (auto ord : orders){
+				validOrderVec = validOrderVec && m_positionCtl->completeOrder(ord);
+			}
+			return validOrderVec;
 		}
 		else
 			return false;

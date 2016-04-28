@@ -25,8 +25,8 @@ MACrossBOLLStrategy::~MACrossBOLLStrategy()
 }
 
 
-Order MACrossBOLLStrategy::GetCurOrder() const{
-	return *m_curOrder;
+OrderVec MACrossBOLLStrategy::pendingOrders() const{
+	return { *m_curOrder };
 }
 
 bool MACrossBOLLStrategy::tryInvoke(const std::vector<TickWrapper>& data, TickWrapper& info){

@@ -56,17 +56,22 @@ void RealTimeDataProcessor::StoreStrategySequenceToDB(const std::string& mark)
 void RealTimeDataProcessor::AppendRealTimeData(TickWrapper& info){
 	// if m_trigger == nullptr, that means RealTimeDataProcessor is in data-recording mode
 	if (m_trigger){
-		Order ord;
+		//Order ord;
+		OrderVec orders;
 #ifdef UseKDataToInvoke
-		bool triggered = m_trigger->tryInvoke(m_TickVec, m_KDataVec, m_TickSet60, info, ord);
+		bool triggered = m_trigger->tryInvoke(m_TickVec, m_KDataVec, m_TickSet60, info, orders);
 #else
-		bool triggered = m_trigger->tryInvoke(m_TickVec, info, ord);
+		bool triggered = m_trigger->tryInvoke(m_TickVec, info, orders);
 #endif
 		if (triggered){
-			ord.SetTriggerTick(info.toTimeStamp());
+			for (auto ord : orders){
+				ord.SetTriggerTick(info.toTimeStamp());
+			}
 
 			if (m_owner){
-				m_owner->AppendOrder(ord);
+				for (auto ord : orders){
+					m_owner->AppendOrder(ord);
+				}
 			}
 		}
 	}

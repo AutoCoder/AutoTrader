@@ -19,7 +19,7 @@ public:
 	bool tryInvoke(const std::vector<TickWrapper>& data, TickWrapper& info);
 	bool tryInvoke(const std::vector<TickWrapper>& tickdata, const std::vector<KData>& data, const std::vector<TickWrapper>& curmindata, TickWrapper& info);
 
-	Order GetCurOrder() const;
+	OrderVec pendingOrders() const;
 protected:
 	virtual double calculateK(const std::vector<TickWrapper>& data, const TickWrapper& current, size_t seconds) const;
 	virtual double calculateK(const std::vector<KData>& data, const KData& current, size_t mins) const;

@@ -23,7 +23,7 @@ public:
 	virtual bool tryInvoke(const std::vector<TickWrapper>& data, TickWrapper& info);
 	virtual bool tryInvoke(const std::vector<TickWrapper>& tickdata, const std::vector<KData>& data, const std::vector<TickWrapper>& curmindata, TickWrapper& info);
 
-	Order GetCurOrder() const;
+	OrderVec pendingOrders() const;
 
 protected:
 	virtual BOLLTech calculateBoll(const std::vector<TickWrapper>& data, const TickWrapper& current, size_t seconds) const;

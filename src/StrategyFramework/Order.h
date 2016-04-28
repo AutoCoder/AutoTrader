@@ -2,6 +2,7 @@
 #define ORDER_H
 #include "stdafx.h"
 #include <string>
+#include <vector>
 #include "ThostFtdcUserApiStruct.h"
 
 //enum ExchangeDirection{
@@ -167,5 +168,7 @@ private:
 	OrderType m_type;
 	long long m_triggerTickTime;
 };
+
+typedef std::vector<Order> OrderVec;
 
 #endif
