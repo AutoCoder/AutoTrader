@@ -97,8 +97,8 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 		}
 		
 		//Enlarge Price Range a little bit
-		mHighPrice += 10;
-		mLowPrice -= 10;
+		mHighPrice += 3;
+		mLowPrice -= 3;
 		
 		Paint paint = new Paint();
 		paint.setTextSize(Text_Size);
@@ -294,7 +294,7 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 				float nextY_long = mTimeRectBottom - (mTimeRectBottom - mTimeRectTop) * ratio_long;
 				paint.setColor(Color.YELLOW);
 				canvas.drawLine(curX, (float) curY_short, nextX, nextY_short, paint);
-				paint.setColor(Color.MAGENTA);
+				paint.setColor(Color.GREEN);
 				canvas.drawLine(curX, (float) curY_long, nextX, nextY_long, paint);	
 				curY_short = nextY_short;
 				curY_long = nextY_long;
