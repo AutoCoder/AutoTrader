@@ -17,10 +17,10 @@ bool BigProfitSmallLoseStrategy::tryInvoke(const std::vector<TickWrapper>& data,
 
 	if (info.Volume() > _threshold_volume){
 		Order long_ord, short_ord;
-		long_ord->SetInstrumentId(info.InstrumentId());
-		long_ord->SetOrderType(Order::LimitPriceFOKOrder);
-		short_ord->SetInstrumentId(info.InstrumentId());
-		short_ord->SetOrderType(Order::LimitPriceFOKOrder);
+		long_ord.SetInstrumentId(info.InstrumentId());
+		long_ord.SetOrderType(Order::LimitPriceFOKOrder);
+		short_ord.SetInstrumentId(info.InstrumentId());
+		short_ord.SetOrderType(Order::LimitPriceFOKOrder);
 
 		// auto stopIter = data.rbegin();
 		// if (data.size() > breakthrough_confirm_duration)
@@ -45,11 +45,12 @@ bool BigProfitSmallLoseStrategy::tryInvoke(const std::vector<TickWrapper>& data,
 		// 	short_ord->SetRefExchangePrice(info.LastPrice() - 1);
 		// 	short_ord->SetExchangeDirection(THOST_FTDC_D_Sell);
 		// }
-		long_ord->SetRefExchangePrice(info.LastPrice() + 1);
-		long_ord->SetExchangeDirection(THOST_FTDC_D_Buy);
-		short_ord->SetRefExchangePrice(info.LastPrice() - 1);
-		short_ord->SetExchangeDirection(THOST_FTDC_D_Sell);
-		m_pendingOrders.push_back(long_ord, short_ord);
+		long_ord.SetRefExchangePrice(info.LastPrice() + 1);
+		long_ord.SetExchangeDirection(THOST_FTDC_D_Buy);
+		short_ord.SetRefExchangePrice(info.LastPrice() - 1);
+		short_ord.SetExchangeDirection(THOST_FTDC_D_Sell);
+		m_pendingOrders.push_back(long_ord);
+                m_pendingOrders.push_back(short_ord);
 		return true;
 	}
 }

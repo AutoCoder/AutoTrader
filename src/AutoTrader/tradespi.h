@@ -96,7 +96,7 @@ public:
 		RtnOrderCallback onRtnOrderCallback,
 		RtnTradeCallback onRtnTradeCallback,
 		CancelOrderCallback OnRtnCancellOrderCallback);
-	~CtpTradeSpi();
+        virtual	~CtpTradeSpi();
 
 	virtual void OnFrontConnected();
 
