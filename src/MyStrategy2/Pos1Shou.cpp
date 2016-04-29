@@ -3,26 +3,25 @@
 #include "AP_Mgr.h"
 
 
-Pos1Shou::Pos1Shou()
+Pos1Shou::Pos1Shou(int quantity)
+	: m_quantity(quantity)
 {
 
 }
 
-bool Pos1Shou::completeOrder(Order& ord){
-	if (!m_detailMgr)
+bool Pos1Shou::CompleteOrder(OrderVec& orders){
+	if (!m_detailMgr && orders.size() == 2)
 		return false;
 
-	double posMoney = 0.0;
-	double available = 0.0;
-
-	AP::Direction posDirection = AP::Long;
-	m_detailMgr->getPosition(posMoney, posDirection, available);
-
-	if (posMoney < std::numeric_limits<double>::epsilon()){
-		ord.SetVolume(1);
-		return true;
+	if (orders[0].GetExchangeDirection() == THOST_FTDC_D_Buy && orders[1].GetExchangeDirection() == THOST_FTDC_D_Sell){
+		if (m_detailMgr->UnClosedVolumeOfLong(orders[0].GetInstrumentId()) == 0 &&
+			m_detailMgr->UnClosedVolumeOfShort(orders[1].GetInstrumentId()) == 0))
+		{
+			orders[0].SetVolume(m_quantity);
+			orders[0].SetVolume(m_quantity);
+			return true;
+		}
 	}
-	else{
-		return false;
-	}
+
+	return false;
 }

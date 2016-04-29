@@ -8,10 +8,12 @@ Pos20Precent::Pos20Precent()
 
 }
 
-bool Pos20Precent::completeOrder(Order& ord){
-	if (!m_detailMgr)
+bool Pos20Precent::CompleteOrders(OrderVec& orders){
+	if (!m_detailMgr && orders.size() == 1)
 		return false;
 
+	Order& ord = orders[0];
+	
 	double posMoney = 0.0;
 	double available = 0.0;
 

@@ -1,8 +1,11 @@
 #ifndef IPositionControl_H
 #define IPositionControl_H
 #include "stdafx.h"
+#include <vector>
 
 class Order;
+typedef std::vector<Order> OrderVec;
+
 namespace AP{
 	class AccountDetailMgr;
 	
@@ -16,8 +19,8 @@ public:
 		
 	void BindAccount(AP::AccountDetailMgr* mgr) { m_detailMgr = mgr; }
 		
-		//return fail or success
-	virtual bool completeOrder(Order& ord);
+	//return fail or success
+	bool CompleteOrders(OrderVec& orders);
 		
 private:
 	AP::AccountDetailMgr* m_detailMgr;

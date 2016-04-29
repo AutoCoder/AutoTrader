@@ -385,5 +385,20 @@ namespace AP{
 		
 		return ret.substr(0, ret.length() - 1);
 	}
+
+	int AccountDetailMgr::UnClosedVolumeOfLong(const std::string& instrument){
+		if (m_tradeMessage_dict.find(instrument) != m_tradeMessage_dict.end()){
+			return m_tradeMessage_dict[instrument].Holding_long;
+		}
+		return 0;
+	}
+
+	int AccountDetailMgr::UnClosedVolumeOfShort(const std::string& instrument){
+		if (m_tradeMessage_dict.find(instrument) != m_tradeMessage_dict.end()){
+			return m_tradeMessage_dict[instrument].Holding_short;
+		}
+
+		return 0;
+	}
 }
 

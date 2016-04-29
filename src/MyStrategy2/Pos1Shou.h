@@ -11,17 +11,17 @@ namespace AP{
 class  Pos1Shou
 {
 public:
-	explicit Pos1Shou();
+	explicit Pos1Shou(int quantity = 1);
 	~Pos1Shou(){};
 		
 	void BindAccount(AP::AccountDetailMgr* mgr) { m_detailMgr = mgr; }
 		
 		//return fail or success
-	virtual bool completeOrder(Order& ord);
+	bool CompleteOrder(OrderVec& orders);
 		
 private:
 	AP::AccountDetailMgr* m_detailMgr;
-				
+	int                   m_quantity;
 };
 
 #endif

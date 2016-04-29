@@ -50,7 +50,7 @@ bool BigProfitSmallLoseStrategy::tryInvoke(const std::vector<TickWrapper>& data,
 		short_ord.SetRefExchangePrice(info.LastPrice() - 1);
 		short_ord.SetExchangeDirection(THOST_FTDC_D_Sell);
 		m_pendingOrders.push_back(long_ord);
-                m_pendingOrders.push_back(short_ord);
+        m_pendingOrders.push_back(short_ord);
 		return true;
 	}
 }

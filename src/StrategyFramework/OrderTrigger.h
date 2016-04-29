@@ -40,11 +40,7 @@ public:
 		if (m_strategy->tryInvoke(data, info))
 		{
 			orders = m_strategy->pendingOrders();
-			bool validOrderVec = true;
-			for (auto ord : orders){
-				validOrderVec = validOrderVec && m_positionCtl->completeOrder(ord);
-			}
-			return validOrderVec;
+			return m_positionCtl->CompleteOrders(orders);
 		}
 		else
 			return false;
@@ -54,11 +50,7 @@ public:
 		if (m_strategy->tryInvoke(tickdata, data, curmindata, info))
 		{
 			orders = m_strategy->pendingOrders();
-			bool validOrderVec = true;
-			for (auto ord : orders){
-				validOrderVec = validOrderVec && m_positionCtl->completeOrder(ord);
-			}
-			return validOrderVec;
+			return m_positionCtl->CompleteOrders(orders);
 		}
 		else
 			return false;
