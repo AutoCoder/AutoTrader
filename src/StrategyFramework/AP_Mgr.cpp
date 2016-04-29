@@ -354,9 +354,14 @@ namespace AP{
 		lk.unlock();
 
 		pos = std::abs(money_long - money_short);
-		direction = money_long > money_short ? AP::Long : AP::Short;
+		if (pos < std::numeric_limits<double>::epsilon())
+		{
+			direction = AP::None;
+		}else{
+			direction = money_long > money_short ? AP::Long : AP::Short;
+		}
+		
 		available = m_accountInfo.Available;
-
 		return pos;
 	}
 

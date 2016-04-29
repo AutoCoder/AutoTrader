@@ -58,6 +58,7 @@ namespace AP{ // Account & Position
 	};
 
 	enum Direction{
+		None = 'N',
 		Long = '0',
 		Short = '1',
 	};

@@ -13,11 +13,11 @@ bool Pos20Precent::CompleteOrders(OrderVec& orders){
 		return false;
 
 	Order& ord = orders[0];
-	
+
 	double posMoney = 0.0;
 	double available = 0.0;
 
-	AP::Direction posDirection = AP::Long;
+	AP::Direction posDirection = AP::None;
 	m_detailMgr->getPosition(posMoney, posDirection, available);
 
 	int subPos = 0;
