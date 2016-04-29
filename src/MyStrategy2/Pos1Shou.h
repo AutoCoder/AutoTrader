@@ -1,8 +1,10 @@
 #ifndef Position_1_SHOU_H
 #define Position_1_SHOU_H
 #include "stdafx.h"
+#include <vector>
 
 class Order;
+typedef std::vector<Order> OrderVec;
 namespace AP{
 	class AccountDetailMgr;
 	
@@ -17,7 +19,7 @@ public:
 	void BindAccount(AP::AccountDetailMgr* mgr) { m_detailMgr = mgr; }
 		
 		//return fail or success
-	bool CompleteOrder(OrderVec& orders);
+	bool CompleteOrders(OrderVec& orders);
 		
 private:
 	AP::AccountDetailMgr* m_detailMgr;
