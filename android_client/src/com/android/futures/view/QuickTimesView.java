@@ -314,10 +314,10 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 					ratio = (float) ((item.getLastPrice() - mLowPrice)/(mHighPrice - mLowPrice));
 					float y_pos = mTimeRectBottom - (mTimeRectBottom - mTimeRectTop) * ratio;
 					
-					if (item.getDirection() == 0)
-						paint.setColor(Color.GREEN);
-					else
+					if (item.getDirection() == 0)//Buy:0 Sell:1
 						paint.setColor(Color.RED);
+					else
+						paint.setColor(Color.GREEN);
 					
 					float radius = mFontHeight / 3;
 					
