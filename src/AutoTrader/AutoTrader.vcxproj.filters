@@ -69,9 +69,6 @@
     <ClInclude Include="tradespi.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="InstrumentInfoMgr.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="socket_server_impl.h">
       <Filter>Header Files\Transmission</Filter>
     </ClInclude>
@@ -135,9 +132,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="tradespi.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="InstrumentInfoMgr.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="socket_server_impl.cpp">

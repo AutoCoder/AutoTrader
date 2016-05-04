@@ -10,7 +10,6 @@ SET(SRC_LIST    ActionProcessor.cpp
 			 	LocalClientSession.cpp
 			 	LocalClientSession.cpp
 			 	ClientSessionMgr.cpp
-				InstrumentInfoMgr.cpp
 				RealTimeDataProcessor.cpp
 				RealTimeDataProcessorPool.cpp
 				Utils.cpp

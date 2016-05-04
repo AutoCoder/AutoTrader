@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="AP_Mgr.h" />
     <ClInclude Include="BOLLTech.h" />
+    <ClInclude Include="InstrumentInfoMgr.h" />
     <ClInclude Include="KData.h" />
     <ClInclude Include="Order.h" />
     <ClInclude Include="OrderTrigger.h" />
@@ -33,6 +34,7 @@
   <ItemGroup>
     <ClCompile Include="AP_Mgr.cpp" />
     <ClCompile Include="BOLLTech.cpp" />
+    <ClCompile Include="InstrumentInfoMgr.cpp" />
     <ClCompile Include="KData.cpp" />
     <ClCompile Include="Order.cpp" />
     <ClCompile Include="TickWrapper.cpp" />

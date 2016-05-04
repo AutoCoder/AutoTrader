@@ -185,7 +185,6 @@ xcopy "$(SolutionDir)src\AutoTrader\config.ini" $(OutputPath) /Y</Command>
     <ClInclude Include="ClientSessionMgr.h" />
     <ClInclude Include="ActionProcessor.h" />
     <ClInclude Include="fifo_action_queue.h" />
-    <ClInclude Include="InstrumentInfoMgr.h" />
     <ClInclude Include="LoadStrategies.h" />
     <ClInclude Include="LocalClientSession.h" />
     <ClInclude Include="remote_server_action.h" />
@@ -212,7 +211,6 @@ xcopy "$(SolutionDir)src\AutoTrader\config.ini" $(OutputPath) /Y</Command>
     <ClCompile Include="ClientSessionMgr.cpp" />
     <ClCompile Include="ActionProcessor.cpp" />
     <ClCompile Include="fifo_action_queue.cpp" />
-    <ClCompile Include="InstrumentInfoMgr.cpp" />
     <ClCompile Include="LocalClientSession.cpp" />
     <ClCompile Include="remote_server_action.cpp" />
     <ClCompile Include="socket_server.cpp" />

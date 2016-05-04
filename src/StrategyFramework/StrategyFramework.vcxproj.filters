@@ -45,6 +45,9 @@
     <ClInclude Include="TechVec.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="InstrumentInfoMgr.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Order.cpp">
@@ -63,6 +66,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TriggerFactory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="InstrumentInfoMgr.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

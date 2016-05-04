@@ -7,7 +7,8 @@ SET(SRC_LIST AP_Mgr.cpp
 		     KData.cpp
 		     Order.cpp
 		     TickWrapper.cpp
-		     TriggerFactory.cpp)
+		     TriggerFactory.cpp
+		     InstrumentInfoMgr.cpp)
 
 INCLUDE_DIRECTORIES(${HEADER_INCLUDE_DIR} ${AUTOTRADE_SOURCE_DIR}/src/Common ${BOOST_DIR})
 
