@@ -13,13 +13,14 @@
 std::vector<CThostFtdcOrderField*> orderList;
 std::vector<CThostFtdcTradeField*> tradeList;
 
-CtpTradeSpi::CtpTradeSpi(CThostFtdcTraderApi* p, const char * brokerID, const char* userID, const char* password, const char* prodname, AP::AccountDetailMgr& admgr, 
+CtpTradeSpi::CtpTradeSpi(CThostFtdcTraderApi* p, const char * brokerID, const char* userID, const char* password, const char* prodname, AP::AccountDetailMgr& admgr,
 	RtnOrderCallback onRtnOrderCallback, RtnTradeCallback onRtnTradeCallback, CancelOrderCallback onRtnCancellOrderCallback)
 	: pUserApi(p)
 	, m_frontID(-1)
 	, m_sessionID(-1)
 	, m_stateChangeHandler(this)
 	, m_account_detail_mgr(admgr)
+	, m_querying(false)
 	, m_OnRtnOrder_callback(onRtnOrderCallback)
 	, m_OnRtnTrade_callback(onRtnTradeCallback)
 	, m_OnCancelOrder_callback(onRtnCancellOrderCallback)
@@ -239,6 +240,7 @@ void CtpTradeSpi::ForceClose(){
 
 void CtpTradeSpi::OnFrontConnected(){
 	SYNC_PRINT << "[Trade] Response | connected...";
+	m_querying.store(true);
 	m_stateChangeHandler.OnFrontConnected();
 }
 
@@ -588,6 +590,8 @@ void CtpTradeSpi::OnRspQryInstrument(CThostFtdcInstrumentField *pInstrument,
 	{
 		//SYNC_PRINT << "[Trade] All Instruments in Position:" << //todo: return all position's instruments;
 		SYNC_PRINT << "[Trade] All Instruments Queried:" << InstrumentManager.AllInstruments();
+
+		m_stateChangeHandler.OnLastRspQryInstrument();
 	}
 }
 
@@ -690,7 +694,7 @@ void CtpTradeSpi::OnRspQryInstrumentMarginRate(CThostFtdcInstrumentMarginRateFie
 		SYNC_PRINT << "[Trade] Reponse | failed to obtain the margin rate field for " << pInstrumentMarginRate->InstrumentID;
 	}
 
-	m_stateChangeHandler.NotifyQueryEnd();
+	NotifyQueryEnd();
 }
 
 ///请求查询合约手续费率
@@ -720,7 +724,7 @@ void CtpTradeSpi::OnRspQryInstrumentCommissionRate(CThostFtdcInstrumentCommissio
 		SYNC_PRINT << "[Trade] Reponse | failed to obtain the commission rate field for " << pInstrumentCommissionRate->InstrumentID;
 	}
 
-	m_stateChangeHandler.NotifyQueryEnd();
+	NotifyQueryEnd();
 }
 
 ///请求查询期权交易成本

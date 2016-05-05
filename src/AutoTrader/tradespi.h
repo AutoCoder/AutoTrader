@@ -79,21 +79,11 @@ class CtpTradeSpi : public CThostFtdcTraderSpi
 			m_TradeUserSpiPtr->ReqQryInstrument_all();
 		}
 
-	public:
-		void WaitQueryEnd(){
-			std::unique_lock<std::mutex> lk(m_mtx);
-			m_con.wait(lk, [this]() -> bool { return !m_querying.load(); });
-		}
-		
-		void NotifyQueryEnd(){
-			m_querying.store(false);
-			m_con.notify_all();
+		void OnLastRspQryInstrument(bool successful = true){
+			m_TradeUserSpiPtr->NotifyQueryEnd();
 		}
 
 	private:
-		std::condition_variable m_con;
-		std::atomic<bool>       m_querying;
-		std::mutex              m_mtx;
 		CtpTradeSpi* m_TradeUserSpiPtr;
 	};
 
@@ -116,6 +106,11 @@ public:
 		void ReqAllRateParameters(const std::vector<std::string>& instruments);
 
 		void ForceClose();
+
+		void WaitQueryEnd(){
+			std::unique_lock<std::mutex> lk(m_mtx);
+			m_con.wait(lk, [this]() -> bool { return !m_querying.load(); });
+		}
 
 private:
 
@@ -200,11 +195,6 @@ private:
 	void ReqQryOptionInstrCommRate(const char* instId);
 
 	bool IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo);
-
-	void WaitQueryEnd(){
-		std::unique_lock<std::mutex> lk(m_mtx);
-		m_con.wait(lk, [this]() -> bool { return !m_querying.load(); });
-	}
 
 	void NotifyQueryEnd(){
 		m_querying.store(false);

@@ -62,6 +62,8 @@ bool ClientSession::Init_CTP()
 	m_trade_api->Init();
 	SYNC_LOG << "CTP Account of " << m_userId << "...Setup";
 
+	m_trade_spi->WaitQueryEnd();
+
 	SYNC_LOG << "Query all rates...";
 	m_trade_spi->ReqAllRateParameters(Account::Manager::Instance().Instruments());
 	SYNC_LOG << "Query all rates...finished";
