@@ -20,7 +20,7 @@ CtpTradeSpi::CtpTradeSpi(CThostFtdcTraderApi* p, const char * brokerID, const ch
 	, m_sessionID(-1)
 	, m_stateChangeHandler(this)
 	, m_account_detail_mgr(admgr)
-	, m_querying(false)
+	, m_querying(true)
 	, m_OnRtnOrder_callback(onRtnOrderCallback)
 	, m_OnRtnTrade_callback(onRtnTradeCallback)
 	, m_OnCancelOrder_callback(onRtnCancellOrderCallback)
@@ -240,7 +240,6 @@ void CtpTradeSpi::ForceClose(){
 
 void CtpTradeSpi::OnFrontConnected(){
 	SYNC_PRINT << "[Trade] Response | connected...";
-	m_querying.store(true);
 	m_stateChangeHandler.OnFrontConnected();
 }
 
