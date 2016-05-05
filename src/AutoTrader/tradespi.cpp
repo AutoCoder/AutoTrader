@@ -448,31 +448,7 @@ void CtpTradeSpi::OnRtnOrder(CThostFtdcOrderField *pOrder)
 
 void CtpTradeSpi::OnRtnTrade(CThostFtdcTradeField *pTrade)
 {
-	//CThostFtdcTradeField* trade = new CThostFtdcTradeField();
-	//memcpy(trade, pTrade, sizeof(CThostFtdcTradeField));
-	//bool founded = false;     unsigned int i = 0;
-	//for (i = 0; i<tradeList.size(); i++){
-	//	if (tradeList[i]->TradeID == trade->TradeID) {
-	//		founded = true;   break;
-	//	}
-	//}
-	//if (founded) tradeList[i] = trade;
-	//else  tradeList.push_back(trade);
-
-	//SYNC_PRINT << "[Trade] 回复 | 订单成交于" << pTrade->TradeDate << pTrade->TradeTime << "...TradeID:" << pTrade->TradeID;
 	SYNC_PRINT << "[Trade] Response | Order trade on:" << pTrade->TradeDate << "|" << pTrade->TradeTime << ", TradeID:" << pTrade->TradeID;
-
-	////fresh Account
-	//SYNC_PRINT << "[Trade] Order executed. begin to refresh Account info...";
-
-	//if (pAccountMgr->isReady()) // this check means that the history trade before account query will not record
-	//	Position::GetManager().PushTradeItem(*pTrade);
-	//ReqQryTradingAccount(); //depreted: calulate locally instead
-
-	//sync the order execute process. Notify that the order trade process is finished.
-	//if (g_OrderRunMtx.try_lock())
-	//	g_OrderRunMtx.unlock();
-	//g_OrderRunMtx.unlock();
 	
 	m_account_detail_mgr.pushTodayNewTrade(*pTrade);//会更新整个账户和仓位的状态，使资金状态保持最新
 
@@ -516,8 +492,7 @@ void CtpTradeSpi::ReqOrderInsert(Order ord){
 		SYNC_PRINT << "[Trade] Request | Inserting Order:\n" << CommonUtils::StringFromStruct(ordstruct);
 		int ret = pUserApi->ReqOrderInsert(&ordstruct, ++m_requestId);
 		SYNC_PRINT << "[Trade] Request | Insert Order..." << ((ret == 0) ? "Success" : "Fail");
-		//if (ret)
-		//	g_OrderRunMtx.unlock();
+
 	}
 	else{
 		SYNC_PRINT << "[Trade] Exception : Invalid OrderField construct";
