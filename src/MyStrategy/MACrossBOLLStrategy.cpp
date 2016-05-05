@@ -51,7 +51,7 @@ bool MACrossBOLLStrategy::tryInvoke(const std::vector<TickWrapper>& data, TickWr
 					StrategyTech* prePtr = it->GetTechVec();
 					// if prePtr == NULL, mean it's recovered from db, so that md is not continuous. so it's should not be singal point.
 					auto prePtr_ = dynamic_cast<MACrossBOLLTech*>(prePtr);
-					if (prePtr_ == NULL || !prePtr_->MAShortUpLong())
+					if (prePtr_ == NULL || prePtr_->MAShortUpLong())
 					{
 						// not special point
 						orderSingal = false;
@@ -77,7 +77,7 @@ bool MACrossBOLLStrategy::tryInvoke(const std::vector<TickWrapper>& data, TickWr
 				for (auto it = data.rbegin(); it != stoper; it++){
 					StrategyTech* prePtr = it->GetTechVec();
 					auto prePtr_ = dynamic_cast<MACrossBOLLTech*>(prePtr);
-					if (prePtr_ == NULL || prePtr_->MAShortUpLong())
+					if (prePtr_ == NULL || !prePtr_->MAShortUpLong())
 					{
 						// not special point
 						orderSingal = false;

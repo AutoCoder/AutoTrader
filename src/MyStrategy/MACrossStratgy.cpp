@@ -63,7 +63,7 @@ bool MACrossStratgy::tryInvoke(const std::vector<TickWrapper>& data, TickWrapper
 					StrategyTech* prePtr = it->GetTechVec();
 					auto prePtr_ = dynamic_cast<MACrossTech*>(prePtr);
 					// if prePtr == NULL, mean it's recovered from db, so that md is not continuous. so it's should not be singal point.
-					if (prePtr_ == NULL || !prePtr_->MAShortUpLong())
+					if (prePtr_ == NULL || prePtr_->MAShortUpLong())
 					{
 						// not special point
 						orderSingal = false;
@@ -89,7 +89,7 @@ bool MACrossStratgy::tryInvoke(const std::vector<TickWrapper>& data, TickWrapper
 				for (auto it = data.rbegin(); it != stoper; it++){
 					StrategyTech* prePtr = it->GetTechVec();
 					auto prePtr_ = dynamic_cast<MACrossTech*>(prePtr);
-					if (prePtr_ == NULL || prePtr_->MAShortUpLong())
+					if (prePtr_ == NULL || !prePtr_->MAShortUpLong())
 					{
 						// not special point
 						orderSingal = false;
@@ -135,7 +135,7 @@ bool MACrossStratgy::tryInvoke(const std::vector<TickWrapper>& tickdata, const s
 					StrategyTech* prePtr = it->GetTechVec();
 					// if prePtr == NULL, mean it's recovered from db, so that md is not continuous. so it's should not be singal point.
 					auto prePtr_ = dynamic_cast<MACrossTech*>(prePtr);
-					if (prePtr_ == NULL || !prePtr_->MAShortUpLong())
+					if (prePtr_ == NULL || prePtr_->MAShortUpLong())
 					{
 						// not special point
 						orderSingal = false;
@@ -162,7 +162,7 @@ bool MACrossStratgy::tryInvoke(const std::vector<TickWrapper>& tickdata, const s
 				for (auto it = tickdata.rbegin(); it != stoper; it++){
 					StrategyTech* prePtr = it->GetTechVec();
 					auto prePtr_ = dynamic_cast<MACrossTech*>(prePtr);
-					if (prePtr_ == NULL || prePtr_->MAShortUpLong())
+					if (prePtr_ == NULL || !prePtr_->MAShortUpLong())
 					{
 						// not special point
 						orderSingal = false;
@@ -270,8 +270,8 @@ std::string MACrossTech::ToJson() const{
 	Json::Value root;
 	root["Type"] = "MA";
 	root["Data"] = Json::Value::nullRef;
-	root["Data"]["Long"] = ShortMA();
-	root["Data"]["Short"] = LongMA();
+	root["Data"]["Long"] = LongMA();
+	root["Data"]["Short"] = ShortMA();
 	Json::FastWriter writer;
 	std::string ret = writer.write(root);
 	return ret;
