@@ -14,13 +14,12 @@ std::vector<CThostFtdcOrderField*> orderList;
 std::vector<CThostFtdcTradeField*> tradeList;
 
 CtpTradeSpi::CtpTradeSpi(CThostFtdcTraderApi* p, const char * brokerID, const char* userID, const char* password, const char* prodname, AP::AccountDetailMgr& admgr, 
-	InitedAccountCallback initFinishCallback, RtnOrderCallback onRtnOrderCallback, RtnTradeCallback onRtnTradeCallback, CancelOrderCallback onRtnCancellOrderCallback)
+	RtnOrderCallback onRtnOrderCallback, RtnTradeCallback onRtnTradeCallback, CancelOrderCallback onRtnCancellOrderCallback)
 	: pUserApi(p)
 	, m_frontID(-1)
 	, m_sessionID(-1)
 	, m_stateChangeHandler(this)
 	, m_account_detail_mgr(admgr)
-	, m_initFinish_callback(initFinishCallback)
 	, m_OnRtnOrder_callback(onRtnOrderCallback)
 	, m_OnRtnTrade_callback(onRtnTradeCallback)
 	, m_OnCancelOrder_callback(onRtnCancellOrderCallback)
@@ -33,6 +32,210 @@ CtpTradeSpi::CtpTradeSpi(CThostFtdcTraderApi* p, const char * brokerID, const ch
 }
 
 CtpTradeSpi::~CtpTradeSpi(){}
+
+void CtpTradeSpi::ReqOrderInsert(Order ord){
+	SYNC_PRINT << "[Trade] Request |" << "Insert Order (" << ord.GetInstrumentId() << ", " \
+		<< ord.GetRefExchangePrice() << ", " \
+		<< (ord.GetExchangeDirection() == THOST_FTDC_D_Buy ? "Buy)" : "Sell)");
+
+	ord.SetIdentityInfo(m_brokerID, m_userID, m_userID, m_orderRef);
+	int nextOrderRef = atoi(m_orderRef);
+	SPRINTF(m_orderRef, "%d", ++nextOrderRef);
+
+	CThostFtdcInputOrderField ordstruct;
+	bool success = ord.GetOrderOriginStruct(ordstruct);
+	if (success){
+		//SYNC_PRINT << "[Debug] 插入订单:" << CommonUtils::StringFromStruct(ordstruct);
+		SYNC_PRINT << "[Trade] Request | Inserting Order:\n" << CommonUtils::StringFromStruct(ordstruct);
+		int ret = pUserApi->ReqOrderInsert(&ordstruct, ++m_requestId);
+		SYNC_PRINT << "[Trade] Request | Insert Order..." << ((ret == 0) ? "Success" : "Fail");
+
+	}
+	else{
+		SYNC_PRINT << "[Trade] Exception : Invalid OrderField construct";
+	}
+}
+
+void CtpTradeSpi::ReqOrderAction(const CThostFtdcOrderField& order)//TThostFtdcSequenceNoType orderSeq, TThostFtdcExchangeIDType exchangeId, TThostFtdcOrderSysIDType orderSysId)
+{
+	CThostFtdcInputOrderActionField req;
+	memset(&req, 0, sizeof(req));
+	STRCPY(req.BrokerID, m_brokerID);
+	STRCPY(req.InvestorID, m_userID);
+
+	STRCPY(req.ExchangeID, order.ExchangeID);
+	STRCPY(req.OrderSysID, order.OrderSysID);
+	req.ActionFlag = THOST_FTDC_AF_Delete;
+
+	int ret = pUserApi->ReqOrderAction(&req, ++m_requestId);
+	//SYNC_PRINT << "[Trade] 请求 | 撤销报单..." << ((ret == 0) ? "成功" : "失败");
+	SYNC_DEBUG_LOG << "[Trade] Request | Cancell Order...OrderSysID:" << order.OrderSysID << ((ret == 0) ? "Success" : "Fail");
+}
+
+
+void CtpTradeSpi::CancelOrder(long long MDtime, int aliveDuration, const std::string& instrumentId){
+	for (auto item : m_account_detail_mgr.getAllOrders())
+	{
+		if (std::string(item.InstrumentID) != instrumentId)
+			continue;
+
+		if (item.OrderStatus == THOST_FTDC_OST_PartTradedQueueing || item.OrderStatus == THOST_FTDC_OST_NoTradeQueueing)
+		{
+			// 超过aliveDuration(6秒)未成交，撤单
+			if ((CommonUtils::TimeToSenconds(item.InsertTime) + aliveDuration) * 2 < MDtime) // unit = 0.5s
+			{
+				//SYNC_PRINT << "[Trade] 撤单...报单ID:" << item.BrokerOrderSeq;
+				SYNC_DEBUG_LOG << "[Trade] Request | Cancel Order...OrderID:" << item.BrokerOrderSeq;
+				ReqOrderAction(item);
+			}
+
+		}
+	}
+}
+
+void CtpTradeSpi::ReqAllRateParameters(const std::vector<std::string>& instruments){
+	for (auto instru : instruments){
+		sleep(1000);
+		m_querying.store(true);
+		ReqQryInstrumentMarginRate(instru.c_str());
+		WaitQueryEnd();
+
+		sleep(1000);
+		m_querying.store(true);
+		ReqQryInstrumentCommissionRate(instru.c_str());
+		WaitQueryEnd();
+	}
+}
+
+void CtpTradeSpi::ForceClose(){
+	TThostFtdcInstrumentIDType    instId;//合约
+	TThostFtdcDirectionType       dir;//方向,'0'买，'1'卖
+	TThostFtdcCombOffsetFlagType  kpp;//开平，"0"开，"1"平,"3"平今
+	TThostFtdcPriceType           price;//价格，0是市价,上期所不支持
+	TThostFtdcVolumeType          vol;//数量
+
+	for (auto item : m_account_detail_mgr.getAllPositionMap()){
+		//平多
+		if (item.second.Holding_long > 0)
+		{
+			STRCPY(instId, item.second.InstId.c_str());
+			dir = THOST_FTDC_D_Sell;// #define THOST_FTDC_D_Buy '0' ||| #define THOST_FTDC_D_Sell '1'
+			price = item.second.LastPrice - 5 * m_account_detail_mgr.getInstrumentField(instId).PriceTick;
+
+			//上期所
+			if (strcmp(m_account_detail_mgr.getInstrumentField(instId).ExchangeID, "SHFE") == 0)
+			{
+				if (item.second.YdPosition_long == 0)//没有昨仓
+				{
+					//SYNC_PRINT << "[Trade] 多单上期所 全部平今";;
+					SYNC_PRINT << "[Trade] Order(Direction:Long) from ShQiSuo, PingJin totally";
+
+					STRCPY(kpp, "3");//平今
+					vol = item.second.Holding_long;
+					ReqOrderInsert(Order(item.second.InstId, price, vol, dir, kpp));
+
+				}
+				else if (item.second.TodayPosition_long == 0)//没有今仓
+				{
+					//SYNC_PRINT << "[Trade] 多单上期所 全部平昨";
+					SYNC_PRINT << "[Trade] Order(Direction:Long) from ShQiSuo, PingCang totally";
+
+					STRCPY(kpp, "1");//平仓
+					vol = item.second.Holding_long;
+					ReqOrderInsert(Order(item.second.InstId, price, vol, dir, kpp));
+
+				}
+				//同时持有昨仓和今仓
+				else if (item.second.YdPosition_long > 0 && item.second.TodayPosition_long > 0)
+				{
+					//SYNC_PRINT << "[Trade] 多单上期所同时 平今平昨";
+					SYNC_PRINT << "[Trade] Order(Direction:Long) from ShQiSuo, PingJin & PingCang totally";
+
+					STRCPY(kpp, "3");//平今
+					vol = item.second.TodayPosition_long;
+					ReqOrderInsert(Order(item.second.InstId, price, vol, dir, kpp));
+
+					STRCPY(kpp, "1");//平仓
+					vol = item.second.YdPosition_long;
+					ReqOrderInsert(Order(item.second.InstId, price, vol, dir, kpp));
+
+				}
+
+			}
+			//非上期所
+			else
+			{
+				//SYNC_PRINT << "[Trade] 非上期所多单 平仓[不支持平今]";
+				SYNC_PRINT << "[Trade] Order(Direction:Long) from Non-ShQiSuo, PingCang Totally[PingJin is unSupported]";
+
+				STRCPY(kpp, "1");
+				vol = item.second.Holding_long;
+				ReqOrderInsert(Order(item.second.InstId, price, vol, dir, kpp));
+
+			}
+		}
+
+		//平空
+		if (item.second.Holding_short > 0)
+		{
+			STRCPY(instId, item.second.InstId.c_str());//或strcpy(instId, iter->first.c_str());
+			dir = '0';
+			price = item.second.LastPrice + 5 * m_account_detail_mgr.getInstrumentField(instId).PriceTick;
+
+			//上期所
+			if (strcmp(m_account_detail_mgr.getInstrumentField(instId).ExchangeID, "SHFE") == 0)
+			{
+				if (item.second.YdPosition_short == 0)//没有昨仓
+				{
+					//SYNC_PRINT << "[Trade] 空单上期所 全部平今";
+					SYNC_PRINT << "[Trade] Order(Direction:Short) from ShQiSuo, PingJin totally";
+
+					STRCPY(kpp, "3");//平今
+					vol = item.second.Holding_short;
+					ReqOrderInsert(Order(item.second.InstId, price, vol, dir, kpp));
+
+				}
+				else if (item.second.TodayPosition_short == 0)//没有今仓
+				{
+					//SYNC_PRINT << "[Trade] 空单上期所 全部平昨";
+					SYNC_PRINT << "[Trade] Order(Direction:Short) from ShQiSuo, PingCang totally";
+
+					STRCPY(kpp, "1");//平仓
+					vol = item.second.Holding_short;
+					ReqOrderInsert(Order(item.second.InstId, price, vol, dir, kpp));
+
+				}
+				//同时持有昨仓和今仓
+				else if (item.second.YdPosition_short > 0 && item.second.TodayPosition_short > 0)
+				{
+					//SYNC_PRINT << "[Trade] 空单上期所 同时平今平昨";
+					SYNC_PRINT << "[Trade] Order(Direction:Short) from ShQiSuo, PingJin & PingCang totally";
+
+					STRCPY(kpp, "3");//平今
+					vol = item.second.TodayPosition_short;
+					ReqOrderInsert(Order(item.second.InstId, price, vol, dir, kpp));
+
+					STRCPY(kpp, "1");//平仓
+					vol = item.second.YdPosition_short;
+					ReqOrderInsert(Order(item.second.InstId, price, vol, dir, kpp));
+
+				}
+			}
+			//非上期所
+			else
+			{
+				//SYNC_PRINT << "[Trade] 非上期所空单 平仓[不支持平今]";
+				SYNC_PRINT << "[Trade] Order(Direction:Short) from Non-ShQiSuo, PingCang Totally[PingJin is unSupported]";
+
+				STRCPY(kpp, "1");
+				vol = item.second.Holding_short;
+				ReqOrderInsert(Order(item.second.InstId, price, vol, dir, kpp));
+
+			}
+		}
+	}
+}
+
 
 void CtpTradeSpi::OnFrontConnected(){
 	SYNC_PRINT << "[Trade] Response | connected...";
@@ -385,7 +588,6 @@ void CtpTradeSpi::OnRspQryInstrument(CThostFtdcInstrumentField *pInstrument,
 	{
 		//SYNC_PRINT << "[Trade] All Instruments in Position:" << //todo: return all position's instruments;
 		SYNC_PRINT << "[Trade] All Instruments Queried:" << InstrumentManager.AllInstruments();
-		m_stateChangeHandler.OnLastRspQryInstrument();
 	}
 }
 
@@ -398,22 +600,6 @@ void CtpTradeSpi::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder,
 		SYNC_PRINT << "[Trade] Inserting Order : " << CommonUtils::StringFromStruct(*pInputOrder);
 	}
 	//if (bIsLast) SetEvent(g_tradehEvent);
-}
-
-void CtpTradeSpi::ReqOrderAction(const CThostFtdcOrderField& order)//TThostFtdcSequenceNoType orderSeq, TThostFtdcExchangeIDType exchangeId, TThostFtdcOrderSysIDType orderSysId)
-{
-	CThostFtdcInputOrderActionField req;
-	memset(&req, 0, sizeof(req));
-	STRCPY(req.BrokerID, m_brokerID);
-	STRCPY(req.InvestorID, m_userID);
-
-	STRCPY(req.ExchangeID, order.ExchangeID);
-	STRCPY(req.OrderSysID, order.OrderSysID);
-	req.ActionFlag = THOST_FTDC_AF_Delete;
-
-	int ret = pUserApi->ReqOrderAction(&req, ++m_requestId);
-	//SYNC_PRINT << "[Trade] 请求 | 撤销报单..." << ((ret == 0) ? "成功" : "失败");
-	SYNC_DEBUG_LOG << "[Trade] Request | Cancell Order...OrderSysID:" << order.OrderSysID << ((ret == 0) ? "Success" : "Fail");
 }
 
 void CtpTradeSpi::OnRspOrderAction(
@@ -476,178 +662,6 @@ bool CtpTradeSpi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo)
 	return ret;
 }
 
-void CtpTradeSpi::ReqOrderInsert(Order ord){
-	SYNC_PRINT << "[Trade] Request |" << "Insert Order (" << ord.GetInstrumentId() << ", " \
-		<< ord.GetRefExchangePrice() << ", " \
-		<< (ord.GetExchangeDirection() == THOST_FTDC_D_Buy ? "Buy)" : "Sell)");
-
-	ord.SetIdentityInfo(m_brokerID, m_userID, m_userID, m_orderRef);
-	int nextOrderRef = atoi(m_orderRef);
-	SPRINTF(m_orderRef, "%d", ++nextOrderRef);
-
-	CThostFtdcInputOrderField ordstruct;
-	bool success = ord.GetOrderOriginStruct(ordstruct);
-	if (success){
-		//SYNC_PRINT << "[Debug] 插入订单:" << CommonUtils::StringFromStruct(ordstruct);
-		SYNC_PRINT << "[Trade] Request | Inserting Order:\n" << CommonUtils::StringFromStruct(ordstruct);
-		int ret = pUserApi->ReqOrderInsert(&ordstruct, ++m_requestId);
-		SYNC_PRINT << "[Trade] Request | Insert Order..." << ((ret == 0) ? "Success" : "Fail");
-
-	}
-	else{
-		SYNC_PRINT << "[Trade] Exception : Invalid OrderField construct";
-	}
-}
-
-void CtpTradeSpi::ForceClose(){
-	TThostFtdcInstrumentIDType    instId;//合约
-	TThostFtdcDirectionType       dir;//方向,'0'买，'1'卖
-	TThostFtdcCombOffsetFlagType  kpp;//开平，"0"开，"1"平,"3"平今
-	TThostFtdcPriceType           price;//价格，0是市价,上期所不支持
-	TThostFtdcVolumeType          vol;//数量
-
-	for (auto item : m_account_detail_mgr.getAllPositionMap()){
-		//平多
-		if (item.second.Holding_long > 0)
-		{
-			STRCPY(instId, item.second.InstId.c_str());
-			dir = THOST_FTDC_D_Sell;// #define THOST_FTDC_D_Buy '0' ||| #define THOST_FTDC_D_Sell '1'
-			price = item.second.LastPrice - 5 * m_account_detail_mgr.getInstrumentField(instId).PriceTick;
-
-			//上期所
-			if (strcmp(m_account_detail_mgr.getInstrumentField(instId).ExchangeID, "SHFE") == 0)
-			{
-				if (item.second.YdPosition_long == 0)//没有昨仓
-				{
-					//SYNC_PRINT << "[Trade] 多单上期所 全部平今";;
-					SYNC_PRINT << "[Trade] Order(Direction:Long) from ShQiSuo, PingJin totally";
-
-					STRCPY(kpp, "3");//平今
-					vol = item.second.Holding_long;
-					ReqOrderInsert(Order(item.second.InstId, price, vol, dir, kpp));
-
-				}
-				else if (item.second.TodayPosition_long == 0)//没有今仓
-				{
-					//SYNC_PRINT << "[Trade] 多单上期所 全部平昨";
-					SYNC_PRINT << "[Trade] Order(Direction:Long) from ShQiSuo, PingCang totally";
-
-					STRCPY(kpp, "1");//平仓
-					vol = item.second.Holding_long;
-					ReqOrderInsert(Order(item.second.InstId, price, vol, dir, kpp));
-
-				}
-				//同时持有昨仓和今仓
-				else if (item.second.YdPosition_long > 0 && item.second.TodayPosition_long > 0)
-				{
-					//SYNC_PRINT << "[Trade] 多单上期所同时 平今平昨";
-					SYNC_PRINT << "[Trade] Order(Direction:Long) from ShQiSuo, PingJin & PingCang totally";
-
-					STRCPY(kpp, "3");//平今
-					vol = item.second.TodayPosition_long;
-					ReqOrderInsert(Order(item.second.InstId, price, vol, dir, kpp));
-
-					STRCPY(kpp, "1");//平仓
-					vol = item.second.YdPosition_long;
-					ReqOrderInsert(Order(item.second.InstId, price, vol, dir, kpp));
-
-				}
-
-			}
-			//非上期所
-			else
-			{
-				//SYNC_PRINT << "[Trade] 非上期所多单 平仓[不支持平今]";
-				SYNC_PRINT << "[Trade] Order(Direction:Long) from Non-ShQiSuo, PingCang Totally[PingJin is unSupported]";
-
-				STRCPY(kpp, "1");
-				vol = item.second.Holding_long;
-				ReqOrderInsert(Order(item.second.InstId, price, vol, dir, kpp));
-
-			}
-		}
-
-		//平空
-		if (item.second.Holding_short > 0)
-		{
-			STRCPY(instId, item.second.InstId.c_str());//或strcpy(instId, iter->first.c_str());
-			dir = '0';
-			price = item.second.LastPrice + 5 * m_account_detail_mgr.getInstrumentField(instId).PriceTick;
-
-			//上期所
-			if (strcmp(m_account_detail_mgr.getInstrumentField(instId).ExchangeID, "SHFE") == 0)
-			{
-				if (item.second.YdPosition_short == 0)//没有昨仓
-				{
-					//SYNC_PRINT << "[Trade] 空单上期所 全部平今";
-					SYNC_PRINT << "[Trade] Order(Direction:Short) from ShQiSuo, PingJin totally";
-
-					STRCPY(kpp, "3");//平今
-					vol = item.second.Holding_short;
-					ReqOrderInsert(Order(item.second.InstId, price, vol, dir, kpp));
-
-				}
-				else if (item.second.TodayPosition_short == 0)//没有今仓
-				{
-					//SYNC_PRINT << "[Trade] 空单上期所 全部平昨";
-					SYNC_PRINT << "[Trade] Order(Direction:Short) from ShQiSuo, PingCang totally";
-
-					STRCPY(kpp, "1");//平仓
-					vol = item.second.Holding_short;
-					ReqOrderInsert(Order(item.second.InstId, price, vol, dir, kpp));
-
-				}
-				//同时持有昨仓和今仓
-				else if (item.second.YdPosition_short > 0 && item.second.TodayPosition_short > 0)
-				{
-					//SYNC_PRINT << "[Trade] 空单上期所 同时平今平昨";
-					SYNC_PRINT << "[Trade] Order(Direction:Short) from ShQiSuo, PingJin & PingCang totally";
-
-					STRCPY(kpp, "3");//平今
-					vol = item.second.TodayPosition_short;
-					ReqOrderInsert(Order(item.second.InstId, price, vol, dir, kpp));
-
-					STRCPY(kpp, "1");//平仓
-					vol = item.second.YdPosition_short;
-					ReqOrderInsert(Order(item.second.InstId, price, vol, dir, kpp));
-
-				}
-			}
-			//非上期所
-			else
-			{
-				//SYNC_PRINT << "[Trade] 非上期所空单 平仓[不支持平今]";
-				SYNC_PRINT << "[Trade] Order(Direction:Short) from Non-ShQiSuo, PingCang Totally[PingJin is unSupported]";
-
-				STRCPY(kpp, "1");
-				vol = item.second.Holding_short;
-				ReqOrderInsert(Order(item.second.InstId, price, vol, dir, kpp));
-
-			}
-		}
-	}
-}
-
-void CtpTradeSpi::CancelOrder(long long MDtime, int aliveDuration, const std::string& instrumentId){
-	for (auto item : m_account_detail_mgr.getAllOrders())
-	{
-		if (std::string(item.InstrumentID) != instrumentId)
-			continue;
-
-		if (item.OrderStatus == THOST_FTDC_OST_PartTradedQueueing || item.OrderStatus == THOST_FTDC_OST_NoTradeQueueing)
-		{
-			// 超过aliveDuration(6秒)未成交，撤单
-			if ((CommonUtils::TimeToSenconds(item.InsertTime) + aliveDuration) * 2 < MDtime) // unit = 0.5s
-			{
-				//SYNC_PRINT << "[Trade] 撤单...报单ID:" << item.BrokerOrderSeq;
-				SYNC_DEBUG_LOG << "[Trade] Request | Cancel Order...OrderID:" << item.BrokerOrderSeq;
-				ReqOrderAction(item);
-			}
-
-		}
-	}
-}
-
 ///请求查询合约保证金率
 void CtpTradeSpi::ReqQryInstrumentMarginRate(const char* instId)
 {
@@ -669,8 +683,6 @@ void CtpTradeSpi::OnRspQryInstrumentMarginRate(CThostFtdcInstrumentMarginRateFie
 {
 	if (!IsErrorRspInfo(pRspInfo) && pInstrumentMarginRate)
 	{
-		//memcpy(&m_MargRateRev, pInstrumentMarginRate, sizeof(CThostFtdcInstrumentMarginRateField));
-		//todo: store the margin rate
 		InstrumentManager.SetMarginRate(pInstrumentMarginRate->InstrumentID, *pInstrumentMarginRate);
 	}
 	else
@@ -679,10 +691,6 @@ void CtpTradeSpi::OnRspQryInstrumentMarginRate(CThostFtdcInstrumentMarginRateFie
 	}
 
 	m_stateChangeHandler.NotifyQueryEnd();
-	//if (bIsLast) {
-	//	// next step
-	//	m_stateChangeHandler.OnLastRspQryInstrumentMarginRate();
-	//}
 }
 
 ///请求查询合约手续费率
@@ -705,16 +713,13 @@ void CtpTradeSpi::OnRspQryInstrumentCommissionRate(CThostFtdcInstrumentCommissio
 {
 	if (!IsErrorRspInfo(pRspInfo) && pInstrumentCommissionRate)
 	{
-		//todo: store the Commission Rate
 		InstrumentManager.SetCommissionRate(pInstrumentCommissionRate->InstrumentID, *pInstrumentCommissionRate);
 	}
 	else
 	{
 		SYNC_PRINT << "[Trade] Reponse | failed to obtain the commission rate field for " << pInstrumentCommissionRate->InstrumentID;
 	}
-	//if (bIsLast){
-	//	m_stateChangeHandler.OnLastRspQryInstrumentCommissionRate();
-	//}
+
 	m_stateChangeHandler.NotifyQueryEnd();
 }
 
@@ -781,9 +786,6 @@ void CtpTradeSpi::OnRspQryOptionInstrCommRate(CThostFtdcOptionInstrCommRateField
 	}
 }
 
-void CtpTradeSpi::InitializationFinished(){
-	m_initFinish_callback();
-}
 //
 /////TFtdcTimeConditionType是一个有效期类型类型
 ///////////////////////////////////////////////////////////////////////////

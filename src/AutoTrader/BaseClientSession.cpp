@@ -62,13 +62,12 @@ bool BaseClientSession::Init_CTP(){
 	assert(m_trade_api);
 
 	Account::Meta meta = Account::Manager::Instance().GetMeta(m_userId);
-	InitedAccountCallback accountInitFinished_Callback = [](){};
 	RtnOrderCallback onRtnOrder_Callback = std::bind(&BaseClientSession::OnRtnOrder, this, std::placeholders::_1);
 	RtnTradeCallback OnRtnTrade_Callback = std::bind(&BaseClientSession::OnRtnTrade, this, std::placeholders::_1);
 	CancelOrderCallback OnCancelOrder_Callback = [](CThostFtdcInputOrderActionField *pInputOrderAction, CThostFtdcRspInfoField *pRspInfo){};
 
 	m_trade_spi = new CtpTradeSpi(m_trade_api, meta.m_BrokerId.c_str(), meta.m_UserId.c_str(), meta.m_Password.c_str(), \
-		Config::Instance()->ProductName().c_str(), *(m_detailMgr.get()), accountInitFinished_Callback, onRtnOrder_Callback, \
+		Config::Instance()->ProductName().c_str(), *(m_detailMgr.get()), onRtnOrder_Callback, \
 		OnRtnTrade_Callback, OnCancelOrder_Callback);
 
 	m_trade_api->RegisterSpi((CThostFtdcTraderSpi*)m_trade_spi);
@@ -77,6 +76,11 @@ bool BaseClientSession::Init_CTP(){
 	m_trade_api->RegisterFront(const_cast<char*>(Config::Instance()->CtpTradeFront().c_str()));
 	m_trade_api->Init();
 	SYNC_LOG << "CTP Account of " << m_userId << "...Setup";
+
+	SYNC_LOG << "Query all rates...";
+	m_trade_spi->ReqAllRateParameters(Account::Manager::Instance().Instruments());
+	SYNC_LOG << "Query all rates...finished";
+
 	return true;
 }
 

@@ -79,24 +79,6 @@ class CtpTradeSpi : public CThostFtdcTraderSpi
 			m_TradeUserSpiPtr->ReqQryInstrument_all();
 		}
 
-		//step 9
-		void OnLastRspQryInstrument(bool successful = true){
-			//Todo: loop all related Instrument, query their marginrate CommissionRate
-			for (auto instru : Account::Manager::Instance().Instruments()){
-				sleep(1000);
-				m_querying.store(true);
-				m_TradeUserSpiPtr->ReqQryInstrumentMarginRate(instru.c_str());
-				WaitQueryEnd();
-
-				sleep(1000);
-				m_querying.store(true);
-				m_TradeUserSpiPtr->ReqQryInstrumentCommissionRate(instru.c_str());
-				WaitQueryEnd();
-			}
-
-			m_TradeUserSpiPtr->InitializationFinished();
-		}
-
 	public:
 		void WaitQueryEnd(){
 			std::unique_lock<std::mutex> lk(m_mtx);
@@ -119,11 +101,23 @@ public:
 	CtpTradeSpi(CThostFtdcTraderApi* pUserApi,
 		const char * brokerID, const char* userID, const char* password, const char* prodName, 
 		AP::AccountDetailMgr& admgr, 
-		InitedAccountCallback initFinishCallback,
 		RtnOrderCallback onRtnOrderCallback,
 		RtnTradeCallback onRtnTradeCallback,
 		CancelOrderCallback OnRtnCancellOrderCallback);
         virtual	~CtpTradeSpi();
+
+		void ReqOrderInsert(Order ord);
+
+		void ReqOrderAction(const CThostFtdcOrderField& order);// TThostFtdcSequenceNoType orderSeq, TThostFtdcExchangeIDType exchangeId, TThostFtdcOrderSysIDType orderSysId);
+
+		//理解：在触发了新的交易之前，把已提交未成交的报单给撤销
+		void CancelOrder(long long MDtime, int aliveDuration = 6, const std::string& instrumentId = "");
+
+		void ReqAllRateParameters(const std::vector<std::string>& instruments);
+
+		void ForceClose();
+
+private:
 
 	virtual void OnFrontConnected();
 
@@ -172,7 +166,7 @@ public:
 	///响应查询期权合约手续费
 	void OnRspQryOptionInstrCommRate(CThostFtdcOptionInstrCommRateField *pOptionInstrCommRate, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
-public:
+private:
 	void ReqUserLogin();
 
 	void ReqSettlementInfoConfirm();
@@ -193,10 +187,6 @@ public:
 
 	void ReqQryInstrument_all();
 
-	void ReqOrderInsert(Order ord);
-
-	void ReqOrderAction(const CThostFtdcOrderField& order);// TThostFtdcSequenceNoType orderSeq, TThostFtdcExchangeIDType exchangeId, TThostFtdcOrderSysIDType orderSysId);
-
 	///请求查询合约保证金率
 	void ReqQryInstrumentMarginRate(const char* instId);
 
@@ -209,34 +199,32 @@ public:
 	///请求查询期权合约手续费
 	void ReqQryOptionInstrCommRate(const char* instId);
 
-	void ForceClose();
-
-	//理解：在触发了新的交易之前，把已提交未成交的报单给撤销
-	void CancelOrder(long long MDtime, int aliveDuration = 6, const std::string& instrumentId = "");
-
-	void InitializationFinished();
-
 	bool IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo);
 
-private:
-	TThostFtdcBrokerIDType m_brokerID;
-	TThostFtdcUserIDType m_userID;
-	TThostFtdcPasswordType m_password;
-	TThostFtdcProductInfoType m_productName;
-	TThostFtdcFrontIDType m_frontID;
-	TThostFtdcSessionIDType m_sessionID;
-	char m_orderRef[13];
-	CThostFtdcTradingAccountField m_accountInfo;
+	void WaitQueryEnd(){
+		std::unique_lock<std::mutex> lk(m_mtx);
+		m_con.wait(lk, [this]() -> bool { return !m_querying.load(); });
+	}
 
-	//bool m_firstquery_order;//是否首次查询报单
-	//bool m_firstquery_trade;//是否首次查询成交
-	//bool m_firstquery_Detail;//是否首次查询持仓明细
-	//bool m_firstquery_TradingAccount;//是否首次查询资金账号
-	//bool m_firstquery_Position;//是否首次查询投资者持仓
-	//bool m_firstquery_Instrument;//是否首次查询合约
+	void NotifyQueryEnd(){
+		m_querying.store(false);
+		m_con.notify_all();
+	}
 
 private:
-	InitedAccountCallback								m_initFinish_callback;
+	TThostFtdcBrokerIDType								m_brokerID;
+	TThostFtdcUserIDType								m_userID;
+	TThostFtdcPasswordType								m_password;
+	TThostFtdcProductInfoType							m_productName;
+	TThostFtdcFrontIDType								m_frontID;
+	TThostFtdcSessionIDType								m_sessionID;
+	char												m_orderRef[13];
+	CThostFtdcTradingAccountField						m_accountInfo;
+
+private:
+	std::condition_variable								m_con;
+	std::atomic<bool>									m_querying;
+	std::mutex											m_mtx;
 	RtnOrderCallback									m_OnRtnOrder_callback;
 	RtnTradeCallback									m_OnRtnTrade_callback;
 	CancelOrderCallback									m_OnCancelOrder_callback;
