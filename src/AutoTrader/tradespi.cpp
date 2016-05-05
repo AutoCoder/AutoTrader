@@ -616,7 +616,7 @@ void CtpTradeSpi::ForceClose(){
 			//非上期所
 			else
 			{
-				SYNC_PRINT << "[Trade] 非上期所空单 平仓[不支持平今]";
+				//SYNC_PRINT << "[Trade] 非上期所空单 平仓[不支持平今]";
 				SYNC_PRINT << "[Trade] Order(Direction:Short) from Non-ShQiSuo, PingCang Totally[PingJin is unSupported]";
 
 				STRCPY(kpp, "1");
@@ -678,10 +678,11 @@ void CtpTradeSpi::OnRspQryInstrumentMarginRate(CThostFtdcInstrumentMarginRateFie
 		SYNC_PRINT << "[Trade] Reponse | failed to obtain the margin rate field for " << pInstrumentMarginRate->InstrumentID;
 	}
 
-	if (bIsLast) {
-		// next step
-		m_stateChangeHandler.OnLastRspQryInstrumentMarginRate();
-	}
+	m_stateChangeHandler.NotifyQueryEnd();
+	//if (bIsLast) {
+	//	// next step
+	//	m_stateChangeHandler.OnLastRspQryInstrumentMarginRate();
+	//}
 }
 
 ///请求查询合约手续费率
@@ -711,9 +712,10 @@ void CtpTradeSpi::OnRspQryInstrumentCommissionRate(CThostFtdcInstrumentCommissio
 	{
 		SYNC_PRINT << "[Trade] Reponse | failed to obtain the commission rate field for " << pInstrumentCommissionRate->InstrumentID;
 	}
-	if (bIsLast){
-		m_stateChangeHandler.OnLastRspQryInstrumentCommissionRate();
-	}
+	//if (bIsLast){
+	//	m_stateChangeHandler.OnLastRspQryInstrumentCommissionRate();
+	//}
+	m_stateChangeHandler.NotifyQueryEnd();
 }
 
 ///请求查询期权交易成本

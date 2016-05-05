@@ -84,25 +84,34 @@ class CtpTradeSpi : public CThostFtdcTraderSpi
 			//Todo: loop all related Instrument, query their marginrate CommissionRate
 			for (auto instru : Account::Manager::Instance().Instruments()){
 				sleep(1000);
+				m_querying.store(true);
 				m_TradeUserSpiPtr->ReqQryInstrumentMarginRate(instru.c_str());
-			}
-		}
+				WaitQueryEnd();
 
-		//step 10
-		void OnLastRspQryInstrumentMarginRate(bool successful = true){
-			for (auto instru : Account::Manager::Instance().Instruments()){
 				sleep(1000);
+				m_querying.store(true);
 				m_TradeUserSpiPtr->ReqQryInstrumentCommissionRate(instru.c_str());
+				WaitQueryEnd();
 			}
-		}
 
-		//step 11 (last step)
-		void OnLastRspQryInstrumentCommissionRate(bool successful = true){
-			//send Account init finish action to fifo
 			m_TradeUserSpiPtr->InitializationFinished();
 		}
 
+	public:
+		void WaitQueryEnd(){
+			std::unique_lock<std::mutex> lk(m_mtx);
+			m_con.wait(lk, [this]() -> bool { return !m_querying.load(); });
+		}
+		
+		void NotifyQueryEnd(){
+			m_querying.store(false);
+			m_con.notify_all();
+		}
+
 	private:
+		std::condition_variable m_con;
+		std::atomic<bool>       m_querying;
+		std::mutex              m_mtx;
 		CtpTradeSpi* m_TradeUserSpiPtr;
 	};
 
