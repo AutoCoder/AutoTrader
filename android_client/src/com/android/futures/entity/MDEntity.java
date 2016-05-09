@@ -9,7 +9,10 @@ public class MDEntity {
 	private int HighPrice;
 	private int LowPrice;
 	private int LastPrice;
+	private int PreSettlementPrice;
 	private int Vol;
+	private int TotalVol;
+	private double TurnOver;
 	private long TimeStamp;
 	private String Instrument;
 	public TechType Techtype;
@@ -18,17 +21,7 @@ public class MDEntity {
 	public MDEntity(){
 		
 	}
-	
-	public MDEntity(int openPrice, int lastPrice, int highPrice, int lowPrice, int vol, long time, String instru){
-		setOpenPrice(openPrice); 
-		setLastPrice(lastPrice); 
-		setHighPrice(highPrice);
-		setLowPrice(lowPrice);
-		setVol(vol);
-		setTimeStamp(time);
-		setInstrument(instru);
-	}
-	
+		
 	// {"Info":"MD","Details":{"OpenPrice":123,"ClosePrice":124,
 	// "HighPrice":125, "LowPrice":122,"Vol":500, "TIMESTAMP":
 	// 111111.5, "ExtraData" : 	{
@@ -47,7 +40,10 @@ public class MDEntity {
 			LastPrice = jsonobj.getInt("LastPrice");
 			HighPrice = jsonobj.getInt("HighPrice");
 			LowPrice = jsonobj.getInt("LowPrice");
+			PreSettlementPrice = jsonobj.getInt("PreSettlementPrice");
 			Vol = jsonobj.getInt("Volume");
+			TotalVol = jsonobj.getInt("TotalVolume");
+			TurnOver = jsonobj.getDouble("TurnOver");
 			Instrument = jsonobj.getString("Instrument");
 			TimeStamp = jsonobj.getLong("TIMESTAMP");
 			
@@ -66,6 +62,10 @@ public class MDEntity {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	public int getPreSettlementPrice() {
+		return PreSettlementPrice;
 	}
 
 	public int getOpenPrice() {
@@ -110,6 +110,14 @@ public class MDEntity {
 
 	public int getVol() {
 		return Vol;
+	}
+	
+	public int getTotalVol() {
+		return TotalVol;
+	}
+	
+	public double getTurnOver() {
+		return TurnOver;
 	}
 
 	public void setVol(int vol) {

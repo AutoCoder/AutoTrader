@@ -113,7 +113,7 @@ bool ClientSession::ReturnFakeCTPMessage(const std::string& instru){
 		root["Data"]["Short"] = 1995;
 		Json::FastWriter writer;
 		std::string extraData = writer.write(root);
-		Transmission::Utils::SendMDInfo(m_session, openPrice, lastPrice, highestPrice, lowestPrice, volume, now_time * 2, instru, extraData);
+		Transmission::Utils::SendMDInfo(m_session, lastPrice, openPrice, lastPrice, highestPrice, lowestPrice, volume, volume, 10000.0, now_time * 2, instru, extraData);
 
 		direction = rand() & 1;  // 0 or 1 randomly
 		OrderSysID++;
@@ -134,7 +134,7 @@ bool ClientSession::ReturnFakeCTPMessage(const std::string& instru){
 
 void ClientSession::SendTickToClient(const TickWrapper& tick){
 	if (m_total_vol != 0)
-		Transmission::Utils::SendMDInfo(m_session, tick.OpenPrice(), tick.LastPrice(), tick.HighestPrice(), tick.LowestPrice(), tick.Volume() - m_total_vol, tick.toTimeStamp(), tick.InstrumentId(), tick.GetTechVec()->ToJson());
+		Transmission::Utils::SendMDInfo(m_session, tick.PreSettlementPrice(), tick.OpenPrice(), tick.LastPrice(), tick.HighestPrice(), tick.LowestPrice(), tick.Volume() - m_total_vol, tick.Volume(), tick.TurnOver(), tick.toTimeStamp(), tick.InstrumentId(), tick.GetTechVec()->ToJson());
 	
 	m_total_vol = tick.Volume();
 }

@@ -17,16 +17,19 @@ namespace Transmission{
 	{
 	}
 
-	void Utils::SendMDInfo(const SockSessionSP& session, int openPrice, int closePrice, int highPrice, int lowPrice, int vol,  long long timestamp, const std::string& instru, const std::string& extradata){
+	void Utils::SendMDInfo(const SockSessionSP& session, int preSettlementPrice, int openPrice, int closePrice, int highPrice, int lowPrice, int vol, int total_vol, double turnover, long long timestamp, const std::string& instru, const std::string& extradata){
 		Json::Value root;
 		root["Info"] = "MD";
 		root["Details"] = Json::Value::nullRef;
+		root["Details"]["PreSettlementPrice"] = preSettlementPrice;
 		root["Details"]["OpenPrice"] = openPrice;
 		root["Details"]["LastPrice"] = closePrice;
 		root["Details"]["HighPrice"] = highPrice;
 		root["Details"]["LowPrice"] = lowPrice;
 		root["Details"]["TIMESTAMP"] = timestamp;
 		root["Details"]["Volume"] = vol;
+		root["Details"]["TotalVolume"] = total_vol;
+		root["Details"]["TurnOver"] = turnover;
 		root["Details"]["Instrument"] = instru;
 
 		Json::Value extra;

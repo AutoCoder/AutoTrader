@@ -34,6 +34,7 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 	private float mTimeRectRight;
 	private float mTimeRectTop;
 	private float mTimeRectBottom;
+	private float mTimeAxis;
 	private double mRatioRange;
 	private float mFontHeight;
 	private float mVolumeRectBottom;
@@ -44,6 +45,7 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 	private double mLowPrice;
 	private double mhighestVolume;
 	private double mLowestVolume;
+	private double mPreSettlementPrice;
 	private int m_beginIdx;
 	private long m_dtimestamp;//unit: 0.5s
 
@@ -76,10 +78,15 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 
 		m_beginIdx = mMDList.size() > DATA_MAX_COUNT ? (mMDList.size() - DATA_MAX_COUNT) : 0;
 		m_dtimestamp = mMDList.get(m_beginIdx).getTimeStamp();
-		mHighPrice = mMDList.size() > 0 ? mMDList.get(m_beginIdx).getLastPrice() : 0.0;
-		mLowPrice = mMDList.size() > 0 ? mMDList.get(m_beginIdx).getLastPrice() : 1000000000.0;
+		mHighPrice = mMDList.size() > 0 ? mMDList.get(m_beginIdx).getPreSettlementPrice() : 0.0;
+		mLowPrice = mMDList.size() > 0 ? mMDList.get(m_beginIdx).getPreSettlementPrice() : 1000000000.0;
 		mhighestVolume = mMDList.size() > 0 ? mMDList.get(m_beginIdx).getVol() : 0.0;
 		mLowestVolume = mMDList.size() > 0 ? mMDList.get(m_beginIdx).getVol() : 0.0;
+
+		if (mMDList.size() > 0)
+			mPreSettlementPrice = mMDList.get(0).getPreSettlementPrice();
+		else
+			mPreSettlementPrice = (mHighPrice + mLowPrice) / 2;
 
 		for (int i = m_beginIdx; i < m_beginIdx + DATA_MAX_COUNT && i < mMDList.size(); ++i) {
 			
@@ -112,6 +119,8 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 		
 		mTimeRectTop = 2* mMargin + mFontHeight;
 		mTimeRectBottom = mTimeRectTop + viewHeight * 2 / 3;
+		float ratio_axis = (float) ((mPreSettlementPrice - mLowPrice) / (float) (mHighPrice - mLowPrice));
+		mTimeAxis = mTimeRectBottom - (mTimeRectBottom - mTimeRectTop) * ratio_axis;
 		mTimeSpacing = (mTimeRectRight - mTimeRectLeft) / DATA_MAX_COUNT;
 		mVolumeRectBottom = viewHeight - mMargin;
 	}
@@ -197,12 +206,14 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 		paint.setTextSize(Text_Size);
 		String high = String.valueOf(mHighPrice);
 		String low = String.valueOf(mLowPrice);
+		String preSettlement = String.valueOf(mPreSettlementPrice);
 		
 		MDEntity lastItem = mMDList.lastElement();
 		paint.setColor(Color.WHITE);
 		canvas.drawText(String.format("%s %s Price:%5.0f Volume:%d", mInstrument, mStrategy, (float)lastItem.getLastPrice(), lastItem.getVol()), mTimeRectLeft, mMargin + mFontHeight , paint);
 		paint.setColor(Color.DKGRAY);
 		canvas.drawRect(mTimeRectLeft, mTimeRectTop, mTimeRectRight, mTimeRectBottom, paint);
+		canvas.drawLine(mTimeRectLeft, mTimeAxis, mTimeRectRight, mTimeAxis, paint);
 		mVolumeRectTop = mTimeRectBottom + 2 * mMargin + mFontHeight;
 		canvas.drawRect(mTimeRectLeft, mVolumeRectTop, mTimeRectRight, mVolumeRectBottom, paint);
 
@@ -218,8 +229,10 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 		canvas.drawText(ratio, mTimeRectRight - ratioWidth, mTimeRectBottom - 1, paint);
 
 		paint.setColor(Color.WHITE);
-		String volumeTitle = "量:1215  现手:1215  额:163.4万";
-		canvas.drawText(volumeTitle, mTimeRectLeft, mVolumeRectTop - mMargin, paint);
+		//draw axis price
+		canvas.drawText(preSettlement, 0, mTimeAxis + + mFontHeight/2, paint);
+		//draw volume/TurnOver number
+		canvas.drawText(String.format("Volume:%d TurnOver:%9.0f", lastItem.getTotalVol(), lastItem.getTurnOver()), mTimeRectLeft, mVolumeRectTop - mMargin, paint);
 		
 		String highVol_str = String.valueOf(mhighestVolume);
 		String lowVol_str = String.valueOf(mLowestVolume);
