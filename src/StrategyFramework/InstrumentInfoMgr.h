@@ -69,6 +69,7 @@ namespace Instrument{
 		InformationMgr& operator = (const InformationMgr& mgr) = delete;
 
 	public:
+		const Information& Get(const std::string& instrumentID) const;
 		void Add(const std::string& instrumentID, const Information& info);
 		bool SetMarginRate(const std::string& instrumentID, const CThostFtdcInstrumentMarginRateField& mgrRate);
 		bool SetCommissionRate(const std::string& instrumentID, const CThostFtdcInstrumentCommissionRateField& comRate);

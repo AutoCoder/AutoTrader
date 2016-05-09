@@ -6,6 +6,7 @@
 #include "AP_Mgr.h"
 #include "Order.h"
 #include "CommonUtils.h"
+#include "InstrumentInfoMgr.h"
 #include "crossplatform.h"
 
 
@@ -345,11 +346,11 @@ namespace AP{
 		std::unique_lock<std::mutex> lk(m_mutex);
 
 		for (auto item : m_tradeList_nonClosed_account_long){
-			money_long += (item.Price * item.Volume * m_instrument_dict.at(item.InstrumentID).VolumeMultiple);// operator [] is not const, so that use at() instead
+			money_long += (item.Price * item.Volume * InstrumentManager.Get(item.InstrumentID).InstruField.VolumeMultiple);// operator [] is not const, so that use at() instead
 		}
 
 		for (auto item : m_tradeList_notClosed_account_short){
-			money_short += (item.Price * item.Volume * m_instrument_dict.at(item.InstrumentID).VolumeMultiple);
+			money_short += (item.Price * item.Volume * InstrumentManager.Get(item.InstrumentID).InstruField.VolumeMultiple);
 		}
 		lk.unlock();
 

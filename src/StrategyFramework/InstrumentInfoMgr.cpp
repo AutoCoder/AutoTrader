@@ -21,6 +21,11 @@ namespace Instrument{
 	{
 	}
 
+	const Information& InformationMgr::Get(const std::string& instrumentID) const{
+		assert (m_InfoDict.find(instrumentID) != m_InfoDict.end());
+		return m_InfoDict.at(instrumentID);
+	}
+
 	void InformationMgr::Add(const std::string& instrumentID, const Information& info){
 		if (m_InfoDict.find(instrumentID) == m_InfoDict.end()){
 			m_InfoDict.insert(std::make_pair(instrumentID, info));
