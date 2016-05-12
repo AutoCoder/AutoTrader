@@ -27,8 +27,8 @@ RealTimeDataProcessor::RealTimeDataProcessor(OrderTriggerBase* trigger, const st
 	, m_KDataVec(spi->GetKDataVec(InstrumentName))
 	, m_TickSet60(spi->GetTickVec60(InstrumentName))
 {
-	if (!replay)
-		recoverHistoryData(600);
+//	if (!replay)
+//		recoverHistoryData(600);
 }
   
 RealTimeDataProcessor::~RealTimeDataProcessor()
