@@ -64,9 +64,9 @@ bool ClientSession::Init_CTP()
 
 	m_trade_spi->WaitQueryEnd();
 
-	SYNC_LOG << "Query all rates...";
+	SYNC_PRINT << "Query all rates...";
 	m_trade_spi->ReqAllRateParameters(Account::Manager::Instance().Instruments());
-	SYNC_LOG << "Query all rates...finished";
+	SYNC_PRINT << "Query all rates...finished";
 
 	OnAccountInitFinished();
 	return true;

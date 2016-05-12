@@ -103,9 +103,14 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 				mLowestVolume = fenshiData.getVol();
 		}
 		
-		//Enlarge Price Range a little bit
-		mHighPrice += 3;
-		mLowPrice -= 3;
+		//let the mTimeAxis centre vertically
+		double absoffup = mHighPrice - mPreSettlementPrice;
+		double absoffdown = mPreSettlementPrice - mLowPrice;
+		if (absoffup > absoffdown){
+			mLowPrice = mPreSettlementPrice - absoffup;
+		}else{
+			mHighPrice = mPreSettlementPrice + absoffdown;
+		}
 		
 		Paint paint = new Paint();
 		paint.setTextSize(Text_Size);
