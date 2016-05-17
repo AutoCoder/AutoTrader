@@ -76,7 +76,8 @@ TickWrapper::TickWrapper(TickWrapper && obj)
 }
 
 long long TickWrapper::toTimeStamp() const{
-	long long ret = CommonUtils::DateTimeToTimestamp(m_MdData.TradingDay, m_MdData.UpdateTime) * 2 + m_MdData.UpdateMillisec / 500;
+	//Note: ActionDay is actual tick date, but TradingDay is the day after ActionDay if the time is 9:00pm ~ 11:00
+	long long ret = CommonUtils::DateTimeToTimestamp(m_MdData.ActionDay, m_MdData.UpdateTime) * 2 + m_MdData.UpdateMillisec / 500;
 	return ret;
 }
 
@@ -84,7 +85,7 @@ long long TickWrapper::FirstSecondsTimeStamp() const{
 	std::string firstseconds(m_MdData.UpdateTime);
 	firstseconds[6] = '0';
 	firstseconds[7] = '0';
-	long long ret = CommonUtils::DateTimeToTimestamp(m_MdData.TradingDay, firstseconds.c_str());
+	long long ret = CommonUtils::DateTimeToTimestamp(m_MdData.ActionDay, firstseconds.c_str());
 	return ret;
 }
 
@@ -99,7 +100,7 @@ void TickWrapper::serializeToDB(DBWrapper& db) const {
 
 	std::stringstream sql;
 	sql << "INSERT INTO `" << tableName << "` (`";
-	sql << "Date" << "`,`";
+	sql << "Date" << "`,`"; //todo : rename column "Date" to "TradingDay"
 	sql << "InstrumentID" << "`,`";
 	sql << "ExchangeID" << "`,`";
 	sql << "ExchangeInstID" << "`,`";
