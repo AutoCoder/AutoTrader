@@ -688,7 +688,7 @@ void CtpTradeSpi::OnRspQryInstrumentMarginRate(CThostFtdcInstrumentMarginRateFie
 	{
 		InstrumentManager.SetMarginRate(pInstrumentMarginRate->InstrumentID, *pInstrumentMarginRate);
 	}
-	else
+	else if (pInstrumentMarginRate)
 	{
 		SYNC_PRINT << "[Trade] Reponse | failed to obtain the margin rate field for " << pInstrumentMarginRate->InstrumentID;
 	}
