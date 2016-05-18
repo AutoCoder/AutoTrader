@@ -36,13 +36,13 @@ void ClientSessionMgr::LoginAccount(const std::string& userId, const std::string
 
 			if (!clientSessionSp)
 			{
+				Transmission::Utils::SendLoginResultInfo(session, Transmission::Succeed);
 				clientSessionSp = std::make_shared<ClientSession>(userId, session);
 				m_client_sessions[session] = clientSessionSp;
 			}else{
 				if (clientSessionSp->IsPositionInfoReady())
 					clientSessionSp->SendPostionInfoToClient();
 			}
-			Transmission::Utils::SendLoginResultInfo(session, Transmission::Succeed);
 			clientSessionSp->OnLoginRequest();
 		}
 		else{
