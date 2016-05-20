@@ -20,6 +20,12 @@ public class MATechInfo {
 		Empty = false;
 	}
 	
+	public MATechInfo(MATechInfo other){
+		this.Short_MA = other.Short_MA;
+		this.Long_MA = other.Long_MA;
+		this.Empty = other.Empty;
+	}
+	
 //	"Data" : {
 	//	"Long" : 1000,
 	//	"Short" : 500,

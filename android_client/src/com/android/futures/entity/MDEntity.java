@@ -3,7 +3,7 @@ package com.android.futures.entity;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class MDEntity {
+public class MDEntity implements Cloneable{
 	private int OpenPrice;
 	private int ClosePrice;
 	private int HighPrice;
@@ -33,6 +33,23 @@ public class MDEntity {
 	//		}
 //		}
 //	}
+	
+	//Cloneable is not recommended in stackoverflow
+	public MDEntity(MDEntity md){
+        this.OpenPrice = md.OpenPrice;
+        this.ClosePrice = md.ClosePrice;
+        this.HighPrice = md.HighPrice;
+        this.LowPrice = md.LowPrice;
+        this.LastPrice = md.LastPrice;
+        this.PreSettlementPrice = md.PreSettlementPrice;
+        this.Vol = md.Vol;
+        this.TotalVol = md.TotalVol;
+        this.TurnOver = md.TurnOver;
+        this.TimeStamp = md.TimeStamp; 
+        this.Instrument = md.Instrument; // not neccessary for deep-copy
+        this.Techtype = md.Techtype;
+        this.TechMA = md.TechMA; // not neccessary for deep-copy
+	}
 
 	public void fromJson(JSONObject jsonobj){
 		try {

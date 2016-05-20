@@ -1,10 +1,12 @@
 package com.android.futures.view;
 
+import java.util.ArrayList;
 import java.util.Vector;
 
 import com.android.futures.entity.MDEntity;
 import com.android.futures.entity.TechType;
 import com.android.futures.entity.TradeEntity;
+import com.android.futures.util.CircularMDQueue;
 import com.android.futures.util.VisualizationSetting;
 
 import android.content.Context;
@@ -20,11 +22,12 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callback {
-	private final int DATA_MAX_COUNT = 4 * 60;
+	private final int DATA_MAX_COUNT = VisualizationSetting.TICKVIEW_DURATION * 60 * 2; // tick_max_count
 	private final float Text_Size = VisualizationSetting.TEXT_XLARGE;
 	private SurfaceHolder mHolder;
 	private DrawThread mThread;
-	public Vector<MDEntity> mMDList = null;
+	//public Vector<MDEntity> mMDList = null;
+	CircularMDQueue mMDList = null;
 	public Vector<TradeEntity> mTradeList = null;
 	private String mInstrument = new String("");
 	private String mStrategy = new String("");
@@ -65,32 +68,34 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 		init();
 	}
 
-	public void setSequenceData(Vector<MDEntity> seqRef, Vector<TradeEntity> tradeseqRef, String instrument, String strategy) {
+	public void setSequenceData(CircularMDQueue seqRef, Vector<TradeEntity> tradeseqRef, String instrument, String strategy) {
 		mMDList = seqRef;
 		mTradeList = tradeseqRef;
 		mInstrument = instrument;
 		mStrategy = strategy;
 	}
-
-	private void UpdateBoundary() {
+	
+	/**
+	 * Return Ticks of current duration
+	 * */
+	private ArrayList<MDEntity> UpdateBoundary() {
+		assert(mMDList.size() > 0);
 		float viewWith = getWidth();
 		float viewHeight = getHeight();
 
-		m_beginIdx = mMDList.size() > DATA_MAX_COUNT ? (mMDList.size() - DATA_MAX_COUNT) : 0;
+		int currentSize = mMDList.size();
+		m_beginIdx = currentSize > DATA_MAX_COUNT ? (currentSize - DATA_MAX_COUNT) : 0;
 		m_dtimestamp = mMDList.get(m_beginIdx).getTimeStamp();
 		mHighPrice = mMDList.size() > 0 ? mMDList.get(m_beginIdx).getPreSettlementPrice() : 0.0;
 		mLowPrice = mMDList.size() > 0 ? mMDList.get(m_beginIdx).getPreSettlementPrice() : 1000000000.0;
 		mhighestVolume = mMDList.size() > 0 ? mMDList.get(m_beginIdx).getVol() : 0.0;
 		mLowestVolume = mMDList.size() > 0 ? mMDList.get(m_beginIdx).getVol() : 0.0;
-
-		if (mMDList.size() > 0)
-			mPreSettlementPrice = mMDList.get(0).getPreSettlementPrice();
-		else
-			mPreSettlementPrice = (mHighPrice + mLowPrice) / 2;
-
-		for (int i = m_beginIdx; i < m_beginIdx + DATA_MAX_COUNT && i < mMDList.size(); ++i) {
+		mPreSettlementPrice = mMDList.get(0).getPreSettlementPrice();
+		ArrayList<MDEntity> CurrentTicks = mMDList.get(m_beginIdx, currentSize-m_beginIdx);
+		
+		for (int i = 0; i < CurrentTicks.size(); ++i) {
 			
-			MDEntity fenshiData = mMDList.get(i);
+			MDEntity fenshiData = CurrentTicks.get(i);
 
 			if (mHighPrice < fenshiData.getLastPrice())
 				mHighPrice = fenshiData.getLastPrice();
@@ -128,6 +133,8 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 		mTimeAxis = mTimeRectBottom - (mTimeRectBottom - mTimeRectTop) * ratio_axis;
 		mTimeSpacing = (mTimeRectRight - mTimeRectLeft) / DATA_MAX_COUNT;
 		mVolumeRectBottom = viewHeight - mMargin;
+		
+		return CurrentTicks;
 	}
 
 	private void init() {
@@ -162,7 +169,7 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 			long tickTime = 0;
 			tickTime = System.currentTimeMillis();
 			while (isRunning) {
-				if (mMDList.isEmpty())
+				if (mMDList.size() == 0)
 					continue;
 				
 				Canvas canvas = null;
@@ -176,10 +183,11 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 							canvas.drawPaint(paint);
 							paint.setXfermode(new PorterDuffXfermode(Mode.SRC));
 
-							UpdateBoundary();
-							drawMDFrame(canvas);
-							drawTicks(canvas);
-							drawVolumes(canvas);
+							
+							ArrayList<MDEntity> CurrentTicks = UpdateBoundary();
+							drawMDFrame(canvas, CurrentTicks);
+							drawTicks(canvas, CurrentTicks);
+							drawVolumes(canvas, CurrentTicks);
 						}
 					}
 				} catch (Exception e) {
@@ -203,7 +211,7 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 		}
 	}
 
-	private void drawMDFrame(Canvas canvas) {
+	private void drawMDFrame(Canvas canvas, ArrayList<MDEntity> CurrentTicks) {
 		Paint paint = new Paint();
 		paint.setAntiAlias(true);
 		paint.setStyle(Style.STROKE);
@@ -213,7 +221,7 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 		String low = String.valueOf(mLowPrice);
 		String preSettlement = String.valueOf(mPreSettlementPrice);
 		
-		MDEntity lastItem = mMDList.lastElement();
+		MDEntity lastItem = CurrentTicks.get(CurrentTicks.size() - 1);
 		paint.setColor(Color.WHITE);
 		canvas.drawText(String.format("%s %s Price:%5.0f Volume:%d", mInstrument, mStrategy, (float)lastItem.getLastPrice(), lastItem.getVol()), mTimeRectLeft, mMargin + mFontHeight , paint);
 		paint.setColor(Color.DKGRAY);
@@ -245,14 +253,14 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 		canvas.drawText(lowVol_str, 0, mVolumeRectBottom - 1, paint);
 	}
 
-	private void drawVolumes(Canvas canvas) {
+	private void drawVolumes(Canvas canvas, ArrayList<MDEntity> CurrentTicks) {
 		float ratio;
 		Paint paint = new Paint();
 
 		paint.setAntiAlias(true);
-		for (int i = m_beginIdx; i < m_beginIdx + DATA_MAX_COUNT && i < mMDList.size(); i++) {
-			MDEntity preData = i > 1 ? mMDList.get(i-1) : mMDList.get(0);
-			MDEntity fenshiData = mMDList.get(i);
+		for (int i = 0; i < CurrentTicks.size(); i++) {
+			MDEntity preData = i > 1 ? CurrentTicks.get(i-1) : CurrentTicks.get(0);
+			MDEntity fenshiData = CurrentTicks.get(i);
 			int timestamp_offset = (int) (fenshiData.getTimeStamp() - m_dtimestamp);
 			
 			ratio = (float) ((fenshiData.getVol() - mLowestVolume) / (mhighestVolume - mLowestVolume));
@@ -272,11 +280,11 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 		}
 	}
 
-	private void drawTicks(Canvas canvas) {
+	private void drawTicks(Canvas canvas, ArrayList<MDEntity> CurrentTicks) {
 		Paint paint = new Paint();
 		paint.setAntiAlias(true);
 		
-		MDEntity first = mMDList.get(m_beginIdx);
+		MDEntity first = CurrentTicks.get(0);
 		boolean bDrawMA = !first.TechMA.IsEmpty() && first.Techtype == TechType.MA;
 		double curY_short = mLowPrice;
 		double curY_long = mLowPrice;
@@ -293,7 +301,7 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 		}
 		
 		//draw tick
-		for (int i = m_beginIdx + 1; i < m_beginIdx + DATA_MAX_COUNT && i < mMDList.size(); i++) {
+		for (int i = 1; i < CurrentTicks.size(); i++) {
 			MDEntity fenshiData = mMDList.get(i);
 			int timestamp_offset = (int) (fenshiData.getTimeStamp() - m_dtimestamp);
 			
@@ -352,8 +360,6 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 						canvas.drawCircle(x_pos, y_pos, radius, paint);
 					}					
 					lastIdx--;
-				}else{
-					break;
 				}
 			}
 		}

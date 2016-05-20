@@ -25,7 +25,7 @@ public class TimesFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.fragment_times, null);
 		mTimesView = (QuickTimesView) view.findViewById(R.id.my_fenshi_view);
-		mTimesView.setSequenceData(mSession.mMdSequence, mSession.mTradeSequence, mSession.getInstrument(), mSession.getStrategyName());
+		mTimesView.setSequenceData(mSession.mMdRing, mSession.mTradeSequence, mSession.getInstrument(), mSession.getStrategyName());
 		return view;
 	}
 	

@@ -6,10 +6,11 @@ import java.util.Vector;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.android.futures.entity.MATechInfo;
 import com.android.futures.entity.MDEntity;
 import com.android.futures.entity.TradeEntity;
-import com.android.futures.tcp.PositionInfo;
+import com.android.futures.util.CircularMDQueue;
+import com.android.futures.util.DataCacheSetting;
+
 import android.os.Handler;
 import android.os.Message;
 
@@ -23,6 +24,8 @@ public class ClientSession implements ClientStatusListener {
 	public int State = LogOut;
 	public Vector<MDEntity> mMdSequence = new Vector<MDEntity>();
 	public Vector<TradeEntity> mTradeSequence = new Vector<TradeEntity>();
+
+	public CircularMDQueue mMdRing = new CircularMDQueue(DataCacheSetting.TICK_MAX);
 	
 	public void SetHandler(Handler handler){
 		mHandler = handler;
@@ -39,6 +42,7 @@ public class ClientSession implements ClientStatusListener {
 
 		mSocketHandler = new SocketHandler(host, port, this);
 		mSocketHandler.listen(true);
+		
 	}
 	
 	public void Login(){
@@ -179,6 +183,7 @@ public class ClientSession implements ClientStatusListener {
 		// update state, clear current tick queue.
 		State = NoTrading;
 		mMdSequence.clear();
+		mMdRing.clear();
 	}
 	
 	public String getInstrument() {
@@ -240,6 +245,7 @@ public class ClientSession implements ClientStatusListener {
 	public void onMDCallback(MDEntity entity) {
 		// TODO Auto-generated method stub
 		mMdSequence.add(entity);
+		mMdRing.Append(entity);
 	}
 }
   
