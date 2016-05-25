@@ -105,7 +105,18 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 				mHighPrice = fenshiData.getLastPrice();
 			if (mLowPrice > fenshiData.getLastPrice()) 
 				mLowPrice = fenshiData.getLastPrice();
-
+			
+			if (fenshiData.Techtype == TechType.MA){
+				if (mHighPrice < fenshiData.TechMA.getLong_MA())
+					mHighPrice = fenshiData.TechMA.getLong_MA();
+				if (mHighPrice < fenshiData.TechMA.getShort_MA())
+					mHighPrice = fenshiData.TechMA.getShort_MA();
+				if (mLowPrice > fenshiData.TechMA.getLong_MA()) 
+					mLowPrice = fenshiData.TechMA.getLong_MA();
+				if (mLowPrice > fenshiData.TechMA.getShort_MA()) 
+					mLowPrice = fenshiData.TechMA.getShort_MA();
+			}
+			
 			if (mhighestVolume < fenshiData.getVol())
 				mhighestVolume = fenshiData.getVol();
 			else if (mLowestVolume > fenshiData.getVol())
