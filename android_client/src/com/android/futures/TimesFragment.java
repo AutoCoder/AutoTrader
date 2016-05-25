@@ -12,7 +12,6 @@ import com.android.futures.tcp.ClientSession;
 import com.android.futures.view.QuickTimesView;
 
 public class TimesFragment extends Fragment {
-	//private TimesView mTimesView;
 	private QuickTimesView mTimesView;
 	private ClientSession mSession;
 

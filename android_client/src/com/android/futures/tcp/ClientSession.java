@@ -22,7 +22,6 @@ public class ClientSession implements ClientStatusListener {
 	private Handler mHandler;
 	private SocketHandler mSocketHandler = null;
 	public int State = LogOut;
-	public Vector<MDEntity> mMdSequence = new Vector<MDEntity>();
 	public Vector<TradeEntity> mTradeSequence = new Vector<TradeEntity>();
 
 	public CircularMDQueue mMdRing = new CircularMDQueue(DataCacheSetting.TICK_MAX);
@@ -182,7 +181,6 @@ public class ClientSession implements ClientStatusListener {
 		
 		// update state, clear current tick queue.
 		State = NoTrading;
-		mMdSequence.clear();
 		mMdRing.clear();
 	}
 	
@@ -244,7 +242,6 @@ public class ClientSession implements ClientStatusListener {
 	@Override
 	public void onMDCallback(MDEntity entity) {
 		// TODO Auto-generated method stub
-		mMdSequence.add(entity);
 		mMdRing.Append(entity);
 	}
 }

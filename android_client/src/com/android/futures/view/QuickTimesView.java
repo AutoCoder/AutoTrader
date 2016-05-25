@@ -26,7 +26,6 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 	private final float Text_Size = VisualizationSetting.TEXT_XLARGE;
 	private SurfaceHolder mHolder;
 	private DrawThread mThread;
-	//public Vector<MDEntity> mMDList = null;
 	CircularMDQueue mMDList = null;
 	public Vector<TradeEntity> mTradeList = null;
 	private String mInstrument = new String("");
@@ -83,8 +82,6 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 		float viewWith = getWidth();
 		float viewHeight = getHeight();
 
-//		int currentSize = mMDList.size();
-//		m_beginIdx = currentSize > DATA_MAX_COUNT ? (currentSize - DATA_MAX_COUNT) : 0;
 		ArrayList<MDEntity> CurrentTicks = mMDList.getLastElements(DATA_MAX_COUNT);
 		if (CurrentTicks.isEmpty())
 			return CurrentTicks;
@@ -276,8 +273,8 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 		Paint paint = new Paint();
 
 		paint.setAntiAlias(true);
-		for (int i = 0; i < CurrentTicks.size(); i++) {
-			MDEntity preData = i > 1 ? CurrentTicks.get(i-1) : CurrentTicks.get(0);
+		for (int i = 1; i < CurrentTicks.size(); i++) {
+			MDEntity preData = CurrentTicks.get(i-1);
 			MDEntity fenshiData = CurrentTicks.get(i);
 			int timestamp_offset = (int) (fenshiData.getTimeStamp() - m_dtimestamp);
 			
@@ -320,7 +317,7 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 		
 		//draw tick
 		for (int i = 1; i < CurrentTicks.size(); i++) {
-			MDEntity fenshiData = mMDList.get(i);
+			MDEntity fenshiData = CurrentTicks.get(i);
 			int timestamp_offset = (int) (fenshiData.getTimeStamp() - m_dtimestamp);
 			
 			ratio = (float) (((float) (fenshiData.getLastPrice() - mLowPrice)) / (mHighPrice - mLowPrice));
