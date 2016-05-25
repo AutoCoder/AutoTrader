@@ -83,15 +83,19 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 		float viewWith = getWidth();
 		float viewHeight = getHeight();
 
-		int currentSize = mMDList.size();
-		m_beginIdx = currentSize > DATA_MAX_COUNT ? (currentSize - DATA_MAX_COUNT) : 0;
-		m_dtimestamp = mMDList.get(m_beginIdx).getTimeStamp();
-		mHighPrice = mMDList.size() > 0 ? mMDList.get(m_beginIdx).getPreSettlementPrice() : 0.0;
-		mLowPrice = mMDList.size() > 0 ? mMDList.get(m_beginIdx).getPreSettlementPrice() : 1000000000.0;
-		mhighestVolume = mMDList.size() > 0 ? mMDList.get(m_beginIdx).getVol() : 0.0;
-		mLowestVolume = mMDList.size() > 0 ? mMDList.get(m_beginIdx).getVol() : 0.0;
-		mPreSettlementPrice = mMDList.get(0).getPreSettlementPrice();
-		ArrayList<MDEntity> CurrentTicks = mMDList.get(m_beginIdx, currentSize-m_beginIdx);
+//		int currentSize = mMDList.size();
+//		m_beginIdx = currentSize > DATA_MAX_COUNT ? (currentSize - DATA_MAX_COUNT) : 0;
+		ArrayList<MDEntity> CurrentTicks = mMDList.getLastElements(DATA_MAX_COUNT);
+		if (CurrentTicks.isEmpty())
+			return CurrentTicks;
+		
+		MDEntity first = CurrentTicks.get(0);
+		mPreSettlementPrice = first.getPreSettlementPrice();
+		m_dtimestamp = first.getTimeStamp();
+		mHighPrice =  mPreSettlementPrice;
+		mLowPrice = mPreSettlementPrice;
+		mhighestVolume = first.getVol();
+		mLowestVolume = first.getVol();
 		
 		for (int i = 0; i < CurrentTicks.size(); ++i) {
 			
@@ -185,9 +189,12 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 
 							
 							ArrayList<MDEntity> CurrentTicks = UpdateBoundary();
-							drawMDFrame(canvas, CurrentTicks);
-							drawTicks(canvas, CurrentTicks);
-							drawVolumes(canvas, CurrentTicks);
+							if (!CurrentTicks.isEmpty())
+							{
+								drawMDFrame(canvas, CurrentTicks);
+								drawTicks(canvas, CurrentTicks);
+								drawVolumes(canvas, CurrentTicks);
+							}
 						}
 					}
 				} catch (Exception e) {
