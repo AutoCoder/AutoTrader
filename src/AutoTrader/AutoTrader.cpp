@@ -188,6 +188,90 @@ void StartTradeLocally(const std::string& userID, const std::string& instrumentI
 	session.StopTrade();
 }
 
+void LaunchAutoTraderWithOfflineMd(size_t spend = 500/*1 Tick duration(unit:ms)*/){
+	ActionQueueProcessor requestsProcessor(Transmission::GetRequestActionQueue()); 
+	ActionQueueProcessor responseProcessor(Transmission::GetResponseActionQueue()); 
+
+	std::future<bool> future_request_processor = std::async(std::launch::async, [&requestsProcessor]()->bool {
+		requestsProcessor.Start();
+		return true;
+	});
+
+	std::future<bool> future_response_processor = std::async(std::launch::async, [&responseProcessor]()->bool {
+		responseProcessor.Start();
+		return true;
+	});
+
+	Transmission::socket_server server(2007);
+	std::future<bool> future_server = std::async(std::launch::async, [&server]()->bool {
+		server.run();
+		return true;
+	});
+
+	std::mutex q_mtx;
+	std::condition_variable q_cv;
+	std::atomic<bool> q_flag(false);
+	
+	//start schedule_stop function
+	auto schedule_stop = std::async(std::launch::async, [&server, &q_mtx, &q_cv, &q_flag, &requestsProcessor, &responseProcessor](){
+		std::unique_lock<std::mutex> lk(q_mtx);
+		q_cv.wait(lk, [&q_flag]{return q_flag.load(); });
+		requestsProcessor.Stop();
+		responseProcessor.Stop();
+		server.stop();
+	});
+
+	//todo: replay md once user startTrade
+
+	// auto future_replay = std::async(std::launch::async, [&q_flag, &q_cv](){
+	// 	//Get the total count of table
+	// 	char countquerybuf[512];
+	// 	const char* countquery = "select count(*) from %s.%s order by id;";
+	// 	SPRINTF(countquerybuf, countquery, Config::Instance()->DBName().c_str(), instrumentID.c_str());
+	// 	std::map<int, std::vector<std::string>> countResult;
+	// 	dbwrapper.Query(countquerybuf, countResult);
+
+	// 	if (countResult.empty()){
+	// 		SYNC_PRINT << "Get 0 md record from db, please check db connection configuration";
+	// 		return;
+	// 	}
+	// 	long long totalCount = CommonUtils::StringtoInt(countResult[0][0]);
+
+	// 	int pagesize = 1000; 
+	// 	for (int i = 0; i < (totalCount / pagesize + 1); i++){
+	// 		const char * sqlselect = "select * from %s.%s order by id limit %ld,%d;";
+
+	// 		char sqlbuf[512];
+	// 		SPRINTF(sqlbuf, sqlselect, Config::Instance()->DBName().c_str(), instrumentID.c_str(), i*pagesize, pagesize);
+
+	// 		std::map<int, std::vector<std::string>> map_results;
+	// 		dbwrapper.Query(sqlbuf, map_results);
+
+	// 		for (auto item : map_results){
+	// 			auto dataItem = TickWrapper::RecoverFromDB(item.second);
+	// 			pool->AppendTick(dataItem);
+	// 		}
+	// 	}
+
+	// 	SYNC_PRINT << "Reply " << instrumentID << " finished.";
+	// 	//quit
+	// 	q_flag.store(true);
+	// 	q_cv.notify_all();
+	// });
+
+	if (future_response_processor.get() == true){
+		SYNC_LOG << "1) Shutdown Response Action processor...Success";
+	}
+
+	if (future_request_processor.get() == true){
+		SYNC_LOG << "2) Shutdown Request Action processor...Success";
+	}		
+
+	if (future_server.get() == true){
+		SYNC_LOG << "3) Shutdown Socket Server...Success";
+	}		
+}
+
 void LaunchAutoTrader(){
 	//Init md thread by RAII
 	RAII_MD md;
