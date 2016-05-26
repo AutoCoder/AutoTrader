@@ -103,12 +103,7 @@ void CtpMdSpi::OnRspSubMarketData(
          CThostFtdcSpecificInstrumentField *pSpecificInstrument, 
          CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
-	SYNC_PRINT << "[Md] Response | [OnRspSubMarketData] : " << ((pRspInfo->ErrorID == 0) ? "success" : "fail") << "; DetailInfo : " << pRspInfo->ErrorMsg;
-  //if(bIsLast)  SetEvent(g_hEvent);
-	if (pRspInfo->ErrorID != 0){
-		//m_isSubscribed = true;
-		m_stateChangeHandler.OnLogined();
-	}
+	SYNC_PRINT << "[Md] Response | [OnRspSubMarketData] : " << ((pRspInfo->ErrorID == 0) ? "success" : "fail") << "; to subscribe " << pSpecificInstrument->InstrumentID;
 }
 
 void CtpMdSpi::OnRspUnSubMarketData(
