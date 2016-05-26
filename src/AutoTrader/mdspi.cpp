@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "mdspi.h"
 #include "TickWrapper.h"
-#include "RealTimeDataProcessorPool.h"
+#include "MdProcessorPool.h"
 #include "spdlog/spdlog.h"
 #include "CommonUtils.h"
 #include "crossplatform.h"
@@ -152,11 +152,11 @@ void CtpMdSpi::OnRtnDepthMarketData(
 
 	//Important Node:
 	//1) must create the local variable "pool" here, otherwise it will not call destruction fucntion when exit(0)
-	//2) can't define a local RealTimeDataProcessor variable here, otherwise it will plus the ref-count, so that it will not call destruction fucntion when exit(0)
-	auto pool = RealTimeDataProcessorPool::getInstance();
+	//2) can't define a local MdProcessor variable here, otherwise it will plus the ref-count, so that it will not call destruction fucntion when exit(0)
+	auto pool = MdProcessorPool::getInstance();
 	TickWrapper tem(pDepthMarketData);
 	
-	pool->AppendRealTimeData(tem);
+	pool->AppendTick(tem);
 	UpdateCachedTickData(tem);
 }
 

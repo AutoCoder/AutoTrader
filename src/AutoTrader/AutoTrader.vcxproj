@@ -195,8 +195,8 @@ xcopy "$(SolutionDir)src\AutoTrader\config.ini" $(OutputPath) /Y</Command>
     <ClInclude Include="ini_parser.h" />
     <ClInclude Include="mdspi.h" />
     <ClInclude Include="ThreadSafeQueue.h" />
-    <ClInclude Include="RealTimeDataProcessor.h" />
-    <ClInclude Include="RealTimeDataProcessorPool.h" />
+    <ClInclude Include="MdProcessor.h" />
+    <ClInclude Include="MdProcessorPool.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -219,8 +219,8 @@ xcopy "$(SolutionDir)src\AutoTrader\config.ini" $(OutputPath) /Y</Command>
     <ClCompile Include="tradespi.cpp" />
     <ClCompile Include="AutoTrader.cpp" />
     <ClCompile Include="mdspi.cpp" />
-    <ClCompile Include="RealTimeDataProcessor.cpp" />
-    <ClCompile Include="RealTimeDataProcessorPool.cpp" />
+    <ClCompile Include="MdProcessor.cpp" />
+    <ClCompile Include="MdProcessorPool.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

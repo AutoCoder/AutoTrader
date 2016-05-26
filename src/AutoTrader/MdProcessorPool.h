@@ -4,7 +4,7 @@
 #include <string>
 #include <map>
 #include <set>
-#include "RealTimeDataProcessor.h"
+#include "MdProcessor.h"
 #include <memory>
 
 class DBWrapper;
@@ -12,23 +12,23 @@ class CtpTradeSpi;
 class BaseClientSession;
 class CtpMdSpi;
 //not for multi-thread: this singleton should be called on main()
-class RealTimeDataProcessorPool
+class MdProcessorPool
 {
 public:
-	~RealTimeDataProcessorPool(){};
-	static RealTimeDataProcessorPool* getInstance();
+	~MdProcessorPool(){};
+	static MdProcessorPool* getInstance();
 
 public:
 	void SetMdSpi(CtpMdSpi* p);
 	void AddProcessor(const std::string& instrument, OrderTriggerBase* trigger, BaseClientSession* session);
-	void AppendRealTimeData(TickWrapper& info);
+	void AppendTick(TickWrapper& info);
 	void StoreStrategySequenceToDB(const std::string& instrumentID, const std::string& mark);
 
 private:
-	RealTimeDataProcessorPool();
-	RealTimeDataProcessorPool(const RealTimeDataProcessorPool&) = delete;
-	RealTimeDataProcessorPool& operator=(const RealTimeDataProcessorPool &) = delete;
-	static RealTimeDataProcessorPool *_instance;
+	MdProcessorPool();
+	MdProcessorPool(const MdProcessorPool&) = delete;
+	MdProcessorPool& operator=(const MdProcessorPool &) = delete;
+	static MdProcessorPool *_instance;
 
 	//class clearer
 	//{
@@ -36,9 +36,9 @@ private:
 	//	clearer(){}
 	//	~clearer()
 	//	{
-	//		if (RealTimeDataProcessorPool::getInstance())
+	//		if (MdProcessorPool::getInstance())
 	//		{
-	//			delete RealTimeDataProcessorPool::getInstance();
+	//			delete MdProcessorPool::getInstance();
 	//		}
 	//	}
 	//};
@@ -48,7 +48,7 @@ private:
 
 private:
 	std::shared_ptr<DBWrapper> m_dbptr;
-	std::map<std::string/*instrument*/, std::vector<std::shared_ptr<RealTimeDataProcessor> > >  m_processorDict;
+	std::map<std::string/*instrument*/, std::vector<std::shared_ptr<MdProcessor> > >  m_processorDict;
 	CtpMdSpi*                  m_mdspi;
 };
 

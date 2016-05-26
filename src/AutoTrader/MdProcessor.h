@@ -11,16 +11,21 @@ class DBWrapper;
 class KData;
 class BaseClientSession;
 class CtpMdSpi;
-#define QueueSize 10
 
-class RealTimeDataProcessor
+class MdProcessor
 {
 public:
-	//if strag == nullptr, that mean RealTimeDataProcessor is in data-recording mode. 
-	RealTimeDataProcessor(OrderTriggerBase* trigger, const std::string& InstrumentName, BaseClientSession* owner, CtpMdSpi* spi, bool replay = false);
-	~RealTimeDataProcessor();
+	//if strag == nullptr, that mean MdProcessor is in data-recording mode. 
+	MdProcessor(OrderTriggerBase* trigger, const std::string& InstrumentName, BaseClientSession* owner, CtpMdSpi* spi);
 
-	void AppendRealTimeData(TickWrapper& info);
+	/**
+	 ** Use stored md in db, not online md.
+	**/
+	MdProcessor(OrderTriggerBase* trigger, const std::string& InstrumentName, BaseClientSession* owner, std::vector<TickWrapper>& tickVec, std::vector<KData>& kdataVec, std::vector<TickWrapper>& tick60);
+	
+	~MdProcessor();
+
+	void AppendTick(TickWrapper& info);
 	void StoreStrategySequenceToDB(const std::string& suggestTableName = "");
 	std::string Instrument() const { return m_Name; }
 	bool IsTrading() const;

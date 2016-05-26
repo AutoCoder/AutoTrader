@@ -14,7 +14,7 @@
 class Order;
 class TickWrapper;
 class CtpTradeSpi;
-class RealTimeDataProcessor;
+class MdProcessor;
 class CThostFtdcTraderApi;
 struct CThostFtdcOrderField;
 struct CThostFtdcTradeField;

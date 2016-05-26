@@ -33,8 +33,8 @@
 #include "ActionProcessor.h"
 #include "ThreadSafeQueue.h"
 #include "fifo_action_queue.h"
-#include "RealTimeDataProcessor.h"
-#include "RealTimeDataProcessorPool.h"
+#include "MdProcessor.h"
+#include "MdProcessorPool.h"
 #include "socket_server.h"
 #include "remote_user_action.h"
 #include "LocalClientSession.h"
@@ -47,7 +47,7 @@ public:
 		: pMdUserApi(nullptr)
 		, pMdUserSpi(nullptr)
 	{
-		auto pool = RealTimeDataProcessorPool::getInstance();
+		auto pool = MdProcessorPool::getInstance();
 		auto config = Config::Instance();
 		//Init md thread
 		pMdUserApi = CThostFtdcMdApi::CreateFtdcMdApi();
@@ -82,12 +82,12 @@ void ReplayTickDataFromDB(const std::string& instrumentID, const std::string& st
 	SYNC_PRINT << "Reply " << instrumentID << " data from db";
 	DBWrapper dbwrapper;
 	g_reply = true;
-	auto pool = RealTimeDataProcessorPool::getInstance();
+	auto pool = MdProcessorPool::getInstance();
 	//TODO: Get 2000 dataItem from db per 
 
 	//todo: get strategy pointer by strategyName, get IPositionCtl* by posCtlName
 	std::unique_ptr<MACrossStratgy> p = std::make_unique<MACrossStratgy>(3, 5, (IPositionControl*)NULL);
-	auto processor = std::make_shared<RealTimeDataProcessor>(p.get(), instrumentID, (Account*)NULL, true);
+	auto processor = std::make_shared<MdProcessor>(p.get(), instrumentID, (Account*)NULL, true);
 
 	//Get the total count of table
 	char countquerybuf[512];
@@ -115,7 +115,7 @@ void ReplayTickDataFromDB(const std::string& instrumentID, const std::string& st
 
 		for (auto item : map_results){
 			auto dataItem = TickWrapper::RecoverFromDB(item.second);
-			pool->AppendRealTimeData(dataItem);
+			pool->AppendTick(dataItem);
 		}
 	}
 	SYNC_PRINT << "Reply " << instrumentID << " finished.";

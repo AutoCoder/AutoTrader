@@ -2,7 +2,7 @@
 #include <assert.h>
 
 #include "stdafx.h"
-#include "RealTimeDataProcessor.h"
+#include "MdProcessor.h"
 #include "TickWrapper.h"
 #include "KData.h"
 #include "Order.h"
@@ -18,27 +18,41 @@
 
 //#define UseKDataToInvoke 1
 
-RealTimeDataProcessor::RealTimeDataProcessor(OrderTriggerBase* trigger, const std::string& InstrumentName, BaseClientSession* owner, CtpMdSpi* spi, bool replay)
+MdProcessor::MdProcessor(OrderTriggerBase* trigger, const std::string& InstrumentName, BaseClientSession* owner, CtpMdSpi* spi)
 	: m_Name(InstrumentName)
 	, m_trigger(trigger)
 	, m_owner(owner)
 	, m_dbptr(new DBWrapper)
-	, m_replay(replay)
+	, m_replay(false)
 	, m_TickVec(spi->GetTickVec(InstrumentName))
 	, m_KDataVec(spi->GetKDataVec(InstrumentName))
 	, m_TickSet60(spi->GetTickVec60(InstrumentName))
 {
+	assert(spi);
 //	if (!replay)
 //		recoverHistoryData(600);
 }
+
+MdProcessor::MdProcessor(OrderTriggerBase* trigger, const std::string& InstrumentName, BaseClientSession* owner, \
+	std::vector<TickWrapper>& tickVec, std::vector<KData>& kdataVec, std::vector<TickWrapper>& tick60)
+	: m_Name(InstrumentName)
+	, m_trigger(trigger)
+	, m_owner(owner)
+	, m_dbptr(new DBWrapper)
+	, m_replay(true)
+	, m_TickVec(tickVec)
+	, m_KDataVec(kdataVec)
+	, m_TickSet60(tick60)
+{
+}
   
-RealTimeDataProcessor::~RealTimeDataProcessor()
+MdProcessor::~MdProcessor()
 {
 	if (!m_replay)
 		StoreStrategySequenceToDB("Test_Dest");
 }
 
-void RealTimeDataProcessor::StoreStrategySequenceToDB(const std::string& mark)
+void MdProcessor::StoreStrategySequenceToDB(const std::string& mark)
 {
 	SYNC_LOG << "Start to store Strategy trigger point to db..." << mark;
 	//store Strategy data in memory into db
@@ -55,8 +69,8 @@ void RealTimeDataProcessor::StoreStrategySequenceToDB(const std::string& mark)
 }
 
 //main thread
-void RealTimeDataProcessor::AppendRealTimeData(TickWrapper& info){
-	// if m_trigger == nullptr, that means RealTimeDataProcessor is in data-recording mode
+void MdProcessor::AppendTick(TickWrapper& info){
+	// if m_trigger == nullptr, that means MdProcessor is in data-recording mode
 	if (m_trigger){
 		//Order ord;
 		OrderVec orders;
@@ -87,7 +101,7 @@ void RealTimeDataProcessor::AppendRealTimeData(TickWrapper& info){
 #endif
 }
 
-void RealTimeDataProcessor::recoverHistoryData(int beforeSeconds)
+void MdProcessor::recoverHistoryData(int beforeSeconds)
 {
 	//the previous tradeDay's 1200
 	const char * sqlselect = "select * from (select * from %s.%s order by id desc limit %d) as tbl order by tbl.id;";
@@ -104,7 +118,7 @@ void RealTimeDataProcessor::recoverHistoryData(int beforeSeconds)
 
 }
 
-bool RealTimeDataProcessor::IsTrading() const 
+bool MdProcessor::IsTrading() const 
 { 
 	return m_owner ? m_owner->IsTrading() : false;
 }

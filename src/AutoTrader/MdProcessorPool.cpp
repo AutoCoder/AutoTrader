@@ -1,43 +1,43 @@
 #include "stdafx.h"
 #include "Strategy.h"
-#include "RealTimeDataProcessorPool.h"
+#include "MdProcessorPool.h"
 #include "Config.h"
 #include "DBWrapper.h"
 #include "tradespi.h"
 #include "mdspi.h"
 #include "TickWrapper.h"
-#include "RealTimeDataProcessor.h"
+#include "MdProcessor.h"
 
-RealTimeDataProcessorPool* RealTimeDataProcessorPool::_instance = NULL;
+MdProcessorPool* MdProcessorPool::_instance = NULL;
 
-RealTimeDataProcessorPool* RealTimeDataProcessorPool::getInstance()
+MdProcessorPool* MdProcessorPool::getInstance()
 {
 	if (_instance == NULL)
 	{
-		_instance = new RealTimeDataProcessorPool();
+		_instance = new MdProcessorPool();
 	}
 	return _instance;
 }
 
-RealTimeDataProcessorPool::RealTimeDataProcessorPool()
+MdProcessorPool::MdProcessorPool()
 	:m_mdspi(nullptr)
 {
 }
 
-void RealTimeDataProcessorPool::SetMdSpi(CtpMdSpi* p)
+void MdProcessorPool::SetMdSpi(CtpMdSpi* p)
 {
 	m_mdspi = p;
 }
 
-void RealTimeDataProcessorPool::AddProcessor(const std::string& instrument, OrderTriggerBase* trigger, BaseClientSession* session){
+void MdProcessorPool::AddProcessor(const std::string& instrument, OrderTriggerBase* trigger, BaseClientSession* session){
 	assert(m_mdspi);
-	auto processor = std::make_shared<RealTimeDataProcessor>(trigger, instrument, session, m_mdspi);
+	auto processor = std::make_shared<MdProcessor>(trigger, instrument, session, m_mdspi);
 
 	auto& processorVec = m_processorDict[instrument];
 	processorVec.push_back(processor);
 }
 
-void RealTimeDataProcessorPool::recoverHistoryData(int beforeSeconds, const std::string& instrumentId)
+void MdProcessorPool::recoverHistoryData(int beforeSeconds, const std::string& instrumentId)
 {
 	//the previous tradeDay's 1200
 	const char * sqlselect = "SELECT * FROM %s.%s order by id desc limit %d;";
@@ -48,20 +48,20 @@ void RealTimeDataProcessorPool::recoverHistoryData(int beforeSeconds, const std:
 	std::map<int, std::vector<std::string> > map_results;
 	m_dbptr->Query(sqlbuf, map_results);
 
-	auto& pRealTimeDataProcessor = m_processorDict[instrumentId];
+	auto& pMdProcessor = m_processorDict[instrumentId];
 
 }
 
-void RealTimeDataProcessorPool::AppendRealTimeData(TickWrapper& info)
+void MdProcessorPool::AppendTick(TickWrapper& info)
 {
 	auto processorVec = m_processorDict[info.InstrumentId()];
 	for (auto proccessor : processorVec){
 		if (proccessor->IsTrading())
-			proccessor->AppendRealTimeData(info);
+			proccessor->AppendTick(info);
 	}
 }
 
-// void RealTimeDataProcessorPool::StoreStrategySequenceToDB(const std::string& instrumentID, const std::string& mark)
+// void MdProcessorPool::StoreStrategySequenceToDB(const std::string& instrumentID, const std::string& mark)
 // {
 // 	auto processorVec = m_processorDict[instrumentID]; 
 // 	for (auto proccessor : processorVec){

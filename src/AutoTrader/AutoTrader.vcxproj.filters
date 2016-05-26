@@ -51,10 +51,10 @@
     <ClInclude Include="..\include\ThostFtdcUserApiStruct.h">
       <Filter>Header Files\CTP_API_Header</Filter>
     </ClInclude>
-    <ClInclude Include="RealTimeDataProcessor.h">
+    <ClInclude Include="MdProcessor.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="RealTimeDataProcessorPool.h">
+    <ClInclude Include="MdProcessorPool.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ini_parser.h">
@@ -125,10 +125,10 @@
     <ClCompile Include="mdspi.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="RealTimeDataProcessor.cpp">
+    <ClCompile Include="MdProcessor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="RealTimeDataProcessorPool.cpp">
+    <ClCompile Include="MdProcessorPool.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="tradespi.cpp">

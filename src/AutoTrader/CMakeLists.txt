@@ -10,8 +10,8 @@ SET(SRC_LIST    ActionProcessor.cpp
 			 	LocalClientSession.cpp
 			 	LocalClientSession.cpp
 			 	ClientSessionMgr.cpp
-				RealTimeDataProcessor.cpp
-				RealTimeDataProcessorPool.cpp
+				MdProcessor.cpp
+				MdProcessorPool.cpp
 				Utils.cpp
 				fifo_action_queue.cpp
 				mdspi.cpp

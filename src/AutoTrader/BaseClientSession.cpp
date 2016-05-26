@@ -9,8 +9,8 @@
 #include "AccountMgr.h"
 
 #include "TriggerFactory.h"
-#include "RealTimeDataProcessor.h"
-#include "RealTimeDataProcessorPool.h"
+#include "MdProcessor.h"
+#include "MdProcessorPool.h"
 #include "Order.h"
 #include "tradespi.h"
 #include "OrderTrigger.h"
@@ -156,7 +156,7 @@ bool BaseClientSession::StartTrade(const std::string& instru, const std::string&
 		auto strategyPtr = TriggerFactory::Instance()->GetTrigger(m_userId, strategyName);
 		if (strategyPtr){
 			strategyPtr->BindWithAccount(m_detailMgr.get());
-			RealTimeDataProcessorPool::getInstance()->AddProcessor(instru, strategyPtr, this);
+			MdProcessorPool::getInstance()->AddProcessor(instru, strategyPtr, this);
 			m_runningInstrument = instru;
 			m_runningStrategy = strategyName;
 			m_isTrading.store(true);
