@@ -138,7 +138,7 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 		mFontHeight = textRect.height();
 		float strWidth = paint.measureText(high);
 		mTimeRectLeft = mMargin + strWidth;
-		mTimeRectRight = viewWith - mTimeRectLeft - mMargin;
+		mTimeRectRight = viewWith - mTimeRectLeft;
 		
 		mTimeRectTop = 2* mMargin + mFontHeight;
 		mTimeRectBottom = mTimeRectTop + viewHeight * 2 / 3;
