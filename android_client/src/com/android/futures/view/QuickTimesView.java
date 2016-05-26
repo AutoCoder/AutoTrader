@@ -1,6 +1,7 @@
 package com.android.futures.view;
 
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Vector;
 
 import com.android.futures.entity.MDEntity;
@@ -131,7 +132,7 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 		
 		Paint paint = new Paint();
 		paint.setTextSize(Text_Size);
-		String high = String.valueOf(mHighPrice);
+		String high = String.format(Locale.US, "%.1f", mHighPrice);//String.valueOf(mHighPrice);
 		Rect textRect = new Rect();
 		paint.getTextBounds(high, 0, 1, textRect);
 		mFontHeight = textRect.height();
@@ -232,21 +233,21 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 		paint.setStyle(Style.STROKE);
 		paint.setColor(Color.DKGRAY);
 		paint.setTextSize(Text_Size);
-		String high = String.valueOf(mHighPrice);
-		String low = String.valueOf(mLowPrice);
-		String preSettlement = String.valueOf(mPreSettlementPrice);
+		String high = String.format(Locale.US, "%.1f", mHighPrice); //String.(mHighPrice);
+		String low = String.format(Locale.US, "%.1f", mLowPrice); //String.valueOf(mLowPrice);
+		String preSettlement = String.format(Locale.US, "%.1f", mPreSettlementPrice); //String.valueOf(mPreSettlementPrice);
 		
 		MDEntity lastItem = CurrentTicks.get(CurrentTicks.size() - 1);
 		paint.setColor(Color.WHITE);
-		canvas.drawText(String.format("%s %s Price:%5.0f Volume:%d", mInstrument, mStrategy, (float)lastItem.getLastPrice(), lastItem.getVol()), mTimeRectLeft, mMargin + mFontHeight , paint);
+		canvas.drawText(String.format(Locale.US, "%s %s Price:%5.0f Volume:%d", mInstrument, mStrategy, (float)lastItem.getLastPrice(), lastItem.getVol()), mTimeRectLeft, mMargin + mFontHeight , paint);
 		paint.setColor(Color.DKGRAY);
 		canvas.drawRect(mTimeRectLeft, mTimeRectTop, mTimeRectRight, mTimeRectBottom, paint);
 		canvas.drawLine(mTimeRectLeft, mTimeAxis, mTimeRectRight, mTimeAxis, paint);
 		mVolumeRectTop = mTimeRectBottom + 2 * mMargin + mFontHeight;
 		canvas.drawRect(mTimeRectLeft, mVolumeRectTop, mTimeRectRight, mVolumeRectBottom, paint);
 
-		mRatioRange = (mHighPrice - mLowPrice) / 200.0;
-		String ratio = mRatioRange + "%";
+		mRatioRange = Math.max(Math.abs(mPreSettlementPrice - mHighPrice), Math.abs(mPreSettlementPrice - mLowPrice)) / mPreSettlementPrice * 100;
+		String ratio = String.format(Locale.US, "%.1f", mRatioRange) + "%";
 		float ratioWidth = paint.measureText(high);
 		paint.setColor(Color.RED);
 		canvas.drawText(high, 0, mTimeRectTop + mFontHeight + 1, paint);
@@ -260,7 +261,7 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 		//draw axis price
 		canvas.drawText(preSettlement, 0, mTimeAxis + + mFontHeight/2, paint);
 		//draw volume/TurnOver number
-		canvas.drawText(String.format("Volume:%d TurnOver:%9.0f", lastItem.getTotalVol(), lastItem.getTurnOver()), mTimeRectLeft, mVolumeRectTop - mMargin, paint);
+		canvas.drawText(String.format(Locale.US, "Volume:%d TurnOver:%9.0f", lastItem.getTotalVol(), lastItem.getTurnOver()), mTimeRectLeft, mVolumeRectTop - mMargin, paint);
 		
 		String highVol_str = String.valueOf(mhighestVolume);
 		String lowVol_str = String.valueOf(mLowestVolume);
