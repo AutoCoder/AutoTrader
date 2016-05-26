@@ -1,5 +1,6 @@
 ﻿// AutoTrader.cpp : Defines the entry point for the console application.
 //
+//standard header
 #include "stdafx.h"
 #include <mutex>
 #include <thread>
@@ -8,58 +9,37 @@
 #include <condition_variable>
 #include <ctime>
 
+//headers in 3rdparty
 #include "spdlog/spdlog.h"
-#include "ThreadSafeQueue.h"
-#include "unittest.h"
 
-#include "DBWrapper.h"
+//public headers in other module
+//----Common Dll-----
 #include "Config.h"
-#include "tradespi.h"
-#include "mdspi.h"
-#include "RealTimeDataProcessorPool.h"
-#include "Order.h"
-#include "TickWrapper.h"
+#include "DBWrapper.h"
+#include "AccountMgr.h"
 #include "CommonUtils.h"
+#include "crossplatform.h"
+//----StrategyFramework---
+#include "Order.h"
 #include "AP_Mgr.h"
+#include "TickWrapper.h"
+
+//private headers
+//#include "unittest.h"
+//#include <signal.h>
+#include "mdspi.h"
+#include "tradespi.h"
+#include "LoadStrategies.h"
+#include "ActionProcessor.h"
+#include "ThreadSafeQueue.h"
+#include "fifo_action_queue.h"
+#include "RealTimeDataProcessor.h"
+#include "RealTimeDataProcessorPool.h"
 #include "socket_server.h"
 #include "remote_user_action.h"
-#include "ActionProcessor.h"
-
-#include "RealTimeDataProcessor.h"
-#include "LoadStrategies.h"
-#include "AccountMgr.h"
-#include "crossplatform.h"
 #include "LocalClientSession.h"
-#include <signal.h>
 
 #pragma warning(disable:4996)
-
-//std::mutex g_OrderRunMtx;
-
-//void ExcuteOrderQueue(CtpTradeSpi* pUserSpi){
-//	SYNC_PRINT << "Start to trade";
-//	SYNC_PRINT << "Start to loop order queue";
-//
-//	while (true){
-//		//g_OrderRunMtx.lock();// synchronize the order execute process
-//		Order ord;
-//		if (!order_queue.empty() && order_queue.try_pop(ord)){ // if pop success
-//
-//			//撤销该order同一合约的pending合约
-//			pUserSpi->CancelOrder(ord.GetTriggerTick(), 6, ord.GetInstrumentId());
-//
-//			SYNC_PRINT << "Excute Order regarding instrumentID:" << ord.GetInstrumentId();
-//			pUserSpi->ReqOrderInsert(ord);
-//		}
-//
-//		if (g_quit/* && order_queue.empty()*/) //todo : close position
-//			break;
-//
-//		sleep(500);
-//	}
-//
-//	SYNC_PRINT << "End to loop order queue";
-//}
 
 #ifdef MUSTIMPL
 void ReplayTickDataFromDB(const std::string& instrumentID, const std::string& strategyName, const std::string& posCtlName, const std::string& mark)
@@ -123,8 +103,16 @@ void StartTradeLocally(const std::string& userID, const std::string& instrumentI
 	pMdUserApi->RegisterFront(const_cast<char*>(Config::Instance()->CtpMdFront().c_str()));
 	pMdUserApi->Init();
 
-	std::future<bool> future_action_queue = std::async(std::launch::async, []()->bool {
-		ActionQueueProcessor::Instance().Start();
+	ActionQueueProcessor requestsProcessor(Transmission::GetRequestActionQueue()); 
+	ActionQueueProcessor responseProcessor(Transmission::GetResponseActionQueue()); 
+
+	std::future<bool> future_request_processor = std::async(std::launch::async, [&requestsProcessor]()->bool {
+		requestsProcessor.Start();
+		return true;
+	});
+
+	std::future<bool> future_response_processor = std::async(std::launch::async, [&responseProcessor]()->bool {
+		responseProcessor.Start();
 		return true;
 	});
 
@@ -139,10 +127,11 @@ void StartTradeLocally(const std::string& userID, const std::string& instrumentI
 	std::atomic<bool> q_flag(false);
 
 	//start schedule_stop function
-	auto schedule_stop = std::async(std::launch::async, [&q_mtx, &q_cv, &q_flag](){
+	auto schedule_stop = std::async(std::launch::async, [&q_mtx, &q_cv, &q_flag, &requestsProcessor, &responseProcessor](){
 		std::unique_lock<std::mutex> lk(q_mtx);
 		q_cv.wait(lk, [&q_flag]{return q_flag.load(); });
-		ActionQueueProcessor::Instance().Stop();
+		requestsProcessor.Stop();
+		responseProcessor.Stop();
 	});
 
 	//check if it's on trade available time periodically (15 min)
@@ -162,9 +151,13 @@ void StartTradeLocally(const std::string& userID, const std::string& instrumentI
 		}
 	});
 
-	if (future_action_queue.get() == true){
-		SYNC_LOG << "1) Shutdown Action Queue...Success";
+	if (future_response_processor.get() == true){
+		SYNC_LOG << "1) Shutdown Response Action processor...Success";
 	}
+
+	if (future_request_processor.get() == true){
+		SYNC_LOG << "1) Shutdown Request Action processor...Success";
+	}		
 
 	session.StopTrade();
 
@@ -219,8 +212,16 @@ int main(int argc, const char* argv[]){
 		pMdUserApi->Init();
 		pool->SetMdSpi(pMdUserSpi);
 
-		std::future<bool> future_action_queue = std::async(std::launch::async, []()->bool {
-			ActionQueueProcessor::Instance().Start();
+		ActionQueueProcessor requestsProcessor(Transmission::GetRequestActionQueue()); 
+		ActionQueueProcessor responseProcessor(Transmission::GetResponseActionQueue()); 
+
+		std::future<bool> future_request_processor = std::async(std::launch::async, [&requestsProcessor]()->bool {
+			requestsProcessor.Start();
+			return true;
+		});
+
+		std::future<bool> future_response_processor = std::async(std::launch::async, [&responseProcessor]()->bool {
+			responseProcessor.Start();
 			return true;
 		});
 
@@ -235,10 +236,11 @@ int main(int argc, const char* argv[]){
 		std::atomic<bool> q_flag(false);
 		
 		//start schedule_stop function
-		auto schedule_stop = std::async(std::launch::async, [&server, &q_mtx, &q_cv, &q_flag](){
+		auto schedule_stop = std::async(std::launch::async, [&server, &q_mtx, &q_cv, &q_flag, &requestsProcessor, &responseProcessor](){
 			std::unique_lock<std::mutex> lk(q_mtx);
 			q_cv.wait(lk, [&q_flag]{return q_flag.load(); });
-			ActionQueueProcessor::Instance().Stop();
+			requestsProcessor.Stop();
+			responseProcessor.Stop();
 			server.stop();
 		});
 
@@ -259,8 +261,12 @@ int main(int argc, const char* argv[]){
 			}
 		});
 
-		if (future_action_queue.get() == true){
-			SYNC_LOG << "1) Shutdown Action Queue...Success";
+		if (future_response_processor.get() == true){
+			SYNC_LOG << "1) Shutdown Response Action processor...Success";
+		}
+
+		if (future_request_processor.get() == true){
+			SYNC_LOG << "1) Shutdown Request Action processor...Success";
 		}		
 
 		if (future_server.get() == true){

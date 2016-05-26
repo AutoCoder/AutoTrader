@@ -16,10 +16,10 @@ private:
 	bool& m_running;
 };
 
-ActionQueueProcessor::ActionQueueProcessor()
-	:m_running(false)
+ActionQueueProcessor::ActionQueueProcessor(TQueue& queue)
+	: m_running(false)
+	, m_queueRef(queue)
 {
-
 }
 
 ActionQueueProcessor::~ActionQueueProcessor(){}
@@ -28,17 +28,12 @@ void ActionQueueProcessor::Start(){
 	m_running = true;
 	while (m_running){
 
-		std::shared_ptr<Transmission::BaseAction> action = Transmission::GetFIFOActionQueue().Wait_And_Pop();
+		std::shared_ptr<Transmission::BaseAction> action = m_queueRef.Wait_And_Pop();
 		
 		action->Invoke();
 	}
 }
 
 void ActionQueueProcessor::Stop(){
-	Transmission::GetFIFOActionQueue().Push_back(LocalQuitAction(m_running));
-}
-
-ActionQueueProcessor& ActionQueueProcessor::Instance(){
-	static ActionQueueProcessor instance;
-	return instance;
+	m_queueRef.Push_back(LocalQuitAction(m_running));
 }

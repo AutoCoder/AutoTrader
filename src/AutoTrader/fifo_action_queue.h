@@ -51,7 +51,8 @@ namespace Transmission{
 		threadsafe_queue<std::shared_ptr<BaseAction> > remote_action_queue;
 	};
 
-	FIFOActionQueue& GetFIFOActionQueue();
+	FIFOActionQueue& GetRequestActionQueue();
+	FIFOActionQueue& GetResponseActionQueue();
 }
 
 

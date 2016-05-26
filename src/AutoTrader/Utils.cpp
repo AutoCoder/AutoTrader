@@ -40,7 +40,7 @@ namespace Transmission{
 		Json::FastWriter writer;
 		std::string ret = writer.write(root);
 		ret = str(boost::format("%1%%2%") % ret.length() % ret);
-		Transmission::GetFIFOActionQueue().Push_back(Transmission::RemoteServerAction(session, ret));
+		Transmission::GetResponseActionQueue().Push_back(Transmission::RemoteServerAction(session, ret));
 	}
 
 	void Utils::SendPositionInfo(const SockSessionSP& session, double blance, int posmoney, const std::string& detailList){
@@ -55,7 +55,7 @@ namespace Transmission{
 		std::string ret = writer.write(root);
 		//{"Type":"ACCOUNT_STATUS","Details":{"Blance":122313,"Position":20, "Instrument":"rb1605", "Price":2555}}
 		ret = str(boost::format("%1%%2%") % ret.length() % ret);
-		Transmission::GetFIFOActionQueue().Push_back(Transmission::RemoteServerAction(session, ret));
+		Transmission::GetResponseActionQueue().Push_back(Transmission::RemoteServerAction(session, ret));
 	}
 
 	void Utils::SendAccountInfo(const SockSessionSP& session, const std::vector<std::string>& instruments, const std::vector<std::string>& strategies, bool isTrading, const std::string& runningInstru, const std::string& runningStrgy){
@@ -81,7 +81,7 @@ namespace Transmission{
 		std::string ret = writer.write(root);
 		//{"Type":"ACCOUNT_INFO","Details":{"Instruments": [ "122313", "12233" ], "Strategies": [ "CROSS_3_5" ], "IsTrading" : true, "RunningInstrument" : "", "RunningStrategy" : ""}}
 		ret = str(boost::format("%1%%2%") % ret.length() % ret);
-		Transmission::GetFIFOActionQueue().Push_back(Transmission::RemoteServerAction(session, ret));
+		Transmission::GetResponseActionQueue().Push_back(Transmission::RemoteServerAction(session, ret));
 	}
 
 	void Utils::SendDealInfo(const SockSessionSP& session, TradeEventType type, const char* instrument, int direction, char combOffsetFlag, int price, int vol, char* orderRef, long long timestamp){
@@ -111,7 +111,7 @@ namespace Transmission{
 		Json::FastWriter writer;
 		std::string ret = writer.write(root);
 		ret = str(boost::format("%1%%2%") % ret.length() % ret);
-		Transmission::GetFIFOActionQueue().Push_back(Transmission::RemoteServerAction(session, ret));
+		Transmission::GetResponseActionQueue().Push_back(Transmission::RemoteServerAction(session, ret));
 	}
 
 	void Utils::SendLoginResultInfo(const SockSessionSP& session, ErrorCode code){
@@ -143,7 +143,7 @@ namespace Transmission{
 		Json::FastWriter writer;
 		std::string ret = writer.write(root);
 		ret = str(boost::format("%1%%2%") % ret.length() % ret);
-		Transmission::GetFIFOActionQueue().Push_back(Transmission::RemoteServerAction(session, ret));
+		Transmission::GetResponseActionQueue().Push_back(Transmission::RemoteServerAction(session, ret));
 	}
 
 	void Utils::SendStartTradeResultInfo(const SockSessionSP& session, ErrorCode code){
@@ -175,7 +175,7 @@ namespace Transmission{
 		Json::FastWriter writer;
 		std::string ret = writer.write(root);
 		ret = str(boost::format("%1%%2%") % ret.length() % ret);
-		Transmission::GetFIFOActionQueue().Push_back(Transmission::RemoteServerAction(session, ret));
+		Transmission::GetResponseActionQueue().Push_back(Transmission::RemoteServerAction(session, ret));
 	}
 
 	void Utils::SendLogOutResultInfo(const SockSessionSP& session, ErrorCode code){
@@ -198,7 +198,7 @@ namespace Transmission{
 		Json::FastWriter writer;
 		std::string ret = writer.write(root);
 		ret = str(boost::format("%1%%2%") % ret.length() % ret);
-		Transmission::GetFIFOActionQueue().Push_back(Transmission::RemoteServerAction(session, ret));
+		Transmission::GetResponseActionQueue().Push_back(Transmission::RemoteServerAction(session, ret));
 	}
 
 	void Utils::SendStopTradeResultInfo(const SockSessionSP& session, ErrorCode code){
@@ -221,7 +221,7 @@ namespace Transmission{
 		Json::FastWriter writer;
 		std::string ret = writer.write(root);
 		ret = str(boost::format("%1%%2%") % ret.length() % ret);
-		Transmission::GetFIFOActionQueue().Push_back(Transmission::RemoteServerAction(session, ret));
+		Transmission::GetResponseActionQueue().Push_back(Transmission::RemoteServerAction(session, ret));
 	}
 
 	void Utils::SendQueryPositionResultInfo(const SockSessionSP& session, ErrorCode code){
@@ -247,6 +247,6 @@ namespace Transmission{
 		Json::FastWriter writer;
 		std::string ret = writer.write(root);
 		ret = str(boost::format("%1%%2%") % ret.length() % ret);
-		Transmission::GetFIFOActionQueue().Push_back(Transmission::RemoteServerAction(session, ret));
+		Transmission::GetResponseActionQueue().Push_back(Transmission::RemoteServerAction(session, ret));
 	}
 }

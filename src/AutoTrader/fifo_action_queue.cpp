@@ -3,7 +3,13 @@
 
 namespace Transmission{
 
-	FIFOActionQueue& GetFIFOActionQueue(){
+	FIFOActionQueue& GetRequestActionQueue(){
+		static FIFOActionQueue queue; //Scott Meyers singleton 
+		return queue;
+	}
+
+
+	FIFOActionQueue& GetResponseActionQueue(){
 		static FIFOActionQueue queue; //Scott Meyers singleton 
 		return queue;
 	}

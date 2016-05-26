@@ -42,7 +42,7 @@ namespace Transmission{
 						{
 							immediatelyReply = "Valid Action is received, responsing...\n";
 							//send (UserAction Object) to fifo queue for handling...
-							GetFIFOActionQueue().Push_back(user_action_);
+							GetRequestActionQueue().Push_back(user_action_);
 						}
 						else if (result == RemoteUserAction::Parse_Result::Bad){
 							immediatelyReply = "Invalid Action is received, ignored...\n";
