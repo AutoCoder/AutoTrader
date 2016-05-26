@@ -23,6 +23,7 @@ RealTimeDataProcessor::RealTimeDataProcessor(OrderTriggerBase* trigger, const st
 	, m_trigger(trigger)
 	, m_owner(owner)
 	, m_dbptr(new DBWrapper)
+	, m_replay(replay)
 	, m_TickVec(spi->GetTickVec(InstrumentName))
 	, m_KDataVec(spi->GetKDataVec(InstrumentName))
 	, m_TickSet60(spi->GetTickVec60(InstrumentName))
@@ -33,7 +34,8 @@ RealTimeDataProcessor::RealTimeDataProcessor(OrderTriggerBase* trigger, const st
   
 RealTimeDataProcessor::~RealTimeDataProcessor()
 {
-	StoreStrategySequenceToDB("Test_Dest");
+	if (!m_replay)
+		StoreStrategySequenceToDB("Test_Dest");
 }
 
 void RealTimeDataProcessor::StoreStrategySequenceToDB(const std::string& mark)

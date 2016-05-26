@@ -37,6 +37,7 @@ private:
 	OrderTriggerBase*			m_trigger;
 	BaseClientSession*			m_owner;
 	std::shared_ptr<DBWrapper>	m_dbptr;
+	bool                        m_replay;
 };
 
 
