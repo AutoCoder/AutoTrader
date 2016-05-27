@@ -144,7 +144,8 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 		mTimeRectBottom = mTimeRectTop + viewHeight * 2 / 3;
 		float ratio_axis = (float) ((mPreSettlementPrice - mLowPrice) / (float) (mHighPrice - mLowPrice));
 		mTimeAxis = mTimeRectBottom - (mTimeRectBottom - mTimeRectTop) * ratio_axis;
-		mTimeSpacing = (mTimeRectRight - mTimeRectLeft) / DATA_MAX_COUNT;
+		MDEntity last = CurrentTicks.get(CurrentTicks.size() - 1);
+		mTimeSpacing = (mTimeRectRight - mTimeRectLeft) / (m_dtimestamp - first.getTimeStamp());
 		mVolumeRectBottom = viewHeight - mMargin;
 		
 		return CurrentTicks;
