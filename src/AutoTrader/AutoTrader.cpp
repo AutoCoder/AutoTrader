@@ -352,6 +352,8 @@ void LaunchAutoTrader(){
 Usage: 
    AutoTrade.exe
    AutoTrade.exe replay rb1510 table_mark
+   AutoTrade.exe single 9999021510 rb1610 Pos20Precent_3_5_MACrossStratgy 
+   AutoTrade.exe offline rb1610
 */
 int main(int argc, const char* argv[]){
 	StrategyPluginsLoader loader; //must be top
@@ -370,8 +372,12 @@ int main(int argc, const char* argv[]){
 #endif
 	}
 	else if (argc == 5 && strcmp(argv[1], "single") == 0){
-		//AutoTrader single 9999021510
+		//AutoTrade.exe single 9999021510 rb1610 Pos20Precent_3_5_MACrossStratgy 
 		StartTradeLocally(argv[2], argv[3], argv[4], "local");
+	}
+	else if (argc == 3 && strcmp(argv[1], "offline") == 0){
+		//AutoTrade.exe offline rb1610
+		LaunchAutoTraderWithOfflineMd(argv[2]);
 	}
 	else{
 		LaunchAutoTrader();
