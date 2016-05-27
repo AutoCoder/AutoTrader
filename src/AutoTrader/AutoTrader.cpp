@@ -82,7 +82,7 @@ std::condition_variable q_cv;
 std::atomic<bool> q_flag(false);
 
 void ShutDown(int n){
-	if (SIGINT == n || SIGBREAK == n || SIGTERM == n){
+	if (SIGINT == n || SIGTERM == n){
 		q_flag.store(true);
 		q_cv.notify_all();
 	}
@@ -231,7 +231,6 @@ void LaunchAutoTraderWithOfflineMd(const std::string& instrumentID, size_t spend
 	});
 
 	signal(SIGINT, ShutDown);
-	signal(SIGBREAK, ShutDown);
 	signal(SIGTERM, ShutDown);
 
 	auto future_replay = std::async(std::launch::async, [&instrumentID, &spend](){
