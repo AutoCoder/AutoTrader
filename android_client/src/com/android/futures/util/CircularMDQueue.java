@@ -23,6 +23,8 @@ public class CircularMDQueue implements RandomAccess {
     }
     
     public void clear(){
+    	head = 0;
+    	size = 0;
     	buf.clear();
     }
     
