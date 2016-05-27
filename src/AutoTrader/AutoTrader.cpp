@@ -8,6 +8,7 @@
 #include <future>
 #include <condition_variable>
 #include <ctime>
+#include <signal.h>
 
 //headers in 3rdparty
 #include "spdlog/spdlog.h"
@@ -74,6 +75,18 @@ public:
 private:
 	CThostFtdcMdApi* 	pMdUserApi;
 	CtpMdSpi* 			pMdUserSpi;
+};
+
+std::mutex q_mtx;
+std::condition_variable q_cv;
+std::atomic<bool> q_flag(false);
+
+void ShutDown(int n){
+	if (SIGINT == n || SIGBREAK == n || SIGTERM == n){
+		q_flag.store(true);
+		q_cv.notify_all();
+	}
+
 };
 
 #ifdef MUSTIMPL
@@ -148,20 +161,17 @@ void StartTradeLocally(const std::string& userID, const std::string& instrumentI
 		session.StartTrade(instrumentID, strategyName, err);
 	}
 
-	std::mutex q_mtx;
-	std::condition_variable q_cv;
-	std::atomic<bool> q_flag(false);
 
 	//start schedule_stop function
-	auto schedule_stop = std::async(std::launch::async, [&q_mtx, &q_cv, &q_flag, &requestsProcessor, &responseProcessor](){
+	auto schedule_stop = std::async(std::launch::async, [&requestsProcessor, &responseProcessor](){
 		std::unique_lock<std::mutex> lk(q_mtx);
-		q_cv.wait(lk, [&q_flag]{return q_flag.load(); });
+		q_cv.wait(lk, []{return q_flag.load(); });
 		requestsProcessor.Stop();
 		responseProcessor.Stop();
 	});
 
 	//check if it's on trade available time periodically (15 min)
-	auto check_quit = std::async(std::launch::async, [&q_flag, &q_cv](){
+	auto check_quit = std::async(std::launch::async, [](){
 		const int MilliSecondsPerQuarter = 15 * 60 * 1000;
 		sleep(MilliSecondsPerQuarter); // 允许在非交易时间 运行15分钟
 		while (q_flag.load() == false)
@@ -171,8 +181,7 @@ void StartTradeLocally(const std::string& userID, const std::string& instrumentI
 			int second_elapse = now_local->tm_hour * 3600 + now_local->tm_min * 60 + now_local->tm_sec;
 			if (CommonUtils::IsMarketingTime(second_elapse) == false)
 			{
-				q_flag.store(true);
-				q_cv.notify_all();
+				ShutDown(SIGTERM);
 			}
 		}
 	});
@@ -188,7 +197,10 @@ void StartTradeLocally(const std::string& userID, const std::string& instrumentI
 	session.StopTrade();
 }
 
-void LaunchAutoTraderWithOfflineMd(size_t spend = 500/*1 Tick duration(unit:ms)*/){
+
+
+
+void LaunchAutoTraderWithOfflineMd(const std::string& instrumentID, size_t spend = 500/*1 Tick duration(unit:ms)*/){
 	ActionQueueProcessor requestsProcessor(Transmission::GetRequestActionQueue()); 
 	ActionQueueProcessor responseProcessor(Transmission::GetResponseActionQueue()); 
 
@@ -208,56 +220,55 @@ void LaunchAutoTraderWithOfflineMd(size_t spend = 500/*1 Tick duration(unit:ms)*
 		return true;
 	});
 
-	std::mutex q_mtx;
-	std::condition_variable q_cv;
-	std::atomic<bool> q_flag(false);
 	
 	//start schedule_stop function
-	auto schedule_stop = std::async(std::launch::async, [&server, &q_mtx, &q_cv, &q_flag, &requestsProcessor, &responseProcessor](){
+	auto schedule_stop = std::async(std::launch::async, [&server, &requestsProcessor, &responseProcessor](){
 		std::unique_lock<std::mutex> lk(q_mtx);
-		q_cv.wait(lk, [&q_flag]{return q_flag.load(); });
+		q_cv.wait(lk, []{return q_flag.load(); });
 		requestsProcessor.Stop();
 		responseProcessor.Stop();
 		server.stop();
 	});
 
-	//todo: replay md once user startTrade
+	signal(SIGINT, ShutDown);
+	signal(SIGBREAK, ShutDown);
+	signal(SIGTERM, ShutDown);
 
-	// auto future_replay = std::async(std::launch::async, [&q_flag, &q_cv](){
-	// 	//Get the total count of table
-	// 	char countquerybuf[512];
-	// 	const char* countquery = "select count(*) from %s.%s order by id;";
-	// 	SPRINTF(countquerybuf, countquery, Config::Instance()->DBName().c_str(), instrumentID.c_str());
-	// 	std::map<int, std::vector<std::string>> countResult;
-	// 	dbwrapper.Query(countquerybuf, countResult);
+	auto future_replay = std::async(std::launch::async, [&instrumentID, &spend](){
+		//Get the total count of table
+		DBWrapper dbwrapper;
+		char countquerybuf[512];
+		const char* countquery = "select count(*) from %s.%s order by id;";
+		SPRINTF(countquerybuf, countquery, Config::Instance()->DBName().c_str(), instrumentID.c_str());
+		std::map<int, std::vector<std::string>> countResult;
+		dbwrapper.Query(countquerybuf, countResult);
 
-	// 	if (countResult.empty()){
-	// 		SYNC_PRINT << "Get 0 md record from db, please check db connection configuration";
-	// 		return;
-	// 	}
-	// 	long long totalCount = CommonUtils::StringtoInt(countResult[0][0]);
+		if (countResult.empty()){
+			SYNC_PRINT << "Get 0 md record from db, please check db connection configuration";
+			return;
+		}
+		long long totalCount = CommonUtils::StringtoInt(countResult[0][0]);
 
-	// 	int pagesize = 1000; 
-	// 	for (int i = 0; i < (totalCount / pagesize + 1); i++){
-	// 		const char * sqlselect = "select * from %s.%s order by id limit %ld,%d;";
+		int pagesize = 1000; 
+		while (!q_flag.load()){
+			for (int i = 0; i < (totalCount / pagesize + 1); i++){
+				const char * sqlselect = "select * from %s.%s order by id limit %ld,%d;";
 
-	// 		char sqlbuf[512];
-	// 		SPRINTF(sqlbuf, sqlselect, Config::Instance()->DBName().c_str(), instrumentID.c_str(), i*pagesize, pagesize);
+				char sqlbuf[512];
+				SPRINTF(sqlbuf, sqlselect, Config::Instance()->DBName().c_str(), instrumentID.c_str(), i*pagesize, pagesize);
 
-	// 		std::map<int, std::vector<std::string>> map_results;
-	// 		dbwrapper.Query(sqlbuf, map_results);
+				std::map<int, std::vector<std::string>> map_results;
+				dbwrapper.Query(sqlbuf, map_results);
 
-	// 		for (auto item : map_results){
-	// 			auto dataItem = TickWrapper::RecoverFromDB(item.second);
-	// 			pool->AppendTick(dataItem);
-	// 		}
-	// 	}
-
-	// 	SYNC_PRINT << "Reply " << instrumentID << " finished.";
-	// 	//quit
-	// 	q_flag.store(true);
-	// 	q_cv.notify_all();
-	// });
+				for (auto item : map_results){
+					auto dataItem = TickWrapper::RecoverFromDB(item.second);
+					MdProcessorPool::getInstance()->AppendTick(dataItem);
+					sleep(spend);
+				}
+			}			
+		}
+		SYNC_PRINT << "Reply " << instrumentID << " Stop due to singal.";
+	});
 
 	if (future_response_processor.get() == true){
 		SYNC_LOG << "1) Shutdown Response Action processor...Success";
