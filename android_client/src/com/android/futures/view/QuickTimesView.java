@@ -401,5 +401,7 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 	public void surfaceDestroyed(SurfaceHolder holder) {
 		// TODO Auto-generated method stub
 		mThread.stopThread();
+		mMDList = null;
+		mTradeList = null;
 	}
 }
