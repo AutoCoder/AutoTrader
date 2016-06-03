@@ -12,7 +12,8 @@ import android.widget.Toast;
 import java.io.IOException;
 import com.android.futures.MyApp;
 import com.android.futures.tcp.ClientSession;
-import com.android.futures.util.SubThreadException;;
+import com.android.futures.util.SubThreadException;
+import com.squareup.leakcanary.RefWatcher;;
 
 public class LoginActivity extends Activity{
 	
@@ -28,6 +29,13 @@ public class LoginActivity extends Activity{
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_login);
+		/*
+		 * monitor memory leak
+		*/
+		MyApp app = (MyApp) getApplication();
+		RefWatcher refWatcher = app.getRefWatcher();
+	    refWatcher.watch(this);
+		
 		loginBtn = (Button) this.findViewById(R.id.login_in);
 		cancelBtn = (Button) this.findViewById(R.id.cancel);
 		accountEdit = (EditText) this.findViewById(R.id.accountEdittext);
@@ -35,10 +43,10 @@ public class LoginActivity extends Activity{
 		brokerIdEdit = (EditText) this.findViewById(R.id.brokerIdtext);
 		hostEdit = (EditText) this.findViewById(R.id.host_text);
 		portEdit = (EditText) this.findViewById(R.id.port_text);
+		
 		loginBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				
 				MyApp app = (MyApp) getApplication();
 				ClientSession session = app.GetSession();
 				int port = Integer.parseInt(portEdit.getText().toString());

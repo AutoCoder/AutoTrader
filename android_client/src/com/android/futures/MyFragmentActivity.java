@@ -1,5 +1,7 @@
 package com.android.futures;
 
+import com.squareup.leakcanary.RefWatcher;
+
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentTabHost;
@@ -17,6 +19,14 @@ public class MyFragmentActivity extends FragmentActivity implements OnClickListe
 		try {
 			super.onCreate(bundle);
 			setContentView(R.layout.activity4fragment_my);
+			
+			/*
+			 * monitor memory leak
+			*/
+			MyApp app = (MyApp) getApplication();
+			RefWatcher refWatcher = app.getRefWatcher();
+		    refWatcher.watch(this);
+		    
 		} catch (Exception e) {
 			Log.e("ERROR", "ERROR IN CODE: " + e.toString());
 			e.printStackTrace();

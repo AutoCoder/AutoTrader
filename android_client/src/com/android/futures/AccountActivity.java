@@ -22,6 +22,7 @@ import com.android.futures.MyApp;
 import com.android.futures.entity.TradeEntity;
 import com.android.futures.tcp.AccountInfo;
 import com.android.futures.tcp.PositionInfo;
+import com.squareup.leakcanary.RefWatcher;
 import com.android.futures.tcp.ClientSession;
 import com.android.futures.tcp.ClientStatusListener;
 
@@ -48,6 +49,14 @@ public class AccountActivity extends Activity implements Handler.Callback {
 		try {
 			super.onCreate(savedInstanceState);
 			setContentView(R.layout.activity_account);
+			
+			/*
+			 * monitor memory leak
+			*/
+			MyApp app = (MyApp) getApplication();		
+			RefWatcher refWatcher = app.getRefWatcher();
+		    refWatcher.watch(this);
+
 		} catch (Exception e) {
 			Log.e("ERROR", "ERROR IN CODE: " + e.toString());
 			e.printStackTrace();
@@ -69,8 +78,8 @@ public class AccountActivity extends Activity implements Handler.Callback {
 			String account_str = intent.getStringExtra("AccountId");
 			accountView.setText(account_str.toCharArray(), 0, account_str.length());
 		}
-
-		MyApp app = (MyApp) getApplication();
+		
+		MyApp app = (MyApp) getApplication();		
 		mSession = app.GetSession();
 		mSession.SetHandler(mHandler);
 		mSession.Login();
