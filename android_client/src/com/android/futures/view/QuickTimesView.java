@@ -21,6 +21,7 @@ import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.util.Log;
 
 public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callback {
 	private final int DATA_MAX_COUNT = VisualizationSetting.TICKVIEW_DURATION * 60 * 2; // tick_max_count
@@ -348,36 +349,48 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 		
 		//draw trade signal
 		if (mTradeList.size() != 0){
-			int lastIdx = mTradeList.size() - 1;
-			while (lastIdx >= 0){
-				TradeEntity item = mTradeList.get(lastIdx);
+			final int size = mTradeList.size();
+			int idx = 0;
+			while (idx < size){
+				TradeEntity item = mTradeList.get(idx);
 				long timestamp_offset = item.getTimeStamp() - m_dtimestamp;
-				if (timestamp_offset > 0){
-					float x_pos = mTimeRectLeft + mTimeSpacing * timestamp_offset;
-					ratio = (float) ((item.getLastPrice() - mLowPrice)/(mHighPrice - mLowPrice));
-					float y_pos = mTimeRectBottom - (mTimeRectBottom - mTimeRectTop) * ratio;
-					
-					if (item.getDirection() == 0)//Buy:0 Sell:1
-						paint.setColor(Color.RED);
-					else
-						paint.setColor(Color.GREEN);
-					
-					float radius = mFontHeight / 3;
-					
-					if (item.getType() == TradeEntity.type.Insert_Order){
-						paint.setStyle(Paint.Style.STROKE);
-						canvas.drawCircle(x_pos, y_pos, radius, paint);
-					}
-					else if (item.getType() == TradeEntity.type.Cancell_Order){
-						paint.setStyle(Paint.Style.FILL);
-						paint.setColor(Color.GRAY);
-						canvas.drawCircle(x_pos, y_pos, radius, paint);
-					}else if (item.getType() == TradeEntity.type.Trade){
-						paint.setStyle(Paint.Style.FILL);
-						canvas.drawCircle(x_pos, y_pos, radius, paint);
-					}					
-					lastIdx--;
+				if (timestamp_offset < 0){
+//					StringBuilder msg = new StringBuilder("m_dtimestamp:");
+//					msg.append(m_dtimestamp).append(" item timestamp: ").append(item.getTimeStamp());
+//					Log.d("Exception", msg.toString());
+					break;
 				}
+//				else{
+//					StringBuilder msg = new StringBuilder("m_dtimestamp:");
+//					msg.append(m_dtimestamp).append(" item timestamp: ").append(item.getTimeStamp());
+//					Log.d("Find", msg.toString());
+//				}
+
+					
+				float x_pos = mTimeRectLeft + mTimeSpacing * timestamp_offset;
+				ratio = (float) ((item.getLastPrice() - mLowPrice)/(mHighPrice - mLowPrice));
+				float y_pos = mTimeRectBottom - (mTimeRectBottom - mTimeRectTop) * ratio;
+				
+				if (item.getDirection() == 0)//Buy:0 Sell:1
+					paint.setColor(Color.RED);
+				else
+					paint.setColor(Color.GREEN);
+				
+				float radius = mFontHeight / 3;
+				
+				if (item.getType() == TradeEntity.type.Insert_Order){
+					paint.setStyle(Paint.Style.STROKE);
+					canvas.drawCircle(x_pos, y_pos, radius, paint);
+				}
+				else if (item.getType() == TradeEntity.type.Cancell_Order){
+					paint.setStyle(Paint.Style.FILL);
+					paint.setColor(Color.GRAY);
+					canvas.drawCircle(x_pos, y_pos, radius, paint);
+				}else if (item.getType() == TradeEntity.type.Trade){
+					paint.setStyle(Paint.Style.FILL);
+					canvas.drawCircle(x_pos, y_pos, radius, paint);
+				}					
+				idx++;
 			}
 		}
 	}
