@@ -407,6 +407,8 @@ void CtpTradeSpi::OnRspQryInvestorPositionDetail(CThostFtdcInvestorPositionDetai
 			else if (trade.Direction == '1')
 				m_account_detail_mgr.pushYesterdayUnClosedTrade(trade, AP::Short);
 		}
+
+		SYNC_TRADE_LOG << "[OnRspQryInvestorPositionDetail] :" << CommonUtils::ConvertInvestorPositionDetailFieldToString(*pInvestorPositionDetail);
 	}
 	else
 	{
@@ -432,8 +434,6 @@ void CtpTradeSpi::OnRspQryInvestorPositionDetail(CThostFtdcInvestorPositionDetai
 		SYNC_PRINT << "Query Invester Position Details Successfully";
 		m_stateChangeHandler.OnLastRspQryInvestorPositionDetail();
 	}
-
-	SYNC_TRADE_LOG << "[OnRspQryInvestorPositionDetail] :" << CommonUtils::ConvertInvestorPositionDetailFieldToString(*pInvestorPositionDetail);
 }
 
 void CtpTradeSpi::ReqQryTradingAccount()
@@ -540,6 +540,7 @@ void CtpTradeSpi::OnRspQryInvestorPosition(
 			<< " UseMargin:" << pInvestorPosition->UseMargin;
 
 		m_account_detail_mgr.pushTradeMessage(*pInvestorPosition);
+		SYNC_TRADE_LOG << "[OnRspQryInvestorPosition] :" << CommonUtils::ConvertPositionFieldToString(*pInvestorPosition);
 	}
 	else
 	{
@@ -552,7 +553,7 @@ void CtpTradeSpi::OnRspQryInvestorPosition(
 		m_stateChangeHandler.OnLastRspQryInvestorPosition();
 	}
 
-	SYNC_TRADE_LOG << "[OnRspQryInvestorPosition] :" << CommonUtils::ConvertPositionFieldToString(*pInvestorPosition);
+	
 }
 
 void CtpTradeSpi::ReqQryInstrument_all(){
