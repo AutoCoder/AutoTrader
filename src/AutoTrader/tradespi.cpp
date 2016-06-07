@@ -472,6 +472,8 @@ void CtpTradeSpi::OnRspQryTradingAccount(
 
 		//SYNC_PRINT << "[Trade] 资金查询正常，查询投资者持仓:";
 		SYNC_PRINT << "[Trade] Query Trading Account Successfully，next step-> Query Investor Position:";
+
+		SYNC_TRADE_LOG << "[OnRspQryTradingAccount] :" << CommonUtils::ConvertTradingAccountFieldToString(*pTradingAccount);
 	}
 	else{
 		SYNC_PRINT << " [Trade] Query Trading Account Unsuccessfully, next step-> Query Investor Position:";
@@ -480,8 +482,6 @@ void CtpTradeSpi::OnRspQryTradingAccount(
 	if (bIsLast){
 		m_stateChangeHandler.OnLastRspQryTradingAccount();
 	}
-
-	SYNC_TRADE_LOG << "[OnRspQryTradingAccount] :" << CommonUtils::ConvertTradingAccountFieldToString(*pTradingAccount);
 }
 
 void CtpTradeSpi::ReqQryInvestorPosition_all()
