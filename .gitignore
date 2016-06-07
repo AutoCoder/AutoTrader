@@ -69,3 +69,8 @@ x64/*
 android_client/gen/*
 android_client/bin/*
 bug_backup/
+*.class
+android_client/Leakcanary-lib/bin/*
+android_client/Leakcanary-lib/gen/*
+android_client/Leakcanary-lib/.classpath
+android_client/Leakcanary-lib/.settings

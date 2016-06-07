@@ -6,5 +6,6 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry combineaccessrules="false" exported="true" kind="src" path="/Leakcanary-lib"/>
+	<classpathentry exported="true" kind="lib" path="/Leakcanary-lib/bin/leakcanary-lib.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
