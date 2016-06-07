@@ -135,7 +135,7 @@ void BaseClientSession::OnRtnOrder(CThostFtdcOrderField* pOrder){
 }
 
 void BaseClientSession::OnRtnTrade(CThostFtdcTradeField* pTrade){
-	SYNC_TRADE_LOG << CommonUtils::ConvertTradeToString(*pTrade);
+	//SYNC_TRADE_LOG << CommonUtils::ConvertTradeToString(*pTrade);
 }
 
 void BaseClientSession::StopTrade(){

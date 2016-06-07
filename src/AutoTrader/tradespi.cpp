@@ -325,6 +325,8 @@ void CtpTradeSpi::OnRspQryOrder(CThostFtdcOrderField *pOrder, CThostFtdcRspInfoF
 		SYNC_PRINT << m_account_detail_mgr.todayOrderToString();
 		m_stateChangeHandler.OnLastRspQryOrder();
 	}
+
+	SYNC_TRADE_LOG << "[OnRspQryOrder] :" << CommonUtils::ConvertOrderToString(*pOrder);
 }
 
 void CtpTradeSpi::ReqQryTrade(){
@@ -359,6 +361,7 @@ void CtpTradeSpi::OnRspQryTrade(CThostFtdcTradeField *pTrade, CThostFtdcRspInfoF
 		m_stateChangeHandler.OnLastRspQryTrade();
 	}
 
+	SYNC_TRADE_LOG << "[OnRspQryTrade] :" << CommonUtils::ConvertTradeToString(*pTrade);
 }
 
 void CtpTradeSpi::ReqQryInvestorPositionDetail(){
@@ -429,6 +432,8 @@ void CtpTradeSpi::OnRspQryInvestorPositionDetail(CThostFtdcInvestorPositionDetai
 		SYNC_PRINT << "Query Invester Position Details Successfully";
 		m_stateChangeHandler.OnLastRspQryInvestorPositionDetail();
 	}
+
+	SYNC_TRADE_LOG << "[OnRspQryInvestorPositionDetail] :" << CommonUtils::ConvertInvestorPositionDetailFieldToString(*pInvestorPositionDetail);
 }
 
 void CtpTradeSpi::ReqQryTradingAccount()
@@ -475,6 +480,8 @@ void CtpTradeSpi::OnRspQryTradingAccount(
 	if (bIsLast){
 		m_stateChangeHandler.OnLastRspQryTradingAccount();
 	}
+
+	SYNC_TRADE_LOG << "[OnRspQryTradingAccount] :" << CommonUtils::ConvertTradingAccountFieldToString(*pTradingAccount);
 }
 
 void CtpTradeSpi::ReqQryInvestorPosition_all()
@@ -544,6 +551,8 @@ void CtpTradeSpi::OnRspQryInvestorPosition(
 	{
 		m_stateChangeHandler.OnLastRspQryInvestorPosition();
 	}
+
+	SYNC_TRADE_LOG << "[OnRspQryInvestorPosition] :" << CommonUtils::ConvertPositionFieldToString(*pInvestorPosition);
 }
 
 void CtpTradeSpi::ReqQryInstrument_all(){
@@ -633,6 +642,8 @@ void CtpTradeSpi::OnRtnOrder(CThostFtdcOrderField *pOrder)
 		SYNC_PRINT << "[Trade] Order ID:" << pOrder->BrokerOrderSeq << ", OrderSubmitStatus:" << CommonUtils::InterpretOrderSubmitStatusCode(pOrder->OrderSubmitStatus);
 		m_OnRtnOrder_callback(pOrder);
 	}
+
+	SYNC_TRADE_LOG << "[OnRtnOrder] :" << CommonUtils::ConvertOrderToString(*pOrder);
 }
 
 void CtpTradeSpi::OnRtnTrade(CThostFtdcTradeField *pTrade)
@@ -642,6 +653,8 @@ void CtpTradeSpi::OnRtnTrade(CThostFtdcTradeField *pTrade)
 	m_account_detail_mgr.pushTodayNewTrade(*pTrade);//会更新整个账户和仓位的状态，使资金状态保持最新
 
 	m_OnRtnTrade_callback(pTrade);
+
+	SYNC_TRADE_LOG << "[OnRtnTrade] :" << CommonUtils::ConvertTradeToString(*pTrade);
 }
 
 

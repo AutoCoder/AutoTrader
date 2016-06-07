@@ -412,3 +412,68 @@ std::string CommonUtils::ConvertTradeListToString(const std::vector< CThostFtdcT
 	result << "-----------------------" << std::endl;
 	return result.str();
 }
+
+
+std::string CommonUtils::ConvertPositionFieldToString(const CThostFtdcInvestorPositionField& pos){
+	std::stringstream result;
+
+	result << "InstrumentID:" << pos.InstrumentID << std::endl
+		<< " TradingDay:" << pos.TradingDay << std::endl
+		<< " Position:" << pos.Position << std::endl
+		<< " TodayPosition" << pos.TodayPosition << std::endl
+		<< " YdPosition:" << pos.YdPosition << std::endl
+		<< " Commission:" << pos.Commission << std::endl
+		<< " FrozenCommission:" << pos.FrozenCommission << std::endl
+		<< " UseMargin:" << pos.UseMargin << std::endl
+		<< " PreMargin:" << pos.PreMargin << std::endl
+		<< " FrozenMargin" << pos.FrozenMargin << std::endl
+		<< " CloseProfit:" << pos.CloseProfit << std::endl
+		<< " CloseVolume:" << pos.CloseVolume << std::endl
+		<< " OpenCost:" << pos.OpenCost << std::endl
+		<< " OpenVolume:" << pos.OpenVolume << std::endl
+		<< " PositionProfit:" << pos.PositionProfit << std::endl << std::endl;
+
+	return result.str();
+}
+
+std::string CommonUtils::ConvertInvestorPositionDetailFieldToString(const CThostFtdcInvestorPositionDetailField& posdetail){
+	std::stringstream result;
+
+	result << "InstrumentID:" << posdetail.InstrumentID << std::endl
+		<< " TradingDay:" << posdetail.TradingDay << std::endl
+		<< " Direction:" << posdetail.Direction << std::endl
+		<< " ExchangeID" << posdetail.ExchangeID << std::endl
+		<< " Margin:" << posdetail.Margin << std::endl
+		<< " OpenDate:" << posdetail.OpenDate << std::endl
+		<< " OpenPrice:" << posdetail.OpenPrice << std::endl
+		<< " TradeID:" << posdetail.TradeID << std::endl
+		<< " Volume:" << posdetail.Volume << std::endl
+		<< " CloseAmount" << posdetail.CloseAmount << std::endl << std::endl;
+
+
+	return result.str();
+}
+
+std::string CommonUtils::ConvertTradingAccountFieldToString(const CThostFtdcTradingAccountField& accField){
+	std::stringstream result;
+
+	result << "AccountID:" << accField.AccountID << std::endl
+		<< " TradingDay:" << accField.TradingDay << std::endl
+		<< " Available:" << accField.Available << std::endl
+		<< " Balance:" << accField.Balance << std::endl
+		<< " CloseProfit" << accField.CloseProfit << std::endl
+		<< " Commission:" << accField.Commission << std::endl
+		<< " CurrMargin:" << accField.CurrMargin << std::endl
+		<< " DeliveryMargin:" << accField.DeliveryMargin << std::endl
+		<< " Deposit:" << accField.Deposit << std::endl
+		<< " ExchangeDeliveryMargin:" << accField.ExchangeDeliveryMargin << std::endl
+		<< " ExchangeMargin:" << accField.ExchangeMargin << std::endl
+		<< " FrozenCash:" << accField.FrozenCash << std::endl
+		<< " FrozenCommission:" << accField.FrozenCommission << std::endl
+		<< " FrozenMargin:" << accField.FrozenMargin << std::endl
+		<< " PositionProfit:" << accField.PositionProfit << std::endl
+		<< " Withdraw" << accField.Withdraw << std::endl << std::endl;
+
+
+	return result.str();
+}

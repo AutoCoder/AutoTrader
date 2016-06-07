@@ -11,6 +11,9 @@ typedef int seconds;
 struct CThostFtdcInputOrderField;
 struct CThostFtdcOrderField;
 struct CThostFtdcTradeField;
+struct CThostFtdcInvestorPositionField;
+struct CThostFtdcInvestorPositionDetailField;
+struct CThostFtdcTradingAccountField;
 
 class COMMON_API CommonUtils
 {
@@ -43,7 +46,9 @@ public:
 	static std::string ConvertTradeToString(const CThostFtdcTradeField& trade);
 	static std::string ConvertOrderListToString(const std::vector< CThostFtdcOrderField >& list);
 	static std::string ConvertTradeListToString(const std::vector< CThostFtdcTradeField >& list);
-
+	static std::string ConvertPositionFieldToString(const CThostFtdcInvestorPositionField& pos);
+	static std::string ConvertInvestorPositionDetailFieldToString(const CThostFtdcInvestorPositionDetailField& posdetail);
+	static std::string ConvertTradingAccountFieldToString(const CThostFtdcTradingAccountField& accField);
 };
 
 #endif
