@@ -357,10 +357,6 @@ Usage:
 */
 int main(int argc, const char* argv[]){
 	StrategyPluginsLoader loader; //must be top
-
-	size_t q_size = 8192 * 2; //queue size must be power of 2
-	spdlog::set_async_mode(q_size);
-	spdlog::set_pattern("*** [%H:%M:%S %z] [thread %t] %v ***");
 	auto console = spdlog::stdout_logger_mt("console");
 	auto file_logger = spdlog::rotating_logger_mt("file_logger", "logs/logfile", 1048576 * 5, 3);
 	auto file_debug_logger = spdlog::rotating_logger_mt("file_debug_logger", "logs/debug", 1048576 * 5, 3);
