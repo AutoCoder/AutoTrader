@@ -313,6 +313,7 @@ void CtpTradeSpi::OnRspQryOrder(CThostFtdcOrderField *pOrder, CThostFtdcRspInfoF
 		CThostFtdcOrderField copy_order;
 		memcpy(&copy_order, pOrder, sizeof(CThostFtdcOrderField));
 		m_account_detail_mgr.pushTodayOrder(copy_order);
+		SYNC_TRADE_LOG << "[OnRspQryOrder] :" << CommonUtils::ConvertOrderToString(*pOrder);
 	}
 	else
 	{
@@ -325,8 +326,6 @@ void CtpTradeSpi::OnRspQryOrder(CThostFtdcOrderField *pOrder, CThostFtdcRspInfoF
 		SYNC_PRINT << m_account_detail_mgr.todayOrderToString();
 		m_stateChangeHandler.OnLastRspQryOrder();
 	}
-
-	SYNC_TRADE_LOG << "[OnRspQryOrder] :" << CommonUtils::ConvertOrderToString(*pOrder);
 }
 
 void CtpTradeSpi::ReqQryTrade(){
@@ -349,6 +348,7 @@ void CtpTradeSpi::OnRspQryTrade(CThostFtdcTradeField *pTrade, CThostFtdcRspInfoF
 		CThostFtdcTradeField trade;
 		memcpy(&trade, pTrade, sizeof(CThostFtdcTradeField));
 		m_account_detail_mgr.pushTodayTrade(trade);
+		SYNC_TRADE_LOG << "[OnRspQryTrade] :" << CommonUtils::ConvertTradeToString(*pTrade);
 	}
 	else{
 		SYNC_PRINT << "[Trade] Query Trade fails!";
@@ -360,8 +360,6 @@ void CtpTradeSpi::OnRspQryTrade(CThostFtdcTradeField *pTrade, CThostFtdcRspInfoF
 		SYNC_PRINT << m_account_detail_mgr.todayTradeToString();
 		m_stateChangeHandler.OnLastRspQryTrade();
 	}
-
-	SYNC_TRADE_LOG << "[OnRspQryTrade] :" << CommonUtils::ConvertTradeToString(*pTrade);
 }
 
 void CtpTradeSpi::ReqQryInvestorPositionDetail(){

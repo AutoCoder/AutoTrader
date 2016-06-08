@@ -420,13 +420,13 @@ std::string CommonUtils::ConvertPositionFieldToString(const CThostFtdcInvestorPo
 	result << "InstrumentID:" << pos.InstrumentID << std::endl
 		<< " TradingDay:" << pos.TradingDay << std::endl
 		<< " Position:" << pos.Position << std::endl
-		<< " TodayPosition" << pos.TodayPosition << std::endl
+		<< " TodayPosition:" << pos.TodayPosition << std::endl
 		<< " YdPosition:" << pos.YdPosition << std::endl
 		<< " Commission:" << pos.Commission << std::endl
 		<< " FrozenCommission:" << pos.FrozenCommission << std::endl
 		<< " UseMargin:" << pos.UseMargin << std::endl
 		<< " PreMargin:" << pos.PreMargin << std::endl
-		<< " FrozenMargin" << pos.FrozenMargin << std::endl
+		<< " FrozenMargin:" << pos.FrozenMargin << std::endl
 		<< " CloseProfit:" << pos.CloseProfit << std::endl
 		<< " CloseVolume:" << pos.CloseVolume << std::endl
 		<< " OpenCost:" << pos.OpenCost << std::endl
@@ -442,13 +442,13 @@ std::string CommonUtils::ConvertInvestorPositionDetailFieldToString(const CThost
 	result << "InstrumentID:" << posdetail.InstrumentID << std::endl
 		<< " TradingDay:" << posdetail.TradingDay << std::endl
 		<< " Direction:" << posdetail.Direction << std::endl
-		<< " ExchangeID" << posdetail.ExchangeID << std::endl
+		<< " ExchangeID:" << posdetail.ExchangeID << std::endl
 		<< " Margin:" << posdetail.Margin << std::endl
 		<< " OpenDate:" << posdetail.OpenDate << std::endl
 		<< " OpenPrice:" << posdetail.OpenPrice << std::endl
 		<< " TradeID:" << posdetail.TradeID << std::endl
 		<< " Volume:" << posdetail.Volume << std::endl
-		<< " CloseAmount" << posdetail.CloseAmount << std::endl << std::endl;
+		<< " CloseAmount:" << posdetail.CloseAmount << std::endl << std::endl;
 
 
 	return result.str();
@@ -461,7 +461,7 @@ std::string CommonUtils::ConvertTradingAccountFieldToString(const CThostFtdcTrad
 		<< " TradingDay:" << accField.TradingDay << std::endl
 		<< " Available:" << accField.Available << std::endl
 		<< " Balance:" << accField.Balance << std::endl
-		<< " CloseProfit" << accField.CloseProfit << std::endl
+		<< " CloseProfit:" << accField.CloseProfit << std::endl
 		<< " Commission:" << accField.Commission << std::endl
 		<< " CurrMargin:" << accField.CurrMargin << std::endl
 		<< " DeliveryMargin:" << accField.DeliveryMargin << std::endl
@@ -472,7 +472,7 @@ std::string CommonUtils::ConvertTradingAccountFieldToString(const CThostFtdcTrad
 		<< " FrozenCommission:" << accField.FrozenCommission << std::endl
 		<< " FrozenMargin:" << accField.FrozenMargin << std::endl
 		<< " PositionProfit:" << accField.PositionProfit << std::endl
-		<< " Withdraw" << accField.Withdraw << std::endl << std::endl;
+		<< " Withdraw:" << accField.Withdraw << std::endl << std::endl;
 
 
 	return result.str();
