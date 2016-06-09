@@ -45,10 +45,11 @@ namespace PP {
 		CThostFtdcInvestorPositionFieldWrapper& operator +=(const CThostFtdcInvestorPositionField& other);
 		CThostFtdcInvestorPositionField GetLongPos() const { return m_LongPos; }
 		CThostFtdcInvestorPositionField GetShortPos() const { return m_ShortPos; }
-
+		std::string ToString();
 	private:
 		bool IsLongPosEmpty();
 		bool IsShortPosEmpty();
+		
 
 	private:
 		CThostFtdcInvestorPositionField m_LongPos;
@@ -85,6 +86,7 @@ namespace PP {
 
 	private:
 		CThostFtdcInvestorPositionField ToPositionInfo(const CThostFtdcTradeField& newestTrade);
+		std::string ToString();
 
 	private:
 		typedef std::map<std::string, CThostFtdcInvestorPositionFieldWrapper> PositionInfoMap; // key => InstrumentID
@@ -100,6 +102,6 @@ namespace PP {
 
 }
 
-typedef PP::PositionProfitMgr PPMgr;
+
 
 #endif

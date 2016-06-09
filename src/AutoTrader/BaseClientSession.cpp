@@ -22,12 +22,14 @@
 #include "CommonUtils.h"
 #include "crossplatform.h"
 #include "BaseClientSession.h"
+#include "PPMgr.h"
 
 
 BaseClientSession::BaseClientSession(const std::string& userId)
 : m_userId(userId)
 , m_isTrading(false)
 , m_detailMgr(std::unique_ptr<AP::AccountDetailMgr>(new AP::AccountDetailMgr()))
+, m_PPMgr(std::unique_ptr<PPMgr>(new PPMgr()))
 , m_total_vol(0)
 , m_ReleaseingCtpAccount(false)
 , m_PositionInfo_ready(false)
@@ -67,7 +69,7 @@ bool BaseClientSession::Init_CTP(){
 	CancelOrderCallback OnCancelOrder_Callback = [](CThostFtdcInputOrderActionField *pInputOrderAction, CThostFtdcRspInfoField *pRspInfo){};
 
 	m_trade_spi = new CtpTradeSpi(m_trade_api, meta.m_BrokerId.c_str(), meta.m_UserId.c_str(), meta.m_Password.c_str(), \
-		Config::Instance()->ProductName().c_str(), *(m_detailMgr.get()), onRtnOrder_Callback, \
+		Config::Instance()->ProductName().c_str(), *(m_detailMgr.get()), *(m_PPMgr.get()), onRtnOrder_Callback, \
 		OnRtnTrade_Callback, OnCancelOrder_Callback);
 
 	m_trade_api->RegisterSpi((CThostFtdcTraderSpi*)m_trade_spi);

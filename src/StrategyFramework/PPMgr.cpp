@@ -1,7 +1,9 @@
 #include <assert.h>
 #include <algorithm>
+#include <sstream>
 #include "PPMgr.h"
 #include "InstrumentInfoMgr.h"
+#include "CommonUtils.h"
 
 namespace PP {
 
@@ -18,6 +20,23 @@ namespace PP {
 
 	bool CThostFtdcInvestorPositionFieldWrapper::IsShortPosEmpty(){
 		return m_ShortPos.PosiDirection == THOST_FTDC_PD_Net;
+	}
+
+	std::string CThostFtdcInvestorPositionFieldWrapper::ToString(){
+		std::stringstream result;
+
+		result << "-----------------------------------" << std::endl;
+		if (IsLongPosEmpty()){
+			result << "LongPositon =>{ " << CommonUtils::ConvertPositionFieldToString(m_LongPos) << " }" << std::endl;
+		}
+
+		if (IsShortPosEmpty()){
+			result << "ShortPositon =>{ " << CommonUtils::ConvertPositionFieldToString(m_ShortPos) << " }" << std::endl;
+		}
+
+		result << "-----------------------------------" << std::endl;
+
+		return result.str();
 	}
 
 	CThostFtdcInvestorPositionFieldWrapper& CThostFtdcInvestorPositionFieldWrapper::operator +=(const CThostFtdcInvestorPositionField& other){
@@ -274,5 +293,20 @@ namespace PP {
 
 	double PositionProfitMgr::GetUsedMargin(){
 		return m_accountInfo.CurrMargin;
+	}
+
+	std::string PositionProfitMgr::ToString(){
+		std::stringstream result;
+		result << "$AccountInfo =>" << std::endl;
+		result << CommonUtils::ConvertAccountInfoToString(m_accountInfo) << std::endl << std::endl;
+
+		result << "$PositionField => {" << std::endl;
+		for (auto posfield : m_posFieldMap){
+			result << "InstrumentID : " << posfield.first << std::endl;
+			result << posfield.second.ToString();
+			result << std::endl;
+		}
+		
+		return result.str();
 	}
 }

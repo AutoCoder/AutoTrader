@@ -9,17 +9,19 @@
 #include "CommonUtils.h"
 #include "AP_Mgr.h"
 #include "InstrumentInfoMgr.h"
+#include "PPMgr.h"
 
 std::vector<CThostFtdcOrderField*> orderList;
 std::vector<CThostFtdcTradeField*> tradeList;
 
-CtpTradeSpi::CtpTradeSpi(CThostFtdcTraderApi* p, const char * brokerID, const char* userID, const char* password, const char* prodname, AP::AccountDetailMgr& admgr,
+CtpTradeSpi::CtpTradeSpi(CThostFtdcTraderApi* p, const char * brokerID, const char* userID, const char* password, const char* prodname, AP::AccountDetailMgr& admgr, PPMgr& ppmgr,
 	RtnOrderCallback onRtnOrderCallback, RtnTradeCallback onRtnTradeCallback, CancelOrderCallback onRtnCancellOrderCallback)
 	: pUserApi(p)
 	, m_frontID(-1)
 	, m_sessionID(-1)
 	, m_stateChangeHandler(this)
 	, m_account_detail_mgr(admgr)
+	, m_ppmgr(ppmgr)
 	, m_querying(true)
 	, m_OnRtnOrder_callback(onRtnOrderCallback)
 	, m_OnRtnTrade_callback(onRtnTradeCallback)
@@ -457,7 +459,7 @@ void CtpTradeSpi::OnRspQryTradingAccount(
 {
 	if (!IsErrorRspInfo(pRspInfo) && pTradingAccount){
 		m_account_detail_mgr.setAccountStatus(*pTradingAccount);
-
+		m_ppmgr.SetAccountInfo(*pTradingAccount);
 		memcpy(&m_accountInfo, pTradingAccount, sizeof(CThostFtdcTradingAccountField));
 		SYNC_PRINT << "[Trade] Response | Balance:" << pTradingAccount->Balance
 			<< " Available:" << pTradingAccount->Available
@@ -538,6 +540,7 @@ void CtpTradeSpi::OnRspQryInvestorPosition(
 			<< " UseMargin:" << pInvestorPosition->UseMargin;
 
 		m_account_detail_mgr.pushTradeMessage(*pInvestorPosition);
+		m_ppmgr.PushInvestorPosition(*pInvestorPosition);
 		SYNC_TRADE_LOG << "[OnRspQryInvestorPosition] :" << CommonUtils::ConvertPositionFieldToString(*pInvestorPosition);
 	}
 	else
@@ -636,6 +639,7 @@ void CtpTradeSpi::OnRtnOrder(CThostFtdcOrderField *pOrder)
 
 	//if it fails to push, whichi mean it is duplicated order
 	bool success = m_account_detail_mgr.pushImmediateOrder(*pOrder);
+	m_ppmgr.PushOrder(*pOrder);
 	if (success){
 		SYNC_PRINT << "[Trade] FrontID:" << pOrder->FrontID << ", SessionID: " << pOrder->SessionID << ", OrderRef:" << pOrder->OrderRef;
 		SYNC_PRINT << "[Trade] Order ID:" << pOrder->BrokerOrderSeq << ", OrderSubmitStatus:" << CommonUtils::InterpretOrderSubmitStatusCode(pOrder->OrderSubmitStatus);
@@ -650,7 +654,7 @@ void CtpTradeSpi::OnRtnTrade(CThostFtdcTradeField *pTrade)
 	SYNC_PRINT << "[Trade] Response | Order trade on:" << pTrade->TradeDate << "|" << pTrade->TradeTime << ", TradeID:" << pTrade->TradeID;
 	
 	m_account_detail_mgr.pushTodayNewTrade(*pTrade);//会更新整个账户和仓位的状态，使资金状态保持最新
-
+	m_ppmgr.PushTrade(*pTrade);
 	m_OnRtnTrade_callback(pTrade);
 
 	SYNC_TRADE_LOG << "[OnRtnTrade] :" << CommonUtils::ConvertTradeToString(*pTrade);

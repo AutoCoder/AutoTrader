@@ -477,3 +477,23 @@ std::string CommonUtils::ConvertTradingAccountFieldToString(const CThostFtdcTrad
 
 	return result.str();
 }
+
+std::string CommonUtils::ConvertAccountInfoToString(const CThostFtdcTradingAccountField& account){
+	std::stringstream result;
+
+	result << "AccountID:" << account.AccountID << std::endl
+		<< " FrozenMargin:" << account.FrozenMargin << std::endl
+		<< " FrozenCash:" << account.FrozenCash << std::endl
+		<< " FrozenCommission:" << account.FrozenCommission << std::endl
+		<< " CurrMargin:" << account.CurrMargin << std::endl
+		<< " Commission:" << account.Commission << std::endl
+		<< " Deposit:" << account.CloseProfit << std::endl
+		<< " PositionProfit:" << account.PositionProfit << std::endl
+		<< " Balance:" << account.Balance << std::endl
+		<< " Available:" << account.Available << std::endl
+		<< " Deposit:" << account.Deposit << std::endl
+		<< " Withdraw:" << account.Withdraw << std::endl << std::endl;
+
+
+	return result.str();
+}

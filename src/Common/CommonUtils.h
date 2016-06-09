@@ -42,6 +42,8 @@ public:
 	static std::string StringFromStruct(const CThostFtdcInputOrderField& innerStruct);
 	static std::string OffsetFlagToString(char flag);
 
+
+	static std::string ConvertAccountInfoToString(const CThostFtdcTradingAccountField& account);
 	static std::string ConvertOrderToString(const CThostFtdcOrderField& order);
 	static std::string ConvertTradeToString(const CThostFtdcTradeField& trade);
 	static std::string ConvertOrderListToString(const std::vector< CThostFtdcOrderField >& list);

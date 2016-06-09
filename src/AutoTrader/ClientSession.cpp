@@ -52,7 +52,7 @@ bool ClientSession::Init_CTP()
 	CancelOrderCallback OnCancelOrder_Callback = std::bind(&ClientSession::OnCancelOrder, this, std::placeholders::_1, std::placeholders::_2);
 
 	m_trade_spi = new CtpTradeSpi(m_trade_api, meta.m_BrokerId.c_str(), meta.m_UserId.c_str(), meta.m_Password.c_str(), \
-		Config::Instance()->ProductName().c_str(), *(m_detailMgr.get()), \
+		Config::Instance()->ProductName().c_str(), *(m_detailMgr.get()), *(m_PPMgr.get()), \
 		onRtnOrder_Callback, OnRtnTrade_Callback, OnCancelOrder_Callback);
 
 	m_trade_api->RegisterSpi((CThostFtdcTraderSpi*)m_trade_spi);

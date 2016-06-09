@@ -14,10 +14,15 @@ namespace AP{
 	class AccountDetailMgr;
 };
 
+namespace PP{
+	class PositionProfitMgr;
+}
+
 typedef std::function<void()>															InitedAccountCallback;
 typedef std::function<void(CThostFtdcOrderField*)>										RtnOrderCallback;
 typedef std::function<void(CThostFtdcTradeField*)>										RtnTradeCallback;
 typedef std::function<void(CThostFtdcInputOrderActionField*, CThostFtdcRspInfoField*)>	CancelOrderCallback;
+typedef PP::PositionProfitMgr PPMgr;
 
 class CtpTradeSpi : public CThostFtdcTraderSpi
 {
@@ -89,8 +94,9 @@ class CtpTradeSpi : public CThostFtdcTraderSpi
 
 public:
 	CtpTradeSpi(CThostFtdcTraderApi* pUserApi,
-		const char * brokerID, const char* userID, const char* password, const char* prodName, 
-		AP::AccountDetailMgr& admgr, 
+		const char * brokerID, const char* userID, const char* password, const char* prodName,
+		AP::AccountDetailMgr& admgr,
+		PPMgr& ppmgr,
 		RtnOrderCallback onRtnOrderCallback,
 		RtnTradeCallback onRtnTradeCallback,
 		CancelOrderCallback OnRtnCancellOrderCallback);
@@ -219,6 +225,7 @@ private:
 	RtnTradeCallback									m_OnRtnTrade_callback;
 	CancelOrderCallback									m_OnCancelOrder_callback;
 	AP::AccountDetailMgr&								m_account_detail_mgr;
+	PPMgr&												m_ppmgr;
 	CThostFtdcTraderApi*								pUserApi;
 	TradeThreadStateChangedHandler						m_stateChangeHandler;
 	int              									m_requestId;

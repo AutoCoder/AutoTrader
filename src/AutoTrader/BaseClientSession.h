@@ -19,6 +19,10 @@ class CThostFtdcTraderApi;
 struct CThostFtdcOrderField;
 struct CThostFtdcTradeField;
 
+namespace PP{
+	class PositionProfitMgr;
+}
+
 namespace AP{
 	class AccountDetailMgr;
 }
@@ -61,6 +65,8 @@ protected:
 	std::string										m_userId;
 	std::atomic<bool>                               m_isTrading; // access by thread-OrderExecutor and thread-ActionQueueInvoker
 	std::unique_ptr<AP::AccountDetailMgr>           m_detailMgr;
+	typedef PP::PositionProfitMgr PPMgr;
+	std::unique_ptr<PPMgr>                          m_PPMgr;
 	int                                             m_total_vol;
 	bool                                            m_ReleaseingCtpAccount;
 	std::atomic<bool>                               m_PositionInfo_ready;//access by thread-tradespi and thread-ActionQueueInvoker
