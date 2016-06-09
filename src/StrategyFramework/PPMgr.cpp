@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <algorithm>
 #include "PPMgr.h"
 #include "InstrumentInfoMgr.h"
 
@@ -49,6 +50,8 @@ namespace PP {
 			m_ShortPos.UseMargin += other.UseMargin;
 			m_ShortPos.Commission += other.Commission;
 		}
+
+		return *this;
 	}
 
 	PositionProfitMgr::PositionProfitMgr()
@@ -64,27 +67,27 @@ namespace PP {
 
 
 	void PositionProfitMgr::PushOrder(const CThostFtdcOrderField& orderField){
-		bool ForzonUpdateNeeded = false;
-		bool IsfinishedorCancelled = (orderField.OrderStatus == THOST_FTDC_OST_AllTraded || orderField.OrderStatus == THOST_FTDC_OST_Canceled);
-		auto iter = std::find(m_orderFieldVec.begin(), m_orderFieldVec.end(), IsSameOrder<CThostFtdcOrderField>(orderField));
+		bool IsInsertOrder = false;
+		bool IsfinishOrder = orderField.OrderStatus == THOST_FTDC_OST_AllTraded;
+		bool IsCancelled = orderField.OrderStatus == THOST_FTDC_OST_Canceled;
+		auto iter = std::find_if(m_orderFieldVec.begin(), m_orderFieldVec.end(), IsSameOrder<CThostFtdcOrderField>(orderField));
 		if (iter == m_orderFieldVec.end()){
 			m_orderFieldVec.push_back(orderField);
 			//that mean OrderStatus == THOST_FTDC_OST_NoTradeQueueing
-			ForzonUpdateNeeded = true;
+			IsInsertOrder = true;
 
 		}
 		else{
 			//if a order is finished, it will be earsed in the list
-			if (IsfinishedorCancelled){
+			if (IsfinishOrder || IsCancelled){
 				m_orderFieldVec.erase(iter);
-				ForzonUpdateNeeded = true;
-			}
-			else{
-				ForzonUpdateNeeded = false;
 			}
 		}
 
-		if (ForzonUpdateNeeded){
+		bool PositionStatusChanged = IsInsertOrder || IsfinishOrder || IsCancelled;
+
+
+		if (PositionStatusChanged){
 			double commratio = 1.0;
 			if (orderField.CombOffsetFlag[0] == THOST_FTDC_OF_Open)
 				commratio = InstrumentManager.Get(orderField.InstrumentID).ComRateField.OpenRatioByVolume;
@@ -96,19 +99,37 @@ namespace PP {
 				assert(false);
 			}
 			double commission = commratio * orderField.VolumeTotalOriginal;
-			m_accountInfo.FrozenCommission += commission * (IsfinishedorCancelled ? -1 : 1);
-			m_accountInfo.Available += commission * (IsfinishedorCancelled ? 1 : -1);
 
 			double margin = 0.0;
 			if (orderField.Direction == THOST_FTDC_D_Buy){
 				margin = InstrumentManager.Get(orderField.InstrumentID).MgrRateField.LongMarginRatioByVolume * orderField.VolumeTotalOriginal;
-				m_accountInfo.FrozenMargin += (margin * (IsfinishedorCancelled ? -1 : 1));
 			}
 			else if (orderField.Direction == THOST_FTDC_D_Sell){
 				margin = InstrumentManager.Get(orderField.InstrumentID).MgrRateField.ShortMarginRatioByVolume * orderField.VolumeTotalOriginal;
-				m_accountInfo.FrozenMargin += (margin * (IsfinishedorCancelled ? -1 : 1));
 			}
-			m_accountInfo.Available += (margin * (IsfinishedorCancelled ? 1 : -1));
+
+			if (IsInsertOrder)
+			{
+				m_accountInfo.FrozenCommission += commission;
+				m_accountInfo.FrozenMargin += margin;
+				m_accountInfo.Available -= commission;
+				m_accountInfo.Available -= margin;
+			}
+			else if (IsfinishOrder){
+				m_accountInfo.FrozenCommission -= commission;
+				m_accountInfo.FrozenMargin -= margin;
+				m_accountInfo.Commission += commission;
+				m_accountInfo.CurrMargin += margin;
+			}
+			else if (IsCancelled){
+				m_accountInfo.FrozenCommission -= commission;
+				m_accountInfo.FrozenMargin -= margin;
+				m_accountInfo.Available += commission;
+				m_accountInfo.Available += margin;
+			}
+		}
+		else{
+			return;
 		}
 	}
 
@@ -118,11 +139,6 @@ namespace PP {
 		if (m_acccountInfoInitialized){
 			CThostFtdcInvestorPositionField newPos = ToPositionInfo(tradeField);
 			PushInvestorPosition(newPos);
-
-			//update m_accountInfo
-			for (auto instr : m_posFieldMap){
-
-			}
 		}
 	}
 
@@ -130,7 +146,6 @@ namespace PP {
 	{
 		CThostFtdcInvestorPositionField newPosInfo;
 		memset(&newPosInfo, 0, sizeof(CThostFtdcInvestorPositionField));
-
 
 		memcpy(newPosInfo.BrokerID, tradeField.BrokerID, sizeof(newPosInfo.BrokerID));
 		memcpy(newPosInfo.InvestorID, tradeField.InvestorID, sizeof(newPosInfo.InvestorID));
@@ -197,6 +212,8 @@ namespace PP {
 		else{
 			assert(false);
 		}
+
+		return newPosInfo;
 	}
 
 	void PositionProfitMgr::SetAccountInfo(const CThostFtdcTradingAccountField& info){
@@ -210,7 +227,6 @@ namespace PP {
 	void PositionProfitMgr::PushInvestorPositionDetail(const CThostFtdcInvestorPositionDetailField& posDetail){
 
 	}
-
 
 	size_t PositionProfitMgr::GetUnclosedPosition(const std::string& instrumentId, TThostFtdcDirectionType type){
 		if (m_posFieldMap.find(instrumentId) != m_posFieldMap.end()){

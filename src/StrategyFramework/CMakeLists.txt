@@ -3,6 +3,7 @@ message(STATUS "StrategyFramework cmake configuring")
 SET(LIBRARY_OUTPUT_PATH ${AUTOTRADE_SOURCE_DIR}/bin)
 
 SET(SRC_LIST AP_Mgr.cpp 
+			 PPMgr.cpp 
 		     BOLLTech.cpp 
 		     KData.cpp
 		     Order.cpp

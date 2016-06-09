@@ -25,6 +25,7 @@
     <ClInclude Include="KData.h" />
     <ClInclude Include="Order.h" />
     <ClInclude Include="OrderTrigger.h" />
+    <ClInclude Include="PPMgr.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Strategy.h" />
     <ClInclude Include="TechVec.h" />
@@ -37,6 +38,7 @@
     <ClCompile Include="InstrumentInfoMgr.cpp" />
     <ClCompile Include="KData.cpp" />
     <ClCompile Include="Order.cpp" />
+    <ClCompile Include="PPMgr.cpp" />
     <ClCompile Include="TickWrapper.cpp" />
     <ClCompile Include="TriggerFactory.cpp" />
   </ItemGroup>
