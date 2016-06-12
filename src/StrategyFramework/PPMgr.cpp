@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <algorithm>
 #include <sstream>
+#include <string.h>
 #include "PPMgr.h"
 #include "InstrumentInfoMgr.h"
 #include "CommonUtils.h"
