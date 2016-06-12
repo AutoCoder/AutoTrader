@@ -16,6 +16,7 @@
 #include "tradespi.h"
 #include "OrderTrigger.h"
 #include "AP_Mgr.h"
+#include "PPMgr.h"
 #include "Config.h"
 #include "TickWrapper.h"
 #include "Transmission.h"
@@ -38,6 +39,20 @@ ClientSession::ClientSession(const std::string& userId, const SockSessionSP& s)
 
 ClientSession::~ClientSession()
 {
+	SYNC_TRADE_LOG << m_PPMgr->ToString();
+
+	if (m_trade_api)
+	{
+		m_trade_api->RegisterSpi(NULL);
+		m_trade_api->Release();
+		m_trade_api = NULL;
+	}
+	if (m_trade_spi)
+	{
+		delete m_trade_spi;
+		m_trade_spi = NULL;
+	}
+	SYNC_LOG << "CTP Account of " << m_userId << "...Logout";
 }
 
 bool ClientSession::Init_CTP()

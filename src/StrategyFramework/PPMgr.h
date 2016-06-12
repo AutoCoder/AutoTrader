@@ -83,10 +83,10 @@ namespace PP {
 		double GetPositionProfit();
 
 		void   SetAccountInfoInitialized(bool init = true) { m_acccountInfoInitialized = init; };
-
+		std::string ToString();
 	private:
 		CThostFtdcInvestorPositionField ToPositionInfo(const CThostFtdcTradeField& newestTrade);
-		std::string ToString();
+		
 
 	private:
 		typedef std::map<std::string, CThostFtdcInvestorPositionFieldWrapper> PositionInfoMap; // key => InstrumentID
