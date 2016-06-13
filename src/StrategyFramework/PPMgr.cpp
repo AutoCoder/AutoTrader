@@ -26,11 +26,11 @@ namespace PP {
 		std::stringstream result;
 
 		result << "-----------------------------------" << std::endl;
-		if (IsLongPosEmpty()){
+		if (!IsLongPosEmpty()){
 			result << "LongPositon =>{ " << CommonUtils::ConvertPositionFieldToString(m_LongPos) << " }" << std::endl;
 		}
 
-		if (IsShortPosEmpty()){
+		if (!IsShortPosEmpty()){
 			result << "ShortPositon =>{ " << CommonUtils::ConvertPositionFieldToString(m_ShortPos) << " }" << std::endl;
 		}
 
@@ -68,6 +68,7 @@ namespace PP {
 			m_ShortPos.CloseAmount += other.CloseAmount;
 			m_ShortPos.UseMargin += other.UseMargin;
 			m_ShortPos.Commission += other.Commission;
+			m_ShortPos.PosiDirection = other.PosiDirection;
 		}
 
 		return *this;
