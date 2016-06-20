@@ -41,35 +41,43 @@ namespace PP {
 	}
 
 	CThostFtdcInvestorPositionFieldWrapper& CThostFtdcInvestorPositionFieldWrapper::operator +=(const CThostFtdcInvestorPositionField& other){
-		if (IsLongPosEmpty()){
-			memcpy(&m_LongPos, &(other), sizeof(CThostFtdcInvestorPositionField));
+		if (other.PosiDirection == THOST_FTDC_PD_Long)
+		{
+			if (IsLongPosEmpty()){
+				memcpy(&m_LongPos, &(other), sizeof(CThostFtdcInvestorPositionField));
+			}
+			else{
+				m_LongPos.LongFrozen += other.LongFrozen;
+				m_LongPos.LongFrozenAmount += other.LongFrozenAmount;
+				m_LongPos.PositionCost = (m_LongPos.PositionCost * m_LongPos.OpenVolume + other.PositionCost * other.OpenVolume) / (m_LongPos.OpenVolume + other.OpenVolume);
+				m_LongPos.OpenVolume += other.OpenVolume;
+				m_LongPos.CloseVolume += other.CloseVolume;
+				m_LongPos.OpenAmount += other.OpenAmount;
+				m_LongPos.CloseAmount += other.CloseAmount;
+				m_LongPos.UseMargin += other.UseMargin;
+				m_LongPos.Commission += other.Commission;
+			}
+		}
+		else if (other.PosiDirection == THOST_FTDC_PD_Short)
+		{
+			if (IsShortPosEmpty()){
+				memcpy(&m_ShortPos, &(other), sizeof(CThostFtdcInvestorPositionField));
+			}
+			else{
+				m_ShortPos.LongFrozen += other.LongFrozen;
+				m_ShortPos.LongFrozenAmount += other.LongFrozenAmount;
+				m_ShortPos.PositionCost = (m_ShortPos.PositionCost * m_ShortPos.OpenVolume + other.PositionCost * other.OpenVolume) / (m_ShortPos.OpenVolume + other.OpenVolume);
+				m_ShortPos.OpenVolume += other.OpenVolume;
+				m_ShortPos.CloseVolume += other.CloseVolume;
+				m_ShortPos.OpenAmount += other.OpenAmount;
+				m_ShortPos.CloseAmount += other.CloseAmount;
+				m_ShortPos.UseMargin += other.UseMargin;
+				m_ShortPos.Commission += other.Commission;
+				m_ShortPos.PosiDirection = other.PosiDirection;
+			}
 		}
 		else{
-			m_LongPos.LongFrozen += other.LongFrozen;
-			m_LongPos.LongFrozenAmount += other.LongFrozenAmount;
-			m_LongPos.PositionCost = (m_LongPos.PositionCost * m_LongPos.OpenVolume + other.PositionCost * other.OpenVolume) / (m_LongPos.OpenVolume + other.OpenVolume);
-			m_LongPos.OpenVolume += other.OpenVolume;
-			m_LongPos.CloseVolume += other.CloseVolume;
-			m_LongPos.OpenAmount += other.OpenAmount;
-			m_LongPos.CloseAmount += other.CloseAmount;
-			m_LongPos.UseMargin += other.UseMargin;
-			m_LongPos.Commission += other.Commission;
-		}
-
-		if (IsShortPosEmpty()){
-			memcpy(&m_ShortPos, &(other), sizeof(CThostFtdcInvestorPositionField));
-		}
-		else{
-			m_ShortPos.LongFrozen += other.LongFrozen;
-			m_ShortPos.LongFrozenAmount += other.LongFrozenAmount;
-			m_ShortPos.PositionCost = (m_ShortPos.PositionCost * m_ShortPos.OpenVolume + other.PositionCost * other.OpenVolume) / (m_ShortPos.OpenVolume + other.OpenVolume);
-			m_ShortPos.OpenVolume += other.OpenVolume;
-			m_ShortPos.CloseVolume += other.CloseVolume;
-			m_ShortPos.OpenAmount += other.OpenAmount;
-			m_ShortPos.CloseAmount += other.CloseAmount;
-			m_ShortPos.UseMargin += other.UseMargin;
-			m_ShortPos.Commission += other.Commission;
-			m_ShortPos.PosiDirection = other.PosiDirection;
+			//do nothing
 		}
 
 		return *this;
