@@ -1,6 +1,7 @@
 #ifndef POSITION_PROFIT_MGR_H
 #define POSITION_PROFIT_MGR_H
 
+#include <string.h>
 #include <vector>
 #include <map>
 #include "stdafx.h"
