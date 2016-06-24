@@ -5,7 +5,7 @@
 #include <memory>
 #include <list>
 #include <vector>
-#include "AP_Mgr.h"
+#include "PPMgr.h"
 #include "Order.h"
 #include "TickWrapper.h"
 #include "KData.h"
@@ -18,7 +18,7 @@ public:
 	virtual bool tryInvoke(const std::vector<TickWrapper>& data, TickWrapper& info, OrderVec& order) = 0;
 	virtual bool tryInvoke(const std::vector<TickWrapper>& tickdata, const std::vector<KData>& data, const std::vector<TickWrapper>& curmindata, TickWrapper& info, OrderVec& order) = 0;
 
-	virtual void BindWithAccount(AP::AccountDetailMgr*) = 0;
+	virtual void BindWithAccount(PP::PositionProfitMgr*) = 0;
 };
 
 
@@ -56,7 +56,7 @@ public:
 			return false;
 	}
 
-	virtual void BindWithAccount(AP::AccountDetailMgr* mgr){
+	virtual void BindWithAccount(PP::PositionProfitMgr* mgr){
 		m_positionCtl->BindAccount(mgr);
 	}
 

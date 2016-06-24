@@ -28,7 +28,6 @@
 BaseClientSession::BaseClientSession(const std::string& userId)
 : m_userId(userId)
 , m_isTrading(false)
-, m_detailMgr(std::unique_ptr<AP::AccountDetailMgr>(new AP::AccountDetailMgr()))
 , m_PPMgr(std::unique_ptr<PPMgr>(new PPMgr()))
 , m_total_vol(0)
 , m_ReleaseingCtpAccount(false)
@@ -69,7 +68,7 @@ bool BaseClientSession::Init_CTP(){
 	CancelOrderCallback OnCancelOrder_Callback = [](CThostFtdcInputOrderActionField *pInputOrderAction, CThostFtdcRspInfoField *pRspInfo){};
 
 	m_trade_spi = new CtpTradeSpi(m_trade_api, meta.m_BrokerId.c_str(), meta.m_UserId.c_str(), meta.m_Password.c_str(), \
-		Config::Instance()->ProductName().c_str(), *(m_detailMgr.get()), *(m_PPMgr.get()), onRtnOrder_Callback, \
+		Config::Instance()->ProductName().c_str(), *(m_PPMgr.get()), onRtnOrder_Callback, \
 		OnRtnTrade_Callback, OnCancelOrder_Callback);
 
 	m_trade_api->RegisterSpi((CThostFtdcTraderSpi*)m_trade_spi);
@@ -157,7 +156,7 @@ bool BaseClientSession::StartTrade(const std::string& instru, const std::string&
 	if (std::find(meta.m_Instruments.begin(), meta.m_Instruments.end(), instru) != meta.m_Instruments.end()){
 		auto strategyPtr = TriggerFactory::Instance()->GetTrigger(m_userId, strategyName);
 		if (strategyPtr){
-			strategyPtr->BindWithAccount(m_detailMgr.get());
+			strategyPtr->BindWithAccount(m_PPMgr.get());
 			MdProcessorPool::getInstance()->AddProcessor(instru, strategyPtr, this);
 			m_runningInstrument = instru;
 			m_runningStrategy = strategyName;

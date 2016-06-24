@@ -95,7 +95,7 @@ namespace PP {
 	}
 
 
-	void PositionProfitMgr::PushOrder(const CThostFtdcOrderField& orderField){
+	bool PositionProfitMgr::PushOrder(const CThostFtdcOrderField& orderField){
 		bool IsInsertOrder = false;
 		bool IsfinishOrder = orderField.OrderStatus == THOST_FTDC_OST_AllTraded;
 		bool IsCancelled = orderField.OrderStatus == THOST_FTDC_OST_Canceled;
@@ -157,9 +157,8 @@ namespace PP {
 				m_accountInfo.Available += margin;
 			}
 		}
-		else{
-			return;
-		}
+		
+		return IsInsertOrder;
 	}
 
 
@@ -245,25 +244,25 @@ namespace PP {
 		return newPosInfo;
 	}
 
-	void PositionProfitMgr::SetAccountInfo(const CThostFtdcTradingAccountField& info){
+	void PositionProfitMgr::SetAccountInfo(const CThostFtdcTradingAccountField& info) {
 		memcpy(&m_accountInfo, &info, sizeof(CThostFtdcTradingAccountField));
 	}
 
-	void PositionProfitMgr::PushInvestorPosition(const CThostFtdcInvestorPositionField& posInfo){
+	void PositionProfitMgr::PushInvestorPosition(const CThostFtdcInvestorPositionField& posInfo) {
 		m_posFieldMap[posInfo.InstrumentID] += posInfo;
 	}
 
-	void PositionProfitMgr::PushInvestorPositionDetail(const CThostFtdcInvestorPositionDetailField& posDetail){
+	void PositionProfitMgr::PushInvestorPositionDetail(const CThostFtdcInvestorPositionDetailField& posDetail) {
 
 	}
 
-	size_t PositionProfitMgr::GetUnclosedPosition(const std::string& instrumentId, TThostFtdcDirectionType type){
+	size_t PositionProfitMgr::GetUnclosedPosition(const std::string& instrumentId, TThostFtdcDirectionType type) const{
 		if (m_posFieldMap.find(instrumentId) != m_posFieldMap.end()){
 			if (type == THOST_FTDC_D_Buy){
-				return m_posFieldMap[instrumentId].GetLongPos().Position;
+				return m_posFieldMap.at(instrumentId).GetLongPos().Position;
 			}
 			else if (type == THOST_FTDC_D_Sell){
-				return m_posFieldMap[instrumentId].GetShortPos().Position;
+				return m_posFieldMap.at(instrumentId).GetShortPos().Position;
 			}
 			else{
 				assert(false);
@@ -275,13 +274,13 @@ namespace PP {
 		}
 	}
 
-	size_t PositionProfitMgr::GetYDUnclosedPosition(const std::string& instrumentId, TThostFtdcDirectionType type){
+	size_t PositionProfitMgr::GetYDUnclosedPosition(const std::string& instrumentId, TThostFtdcDirectionType type) const{
 		if (m_posFieldMap.find(instrumentId) != m_posFieldMap.end()){
 			if (type == THOST_FTDC_D_Buy){
-				return m_posFieldMap[instrumentId].GetLongPos().YdPosition;
+				return m_posFieldMap.at(instrumentId).GetLongPos().YdPosition;
 			}
 			else if (type == THOST_FTDC_D_Sell){
-				return m_posFieldMap[instrumentId].GetShortPos().YdPosition;
+				return m_posFieldMap.at(instrumentId).GetShortPos().YdPosition;
 			}
 			else{
 				assert(false);
@@ -293,19 +292,19 @@ namespace PP {
 		}
 	}
 
-	double PositionProfitMgr::GetAvailableMoney(){
+	double PositionProfitMgr::GetAvailableMoney() const{
 		return m_accountInfo.Available;
 	}
 
-	double PositionProfitMgr::GetFrozenCommission(){
+	double PositionProfitMgr::GetFrozenCommission() const{
 		return m_accountInfo.FrozenCommission;
 	}
 
-	double PositionProfitMgr::GetUsedMargin(){
+	double PositionProfitMgr::GetUsedMargin() const{
 		return m_accountInfo.CurrMargin;
 	}
 
-	std::string PositionProfitMgr::ToString(){
+	std::string PositionProfitMgr::ToString() const{
 		std::stringstream result;
 		result << "$AccountInfo =>" << std::endl;
 		result << CommonUtils::ConvertAccountInfoToString(m_accountInfo) << std::endl << std::endl;
@@ -317,6 +316,14 @@ namespace PP {
 			result << std::endl;
 		}
 		
+		return result.str();
+	}
+
+	std::string PositionProfitMgr::PositionOfInstruments() const{
+		std::stringstream result;
+		for (auto item : m_posFieldMap){
+			result << item.first << " Long:" << item.second.GetLongPos().Position << " Short:" << item.second.GetShortPos().Position << "\n";
+		}
 		return result.str();
 	}
 }

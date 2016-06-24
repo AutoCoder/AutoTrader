@@ -10,9 +10,6 @@
 
 class IPositionControl;
 class Order;
-namespace AP{
-	class AccountDetailMgr;
-};
 
 namespace PP{
 	class PositionProfitMgr;
@@ -95,7 +92,6 @@ class CtpTradeSpi : public CThostFtdcTraderSpi
 public:
 	CtpTradeSpi(CThostFtdcTraderApi* pUserApi,
 		const char * brokerID, const char* userID, const char* password, const char* prodName,
-		AP::AccountDetailMgr& admgr,
 		PPMgr& ppmgr,
 		RtnOrderCallback onRtnOrderCallback,
 		RtnTradeCallback onRtnTradeCallback,
@@ -224,7 +220,6 @@ private:
 	RtnOrderCallback									m_OnRtnOrder_callback;
 	RtnTradeCallback									m_OnRtnTrade_callback;
 	CancelOrderCallback									m_OnCancelOrder_callback;
-	AP::AccountDetailMgr&								m_account_detail_mgr;
 	PPMgr&												m_ppmgr;
 	CThostFtdcTraderApi*								pUserApi;
 	TradeThreadStateChangedHandler						m_stateChangeHandler;

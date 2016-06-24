@@ -1,6 +1,6 @@
 #include "Pos20Precent.h"
 #include "Order.h"
-#include "AP_Mgr.h"
+#include "PPMgr.h"
 #include "crossplatform.h"
 
 Pos20Precent::Pos20Precent()
@@ -9,65 +9,56 @@ Pos20Precent::Pos20Precent()
 }
 
 bool Pos20Precent::CompleteOrders(OrderVec& orders){
-	if (!m_detailMgr && orders.size() == 1)
+	if (!m_ppMgr && orders.size() == 1)
 		return false;
 
 	Order& ord = orders[0];
+	size_t long_pos = m_ppMgr->GetUnclosedPosition(ord.GetInstrumentId(), THOST_FTDC_D_Buy);
+	size_t short_pos = m_ppMgr->GetUnclosedPosition(ord.GetInstrumentId(), THOST_FTDC_D_Sell);
+	size_t long_ydpos = m_ppMgr->GetYDUnclosedPosition(ord.GetInstrumentId(), THOST_FTDC_D_Buy);
+	size_t short_ydpos = m_ppMgr->GetYDUnclosedPosition(ord.GetInstrumentId(), THOST_FTDC_D_Sell);
+	double pos_money = m_ppMgr->GetFrozenCommission() + m_ppMgr->GetUsedMargin();
+	double available = m_ppMgr->GetAvailableMoney();
+	double purchaseMoney = (available + pos_money) * 0.2; // 20% up-limit line
 
-	double posMoney = 0.0;
-	double available = 0.0;
-
-	AP::Direction posDirection = AP::None;
-	m_detailMgr->getPosition(posMoney, posDirection, available);
-
-	int subPos = 0;
-	int subtodayPos = 0;
-	int subydPos = 0;
-	AP::Direction subtodayDirection = AP::Long;
-	AP::Direction subydDirection = AP::Long;
-	subPos = m_detailMgr->getPositionVolume(ord.GetInstrumentId(), subtodayDirection, subtodayPos, subydDirection, subydPos);
-
-	//如果订单买卖方向与持仓买卖方向一致,或者仓位为0。
-	if (ord.GetExchangeDirection() == posDirection || posMoney < std::numeric_limits<double>::epsilon()){
-		if (posMoney > available * 0.2){
-			//仓位已经超过2成， 则放弃该订单
+	auto gen_open_order = [&ord](double available, double pos_money, double purchaseMoney) -> bool {
+		if (purchaseMoney > available / 4) // >20%
 			return false;
+
+		int vol = purchaseMoney / ord.GetRefExchangePrice();
+		if (vol == 0)
+			return false;
+
+		ord.SetCombOffsetFlagType(THOST_FTDC_OF_Open);
+		ord.SetVolume(vol);
+		return true;
+	};
+
+	if (long_pos == short_pos){  // current position is 0, open position
+		return gen_open_order(available, pos_money, purchaseMoney);
+	}
+	else{ // close position
+
+		TThostFtdcDirectionType pos_direction = long_pos < short_pos ? THOST_FTDC_D_Sell : THOST_FTDC_D_Buy;
+		if (ord.GetExchangeDirection() == pos_direction){
+			return gen_open_order(available, pos_money, purchaseMoney);
 		}
 		else{
-			double purchaseMoney = available*0.2 - posMoney;
-			int vol = purchaseMoney / ord.GetRefExchangePrice();
-			if (vol == 0)
-				return false;
+			// if yd pos is empty, use THOST_FTDC_OF_CloseToday
+			// if yd pos is not empty, use THOST_FTDC_OF_Close
+			char combOffsetFlag = (short_ydpos == long_ydpos ? THOST_FTDC_OF_CloseToday : THOST_FTDC_OF_Close);
 
-			ord.SetCombOffsetFlagType(THOST_FTDC_OF_Open);
-			ord.SetVolume(vol);
+			if (pos_direction == THOST_FTDC_D_Sell){
+				ord.SetCombOffsetFlagType(combOffsetFlag);
+				ord.SetVolume(short_pos - long_pos);
+			}
+			else{ // THOST_FTDC_D_Buy
+				ord.SetCombOffsetFlagType(combOffsetFlag);
+				ord.SetVolume(long_pos - short_pos);
+			}
+
 			return true;
 		}
-	}
-	else{
-		if (subydPos != 0 && subtodayPos != 0){
-			if (subtodayDirection == subydDirection){
-				ord.SetCombOffsetFlagType(THOST_FTDC_OF_Close);
-				ord.SetVolume(subydPos + subtodayPos);
-			}
-			else{
-				ord.SetCombOffsetFlagType(THOST_FTDC_OF_Close);
-				ord.SetVolume(std::abs(subydPos - subtodayPos));
-			}
-		}
-		else{
-			if (subtodayPos != 0){
-				ord.SetCombOffsetFlagType(THOST_FTDC_OF_CloseToday);
-				ord.SetVolume(subtodayPos);
-			}
-			else if (subydPos != 0){
-				ord.SetCombOffsetFlagType(THOST_FTDC_OF_Close);
-				ord.SetVolume(subydPos);
-			}
-			else{ // subydPos == 0 && subtodayPos == 0
-				return false;
-			}
-		}
-		return true;
+
 	}
 }

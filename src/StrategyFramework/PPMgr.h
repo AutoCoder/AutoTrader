@@ -62,7 +62,7 @@ namespace PP {
 		PositionProfitMgr();
 		~PositionProfitMgr();
 
-		void PushOrder(const CThostFtdcOrderField& orderField);
+		bool PushOrder(const CThostFtdcOrderField& orderField);
 		void PushTrade(const CThostFtdcTradeField& tradeField);
 
 		void SetAccountInfo(const CThostFtdcTradingAccountField& info);
@@ -75,15 +75,18 @@ namespace PP {
 		*	///Âô
 		*	#define THOST_FTDC_D_Sell '1'
 		*/
-		size_t GetUnclosedPosition(const std::string& instrumentId, TThostFtdcDirectionType type);
-		size_t GetYDUnclosedPosition(const std::string& instrumentId, TThostFtdcDirectionType type);
-		double GetAvailableMoney();
-		double GetFrozenCommission();
-		double GetUsedMargin();
-		double GetPositionProfit();
+		size_t GetUnclosedPosition(const std::string& instrumentId, TThostFtdcDirectionType type) const ;
+		size_t GetYDUnclosedPosition(const std::string& instrumentId, TThostFtdcDirectionType type) const;
+		double GetAvailableMoney() const ;
+		double GetFrozenCommission() const ;
+		double GetUsedMargin() const ;
+		double GetPositionProfit() const ;
 
 		void   SetAccountInfoInitialized(bool init = true) { m_acccountInfoInitialized = init; };
-		std::string ToString();
+
+		std::string ToString() const ;
+		std::string PositionOfInstruments() const;
+		const std::vector<CThostFtdcOrderField>& GetAllOrders() const { return m_orderFieldVec; };
 	private:
 		CThostFtdcInvestorPositionField ToPositionInfo(const CThostFtdcTradeField& newestTrade);
 		

@@ -67,10 +67,10 @@ bool ClientSession::Init_CTP()
 	CancelOrderCallback OnCancelOrder_Callback = std::bind(&ClientSession::OnCancelOrder, this, std::placeholders::_1, std::placeholders::_2);
 
 	m_trade_spi = new CtpTradeSpi(m_trade_api, meta.m_BrokerId.c_str(), meta.m_UserId.c_str(), meta.m_Password.c_str(), \
-		Config::Instance()->ProductName().c_str(), *(m_detailMgr.get()), *(m_PPMgr.get()), \
+		Config::Instance()->ProductName().c_str(), *(m_PPMgr.get()), \
 		onRtnOrder_Callback, OnRtnTrade_Callback, OnCancelOrder_Callback);
 
-	m_trade_api->RegisterSpi((CThostFtdcTraderSpi*)m_trade_spi);
+	m_trade_api->RegisterSpi((CThostFtdcTraderSpi*)m_trade_spi); 
 	m_trade_api->SubscribePublicTopic(THOST_TERT_RESTART);
 	m_trade_api->SubscribePrivateTopic(THOST_TERT_RESTART);
 	m_trade_api->RegisterFront(const_cast<char*>(Config::Instance()->CtpTradeFront().c_str()));
@@ -155,16 +155,7 @@ void ClientSession::SendTickToClient(const TickWrapper& tick){
 }
 
 void ClientSession::SendPostionInfoToClient(){
-	double posMoney = 0.0;
-	double balance = 0.0;
-	AP::Direction posDirection = AP::Long;
-	m_detailMgr->getPosition(posMoney, posDirection, balance);
-	std::string instru = m_detailMgr->getInstrumentList();
-	int todayPos = 0;    AP::Direction todayDirection = AP::Long;
-	int ydPos = 0;       AP::Direction ydDirection = AP::Long;
-
-	int posVol = m_detailMgr->getPositionVolume(instru, todayDirection, todayPos, ydDirection, ydPos);
-	Transmission::Utils::SendPositionInfo(m_session, balance, posMoney, m_detailMgr->getPositionOfInstruments());
+	Transmission::Utils::SendPositionInfo(m_session, m_PPMgr->GetAvailableMoney(), m_PPMgr->GetFrozenCommission() + m_PPMgr->GetUsedMargin(), m_PPMgr->PositionOfInstruments());
 }
 
 void ClientSession::OnAccountInitFinished(){

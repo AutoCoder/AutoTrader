@@ -23,10 +23,6 @@ namespace PP{
 	class PositionProfitMgr;
 }
 
-namespace AP{
-	class AccountDetailMgr;
-}
-
 namespace Account{
 	struct Meta;
 }
@@ -64,7 +60,6 @@ protected:
 protected:
 	std::string										m_userId;
 	std::atomic<bool>                               m_isTrading; // access by thread-OrderExecutor and thread-ActionQueueInvoker
-	std::unique_ptr<AP::AccountDetailMgr>           m_detailMgr;
 	typedef PP::PositionProfitMgr PPMgr;
 	std::unique_ptr<PPMgr>                          m_PPMgr;
 	int                                             m_total_vol;
