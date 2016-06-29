@@ -4,6 +4,7 @@
 #include "ThostFtdcUserApiDataType.h"
 #include "ThostFtdcUserApiStruct.h"
 #include <map>
+#include "stdafx.h"
 
 namespace Instrument{
 

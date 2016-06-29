@@ -33,6 +33,4 @@ LINK_DIRECTORIES(${LINK_LIB_DIR} ${EXECUTABLE_OUTPUT_PATH} ${BOOST_DIR}/stage/li
 
 ADD_EXECUTABLE(AutoTrader ${SRC_LIST})
 
-ADD_DEPENDENCIES(AutoTrader lib_json Common StrategyFramework)
-
 TARGET_LINK_LIBRARIES(AutoTrader dl lib_json libmysql thostmduserapi thosttraderapi Common StrategyFramework boost_filesystem boost_system)
