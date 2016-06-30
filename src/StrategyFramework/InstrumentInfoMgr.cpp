@@ -1,8 +1,10 @@
-#include "stdafx.h"
-#include "InstrumentInfoMgr.h"
-
-#include "json/json.h"
 #include <assert.h>
+#include <fstream>
+#include "json/json.h"
+
+#include "stdafx.h"
+#include "crossplatform.h"
+#include "InstrumentInfoMgr.h"
 
 namespace Instrument{
 
@@ -49,6 +51,7 @@ namespace Instrument{
 	InformationMgr::InformationMgr()
 	{
 		m_InfoDict.clear();
+		unserialize();
 	}
 
 
@@ -101,7 +104,7 @@ namespace Instrument{
 		for (auto instru : m_InfoDict){
 			Json::Value instru_info;
 			Json::Value instru_basic_info, margin_info, commission_info;
-			instru.second.InstruField.ExchangeID
+			
 
 			instru_basic_info[kExchangeID] = instru.second.InstruField.ExchangeID;
 			instru_basic_info[kDeliveryYear] = instru.second.InstruField.DeliveryYear;
@@ -133,9 +136,10 @@ namespace Instrument{
 
 			root[instru.first] = instru_info;
 		}
-		std::ofstream jsonfile(FactorSettingFilePath);
-		Json::StreamWriter writer;
-		writer.write(root, &jsonfile);
+		std::ofstream out_json_file(FactorSettingFilePath);
+		Json::StyledStreamWriter writer;
+		writer.write(out_json_file, root);
+		out_json_file.close();
 	}
 	
 	void InformationMgr::unserialize(){
@@ -143,46 +147,48 @@ namespace Instrument{
 
 		Json::Value root;
 
-		std::ifstream jsonfile(FactorSettingFilePath);
+		std::ifstream in_json_file(FactorSettingFilePath);
 
 
-		if (reader.parse(jsonfile, root, false) == false || root.type()==Json::nullValue){
+		if (reader.parse(in_json_file, root, false) == false || root.type()==Json::nullValue){
 			m_isSetup = false;
 			return;	
 		}
 
 		m_InfoDict.clear();
 
-		for (auto key : root.Members){
+		for (auto key : root.getMemberNames()){
 			Information instu_info;
-			strcpy(instu_info.InstruField.InstrumentID, key.c_str());
-			strcpy(instu_info.InstruField.ExchangeID, root[key][kExchangeID].c_str());
-			strcpy(instu_info.InstruField.DeliveryYear, root[key][kDeliveryYear].c_str());
-			strcpy(instu_info.InstruField.DeliveryMonth, root[key][kDeliveryMonth].c_str());
-			instu_info.InstruField.VolumeMultiple = root[key][kVolumeMultiple];
-			strcpy(instu_info.InstruField.OpenDate, root[key][kOpenDate].c_str());
-			strcpy(instu_info.InstruField.ExpireDate, root[key][kExpireDate].c_str());
-			instu_info.InstruField.IsTrading = root[key][kIsTrading];
-			instu_info.InstruField.PositionType = root[key][kPositionType];
+			STRCPY(instu_info.InstruField.InstrumentID, key.c_str());
+			STRCPY(instu_info.InstruField.ExchangeID, root[key][kExchangeID].asString().c_str());
+			instu_info.InstruField.DeliveryYear = root[key][kDeliveryYear].asInt();
+			instu_info.InstruField.DeliveryMonth = root[key][kDeliveryMonth].asInt();
+			instu_info.InstruField.VolumeMultiple = root[key][kVolumeMultiple].asInt();
+			STRCPY(instu_info.InstruField.OpenDate, root[key][kOpenDate].asString().c_str());
+			STRCPY(instu_info.InstruField.ExpireDate, root[key][kExpireDate].asString().c_str());
+			instu_info.InstruField.IsTrading = root[key][kIsTrading].asInt();
+			instu_info.InstruField.PositionType = root[key][kPositionType].asUInt();
 
-			strcpy(instu_info.MgrRateField.BrokerID, root[key][kBrokerID].c_str());
-			strcpy(instu_info.MgrRateField.InvestorID, root[key][kInvestorID].c_str());
-			instu_info.MgrRateField.HedgeFlag = root[key][kHedgeFlag];
-			instu_info.MgrRateField.LongMarginRatioByMoney = root[key][kLongMarginRatioByMoney];
-			instu_info.MgrRateField.LongMarginRatioByVolume = root[key][kLongMarginRatioByVolume];
-			instu_info.MgrRateField.ShortMarginRatioByMoney = root[key][kShortMarginRatioByMoney];
-			instu_info.MgrRateField.ShortMarginRatioByVolume = root[key][kShortMarginRatioByVolume];
+			STRCPY(instu_info.MgrRateField.BrokerID, root[key][kBrokerID].asString().c_str());
+			STRCPY(instu_info.MgrRateField.InvestorID, root[key][kInvestorID].asString().c_str());
+			instu_info.MgrRateField.HedgeFlag = root[key][kHedgeFlag].asUInt();
+			instu_info.MgrRateField.LongMarginRatioByMoney = root[key][kLongMarginRatioByMoney].asDouble();
+			instu_info.MgrRateField.LongMarginRatioByVolume = root[key][kLongMarginRatioByVolume].asDouble();
+			instu_info.MgrRateField.ShortMarginRatioByMoney = root[key][kShortMarginRatioByMoney].asDouble();
+			instu_info.MgrRateField.ShortMarginRatioByVolume = root[key][kShortMarginRatioByVolume].asDouble();
 
-			instu_info.ComRateField.OpenRatioByMoney = root[key][kOpenRatioByMoney];
-			instu_info.ComRateField.OpenRatioByVolume = root[key][kOpenRatioByVolume];
-			instu_info.ComRateField.CloseRatioByMoney = root[key][kCloseRatioByMoney];
-			instu_info.ComRateField.CloseRatioByVolume = root[key][kCloseRatioByVolume];
-			instu_info.ComRateField.CloseTodayRatioByMoney = root[key][kCloseTodayRatioByMoney];
-			instu_info.ComRateField.CloseTodayRatioByVolume = root[key][kCloseTodayRatioByVolume];
+			instu_info.ComRateField.OpenRatioByMoney = root[key][kOpenRatioByMoney].asDouble();
+			instu_info.ComRateField.OpenRatioByVolume = root[key][kOpenRatioByVolume].asDouble();
+			instu_info.ComRateField.CloseRatioByMoney = root[key][kCloseRatioByMoney].asDouble();
+			instu_info.ComRateField.CloseRatioByVolume = root[key][kCloseRatioByVolume].asDouble();
+			instu_info.ComRateField.CloseTodayRatioByMoney = root[key][kCloseTodayRatioByMoney].asDouble();
+			instu_info.ComRateField.CloseTodayRatioByVolume = root[key][kCloseTodayRatioByVolume].asDouble();
 
 			Add(key, instu_info);
 		}
+		
 		m_isSetup = true;
+		in_json_file.close();
 	}
 }
 
