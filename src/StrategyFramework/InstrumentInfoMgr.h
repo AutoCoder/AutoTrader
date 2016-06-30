@@ -75,9 +75,14 @@ namespace Instrument{
 		bool SetMarginRate(const std::string& instrumentID, const CThostFtdcInstrumentMarginRateField& mgrRate);
 		bool SetCommissionRate(const std::string& instrumentID, const CThostFtdcInstrumentCommissionRateField& comRate);
 		std::string AllInstruments() const;
+
+		void serialize() const;
+	private:
+		void unserialize();
 	private:
 		//the pair-first is instrument Name
 		std::map< std::string, Information > m_InfoDict;
+		bool m_isSetup;
 	};
 
 	//InformationMgr& GetManager();

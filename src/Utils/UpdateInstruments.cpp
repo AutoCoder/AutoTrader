@@ -23,7 +23,7 @@ int main(int argc, const char* argv[]){
 	trade_api->SubscribePrivateTopic(THOST_TERT_RESTART);
 	trade_api->RegisterFront(const_cast<char*>(Config::Instance()->CtpTradeFront().c_str()));
 	trade_api->Init();
-	SYNC_PRINT << "Start to update the factor of instruments  ";
+	SYNC_PRINT << "Start to update the factor of instruments";
 
 
 	// todo : InstrumentInfoMgr serialize to disk
