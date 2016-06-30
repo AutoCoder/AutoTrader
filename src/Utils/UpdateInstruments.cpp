@@ -25,7 +25,7 @@ int main(int argc, const char* argv[]){
 	trade_api->Init();
 	SYNC_PRINT << "Start to update the factor of instruments";
 
-
-	// todo : InstrumentInfoMgr serialize to disk
+	trade_spi->WaitQueryEnd();
+	InstrumentManager.serialize();
 	return 0;
 }
