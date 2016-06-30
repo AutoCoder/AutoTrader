@@ -151,7 +151,9 @@ void CtpTradeSpi::OnRspQryInstrumentMarginRate(CThostFtdcInstrumentMarginRateFie
 		SYNC_PRINT << "[Trade] Reponse | failed to obtain the margin rate field for " << pInstrumentMarginRate->InstrumentID;
 	}
 
-	NotifyQueryEnd();
+	if (bIsLast){
+		m_stateChangeHandler.OnLastRspQryInstrumentMarginRate();
+	}
 }
 
 ///请求查询合约手续费率
@@ -179,7 +181,9 @@ void CtpTradeSpi::OnRspQryInstrumentCommissionRate(CThostFtdcInstrumentCommissio
 		SYNC_PRINT << "[Trade] Reponse | failed to obtain the commission rate field for " << pInstrumentCommissionRate->InstrumentID;
 	}
 
-	NotifyQueryEnd();
+	if (bIsLast){
+		m_stateChangeHandler.OnLastRspQryInstrumentCommissionRate();
+	}
 }
 
 ///请求查询期权交易成本
