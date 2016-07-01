@@ -26,7 +26,7 @@ int main(int argc, const char* argv[]){
 	trade_api->Init();
 	SYNC_PRINT << "Start to update the factor of instruments";
 
-	trade_spi->WaitQueryEnd();
+	trade_spi->WaitQueryFinshed();
 	InstrumentManager.serialize();
 	return 0;
 }

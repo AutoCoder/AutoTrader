@@ -40,16 +40,17 @@ class CtpTradeSpi : public CThostFtdcTraderSpi
 			for(auto iter = InstrumentManager.begin(); iter != InstrumentManager.end(); ++iter){
 				sleep(1000);
 				m_TradeUserSpiPtr->ReqQryInstrumentMarginRate(iter->first);
-				m_TradeUserSpiPtr->WaitQueryEnd();
+				m_TradeUserSpiPtr->WaitQueryResponsed();
 			}
 
 			for(auto iter = InstrumentManager.begin(); iter != InstrumentManager.end(); ++iter){
 				sleep(1000);
 				m_TradeUserSpiPtr->ReqQryInstrumentCommissionRate(iter->first);
-				m_TradeUserSpiPtr->WaitQueryEnd();
+				m_TradeUserSpiPtr->WaitQueryResponsed();
 			}
 
 			SYNC_PRINT << "[Trade] Finish all margin & commission querying.";
+			m_TradeUserSpiPtr->NotifyQueryFinished();
 		}
 
 	private:
@@ -61,9 +62,14 @@ public:
 		const char * brokerID, const char* userID, const char* password, const char* prodName);
         virtual	~CtpTradeSpi();
 
-	void WaitQueryEnd(){
-		std::unique_lock<std::mutex> lk(m_mtx);
-		m_con.wait(lk, [this]() -> bool { return !m_querying.load(); });
+	void WaitQueryResponsed(){
+		std::unique_lock<std::mutex> lk(m_mtx1);
+		m_con1.wait(lk, [this]() -> bool { return !m_hanging.load(); });
+	}
+
+	void WaitQueryFinshed(){
+		std::unique_lock<std::mutex> lk(m_mtx2);
+		m_con2.wait(lk, [this]() -> bool { return m_isfinished.load(); });
 	}
 
 private:
@@ -109,9 +115,14 @@ private:
 
 	bool IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo);
 
-	void NotifyQueryEnd(){
-		m_querying.store(false);
-		m_con.notify_all();
+	void NotifyQueryResponse(){
+		m_hanging.store(false);
+		m_con1.notify_all();
+	}
+
+	void NotifyQueryFinished(){
+		m_isfinished.store(true);
+		m_con2.notify_all();
 	}
 
 private:
@@ -124,9 +135,12 @@ private:
 	char												m_orderRef[13];
 
 private:
-	std::mutex											m_mtx;
-	std::condition_variable								m_con;
-	std::atomic<bool>									m_querying;
+	std::mutex											m_mtx1;
+	std::mutex											m_mtx2;
+	std::condition_variable								m_con1;
+	std::condition_variable								m_con2;
+	std::atomic<bool>									m_hanging;
+	std::atomic<bool>									m_isfinished;
 	
 	int              									m_requestId;
 	TradeThreadStateChangedHandler						m_stateChangeHandler;

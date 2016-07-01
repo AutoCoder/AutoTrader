@@ -5,9 +5,10 @@
 CtpTradeSpi::CtpTradeSpi(CThostFtdcTraderApi* p, const char * brokerID, const char* userID, const char* password, const char* prodname)
 	: m_frontID(-1)
 	, m_sessionID(-1)
-	, m_querying(true)
-	, m_stateChangeHandler(this)
+	, m_hanging(false)
+	, m_isfinished(false)
 	, m_requestId(0)
+	, m_stateChangeHandler(this)
 	, pUserApi(p)
 {
 	STRCPY(m_brokerID, brokerID);
@@ -127,6 +128,7 @@ bool CtpTradeSpi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo)
 ///请求查询合约保证金率
 void CtpTradeSpi::ReqQryInstrumentMarginRate(const std::string& instrumentId)
 {
+	m_hanging.store(true);
 	CThostFtdcQryInstrumentMarginRateField req;
 	memset(&req, 0, sizeof(req));
 	STRCPY(req.BrokerID, m_brokerID);
@@ -151,12 +153,13 @@ void CtpTradeSpi::OnRspQryInstrumentMarginRate(CThostFtdcInstrumentMarginRateFie
 		SYNC_PRINT << "[Trade] Reponse | failed to obtain the margin rate field for " << pInstrumentMarginRate->InstrumentID;
 	}
 
-	NotifyQueryEnd();
+	NotifyQueryResponse();
 }
 
 ///请求查询合约手续费率
 void CtpTradeSpi::ReqQryInstrumentCommissionRate(const std::string& instrumentId)
 {
+	m_hanging.store(true);
 	CThostFtdcQryInstrumentCommissionRateField req;
 
 	memset(&req, 0, sizeof(req));
@@ -180,12 +183,13 @@ void CtpTradeSpi::OnRspQryInstrumentCommissionRate(CThostFtdcInstrumentCommissio
 		SYNC_PRINT << "[Trade] Reponse | failed to obtain the commission rate field for " << pInstrumentCommissionRate->InstrumentID;
 	}
 
-	NotifyQueryEnd();
+	NotifyQueryResponse();
 }
 
 ///请求查询期权交易成本
 void CtpTradeSpi::ReqQryOptionInstrTradeCost(const std::string& instrumentId)
 {
+
 	CThostFtdcQryOptionInstrTradeCostField req;
 
 	memset(&req, 0, sizeof(req));
