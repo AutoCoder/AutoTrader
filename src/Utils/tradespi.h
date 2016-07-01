@@ -37,19 +37,7 @@ class CtpTradeSpi : public CThostFtdcTraderSpi
 
 		//step 4
 		void OnLastRspQryInstrument(){
-			for(auto iter = InstrumentManager.begin(); iter != InstrumentManager.end(); ++iter){
-				sleep(1000);
-				m_TradeUserSpiPtr->ReqQryInstrumentMarginRate(iter->first);
-				m_TradeUserSpiPtr->WaitQueryResponsed();
-			}
 
-			for(auto iter = InstrumentManager.begin(); iter != InstrumentManager.end(); ++iter){
-				sleep(1000);
-				m_TradeUserSpiPtr->ReqQryInstrumentCommissionRate(iter->first);
-				m_TradeUserSpiPtr->WaitQueryResponsed();
-			}
-
-			SYNC_PRINT << "[Trade] Finish all margin & commission querying.";
 			m_TradeUserSpiPtr->NotifyQueryFinished();
 		}
 
@@ -101,6 +89,7 @@ private:
 
 	void ReqQryInstrument_all();
 
+public:
 	///请求查询合约保证金率
 	void ReqQryInstrumentMarginRate(const std::string& instrumentId);
 
@@ -113,12 +102,12 @@ private:
 	///请求查询期权合约手续费
 	void ReqQryOptionInstrCommRate(const std::string& instrumentId);
 
-	bool IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo);
-
 	void NotifyQueryResponse(){
 		m_hanging.store(false);
 		m_con1.notify_all();
 	}
+private:
+	bool IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo);
 
 	void NotifyQueryFinished(){
 		m_isfinished.store(true);

@@ -27,6 +27,21 @@ int main(int argc, const char* argv[]){
 	SYNC_PRINT << "Start to update the factor of instruments";
 
 	trade_spi->WaitQueryFinshed();
+
+	for(auto iter = InstrumentManager.begin(); iter != InstrumentManager.end(); ++iter){
+		sleep(1000);
+		trade_spi->ReqQryInstrumentMarginRate(iter->first);
+		trade_spi->WaitQueryResponsed();
+	}
+
+	for(auto iter = InstrumentManager.begin(); iter != InstrumentManager.end(); ++iter){
+		sleep(1000);
+		trade_spi->ReqQryInstrumentCommissionRate(iter->first);
+		trade_spi->WaitQueryResponsed();
+	}
+
+	SYNC_PRINT << "[Trade] Finish all margin & commission querying.";
+	
 	InstrumentManager.serialize();
 	return 0;
 }
