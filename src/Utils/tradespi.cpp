@@ -3,12 +3,12 @@
 
 
 CtpTradeSpi::CtpTradeSpi(CThostFtdcTraderApi* p, const char * brokerID, const char* userID, const char* password, const char* prodname)
-	: pUserApi(p)
-	, m_frontID(-1)
+	: m_frontID(-1)
 	, m_sessionID(-1)
-	, m_stateChangeHandler(this)
 	, m_querying(true)
+	, m_stateChangeHandler(this)
 	, m_requestId(0)
+	, pUserApi(p)
 {
 	STRCPY(m_brokerID, brokerID);
 	STRCPY(m_userID, userID);
@@ -151,9 +151,7 @@ void CtpTradeSpi::OnRspQryInstrumentMarginRate(CThostFtdcInstrumentMarginRateFie
 		SYNC_PRINT << "[Trade] Reponse | failed to obtain the margin rate field for " << pInstrumentMarginRate->InstrumentID;
 	}
 
-	if (bIsLast){
-		m_stateChangeHandler.OnLastRspQryInstrumentMarginRate();
-	}
+	NotifyQueryEnd();
 }
 
 ///请求查询合约手续费率
@@ -182,9 +180,7 @@ void CtpTradeSpi::OnRspQryInstrumentCommissionRate(CThostFtdcInstrumentCommissio
 		SYNC_PRINT << "[Trade] Reponse | failed to obtain the commission rate field for " << pInstrumentCommissionRate->InstrumentID;
 	}
 
-	if (bIsLast){
-		m_stateChangeHandler.OnLastRspQryInstrumentCommissionRate();
-	}
+	NotifyQueryEnd();
 }
 
 ///请求查询期权交易成本

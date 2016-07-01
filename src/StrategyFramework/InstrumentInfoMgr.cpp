@@ -4,6 +4,7 @@
 
 #include "stdafx.h"
 #include "crossplatform.h"
+#include "InstrumentInfoMgr.h"
 
 
 namespace Instrument{

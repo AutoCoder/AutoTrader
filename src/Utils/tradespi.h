@@ -122,7 +122,6 @@ private:
 	TThostFtdcFrontIDType								m_frontID;
 	TThostFtdcSessionIDType								m_sessionID;
 	char												m_orderRef[13];
-	CThostFtdcTradingAccountField						m_accountInfo;
 
 private:
 	std::mutex											m_mtx;
@@ -130,8 +129,8 @@ private:
 	std::atomic<bool>									m_querying;
 	
 	int              									m_requestId;
-	CThostFtdcTraderApi*								pUserApi;
 	TradeThreadStateChangedHandler						m_stateChangeHandler;
+	CThostFtdcTraderApi*								pUserApi;
 };
 
 #endif 

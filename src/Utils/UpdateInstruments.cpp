@@ -6,8 +6,9 @@
 #include "crossplatform.h"
 #include "InstrumentInfoMgr.h"
 
+#ifdef WIN32
 #pragma warning(disable:4996)
-
+#endif
 
 int main(int argc, const char* argv[]){
 	auto console = spdlog::stdout_logger_mt("console");
