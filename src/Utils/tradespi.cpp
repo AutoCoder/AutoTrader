@@ -1,6 +1,5 @@
 #include "tradespi.h"
 #include "spdlog/spdlog.h"
-#include "InstrumentInfoMgr.h"
 
 
 CtpTradeSpi::CtpTradeSpi(CThostFtdcTraderApi* p, const char * brokerID, const char* userID, const char* password, const char* prodname)
@@ -126,12 +125,13 @@ bool CtpTradeSpi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo)
 
 
 ///请求查询合约保证金率
-void CtpTradeSpi::ReqQryInstrumentMarginRate()
+void CtpTradeSpi::ReqQryInstrumentMarginRate(const std::string& instrumentId)
 {
 	CThostFtdcQryInstrumentMarginRateField req;
 	memset(&req, 0, sizeof(req));
 	STRCPY(req.BrokerID, m_brokerID);
 	STRCPY(req.InvestorID, m_userID);
+	STRCPY(req.InstrumentID, instrumentId.c_str());
 
 	req.HedgeFlag = THOST_FTDC_HF_Speculation;
 
@@ -155,13 +155,14 @@ void CtpTradeSpi::OnRspQryInstrumentMarginRate(CThostFtdcInstrumentMarginRateFie
 }
 
 ///请求查询合约手续费率
-void CtpTradeSpi::ReqQryInstrumentCommissionRate()
+void CtpTradeSpi::ReqQryInstrumentCommissionRate(const std::string& instrumentId)
 {
 	CThostFtdcQryInstrumentCommissionRateField req;
 
 	memset(&req, 0, sizeof(req));
 	STRCPY(req.BrokerID, m_brokerID);
 	STRCPY(req.InvestorID, m_userID);
+	STRCPY(req.InstrumentID, instrumentId.c_str());
 
 	int ret = pUserApi->ReqQryInstrumentCommissionRate(&req, ++m_requestId);
 	SYNC_PRINT << "[Trade] Request | Query CommissionRate..." << ((ret == 0) ? "Success" : "Fail") << " ret:" << ret;
@@ -183,13 +184,14 @@ void CtpTradeSpi::OnRspQryInstrumentCommissionRate(CThostFtdcInstrumentCommissio
 }
 
 ///请求查询期权交易成本
-void CtpTradeSpi::ReqQryOptionInstrTradeCost()
+void CtpTradeSpi::ReqQryOptionInstrTradeCost(const std::string& instrumentId)
 {
 	CThostFtdcQryOptionInstrTradeCostField req;
 
 	memset(&req, 0, sizeof(req));
 	STRCPY(req.BrokerID, m_brokerID);
 	STRCPY(req.InvestorID, m_userID);
+	STRCPY(req.InstrumentID, instrumentId.c_str());
 
 	req.HedgeFlag = THOST_FTDC_HF_Speculation;
 	int ret = pUserApi->ReqQryOptionInstrTradeCost(&req, ++m_requestId);
@@ -212,13 +214,14 @@ void CtpTradeSpi::OnRspQryOptionInstrTradeCost(CThostFtdcOptionInstrTradeCostFie
 }
 
 ///请求查询期权合约手续费
-void CtpTradeSpi::ReqQryOptionInstrCommRate()
+void CtpTradeSpi::ReqQryOptionInstrCommRate(const std::string& instrumentId)
 {
 	CThostFtdcQryOptionInstrCommRateField req;
 
 	memset(&req, 0, sizeof(req));
 	STRCPY(req.BrokerID, m_brokerID);
 	STRCPY(req.InvestorID, m_userID);
+	STRCPY(req.InstrumentID, instrumentId.c_str());
 
 	int ret = pUserApi->ReqQryOptionInstrCommRate(&req, ++m_requestId);
 	SYNC_PRINT << "[Trade] Request | Query OptionInstrCommRate..." << ((ret == 0) ? "Success" : "Fail") << " ret:" << ret;

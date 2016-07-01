@@ -5,6 +5,7 @@
 #include "ThostFtdcUserApiStruct.h"
 #include <map>
 #include "stdafx.h"
+#include "InstrumentInfoMgr.h"
 
 namespace Instrument{
 
@@ -63,6 +64,9 @@ namespace Instrument{
 	class STRATEGY_API InformationMgr
 	{
 	public:
+		typedef std::map< std::string, Information > InstrumentDict;
+		typedef InstrumentDict::iterator             InstrumentDictIterator;
+		typedef InstrumentDict::const_iterator       InstrumentDictConstIterator;
 		InformationMgr();
 		~InformationMgr();
 
@@ -75,13 +79,15 @@ namespace Instrument{
 		bool SetMarginRate(const std::string& instrumentID, const CThostFtdcInstrumentMarginRateField& mgrRate);
 		bool SetCommissionRate(const std::string& instrumentID, const CThostFtdcInstrumentCommissionRateField& comRate);
 		std::string AllInstruments() const;
-
+		InstrumentDictIterator begin() { return m_InfoDict.begin(); } ;
+		InstrumentDictConstIterator end() const { return m_InfoDict.end(); };
 		void serialize() const;
 	private:
 		void unserialize();
 	private:
 		//the pair-first is instrument Name
 		std::map< std::string, Information > m_InfoDict;
+		std::vector< std::string >           m_InfoVec;
 		bool m_isSetup;
 	};
 

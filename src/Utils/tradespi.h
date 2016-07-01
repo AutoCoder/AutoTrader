@@ -6,6 +6,7 @@
 #include <condition_variable>
 #include "crossplatform.h"
 #include "ThostFtdcTraderApi.h"
+#include "InstrumentInfoMgr.h"
 
 class CtpTradeSpi : public CThostFtdcTraderSpi
 {
@@ -36,20 +37,19 @@ class CtpTradeSpi : public CThostFtdcTraderSpi
 
 		//step 4
 		void OnLastRspQryInstrument(){
-			sleep(1000);
-			m_TradeUserSpiPtr->ReqQryInstrumentMarginRate();
-		}
+			for(auto iter = InstrumentManager.begin(); iter != InstrumentManager.end(); ++iter){
+				sleep(1000);
+				m_TradeUserSpiPtr->ReqQryInstrumentMarginRate(iter->first);
+				m_TradeUserSpiPtr->WaitQueryEnd();
+			}
 
-		//step 5
-		void OnLastRspQryInstrumentMarginRate(){
-			sleep(1000);
-			m_TradeUserSpiPtr->ReqQryInstrumentCommissionRate();
-		}
+			for(auto iter = InstrumentManager.begin(); iter != InstrumentManager.end(); ++iter){
+				sleep(1000);
+				m_TradeUserSpiPtr->ReqQryInstrumentCommissionRate(iter->first);
+				m_TradeUserSpiPtr->WaitQueryEnd();
+			}
 
-		//step 6
-		void OnLastRspQryInstrumentCommissionRate(){
-			//initilization Done 
-			m_TradeUserSpiPtr->NotifyQueryEnd();
+			SYNC_PRINT << "[Trade] Finish all margin & commission querying.";
 		}
 
 	private:
@@ -96,16 +96,16 @@ private:
 	void ReqQryInstrument_all();
 
 	///请求查询合约保证金率
-	void ReqQryInstrumentMarginRate();
+	void ReqQryInstrumentMarginRate(const std::string& instrumentId);
 
 	///请求查询合约手续费率
-	void ReqQryInstrumentCommissionRate();
+	void ReqQryInstrumentCommissionRate(const std::string& instrumentId);
 
 	///请求查询期权交易成本
-	void ReqQryOptionInstrTradeCost();
+	void ReqQryOptionInstrTradeCost(const std::string& instrumentId);
 
 	///请求查询期权合约手续费
-	void ReqQryOptionInstrCommRate();
+	void ReqQryOptionInstrCommRate(const std::string& instrumentId);
 
 	bool IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo);
 

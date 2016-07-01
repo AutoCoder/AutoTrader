@@ -4,7 +4,7 @@
 
 #include "stdafx.h"
 #include "crossplatform.h"
-#include "InstrumentInfoMgr.h"
+
 
 namespace Instrument{
 
@@ -68,6 +68,7 @@ namespace Instrument{
 		assert(!m_isSetup);
 		if (m_InfoDict.find(instrumentID) == m_InfoDict.end()){
 			m_InfoDict.insert(std::make_pair(instrumentID, info));
+
 		}
 	}
 
@@ -186,7 +187,7 @@ namespace Instrument{
 
 			Add(key, instu_info);
 		}
-		
+
 		m_isSetup = true;
 		in_json_file.close();
 	}
