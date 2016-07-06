@@ -77,12 +77,7 @@ class CtpTradeSpi : public CThostFtdcTraderSpi
 
 		//step 8
 		void OnLastRspQryInvestorPosition(bool successful = true){
-			sleep(1000);
-			m_TradeUserSpiPtr->ReqQryInstrument_all();
-		}
-
-		void OnLastRspQryInstrument(bool successful = true){
-			m_TradeUserSpiPtr->NotifyQueryEnd();
+			m_TradeUserSpiPtr->InitializationFinished();
 		}
 
 	private:
@@ -93,6 +88,7 @@ public:
 	CtpTradeSpi(CThostFtdcTraderApi* pUserApi,
 		const char * brokerID, const char* userID, const char* password, const char* prodName,
 		PPMgr& ppmgr,
+		InitedAccountCallback onInitedAccountCallback,
 		RtnOrderCallback onRtnOrderCallback,
 		RtnTradeCallback onRtnTradeCallback,
 		CancelOrderCallback OnRtnCancellOrderCallback);
@@ -105,13 +101,10 @@ public:
 		//理解：在触发了新的交易之前，把已提交未成交的报单给撤销
 		void CancelOrder(long long MDtime, int aliveDuration = 6, const std::string& instrumentId = "");
 
-		void ReqAllRateParameters(const std::vector<std::string>& instruments);
-
 		void ForceClose();
 
-		void WaitQueryEnd(){
-			std::unique_lock<std::mutex> lk(m_mtx);
-			m_con.wait(lk, [this]() -> bool { return !m_querying.load(); });
+		void InitializationFinished(){
+			m_OnInitedAccount_Callback();
 		}
 
 private:
@@ -151,18 +144,6 @@ private:
 
 	virtual void OnRtnTrade(CThostFtdcTradeField *pTrade);
 
-	//响应查询合约保证金率
-	void OnRspQryInstrumentMarginRate(CThostFtdcInstrumentMarginRateField *pInstrumentMarginRate, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
-
-	///响应查询合约手续费率
-	void OnRspQryInstrumentCommissionRate(CThostFtdcInstrumentCommissionRateField *pInstrumentCommissionRate, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
-
-	///响应查询期权交易成本
-	void OnRspQryOptionInstrTradeCost(CThostFtdcOptionInstrTradeCostField *pOptionInstrTradeCost, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
-
-	///响应查询期权合约手续费
-	void OnRspQryOptionInstrCommRate(CThostFtdcOptionInstrCommRateField *pOptionInstrCommRate, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
-
 private:
 	void ReqUserLogin();
 
@@ -182,26 +163,7 @@ private:
 
 	void ReqQryInvestorPosition();
 
-	void ReqQryInstrument_all();
-
-	///请求查询合约保证金率
-	void ReqQryInstrumentMarginRate(const char* instId);
-
-	///请求查询合约手续费率
-	void ReqQryInstrumentCommissionRate(const char* instId);
-
-	///请求查询期权交易成本
-	void ReqQryOptionInstrTradeCost(const char* instId);
-
-	///请求查询期权合约手续费
-	void ReqQryOptionInstrCommRate(const char* instId);
-
 	bool IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo);
-
-	void NotifyQueryEnd(){
-		m_querying.store(false);
-		m_con.notify_all();
-	}
 
 private:
 	TThostFtdcBrokerIDType								m_brokerID;
@@ -211,12 +173,9 @@ private:
 	TThostFtdcFrontIDType								m_frontID;
 	TThostFtdcSessionIDType								m_sessionID;
 	char												m_orderRef[13];
-	CThostFtdcTradingAccountField						m_accountInfo;
-
+	
 private:
-	std::condition_variable								m_con;
-	std::atomic<bool>									m_querying;
-	std::mutex											m_mtx;
+	InitedAccountCallback                               m_OnInitedAccount_Callback;
 	RtnOrderCallback									m_OnRtnOrder_callback;
 	RtnTradeCallback									m_OnRtnTrade_callback;
 	CancelOrderCallback									m_OnCancelOrder_callback;

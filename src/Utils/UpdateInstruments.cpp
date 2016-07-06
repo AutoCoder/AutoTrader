@@ -30,18 +30,17 @@ int main(int argc, const char* argv[]){
 
 	for(auto iter = InstrumentManager.begin(); iter != InstrumentManager.end(); ++iter){
 		sleep(1000);
-		trade_spi->ReqQryInstrumentMarginRate(iter->first);
+		SYNC_PRINT << "query margin & commission for " << iter->first; 
+		std::string one_instru = iter->second.InstruField.InstrumentID;
+		trade_spi->ReqQryInstrumentMarginRate(one_instru);
 		trade_spi->WaitQueryResponsed();
-	}
-
-	for(auto iter = InstrumentManager.begin(); iter != InstrumentManager.end(); ++iter){
 		sleep(1000);
-		trade_spi->ReqQryInstrumentCommissionRate(iter->first);
+		trade_spi->ReqQryInstrumentCommissionRate(one_instru);
 		trade_spi->WaitQueryResponsed();
 	}
 
 	SYNC_PRINT << "[Trade] Finish all margin & commission querying.";
-	
+
 	InstrumentManager.serialize();
 	return 0;
 }

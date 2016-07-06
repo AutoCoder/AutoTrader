@@ -40,25 +40,21 @@ namespace Instrument{
 	{
 		Information(){};
 		Information(const CThostFtdcInstrumentField& ins_field)
-			:InstruField(ins_field)
 		{
-			
+			memcpy(&InstruField, &ins_field, sizeof(CThostFtdcInstrumentField));
+			memset(&MgrRateField, 0, sizeof(CThostFtdcInstrumentMarginRateField));
+			memset(&ComRateField, 0, sizeof(CThostFtdcInstrumentCommissionRateField));
 		};
+
+		Information& operator = (const Information& info){
+			memcpy(&InstruField, &info.InstruField, sizeof(CThostFtdcInstrumentField));
+			memcpy(&MgrRateField, &info.MgrRateField, sizeof(CThostFtdcInstrumentMarginRateField));
+			memcpy(&ComRateField, &info.ComRateField, sizeof(CThostFtdcInstrumentCommissionRateField));
+		}
 
 		CThostFtdcInstrumentField					InstruField;
 		CThostFtdcInstrumentMarginRateField			MgrRateField;
 		CThostFtdcInstrumentCommissionRateField		ComRateField;
-		//期货保证金率
-		TThostFtdcRatioType	LongMgrByMoney;
-		TThostFtdcMoneyType	LongMgrByVolume;
-		TThostFtdcRatioType	ShortMgrByMoney;
-		TThostFtdcMoneyType	ShortMgrByVolume;
-		OpMgrate	omgr;			//期权保证金率
-		InstFee		fee;			//合并的手续费率
-		TThostFtdcLargeVolumeType	OpenInterest;
-		TThostFtdcMoneyType	Turnover;
-		TThostFtdcPriceType	UpLmtPx;
-		TThostFtdcPriceType	LowLmtPx;
 	};
 
 	class STRATEGY_API InformationMgr

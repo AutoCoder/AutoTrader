@@ -94,7 +94,7 @@ void CtpTradeSpi::OnRspQryInstrument(CThostFtdcInstrumentField *pInstrument,
 		{
 			Instrument::Information info(*pInstrument);
 
-			std::string instru_key(pInstrument->InstrumentID);
+			std::string instru_key(pInstrument->ProductID);
 			InstrumentManager.Add(instru_key, info);
 		}
 	}

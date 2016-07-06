@@ -6,6 +6,25 @@
 #include "crossplatform.h"
 #include "InstrumentInfoMgr.h"
 
+namespace{
+	std::string InstrumentIDToProductID(const std::string& instrumentID){
+		assert(!instrumentID.empty());
+		size_t max_idx = instrumentID.size();
+		while (true){
+			char c = instrumentID.at(max_idx-1);
+			if (c >= '0' && c <= '9')
+			{
+				--max_idx;
+			}
+			else{
+				break;
+			}
+		}
+
+		
+		return instrumentID.substr(0, max_idx);
+	}
+}
 
 namespace Instrument{
 
@@ -16,6 +35,7 @@ namespace Instrument{
 	static const char* kMarginInfo = "MarginInfo";
 	static const char* kCommissionInfo = "CommissionInfo";
 
+	static const char* kInstrumentID = "InstrumentID";
 	static const char* kExchangeID = "ExchangeID";
 	static const char* kDeliveryYear = "DeliveryYear";
 	static const char* kDeliveryMonth = "DeliveryMonth";
@@ -60,35 +80,34 @@ namespace Instrument{
 	{
 	}
 
-	const Information& InformationMgr::Get(const std::string& instrumentID) const{
-		assert (m_InfoDict.find(instrumentID) != m_InfoDict.end());
-		return m_InfoDict.at(instrumentID);
+	const Information& InformationMgr::Get(const std::string& productID) const{
+		assert (m_InfoDict.find(productID) != m_InfoDict.end());
+		return m_InfoDict.at(productID);
 	}
 
-	void InformationMgr::Add(const std::string& instrumentID, const Information& info){
-		assert(!m_isSetup);
-		if (m_InfoDict.find(instrumentID) == m_InfoDict.end()){
-			m_InfoDict.insert(std::make_pair(instrumentID, info));
+	void InformationMgr::Add(const std::string& productID, const Information& info){
+		assert(!productID.empty());
+
+		if (m_InfoDict.find(productID) == m_InfoDict.end()){
+			m_InfoDict.insert(std::make_pair(productID, info));
 
 		}
 	}
 
 	bool InformationMgr::SetMarginRate(const std::string& instrumentID, const CThostFtdcInstrumentMarginRateField& mgrRate){
-		assert(!m_isSetup);
-		if (m_InfoDict.find(instrumentID) != m_InfoDict.end()){
-			m_InfoDict[instrumentID].MgrRateField = mgrRate;
-			return true;
-		}
-		return false;
+		assert(!instrumentID.empty());
+		const std::string& prodID = InstrumentIDToProductID(instrumentID);
+		bool is_override = (m_InfoDict.find(prodID) != m_InfoDict.end());
+		m_InfoDict[prodID].MgrRateField = mgrRate;
+		return is_override;
 	}
 
 	bool InformationMgr::SetCommissionRate(const std::string& instrumentID, const CThostFtdcInstrumentCommissionRateField& comRate){
-		assert(!m_isSetup);
-		if (m_InfoDict.find(instrumentID) != m_InfoDict.end()){
-			m_InfoDict[instrumentID].ComRateField = comRate;
-			return true;
-		}
-		return false;
+		assert(!instrumentID.empty());
+		const std::string& prodID = InstrumentIDToProductID(instrumentID);
+		bool is_override = (m_InfoDict.find(prodID) != m_InfoDict.end());
+		m_InfoDict[prodID].ComRateField = comRate;
+		return is_override;
 	}
 
 	std::string InformationMgr::AllInstruments() const{
@@ -107,7 +126,7 @@ namespace Instrument{
 			Json::Value instru_info;
 			Json::Value instru_basic_info, margin_info, commission_info;
 			
-
+			instru_basic_info[kInstrumentID] = instru.second.InstruField.InstrumentID;
 			instru_basic_info[kExchangeID] = instru.second.InstruField.ExchangeID;
 			instru_basic_info[kDeliveryYear] = instru.second.InstruField.DeliveryYear;
 			instru_basic_info[kDeliveryMonth] = instru.second.InstruField.DeliveryMonth;
@@ -161,7 +180,8 @@ namespace Instrument{
 
 		for (auto key : root.getMemberNames()){
 			Information instu_info;
-			STRCPY(instu_info.InstruField.InstrumentID, key.c_str());
+			STRCPY(instu_info.InstruField.ProductID, key.c_str());
+			STRCPY(instu_info.InstruField.InstrumentID, root[key][kInstrumentID].asString().c_str());
 			STRCPY(instu_info.InstruField.ExchangeID, root[key][kExchangeID].asString().c_str());
 			instu_info.InstruField.DeliveryYear = root[key][kDeliveryYear].asInt();
 			instu_info.InstruField.DeliveryMonth = root[key][kDeliveryMonth].asInt();

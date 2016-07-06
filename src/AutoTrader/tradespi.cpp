@@ -14,13 +14,13 @@ std::vector<CThostFtdcOrderField*> orderList;
 std::vector<CThostFtdcTradeField*> tradeList;
 
 CtpTradeSpi::CtpTradeSpi(CThostFtdcTraderApi* p, const char * brokerID, const char* userID, const char* password, const char* prodname, PPMgr& ppmgr,
-	RtnOrderCallback onRtnOrderCallback, RtnTradeCallback onRtnTradeCallback, CancelOrderCallback onRtnCancellOrderCallback)
+	InitedAccountCallback onInitedAccountCallback, RtnOrderCallback onRtnOrderCallback, RtnTradeCallback onRtnTradeCallback, CancelOrderCallback onRtnCancellOrderCallback)
 	: pUserApi(p)
 	, m_frontID(-1)
 	, m_sessionID(-1)
 	, m_stateChangeHandler(this)
 	, m_ppmgr(ppmgr)
-	, m_querying(true)
+	, m_OnInitedAccount_Callback(onInitedAccountCallback)
 	, m_OnRtnOrder_callback(onRtnOrderCallback)
 	, m_OnRtnTrade_callback(onRtnTradeCallback)
 	, m_OnCancelOrder_callback(onRtnCancellOrderCallback)
@@ -91,20 +91,6 @@ void CtpTradeSpi::CancelOrder(long long MDtime, int aliveDuration, const std::st
 			}
 
 		}
-	}
-}
-
-void CtpTradeSpi::ReqAllRateParameters(const std::vector<std::string>& instruments){
-	for (auto instru : instruments){
-		sleep(1000);
-		m_querying.store(true);
-		ReqQryInstrumentMarginRate(instru.c_str());
-		WaitQueryEnd();
-
-		sleep(1000);
-		m_querying.store(true);
-		ReqQryInstrumentCommissionRate(instru.c_str());
-		WaitQueryEnd();
 	}
 }
 
@@ -451,7 +437,6 @@ void CtpTradeSpi::OnRspQryTradingAccount(
 {
 	if (!IsErrorRspInfo(pRspInfo) && pTradingAccount){
 		m_ppmgr.SetAccountInfo(*pTradingAccount);
-		memcpy(&m_accountInfo, pTradingAccount, sizeof(CThostFtdcTradingAccountField));
 		SYNC_PRINT << "[Trade] Response | Balance:" << pTradingAccount->Balance
 			<< " Available:" << pTradingAccount->Available
 			<< " CurrMargin:" << pTradingAccount->CurrMargin
@@ -547,13 +532,6 @@ void CtpTradeSpi::OnRspQryInvestorPosition(
 	
 }
 
-void CtpTradeSpi::ReqQryInstrument_all(){
-	CThostFtdcQryInstrumentField req;
-	memset(&req, 0, sizeof(req));
-	int ret = pUserApi->ReqQryInstrument(&req, ++m_requestId);
-	SYNC_PRINT << "[Trade] Request | Query Instrument(All)..." << ((ret == 0) ? "Success" : "Fail") << " ret:" << ret;
-}
-
 void CtpTradeSpi::ReqQryInstrument(TThostFtdcInstrumentIDType instId)
 {
 	CThostFtdcQryInstrumentField req;
@@ -566,33 +544,33 @@ void CtpTradeSpi::ReqQryInstrument(TThostFtdcInstrumentIDType instId)
 void CtpTradeSpi::OnRspQryInstrument(CThostFtdcInstrumentField *pInstrument,
 	CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
-	if (!IsErrorRspInfo(pRspInfo) && pInstrument)
-	{
-		if (((pInstrument->ProductClass == THOST_FTDC_PC_Futures) || (pInstrument->ProductClass == THOST_FTDC_PC_Options) ||
-			(pInstrument->ProductClass == THOST_FTDC_PC_SpotOption) /*||(pInstrument->ProductClass ==THOST_FTDC_PC_Combination)*/) &&
-			(pInstrument->IsTrading))
-		{
-			Instrument::Information info(*pInstrument);
+	// if (!IsErrorRspInfo(pRspInfo) && pInstrument)
+	// {
+	// 	if (((pInstrument->ProductClass == THOST_FTDC_PC_Futures) || (pInstrument->ProductClass == THOST_FTDC_PC_Options) ||
+	// 		(pInstrument->ProductClass == THOST_FTDC_PC_SpotOption) /*||(pInstrument->ProductClass ==THOST_FTDC_PC_Combination)*/) &&
+	// 		(pInstrument->IsTrading))
+	// 	{
+	// 		Instrument::Information info(*pInstrument);
 
-			std::string instru_key(pInstrument->InstrumentID);
-			InstrumentManager.Add(instru_key, info);
-		}
-	}
-	else
-	{
-		if (pRspInfo)
-		{
-			SYNC_PRINT << "[Trade] Failed to query instrument info, error:" << pRspInfo->ErrorMsg;
-		}
-	}
+	// 		std::string instru_key(pInstrument->InstrumentID);
+	// 		InstrumentManager.Add(instru_key, info);
+	// 	}
+	// }
+	// else
+	// {
+	// 	if (pRspInfo)
+	// 	{
+	// 		SYNC_PRINT << "[Trade] Failed to query instrument info, error:" << pRspInfo->ErrorMsg;
+	// 	}
+	// }
 
-	if (bIsLast)
-	{
-		//SYNC_PRINT << "[Trade] All Instruments in Position:" << //todo: return all position's instruments;
-		SYNC_PRINT << "[Trade] All Instruments Queried:" << InstrumentManager.AllInstruments();
+	// if (bIsLast)
+	// {
+	// 	//SYNC_PRINT << "[Trade] All Instruments in Position:" << //todo: return all position's instruments;
+	// 	SYNC_PRINT << "[Trade] All Instruments Queried:" << InstrumentManager.AllInstruments();
 
-		m_stateChangeHandler.OnLastRspQryInstrument();
-	}
+	// 	m_stateChangeHandler.OnLastRspQryInstrument();
+	// }
 }
 
 void CtpTradeSpi::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder,
@@ -667,130 +645,6 @@ bool CtpTradeSpi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo)
 		SYNC_PRINT << "[Trade] Response | " << pRspInfo->ErrorMsg;
 	}
 	return ret;
-}
-
-///请求查询合约保证金率
-void CtpTradeSpi::ReqQryInstrumentMarginRate(const char* instId)
-{
-	assert(instId);
-	CThostFtdcQryInstrumentMarginRateField req;
-	memset(&req, 0, sizeof(req));
-	STRCPY(req.BrokerID, m_brokerID);
-	STRCPY(req.InvestorID, m_userID);
-
-	STRCPY(req.InstrumentID, instId);
-	req.HedgeFlag = THOST_FTDC_HF_Speculation;
-
-	int ret = pUserApi->ReqQryInstrumentMarginRate(&req, ++m_requestId);
-	SYNC_PRINT << "[Trade] Request | Query MarginRate of Instrument(" << instId << ")..." << ((ret == 0) ? "Success" : "Fail") << " ret:" << ret;
-}
-
-//响应查询合约保证金率
-void CtpTradeSpi::OnRspQryInstrumentMarginRate(CThostFtdcInstrumentMarginRateField *pInstrumentMarginRate, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
-{
-	if (!IsErrorRspInfo(pRspInfo) && pInstrumentMarginRate)
-	{
-		InstrumentManager.SetMarginRate(pInstrumentMarginRate->InstrumentID, *pInstrumentMarginRate);
-	}
-	else if (pInstrumentMarginRate)
-	{
-		SYNC_PRINT << "[Trade] Reponse | failed to obtain the margin rate field for " << pInstrumentMarginRate->InstrumentID;
-	}
-
-	NotifyQueryEnd();
-}
-
-///请求查询合约手续费率
-void CtpTradeSpi::ReqQryInstrumentCommissionRate(const char* instId)
-{
-	assert(instId);
-	CThostFtdcQryInstrumentCommissionRateField req;
-
-	memset(&req, 0, sizeof(req));
-	STRCPY(req.BrokerID, m_brokerID);
-	STRCPY(req.InvestorID, m_userID);
-
-	STRCPY(req.InstrumentID, instId);
-	int ret = pUserApi->ReqQryInstrumentCommissionRate(&req, ++m_requestId);
-	SYNC_PRINT << "[Trade] Request | Query CommissionRate of Instrument(" << instId << ")..." << ((ret == 0) ? "Success" : "Fail") << " ret:" << ret;
-}
-
-///响应查询合约手续费率
-void CtpTradeSpi::OnRspQryInstrumentCommissionRate(CThostFtdcInstrumentCommissionRateField *pInstrumentCommissionRate, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
-{
-	if (!IsErrorRspInfo(pRspInfo) && pInstrumentCommissionRate)
-	{
-		InstrumentManager.SetCommissionRate(pInstrumentCommissionRate->InstrumentID, *pInstrumentCommissionRate);
-	}
-	else if (pInstrumentCommissionRate)
-	{
-		SYNC_PRINT << "[Trade] Reponse | failed to obtain the commission rate field for " << pInstrumentCommissionRate->InstrumentID;
-	}
-
-	NotifyQueryEnd();
-}
-
-///请求查询期权交易成本
-void CtpTradeSpi::ReqQryOptionInstrTradeCost(const char* instId)
-{
-	assert(instId);
-	CThostFtdcQryOptionInstrTradeCostField req;
-
-	memset(&req, 0, sizeof(req));
-	STRCPY(req.BrokerID, m_brokerID);
-	STRCPY(req.InvestorID, m_userID);
-	STRCPY(req.InstrumentID, instId);
-
-	req.HedgeFlag = THOST_FTDC_HF_Speculation;
-	int ret = pUserApi->ReqQryOptionInstrTradeCost(&req, ++m_requestId);
-	SYNC_PRINT << "[Trade] Request | Query OptionInstrTradeCost of Instrument(" << instId << ")..." << ((ret == 0) ? "Success" : "Fail") << " ret:" << ret;
-}
-
-///响应查询期权交易成本
-void CtpTradeSpi::OnRspQryOptionInstrTradeCost(CThostFtdcOptionInstrTradeCostField *pOptionInstrTradeCost, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
-{
-	if (!IsErrorRspInfo(pRspInfo) && pOptionInstrTradeCost)
-	{
-		//todo: store the Option InstrTradeCost
-	}
-	else
-	{
-		
-	}
-	if (bIsLast){
-	}
-}
-
-///请求查询期权合约手续费
-void CtpTradeSpi::ReqQryOptionInstrCommRate(const char* instId)
-{
-	assert(instId);
-	CThostFtdcQryOptionInstrCommRateField req;
-
-	memset(&req, 0, sizeof(req));
-	STRCPY(req.BrokerID, m_brokerID);
-	STRCPY(req.InvestorID, m_userID);
-	STRCPY(req.InstrumentID, instId);
-
-	int ret = pUserApi->ReqQryOptionInstrCommRate(&req, ++m_requestId);
-	SYNC_PRINT << "[Trade] Request | Query OptionInstrCommRate of Instrument(" << instId << ")..." << ((ret == 0) ? "Success" : "Fail") << " ret:" << ret;
-}
-
-///响应查询期权合约手续费
-void CtpTradeSpi::OnRspQryOptionInstrCommRate(CThostFtdcOptionInstrCommRateField *pOptionInstrCommRate, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
-{
-	if (!IsErrorRspInfo(pRspInfo) && pOptionInstrCommRate)
-	{
-		//todo: store the Option OptionInstrCommRate
-	}
-	else
-	{
-		
-	}
-
-	if (bIsLast){
-
-	}
 }
 
 //
