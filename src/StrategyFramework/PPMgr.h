@@ -79,6 +79,7 @@ namespace PP {
 		size_t GetUnclosedPosition(const std::string& instrumentId, TThostFtdcDirectionType type) const ;
 		size_t GetYDUnclosedPosition(const std::string& instrumentId, TThostFtdcDirectionType type) const;
 		double GetAvailableMoney() const ;
+		double GetBalanceMoney() const;
 		double GetFrozenCommission() const ;
 		double GetUsedMargin() const ;
 		double GetPositionProfit() const ;

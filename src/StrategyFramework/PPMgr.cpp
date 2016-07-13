@@ -296,6 +296,10 @@ namespace PP {
 		return m_accountInfo.Available;
 	}
 
+	double PositionProfitMgr::GetBalanceMoney() const {
+		return m_accountInfo.Balance;
+	}
+
 	double PositionProfitMgr::GetFrozenCommission() const{
 		return m_accountInfo.FrozenCommission;
 	}
