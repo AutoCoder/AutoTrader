@@ -39,7 +39,7 @@ ClientSession::ClientSession(const std::string& userId, const SockSessionSP& s)
 
 ClientSession::~ClientSession()
 {
-	SYNC_TRADE_LOG << m_PPMgr->ToString();
+	SYNC_TRADE_LOG << "PositionInfo(AfterTrade)" << m_PPMgr->ToString();
 
 	if (m_trade_api)
 	{
@@ -154,6 +154,8 @@ void ClientSession::SendPostionInfoToClient(){
 
 void ClientSession::OnAccountInitFinished(){
 	m_PositionInfo_ready = true;
+	//log position info
+	SYNC_TRADE_LOG << "PositionInfo(BeforeTrade):" << m_PPMgr->ToString();
 	SendPostionInfoToClient();
 }
 
