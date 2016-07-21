@@ -156,7 +156,7 @@ void ClientSession::OnAccountInitFinished(){
 	m_PositionInfo_ready = true;
 	//log position info
 	SYNC_DEBUG_LOG << "PositionInfo(BeforeTrade):" << m_PPMgr->ToString();
-	DEBUG_LOGGER.flush();
+	DEBUG_LOGGER->flush();
 	SendPostionInfoToClient();
 }
 
