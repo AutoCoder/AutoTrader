@@ -40,6 +40,7 @@ ClientSession::ClientSession(const std::string& userId, const SockSessionSP& s)
 ClientSession::~ClientSession()
 {
 	SYNC_DEBUG_LOG << "PositionInfo(AfterTrade)" << m_PPMgr->ToString();
+	DEBUG_LOGGER->flush();
 
 	if (m_trade_api)
 	{
