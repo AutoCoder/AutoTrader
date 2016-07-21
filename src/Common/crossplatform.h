@@ -25,10 +25,14 @@
 
 #ifndef SYNC_PRINT
 #include "spdlog/spdlog.h"
-#define SYNC_PRINT spdlog::get("console")->info()
-#define SYNC_LOG spdlog::get("file_logger")->info()
-#define SYNC_DEBUG_LOG spdlog::get("file_debug_logger")->info()
-#define SYNC_TRADE_LOG spdlog::get("file_trade_logger")->info()
+#define CONSOLE_LOGGER spdlog::get("console")
+#define COMMON_LOGGER spdlog::get("file_logger")
+#define DEBUG_LOGGER spdlog::get("file_debug_logger")
+#define TRADE_LOGGER spdlog::get("file_trade_logger")
+#define SYNC_PRINT CONSOLE_LOGGER->info()
+#define SYNC_LOG COMMON_LOGGER->info()
+#define SYNC_DEBUG_LOG DEBUG_LOGGER->info()
+#define SYNC_TRADE_LOG TRADE_LOGGER->info()
 #endif
 
 #endif
