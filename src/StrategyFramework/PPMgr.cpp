@@ -120,7 +120,7 @@ namespace PP {
 			double commratio = 1.0;
 			if (orderField.CombOffsetFlag[0] == THOST_FTDC_OF_Open)
 				commratio = InstrumentManager.Get(orderField.InstrumentID).ComRateField.OpenRatioByVolume;
-			else if (THOST_FTDC_OF_Close == orderField.CombOffsetFlag[0] && THOST_FTDC_OF_CloseYesterday == orderField.CombOffsetFlag[0])
+			else if (THOST_FTDC_OF_Close == orderField.CombOffsetFlag[0] ||  THOST_FTDC_OF_CloseYesterday == orderField.CombOffsetFlag[0])
 				commratio = InstrumentManager.Get(orderField.InstrumentID).ComRateField.CloseRatioByVolume;
 			else if (orderField.CombOffsetFlag[0] == THOST_FTDC_OF_CloseToday)
 				commratio = InstrumentManager.Get(orderField.InstrumentID).ComRateField.CloseTodayRatioByVolume;
