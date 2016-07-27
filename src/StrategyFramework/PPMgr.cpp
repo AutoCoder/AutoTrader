@@ -319,7 +319,7 @@ namespace PP {
 			result << posfield.second.ToString();
 			result << std::endl;
 		}
-		
+	        result << "}" << std::endl;	
 		return result.str();
 	}
 
