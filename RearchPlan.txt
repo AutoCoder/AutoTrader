@@ -197,3 +197,12 @@ And if deemed to not be of interest, where you just want your program to continu
 (gdb) handle SIGUSR1 noprint nostop
 Signal        Stop      Print   Pass to program Description
 SIGUSR1       No        No      Yes             User defined signal 1
+
+
+[2016-07-27]
+关于仓位实时计算。以下是当前思路：
+目前通过PPMgr类来对仓位进行管理。tradespi只通过以下四个回调进行仓位更新：
+1） OnRspQryTradingAccount //获取账户总体资金情况，仅初始化时回调一次
+2） OnRspQryInvestorPosition //获取账户仓位情况，仅初始化时回调一次
+3） OnRtnOrder // 如果当前交易日有报单，那么在初始化之前，会回调。主要用于更新冻结的保证金和手续费
+4） OnRtnTrade // 如果当前交易日有成交，那么在初始化之前，会回调。这时不对仓位进行更新。需等到OnRspQryInvestorPosition全部回调 & 即仓位初始化完成后。如果再有新的成交产生，这时候需要对仓位进行更新。

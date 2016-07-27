@@ -77,6 +77,7 @@ class CtpTradeSpi : public CThostFtdcTraderSpi
 
 		//step 8
 		void OnLastRspQryInvestorPosition(bool successful = true){
+
 			m_TradeUserSpiPtr->InitializationFinished();
 		}
 
@@ -104,6 +105,7 @@ public:
 		void ForceClose();
 
 		void InitializationFinished(){
+			ppmgr.SetAccountInfoInitialized();
 			m_OnInitedAccount_Callback();
 		}
 
