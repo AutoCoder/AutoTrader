@@ -647,6 +647,11 @@ bool CtpTradeSpi::IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo)
 	return ret;
 }
 
+void CtpTradeSpi::InitializationFinished()
+{
+        m_ppmgr.SetAccountInfoInitialized();
+        m_OnInitedAccount_Callback();
+}
 //
 /////TFtdcTimeConditionType是一个有效期类型类型
 ///////////////////////////////////////////////////////////////////////////

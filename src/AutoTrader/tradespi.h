@@ -104,10 +104,7 @@ public:
 
 		void ForceClose();
 
-		void InitializationFinished(){
-			ppmgr.SetAccountInfoInitialized();
-			m_OnInitedAccount_Callback();
-		}
+		void InitializationFinished();
 
 private:
 
