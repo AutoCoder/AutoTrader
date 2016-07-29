@@ -229,7 +229,7 @@ namespace PP {
 		if (tradeField.OffsetFlag == THOST_FTDC_OF_Open){
 			newPosInfo.Commission = InstrumentManager.Get(tradeField.InstrumentID).ComRateField.OpenRatioByVolume * tradeField.Volume;
 		}
-		else if (tradeField.OffsetFlag == THOST_FTDC_OF_Close)
+		else if (THOST_FTDC_OF_Close == tradeField.OffsetFlag && THOST_FTDC_OF_CloseYesterday == tradeField.OffsetFlag)
 		{
 			newPosInfo.Commission = InstrumentManager.Get(tradeField.InstrumentID).ComRateField.CloseRatioByVolume * tradeField.Volume;
 		}
