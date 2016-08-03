@@ -41,11 +41,26 @@ namespace PP {
 		T m_data; // CThostFtdcOrderField or CThostFtdcTradeField
 	};
 
+	enum class OrderCallBackType{
+		Unknown,
+		InsertOrder,
+		FinishOrder,
+		CancellOrder,
+		Other,
+	};
+
 	struct CThostFtdcInvestorPositionFieldWrapper{
 		explicit CThostFtdcInvestorPositionFieldWrapper();
 		CThostFtdcInvestorPositionFieldWrapper& operator +=(const CThostFtdcInvestorPositionField& other);
-		CThostFtdcInvestorPositionField GetLongPos() const { return m_LongPos; }
-		CThostFtdcInvestorPositionField GetShortPos() const { return m_ShortPos; }
+		CThostFtdcInvestorPositionFieldWrapper& operator +=(const CThostFtdcTradeField& trade);
+		void OnOrder(const CThostFtdcOrderField& order, OrderCallBackType type);
+
+		double 	GetMargin() const;
+		double 	GetFrozenMargin() const;
+		double 	GetCommission() const;
+		double 	GetFrozenCommission() const;
+		int 	GetLongPos() const { return m_LongPos.Position; }
+		int 	GetShortPos() const { return m_ShortPos.Position; }
 		std::string ToString();
 	private:
 		bool IsLongPosEmpty();
@@ -80,9 +95,6 @@ namespace PP {
 		size_t GetYDUnclosedPosition(const std::string& instrumentId, TThostFtdcDirectionType type) const;
 		double GetAvailableMoney() const ;
 		double GetBalanceMoney() const;
-		double GetFrozenCommission() const ;
-		double GetUsedMargin() const ;
-		double GetPositionProfit() const ;
 
 		void   SetAccountInfoInitialized(bool init = true) { m_acccountInfoInitialized = init; };
 

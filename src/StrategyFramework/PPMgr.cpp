@@ -43,6 +43,7 @@ namespace PP {
 	CThostFtdcInvestorPositionFieldWrapper& CThostFtdcInvestorPositionFieldWrapper::operator +=(const CThostFtdcInvestorPositionField& other){
 		if (other.PosiDirection == THOST_FTDC_PD_Long)
 		{
+			assert(IsLongPosEmpty());
 			if (IsLongPosEmpty()){
 				memcpy(&m_LongPos, &(other), sizeof(CThostFtdcInvestorPositionField));
 			}
@@ -89,41 +90,111 @@ namespace PP {
 		return *this;
 	}
 
-	PositionProfitMgr::PositionProfitMgr()
-		:m_acccountInfoInitialized(false)
-	{
-		memset(&m_accountInfo, 0, sizeof(CThostFtdcTradingAccountField));
-	}
+	CThostFtdcInvestorPositionFieldWrapper& CThostFtdcInvestorPositionFieldWrapper::operator +=(const CThostFtdcTradeField& trade){
+		auto initPosFieldFunc = (const CThostFtdcTradeField& tradeField, CThostFtdcInvestorPositionField& posField)[] -> void {
+			//!!!Note:如果当前仓位为空，那么必然是开仓
+			assert(tradeField.OffsetFlag == THOST_FTDC_OF_Open);
+			//Original Position is empty, so should be initialize here
+			posField.InstrumentID = tradeField.InstrumentID;
+			posField.BrokerID = tradeField.BrokerID;
+			posField.InvestorID = tradeField.InvestorID;
+			assert(posField.PosiDirection == tradeField.Direction + 2);
+			posField.HedgeFlag = tradeField.HedgeFlag;
+			posField.PositionDate = THOST_FTDC_PSD_Today;
+			posField.YdPosition = 0;
+			posField.TodayPosition = tradeField.Volume;
+			posField.Position = posField.TodayPosition; //仓位＝开仓量－平仓量
+			posField.LongFrozen = 0;
+			posField.LongFrozenAmount = 0;
+			posField.OpenVolume = tradeField.Volume; //开仓量
+			posField.CloseVolume = 0; //平仓量
+			posField.OpenAmount = tradeField.Price * tradeField.Volume; //开仓金额
+			posField.CloseAmount = 0; //平仓金额
+			//!!!Note: 放弃维护这四个字段，只维护当前账户总冻结手数和冻结金额
+			// ///多头冻结
+			// TThostFtdcVolumeType	LongFrozen;
+			// ///空头冻结
+			// TThostFtdcVolumeType	ShortFrozen;
+			// ///开仓冻结金额
+			// TThostFtdcMoneyType	LongFrozenAmount;
+			// ///开仓冻结金额
+			// TThostFtdcMoneyType	ShortFrozenAmount;
+			posField.PositionCost = tradeField.Price;
+			//取 Max(LongMargin, ShortMargin)作为当前合约的总仓位
+			posField.UseMargin = InstrumentManager.Get(tradeField.InstrumentID).MgrRateField.LongMarginRatioByVolume * tradeField.Volume;
+			posField.PreMargin = 0;
+			posField.Commission = InstrumentManager.Get(tradeField.InstrumentID).ComRateField.OpenRatioByVolume * tradeField.Volume;
+			posField.TradingDay = tradeField.TradeDate;
+		};
 
+		auto appendPosFunc = (const CThostFtdcTradeField& tradeField, CThostFtdcInvestorPositionField& posField)[] -> void {
+			double Amount ＝ posField.PositionCost ＊ posField.Position;
+			double delta_Amount = tradeField.Price * tradeField.Volume;
+			double margin_ratio_by_volume = 0.0;
+			double commission_ratio_by_volume = 0.0;
+			if (posField.PosiDirection == THOST_FTDC_PD_Long)
+				margin_ratio_by_volume = InstrumentManager.Get(tradeField.InstrumentID).MgrRateField.LongMarginRatioByVolume;
+			else if (posField.PosiDirection == THOST_FTDC_PD_Short)
+				margin_ratio_by_volume = InstrumentManager.Get(tradeField.InstrumentID).MgrRateField.ShortMarginRatioByVolume;
+			else
+				assert(false);
 
-	PositionProfitMgr::~PositionProfitMgr()
-	{
-	}
+			if (THOST_FTDC_OF_Open == tradeField.OffsetFlag)
+				commission_ratio_by_volume = InstrumentManager.Get(tradeField.InstrumentID).ComRateField.OpenRatioByVolume;
+			else if (THOST_FTDC_OF_Close == tradeField.OffsetFlag ||  THOST_FTDC_OF_CloseYesterday == tradeField.OffsetFlag)
+				commission_ratio_by_volume = InstrumentManager.Get(tradeField.InstrumentID).ComRateField.CloseRatioByVolume;
+			else if (THOST_FTDC_OF_CloseToday == tradeField.OffsetFlag)
+				commission_ratio_by_volume = InstrumentManager.Get(tradeField.InstrumentID).ComRateField.CloseTodayRatioByVolume;
+			else {
+				assert(false);
+			}
 
+			posField.PreMargin = margin_ratio_by_volume * posField.Position;
+			//update Position
+			if (tradeField.OffsetFlag == THOST_FTDC_OF_Open )
+			{
+				posField.TodayPosition += tradeField.Volume;
+				posField.Position = posField.TodayPosition + posField.YdPosition;
+				posField.OpenVolume += tradeField.Volume; //更新开仓量
+				posField.OpenAmount ＋= tradeField.Price * tradeField.Volume;
+				posField.PositionCost = (Amount + delta_Amount) / posField.Position;
+			}
+			else if (THOST_FTDC_OF_Close == tradeField.OffsetFlag || THOST_FTDC_OF_ForceClose == tradeField.OffsetFlag || 
+				THOST_FTDC_OF_CloseToday == tradeField.OffsetFlag || THOST_FTDC_OF_CloseYesterday == tradeField.OffsetFlag){
+				posField.TodayPosition -= tradeField.Volume;
+				posField.Position = posField.TodayPosition + posField.YdPosition;
+				posField.CloseVolume += tradeField.Volume; //更新平仓量
+				posField.CloseAmount ＋= tradeField.Price * tradeField.Volume;
+				posField.PositionCost = (Amount - delta_Amount) / posField.Position;
+			}
+			posField.UseMargin = margin_ratio_by_volume * posField.Position;
+			posField.Commission += commission_ratio_by_volume * tradeField.Volume;
+		};
 
-	bool PositionProfitMgr::PushOrder(const CThostFtdcOrderField& orderField){
-		bool IsInsertOrder = false;
-		bool IsfinishOrder = orderField.OrderStatus == THOST_FTDC_OST_AllTraded;
-		bool IsCancelled = orderField.OrderStatus == THOST_FTDC_OST_Canceled;
-		auto iter = std::find_if(m_orderFieldVec.begin(), m_orderFieldVec.end(), IsSameOrder<CThostFtdcOrderField>(orderField));
-		if (iter == m_orderFieldVec.end()){
-			m_orderFieldVec.push_back(orderField);
-			//that mean OrderStatus == THOST_FTDC_OST_NoTradeQueueing
-			IsInsertOrder = true;
-
+		if (tradeField.Direction == THOST_FTDC_D_Buy)
+		{
+			if (IsLongPosEmpty())
+				initPosFieldFunc(trade, m_LongPos);
+			else
+				appendPosFunc(trade, m_LongPos);
+		}
+		else if (tradeField.Direction == THOST_FTDC_D_Sell)
+		{	
+			if (IsShortPosEmpty())
+				initPosFieldFunc(trade, m_ShortPos);				
+			else
+				appendPosFunc(trade, m_ShortPos);
 		}
 		else{
-			//if a order is finished, it will be earsed in the list
-			if (IsfinishOrder || IsCancelled){
-				m_orderFieldVec.erase(iter);
-			}
+			assert(false);
 		}
 
-		bool PositionStatusChanged = IsInsertOrder || IsfinishOrder || IsCancelled;
+		return *this;
+	}
 
-
-		if (PositionStatusChanged){
-			double commratio = 1.0;
+	void CThostFtdcInvestorPositionFieldWrapper::OnOrder(const CThostFtdcOrderField& orderField, OrderCallBackType ordCBType){
+		if (FinishOrder == ordCBType || CancellOrder == ordCBType || InsertOrder == ordCBType){
+			double commratio = 0.0;
 			if (orderField.CombOffsetFlag[0] == THOST_FTDC_OF_Open)
 				commratio = InstrumentManager.Get(orderField.InstrumentID).ComRateField.OpenRatioByVolume;
 			else if (THOST_FTDC_OF_Close == orderField.CombOffsetFlag[0] ||  THOST_FTDC_OF_CloseYesterday == orderField.CombOffsetFlag[0])
@@ -143,112 +214,190 @@ namespace PP {
 				margin = InstrumentManager.Get(orderField.InstrumentID).MgrRateField.ShortMarginRatioByVolume * orderField.VolumeTotalOriginal;
 			}
 
-			if (IsInsertOrder)
-			{
-				m_accountInfo.FrozenCommission += commission;
-				m_accountInfo.FrozenMargin += margin;
-				m_accountInfo.Available -= commission;
-				m_accountInfo.Available -= margin;
+			switch(ordCBType){
+				case InsertOrder:
+				{
+					if (orderField.Direction == THOST_FTDC_D_Buy){
+						m_LongPos.LongFrozen += orderField.VolumeTotalOriginal;
+						m_LongPos.FrozenMargin += margin;
+						m_LongPos.FrozenCommission += commission;
+					}
+					else{ // THOST_FTDC_D_Sell
+						m_ShortPos.ShortFrozen += orderField.VolumeTotalOriginal;
+						m_ShortPos.FrozenMargin += margin;
+						m_ShortPos.FrozenCommission += commission;
+					}				
+				}
+				break;
+				case FinishOrder:
+				case CancellOrder:
+				{
+					if (orderField.Direction == THOST_FTDC_D_Buy){
+						m_LongPos.LongFrozen -= orderField.VolumeTotalOriginal;
+						m_LongPos.FrozenMargin -= margin;
+						m_LongPos.FrozenCommission -= commission;
+					}
+					else{ //THOST_FTDC_D_Sell
+						m_ShortPos.ShortFrozen -= orderField.VolumeTotalOriginal;
+						m_ShortPos.FrozenMargin -= margin;
+						m_ShortPos.FrozenCommission -= commission;
+					}
+				}
+				default:
+					break;
 			}
-			else if (IsfinishOrder){
-				m_accountInfo.FrozenCommission -= commission;
-				m_accountInfo.FrozenMargin -= margin;
-				m_accountInfo.Commission += commission;
-				m_accountInfo.CurrMargin += margin;
-			}
-			else if (IsCancelled){
-				m_accountInfo.FrozenCommission -= commission;
-				m_accountInfo.FrozenMargin -= margin;
-				m_accountInfo.Available += commission;
-				m_accountInfo.Available += margin;
-			}
-		}
+		}		
+	}
+
+	double CThostFtdcInvestorPositionFieldWrapper::GetMargin() const{
+		return std::max(m_LongPos.UseMargin, m_ShortPos.UseMargin);
+	}
+
+
+	double CThostFtdcInvestorPositionFieldWrapper::GetFrozenMargin() const{
+		return std::max(m_LongPos.FrozenMargin, m_ShortPos.FrozenMargin);
+	}
+
+
+	double CThostFtdcInvestorPositionFieldWrapper::GetCommission() const{
+		return m_LongPos.Commission + m_ShortPos.Commission;
+	}
 		
-		return IsInsertOrder;
+	double CThostFtdcInvestorPositionFieldWrapper::GetFrozenCommission() const{
+		return m_LongPos.FrozenCommission + m_ShortPos.FrozenCommission;
+	}
+
+	PositionProfitMgr::PositionProfitMgr()
+		:m_acccountInfoInitialized(false)
+	{
+		memset(&m_accountInfo, 0, sizeof(CThostFtdcTradingAccountField));
+	}
+
+
+	PositionProfitMgr::~PositionProfitMgr()
+	{
+	}
+
+
+	bool PositionProfitMgr::PushOrder(const CThostFtdcOrderField& orderField){
+		//假设上一交易日的报单，会被自动取消。
+		if (m_acccountInfoInitialized){
+			// Update m_orderFieldVec
+			auto iter = std::find_if(m_orderFieldVec.begin(), m_orderFieldVec.end(), IsSameOrder<CThostFtdcOrderField>(orderField));
+			OrderCallBackType ordCBType = PP::Unknown;
+			if (orderField.OrderStatus == THOST_FTDC_OST_AllTraded)
+				ordCBType = FinishOrder;
+			else if (orderField.OrderStatus == THOST_FTDC_OST_Canceled)
+				ordCBType = CancellOrder;
+			else if (iter == m_orderFieldVec.end())
+				ordCBType = InsertOrder;
+			else 
+				ordCBType = other;
+
+			switch(ordCBType)
+			{
+				case InsertOrder:
+					m_orderFieldVec.push_back(orderField);
+					break;
+				case CancellOrder:
+				case FinishOrder:
+					m_orderFieldVec.erase(iter);
+					break;
+				case Unknown:
+				case Other:
+					break;
+				default:
+					break;
+			}
+
+			//update frozon part of position.
+			m_posFieldMap[orderField.InstrumentID].OnOrder(orderField, ordCBType);
+		}
+
+		return m_acccountInfoInitialized;
 	}
 
 
 	void PositionProfitMgr::PushTrade(const CThostFtdcTradeField& tradeField){
 
-		if (m_acccountInfoInitialized){
-			CThostFtdcInvestorPositionField newPos = ToPositionInfo(tradeField);
-			PushInvestorPosition(newPos);
+		if (m_acccountInfoInitialized){			
+			m_posFieldMap[tradeField.InstrumentID] += tradeField;
 		}
 	}
 
-	CThostFtdcInvestorPositionField PositionProfitMgr::ToPositionInfo(const CThostFtdcTradeField& tradeField)
-	{
-		CThostFtdcInvestorPositionField newPosInfo;
-		memset(&newPosInfo, 0, sizeof(CThostFtdcInvestorPositionField));
+	// CThostFtdcInvestorPositionField PositionProfitMgr::ToPositionInfo(const CThostFtdcTradeField& tradeField)
+	// {
+	// 	CThostFtdcInvestorPositionField newPosInfo;
+	// 	memset(&newPosInfo, 0, sizeof(CThostFtdcInvestorPositionField));
 
-		memcpy(newPosInfo.BrokerID, tradeField.BrokerID, sizeof(newPosInfo.BrokerID));
-		memcpy(newPosInfo.InvestorID, tradeField.InvestorID, sizeof(newPosInfo.InvestorID));
-		memcpy(newPosInfo.InstrumentID, tradeField.InstrumentID, sizeof(newPosInfo.InstrumentID));
-		newPosInfo.HedgeFlag = tradeField.HedgeFlag;
-		newPosInfo.TodayPosition = tradeField.Volume;
+	// 	memcpy(newPosInfo.BrokerID, tradeField.BrokerID, sizeof(newPosInfo.BrokerID));
+	// 	memcpy(newPosInfo.InvestorID, tradeField.InvestorID, sizeof(newPosInfo.InvestorID));
+	// 	memcpy(newPosInfo.InstrumentID, tradeField.InstrumentID, sizeof(newPosInfo.InstrumentID));
+	// 	newPosInfo.HedgeFlag = tradeField.HedgeFlag;
+	// 	newPosInfo.TodayPosition = tradeField.Volume;
 
-		/* PosiDirection
-		///��
-		#define THOST_FTDC_PD_Net '1'
-		///��ͷ
-		#define THOST_FTDC_PD_Long '2'
-		///��ͷ
-		#define THOST_FTDC_PD_Short '3'
-		*/
+	// 	/* PosiDirection
+	// 	///¾»
+	// 	#define THOST_FTDC_PD_Net '1'
+	// 	///¶àÍ·
+	// 	#define THOST_FTDC_PD_Long '2'
+	// 	///¿ÕÍ·
+	// 	#define THOST_FTDC_PD_Short '3'
+	// 	*/
 
-		/*  Direction
-		///��
-		#define THOST_FTDC_D_Buy '0'
-		///��
-		#define THOST_FTDC_D_Sell '1'
-		*/
-		newPosInfo.PosiDirection = tradeField.Direction + 2;
-		newPosInfo.YdPosition = 0;
-		newPosInfo.Position = newPosInfo.TodayPosition + newPosInfo.YdPosition;
-		newPosInfo.PositionCost = tradeField.Price;
+	// 	/*  Direction
+	// 	///Âò
+	// 	#define THOST_FTDC_D_Buy '0'
+	// 	///Âô
+	// 	#define THOST_FTDC_D_Sell '1'
+	// 	*/
+	// 	newPosInfo.PosiDirection = tradeField.Direction + 2;
+	// 	newPosInfo.YdPosition = 0;
+	// 	newPosInfo.Position = newPosInfo.TodayPosition + newPosInfo.YdPosition;
+	// 	newPosInfo.PositionCost = tradeField.Price;
 
-		//double exchangeMoney = tradeField.Price * tradeField.Volume;
+	// 	//double exchangeMoney = tradeField.Price * tradeField.Volume;
 
-		if (tradeField.Direction == THOST_FTDC_D_Buy){
-			newPosInfo.UseMargin = InstrumentManager.Get(tradeField.InstrumentID).MgrRateField.LongMarginRatioByVolume * tradeField.Volume;
-		}
-		else if (tradeField.Direction == THOST_FTDC_D_Sell){
-			newPosInfo.UseMargin = InstrumentManager.Get(tradeField.InstrumentID).MgrRateField.ShortMarginRatioByVolume * tradeField.Volume;
-		}
+	// 	if (tradeField.Direction == THOST_FTDC_D_Buy){
+	// 		newPosInfo.UseMargin = InstrumentManager.Get(tradeField.InstrumentID).MgrRateField.LongMarginRatioByVolume * tradeField.Volume;
+	// 	}
+	// 	else if (tradeField.Direction == THOST_FTDC_D_Sell){
+	// 		newPosInfo.UseMargin = InstrumentManager.Get(tradeField.InstrumentID).MgrRateField.ShortMarginRatioByVolume * tradeField.Volume;
+	// 	}
 
-		/*
-				///����
-		#define THOST_FTDC_OF_Open '0'
-				///ƽ��
-		#define THOST_FTDC_OF_Close '1'
-				///ǿƽ
-		#define THOST_FTDC_OF_ForceClose '2'
-				///ƽ��
-		#define THOST_FTDC_OF_CloseToday '3'
-				///ƽ��
-		#define THOST_FTDC_OF_CloseYesterday '4'
-				///ǿ��
-		#define THOST_FTDC_OF_ForceOff '5'
-				///����ǿƽ
-		#define THOST_FTDC_OF_LocalForceClose '6'
-		*/
-		if (tradeField.OffsetFlag == THOST_FTDC_OF_Open){
-			newPosInfo.Commission = InstrumentManager.Get(tradeField.InstrumentID).ComRateField.OpenRatioByVolume * tradeField.Volume;
-		}
-		else if (THOST_FTDC_OF_Close == tradeField.OffsetFlag && THOST_FTDC_OF_CloseYesterday == tradeField.OffsetFlag)
-		{
-			newPosInfo.Commission = InstrumentManager.Get(tradeField.InstrumentID).ComRateField.CloseRatioByVolume * tradeField.Volume;
-		}
-		else if (tradeField.OffsetFlag == THOST_FTDC_OF_CloseToday)
-		{
-			newPosInfo.Commission = InstrumentManager.Get(tradeField.InstrumentID).ComRateField.CloseTodayRatioByVolume * tradeField.Volume;
-		}
-		else{
-			assert(false);
-		}
+	// 	/*
+	// 			///¿ª²Ö
+	// 	#define THOST_FTDC_OF_Open '0'
+	// 			///Æ½²Ö
+	// 	#define THOST_FTDC_OF_Close '1'
+	// 			///Ç¿Æ½
+	// 	#define THOST_FTDC_OF_ForceClose '2'
+	// 			///Æ½½ñ
+	// 	#define THOST_FTDC_OF_CloseToday '3'
+	// 			///Æ½×ò
+	// 	#define THOST_FTDC_OF_CloseYesterday '4'
+	// 			///Ç¿¼õ
+	// 	#define THOST_FTDC_OF_ForceOff '5'
+	// 			///±¾µØÇ¿Æ½
+	// 	#define THOST_FTDC_OF_LocalForceClose '6'
+	// 	*/
+	// 	if (tradeField.OffsetFlag == THOST_FTDC_OF_Open){
+	// 		newPosInfo.Commission = InstrumentManager.Get(tradeField.InstrumentID).ComRateField.OpenRatioByVolume * tradeField.Volume;
+	// 	}
+	// 	else if (THOST_FTDC_OF_Close == tradeField.OffsetFlag && THOST_FTDC_OF_CloseYesterday == tradeField.OffsetFlag)
+	// 	{
+	// 		newPosInfo.Commission = InstrumentManager.Get(tradeField.InstrumentID).ComRateField.CloseRatioByVolume * tradeField.Volume;
+	// 	}
+	// 	else if (tradeField.OffsetFlag == THOST_FTDC_OF_CloseToday)
+	// 	{
+	// 		newPosInfo.Commission = InstrumentManager.Get(tradeField.InstrumentID).ComRateField.CloseTodayRatioByVolume * tradeField.Volume;
+	// 	}
+	// 	else{
+	// 		assert(false);
+	// 	}
 
-		return newPosInfo;
-	}
+	// 	return newPosInfo;
+	// }
 
 	void PositionProfitMgr::SetAccountInfo(const CThostFtdcTradingAccountField& info) {
 		memcpy(&m_accountInfo, &info, sizeof(CThostFtdcTradingAccountField));
@@ -265,10 +414,10 @@ namespace PP {
 	size_t PositionProfitMgr::GetUnclosedPosition(const std::string& instrumentId, TThostFtdcDirectionType type) const{
 		if (m_posFieldMap.find(instrumentId) != m_posFieldMap.end()){
 			if (type == THOST_FTDC_D_Buy){
-				return m_posFieldMap.at(instrumentId).GetLongPos().Position;
+				return m_posFieldMap.at(instrumentId).GetLongPos();
 			}
 			else if (type == THOST_FTDC_D_Sell){
-				return m_posFieldMap.at(instrumentId).GetShortPos().Position;
+				return m_posFieldMap.at(instrumentId).GetShortPos();
 			}
 			else{
 				assert(false);
@@ -283,10 +432,10 @@ namespace PP {
 	size_t PositionProfitMgr::GetYDUnclosedPosition(const std::string& instrumentId, TThostFtdcDirectionType type) const{
 		if (m_posFieldMap.find(instrumentId) != m_posFieldMap.end()){
 			if (type == THOST_FTDC_D_Buy){
-				return m_posFieldMap.at(instrumentId).GetLongPos().YdPosition;
+				return m_posFieldMap.at(instrumentId).GetLongPos();
 			}
 			else if (type == THOST_FTDC_D_Sell){
-				return m_posFieldMap.at(instrumentId).GetShortPos().YdPosition;
+				return m_posFieldMap.at(instrumentId).GetShortPos();
 			}
 			else{
 				assert(false);
@@ -299,19 +448,26 @@ namespace PP {
 	}
 
 	double PositionProfitMgr::GetAvailableMoney() const{
-		return m_accountInfo.Available;
+		//todo: loop all positionField and deduct the margin and commission from them.
+		double aMoney = m_accountInfo.Available;
+		for (auto item : m_posFieldMap){
+			aMoney -= item.second.GetMargin();
+			aMoney -= item.second.GetFrozenMargin();
+			aMoney -= item.second.GetCommission();
+			aMoney -= item.second.GetFrozenCommission();
+		}
+		return aMoney;
 	}
 
 	double PositionProfitMgr::GetBalanceMoney() const {
-		return m_accountInfo.Balance;
-	}
-
-	double PositionProfitMgr::GetFrozenCommission() const{
-		return m_accountInfo.FrozenCommission;
-	}
-
-	double PositionProfitMgr::GetUsedMargin() const{
-		return m_accountInfo.CurrMargin;
+		double bMoney = m_accountInfo.Available;
+		for (auto item : m_posFieldMap){
+			bMoney -= item.second.GetMargin();
+			bMoney -= item.second.GetFrozenMargin();
+			bMoney -= item.second.GetCommission();
+			bMoney -= item.second.GetFrozenCommission();
+		}
+		return bMoney;
 	}
 
 	std::string PositionProfitMgr::ToString() const{
