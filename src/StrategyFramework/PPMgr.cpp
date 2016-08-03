@@ -91,13 +91,13 @@ namespace PP {
 	}
 
 	CThostFtdcInvestorPositionFieldWrapper& CThostFtdcInvestorPositionFieldWrapper::operator +=(const CThostFtdcTradeField& trade){
-		auto initPosFieldFunc = (const CThostFtdcTradeField& tradeField, CThostFtdcInvestorPositionField& posField)[] -> void {
+		auto initPosFieldFunc = [](const CThostFtdcTradeField& tradeField, CThostFtdcInvestorPositionField& posField) -> void {
 			//!!!Note:如果当前仓位为空，那么必然是开仓
 			assert(tradeField.OffsetFlag == THOST_FTDC_OF_Open);
 			//Original Position is empty, so should be initialize here
-			posField.InstrumentID = tradeField.InstrumentID;
-			posField.BrokerID = tradeField.BrokerID;
-			posField.InvestorID = tradeField.InvestorID;
+			strcpy(posField.InstrumentID, tradeField.InstrumentID);
+			strcpy(posField.BrokerID, tradeField.BrokerID);
+			strcpy(posField.InvestorID, tradeField.InvestorID);
 			assert(posField.PosiDirection == tradeField.Direction + 2);
 			posField.HedgeFlag = tradeField.HedgeFlag;
 			posField.PositionDate = THOST_FTDC_PSD_Today;
@@ -124,12 +124,12 @@ namespace PP {
 			posField.UseMargin = InstrumentManager.Get(tradeField.InstrumentID).MgrRateField.LongMarginRatioByVolume * tradeField.Volume;
 			posField.PreMargin = 0;
 			posField.Commission = InstrumentManager.Get(tradeField.InstrumentID).ComRateField.OpenRatioByVolume * tradeField.Volume;
-			posField.TradingDay = tradeField.TradeDate;
+			strcpy(posField.TradingDay, tradeField.TradeDate);
 		};
 
-		auto appendPosFunc = (const CThostFtdcTradeField& tradeField, CThostFtdcInvestorPositionField& posField)[] -> void {
-			double Amount ＝ posField.PositionCost ＊ posField.Position;
-			double delta_Amount = tradeField.Price * tradeField.Volume;
+		auto appendPosFunc = [](const CThostFtdcTradeField& tradeField, CThostFtdcInvestorPositionField& posField) -> void {
+			double amount = posField.PositionCost * posField.Position;
+			double delta_amount = tradeField.Price * tradeField.Volume;
 			double margin_ratio_by_volume = 0.0;
 			double commission_ratio_by_volume = 0.0;
 			if (posField.PosiDirection == THOST_FTDC_PD_Long)
@@ -156,29 +156,29 @@ namespace PP {
 				posField.TodayPosition += tradeField.Volume;
 				posField.Position = posField.TodayPosition + posField.YdPosition;
 				posField.OpenVolume += tradeField.Volume; //更新开仓量
-				posField.OpenAmount ＋= tradeField.Price * tradeField.Volume;
-				posField.PositionCost = (Amount + delta_Amount) / posField.Position;
+				posField.OpenAmount += tradeField.Price * tradeField.Volume;
+				posField.PositionCost = (amount + delta_amount) / posField.Position;
 			}
 			else if (THOST_FTDC_OF_Close == tradeField.OffsetFlag || THOST_FTDC_OF_ForceClose == tradeField.OffsetFlag || 
 				THOST_FTDC_OF_CloseToday == tradeField.OffsetFlag || THOST_FTDC_OF_CloseYesterday == tradeField.OffsetFlag){
 				posField.TodayPosition -= tradeField.Volume;
 				posField.Position = posField.TodayPosition + posField.YdPosition;
 				posField.CloseVolume += tradeField.Volume; //更新平仓量
-				posField.CloseAmount ＋= tradeField.Price * tradeField.Volume;
-				posField.PositionCost = (Amount - delta_Amount) / posField.Position;
+				posField.CloseAmount += tradeField.Price * tradeField.Volume;
+				posField.PositionCost = (amount - delta_amount) / posField.Position;
 			}
 			posField.UseMargin = margin_ratio_by_volume * posField.Position;
 			posField.Commission += commission_ratio_by_volume * tradeField.Volume;
 		};
 
-		if (tradeField.Direction == THOST_FTDC_D_Buy)
+		if (trade.Direction == THOST_FTDC_D_Buy)
 		{
 			if (IsLongPosEmpty())
 				initPosFieldFunc(trade, m_LongPos);
 			else
 				appendPosFunc(trade, m_LongPos);
 		}
-		else if (tradeField.Direction == THOST_FTDC_D_Sell)
+		else if (trade.Direction == THOST_FTDC_D_Sell)
 		{	
 			if (IsShortPosEmpty())
 				initPosFieldFunc(trade, m_ShortPos);				
@@ -193,7 +193,7 @@ namespace PP {
 	}
 
 	void CThostFtdcInvestorPositionFieldWrapper::OnOrder(const CThostFtdcOrderField& orderField, OrderCallBackType ordCBType){
-		if (FinishOrder == ordCBType || CancellOrder == ordCBType || InsertOrder == ordCBType){
+		if (OrderCallBackType::FinishOrder == ordCBType || OrderCallBackType::CancellOrder == ordCBType || OrderCallBackType::InsertOrder == ordCBType){
 			double commratio = 0.0;
 			if (orderField.CombOffsetFlag[0] == THOST_FTDC_OF_Open)
 				commratio = InstrumentManager.Get(orderField.InstrumentID).ComRateField.OpenRatioByVolume;
@@ -215,7 +215,7 @@ namespace PP {
 			}
 
 			switch(ordCBType){
-				case InsertOrder:
+				case OrderCallBackType::InsertOrder:
 				{
 					if (orderField.Direction == THOST_FTDC_D_Buy){
 						m_LongPos.LongFrozen += orderField.VolumeTotalOriginal;
@@ -229,8 +229,8 @@ namespace PP {
 					}				
 				}
 				break;
-				case FinishOrder:
-				case CancellOrder:
+				case OrderCallBackType::FinishOrder:
+				case OrderCallBackType::CancellOrder:
 				{
 					if (orderField.Direction == THOST_FTDC_D_Buy){
 						m_LongPos.LongFrozen -= orderField.VolumeTotalOriginal;
@@ -284,27 +284,27 @@ namespace PP {
 		if (m_acccountInfoInitialized){
 			// Update m_orderFieldVec
 			auto iter = std::find_if(m_orderFieldVec.begin(), m_orderFieldVec.end(), IsSameOrder<CThostFtdcOrderField>(orderField));
-			OrderCallBackType ordCBType = PP::Unknown;
+			OrderCallBackType ordCBType = OrderCallBackType::Unknown;
 			if (orderField.OrderStatus == THOST_FTDC_OST_AllTraded)
-				ordCBType = FinishOrder;
+				ordCBType = OrderCallBackType::FinishOrder;
 			else if (orderField.OrderStatus == THOST_FTDC_OST_Canceled)
-				ordCBType = CancellOrder;
+				ordCBType = OrderCallBackType::CancellOrder;
 			else if (iter == m_orderFieldVec.end())
-				ordCBType = InsertOrder;
+				ordCBType = OrderCallBackType::InsertOrder;
 			else 
-				ordCBType = other;
+				ordCBType = OrderCallBackType::Other;
 
 			switch(ordCBType)
 			{
-				case InsertOrder:
+				case OrderCallBackType::InsertOrder:
 					m_orderFieldVec.push_back(orderField);
 					break;
-				case CancellOrder:
-				case FinishOrder:
+				case OrderCallBackType::CancellOrder:
+				case OrderCallBackType::FinishOrder:
 					m_orderFieldVec.erase(iter);
 					break;
-				case Unknown:
-				case Other:
+				case OrderCallBackType::Unknown:
+				case OrderCallBackType::Other:
 					break;
 				default:
 					break;
@@ -470,6 +470,22 @@ namespace PP {
 		return bMoney;
 	}
 
+	double PositionProfitMgr::GetFrozenMargin() const{
+		double ret = 0.0;
+		for (auto item : m_posFieldMap){
+			ret += item.second.GetFrozenMargin();
+		}		
+		return ret;
+	}
+
+	double PositionProfitMgr::GetUsedMargin() const{
+		double ret = 0.0;
+		for (auto item : m_posFieldMap){
+			ret += item.second.GetMargin();
+		}		
+		return ret;
+	}
+
 	std::string PositionProfitMgr::ToString() const{
 		std::stringstream result;
 		result << "$AccountInfo =>" << std::endl;
@@ -488,7 +504,7 @@ namespace PP {
 	std::string PositionProfitMgr::PositionOfInstruments() const{
 		std::stringstream result;
 		for (auto item : m_posFieldMap){
-			result << item.first << " Long:" << item.second.GetLongPos().Position << " Short:" << item.second.GetShortPos().Position << "\n";
+			result << item.first << " Long:" << item.second.GetLongPos() << " Short:" << item.second.GetShortPos() << "\n";
 		}
 		return result.str();
 	}

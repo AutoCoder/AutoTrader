@@ -59,6 +59,7 @@ namespace PP {
 		double 	GetFrozenMargin() const;
 		double 	GetCommission() const;
 		double 	GetFrozenCommission() const;
+
 		int 	GetLongPos() const { return m_LongPos.Position; }
 		int 	GetShortPos() const { return m_ShortPos.Position; }
 		std::string ToString();
@@ -95,6 +96,8 @@ namespace PP {
 		size_t GetYDUnclosedPosition(const std::string& instrumentId, TThostFtdcDirectionType type) const;
 		double GetAvailableMoney() const ;
 		double GetBalanceMoney() const;
+		double GetFrozenMargin() const;
+		double GetUsedMargin() const;
 
 		void   SetAccountInfoInitialized(bool init = true) { m_acccountInfoInitialized = init; };
 
