@@ -480,7 +480,7 @@ std::string CommonUtils::ConvertTradingAccountFieldToString(const CThostFtdcTrad
 
 std::string CommonUtils::ConvertAccountInfoToString(const CThostFtdcTradingAccountField& account){
 	std::stringstream result;
-
+        result.precision(10);
 	result << "AccountID:" << account.AccountID << std::endl
 		<< " FrozenMargin:" << account.FrozenMargin << std::endl
 		<< " FrozenCash:" << account.FrozenCash << std::endl
