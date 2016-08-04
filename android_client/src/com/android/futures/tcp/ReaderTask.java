@@ -183,7 +183,9 @@ public class ReaderTask extends Thread {
 						statusChangeHandler.onMDCallback(tick);
 					} else if (infoType.equals("POSITION_INFO")) {
 						PositionInfo info = new PositionInfo(details.getDouble("Balance"),
-								details.getDouble("PositionMoney"), details.getString("PositionOfInstruments"));
+								details.getDouble("Available"), details.getDouble("Margin"), 
+								details.getDouble("ForzenMargin"), details.getDouble("Commission"),
+								details.getDouble("ForzenCommission"), details.getString("PositionOfInstruments"));
 						if (statusChangeHandler != null)
 							statusChangeHandler.onPositionUpdated(info);
 					} else if (infoType.equals("ACCOUNT_INFO")) {

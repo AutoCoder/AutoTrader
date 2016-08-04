@@ -4,11 +4,20 @@ package com.android.futures.tcp;
 public class PositionInfo {
 	private String Details;
 	private double Balance;
-	private double PositionMoney;
+	private double Available;
+	private double Margin;
+	private double ForzenMargin;
+	private double Commission;
+	private double ForzenCommission;
+
 	
-	PositionInfo(double balance, double positionMoney, String details){
+	PositionInfo(double balance, double available, double margin, double forzenMargin, double commission, double forzenCommission, String details){
 		setBalance(balance);
-		setPositionMoney(positionMoney);
+		setAvailable(available);
+		setMargin(margin);
+		setForzenMargin(forzenMargin);
+		setCommission(commission);
+		setForzenCommission(forzenCommission);
 		setDetails(details);
 	}
 
@@ -28,12 +37,45 @@ public class PositionInfo {
 		Balance = balance;
 	}
 
-	public double getPositionMoney() {
-		return PositionMoney;
+	public double getAvailable() {
+		return Available;
 	}
 
-	public void setPositionMoney(double positionMoney) {
-		PositionMoney = positionMoney;
+	public void setAvailable(double available) {
+		Available = available;
 	}
+
+	public double getMargin(){
+		return Margin;
+	}
+
+	public double setMargin(double margin){
+		Margin = margin;
+	}
+
+	public double getForzenMargin() {
+		return ForzenMargin;
+	}
+
+	public void setForzenMargin(double forzenMargin) {
+		ForzenMargin = forzenMargin;
+	}
+
+	public double getCommission(){
+		return Margin;
+	}
+
+	public double setCommission(double commission){
+		Commission = commission;
+	}
+
+	public double getForzenCommission(){
+		return Margin;
+	}
+
+	public double setForzenCommission(double forzenCommission){
+		ForzenCommission = forzenCommission;
+	}
+
 
 }

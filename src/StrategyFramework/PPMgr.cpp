@@ -460,9 +460,12 @@ namespace PP {
 	}
 
 	double PositionProfitMgr::GetBalanceMoney() const {
-		double bMoney = m_accountInfo.Balance;
+		double bMoney = m_accountInfo.Balane;
 		for (auto item : m_posFieldMap){
+			bMoney -= item.second.GetMargin();
+			bMoney -= item.second.GetFrozenMargin();
 			bMoney -= item.second.GetCommission();
+			bMoney -= item.second.GetFrozenCommission();
 		}
 		return bMoney;
 	}
@@ -483,6 +486,22 @@ namespace PP {
 		return ret;
 	}
 
+	double PositionProfitMgr::GetCommission() const{
+		double ret = 0.0;
+		for (auto item : m_posFieldMap){
+			ret += item.second.GetCommission();
+		}		
+		return ret;
+	}
+
+	double PositionProfitMgr::GetForzenCommission() const{
+		double ret = 0.0;
+		for (auto item : m_posFieldMap){
+			ret += item.second.GetFrozenCommission();
+		}		
+		return ret;
+	}
+	
 	std::string PositionProfitMgr::ToString() const{
 		std::stringstream result;
 		result << "$AccountInfo =>" << std::endl;

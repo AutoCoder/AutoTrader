@@ -175,6 +175,7 @@ public class AccountActivity extends Activity implements Handler.Callback {
 		} else if (msg.what == ClientStatusListener.PositionUpdated) {
 			PositionInfo status = (PositionInfo) msg.obj;
 			balanceView.setText(Double.toString(status.getBalance()));
+			
 			//String pos_text = String.format("[%s]: (%d * %d)", status.getInstrument(), status.getPrice(), status.getPosition());
 			positionView.setText(status.getDetails());
 			IsPositionUpdated = true;

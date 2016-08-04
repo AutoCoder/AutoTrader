@@ -43,12 +43,16 @@ namespace Transmission{
 		Transmission::GetResponseActionQueue().Push_back(Transmission::RemoteServerAction(session, ret));
 	}
 
-	void Utils::SendPositionInfo(const SockSessionSP& session, double blance, int posmoney, const std::string& detailList){
+	void Utils::SendPositionInfo(const SockSessionSP& session, double blance, double available, double margin, double forzenMargin, double commission, double forzenCommission, const std::string& detailList){
 		Json::Value root;
 		root["Info"] = "POSITION_INFO";
 		Json::Value details;
 		details["Balance"] = blance;
-		details["PositionMoney"] = posmoney;
+		details["Available"] = available;
+		details["Margin"] = margin;
+		details["ForzenMargin"] = forzenMargin;
+		details["Commission"] = commission;
+		details["ForzenCommission"] = forzenCommission;
 		details["PositionOfInstruments"] = detailList;
 		root["Details"] = details;
 		Json::FastWriter writer;
