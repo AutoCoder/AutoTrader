@@ -460,7 +460,7 @@ namespace PP {
 	}
 
 	double PositionProfitMgr::GetBalanceMoney() const {
-		double bMoney = m_accountInfo.Available;
+		double bMoney = m_accountInfo.Balance;
 		for (auto item : m_posFieldMap){
 			bMoney -= item.second.GetMargin();
 			bMoney -= item.second.GetFrozenMargin();
