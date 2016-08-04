@@ -38,6 +38,11 @@ public class AccountActivity extends Activity implements Handler.Callback {
 	private Button checkMsgBtn = null;
 	private TextView accountView = null;
 	private TextView balanceView = null;
+	private TextView availableView = null;
+	private TextView marginView = null;
+	private TextView forzenMarginView = null;
+	private TextView commissionView = null;
+	private TextView forzenCommissionView = null;
 	private TextView positionView = null;
 	private boolean IsTrading = false;
 	private boolean IsPositionUpdated = false;
@@ -64,6 +69,12 @@ public class AccountActivity extends Activity implements Handler.Callback {
 		mHandler = new Handler(this);
 		accountView = (TextView) this.findViewById(R.id.account_val);
 		balanceView = (TextView) this.findViewById(R.id.balance_val);
+		availableView = (TextView) this.findViewById(R.id.available_val);
+		marginView = (TextView) this.findViewById(R.id.margin_val);
+		forzenMarginView = (TextView) this.findViewById(R.id.forzenMargin_val);
+		commissionView = (TextView) this.findViewById(R.id.commission_val);
+		forzenCommissionView = (TextView) this.findViewById(R.id.forzenCommission_val);
+
 		positionView = (TextView) this.findViewById(R.id.position_val);
 		mInstrumentList = (Spinner) this.findViewById(R.id.instrument_List);
 		mStrategyList = (Spinner) this.findViewById(R.id.strategy_list);
@@ -175,7 +186,11 @@ public class AccountActivity extends Activity implements Handler.Callback {
 		} else if (msg.what == ClientStatusListener.PositionUpdated) {
 			PositionInfo status = (PositionInfo) msg.obj;
 			balanceView.setText(Double.toString(status.getBalance()));
-			
+			availableView.setText(Double.toString(status.getAvailable()));
+			marginView.setText(Double.toString(status.getMargin()));
+			forzenMarginView.setText(Double.toString(status.getForzenMargin()));
+			commissionView.setText(Double.toString(status.getCommission()));
+			forzenCommissionView.setText(Double.toString(status.getForzenCommission()));
 			//String pos_text = String.format("[%s]: (%d * %d)", status.getInstrument(), status.getPrice(), status.getPosition());
 			positionView.setText(status.getDetails());
 			IsPositionUpdated = true;

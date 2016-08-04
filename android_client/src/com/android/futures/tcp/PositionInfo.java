@@ -49,7 +49,7 @@ public class PositionInfo {
 		return Margin;
 	}
 
-	public double setMargin(double margin){
+	public void setMargin(double margin){
 		Margin = margin;
 	}
 
@@ -65,7 +65,7 @@ public class PositionInfo {
 		return Margin;
 	}
 
-	public double setCommission(double commission){
+	public void setCommission(double commission){
 		Commission = commission;
 	}
 
@@ -73,7 +73,7 @@ public class PositionInfo {
 		return Margin;
 	}
 
-	public double setForzenCommission(double forzenCommission){
+	public void setForzenCommission(double forzenCommission){
 		ForzenCommission = forzenCommission;
 	}
 

@@ -99,7 +99,152 @@
                 android:textColor="#000"
                 android:textSize="15sp" />
         </RelativeLayout>
+        
+        <RelativeLayout
+            android:id="@+id/availableRel"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/accountRel"
+            android:clickable="true"
+            android:gravity="center_vertical" >
 
+            <TextView
+                android:id="@+id/available_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="可用金额："
+                android:textColor="#000"
+                android:textSize="17sp" />
+
+            <TextView
+                android:id="@+id/available_val"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="2dip"
+                android:layout_toRightOf="@id/available_label"
+                android:text="10000.0"
+                android:textColor="#000"
+                android:textSize="15sp" />
+        </RelativeLayout>
+        
+        <RelativeLayout
+            android:id="@+id/marginRel"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/accountRel"
+            android:clickable="true"
+            android:gravity="center_vertical" >
+
+            <TextView
+                android:id="@+id/margin_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="可用金额："
+                android:textColor="#000"
+                android:textSize="17sp" />
+
+            <TextView
+                android:id="@+id/margin_val"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="2dip"
+                android:layout_toRightOf="@id/margin_label"
+                android:text="10000.0"
+                android:textColor="#000"
+                android:textSize="15sp" />
+        </RelativeLayout>     
+         
+        <RelativeLayout
+            android:id="@+id/forzenMarginRel"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/accountRel"
+            android:clickable="true"
+            android:gravity="center_vertical" >
+
+            <TextView
+                android:id="@+id/forzenMargin_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="可用金额："
+                android:textColor="#000"
+                android:textSize="17sp" />
+
+            <TextView
+                android:id="@+id/forzenMargin_val"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="2dip"
+                android:layout_toRightOf="@id/forzenMargin_label"
+                android:text="10000.0"
+                android:textColor="#000"
+                android:textSize="15sp" />
+        </RelativeLayout>  
+                 
+        <RelativeLayout
+            android:id="@+id/commissionRel"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/accountRel"
+            android:clickable="true"
+            android:gravity="center_vertical" >
+
+            <TextView
+                android:id="@+id/commission_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="可用金额："
+                android:textColor="#000"
+                android:textSize="17sp" />
+
+            <TextView
+                android:id="@+id/commission_val"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="2dip"
+                android:layout_toRightOf="@id/commission_label"
+                android:text="10000.0"
+                android:textColor="#000"
+                android:textSize="15sp" />
+        </RelativeLayout>  
+     
+        <RelativeLayout
+            android:id="@+id/forzenCommissionRel"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/accountRel"
+            android:clickable="true"
+            android:gravity="center_vertical" >
+
+            <TextView
+                android:id="@+id/forzenCommission_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="可用金额："
+                android:textColor="#000"
+                android:textSize="17sp" />
+
+            <TextView
+                android:id="@+id/forzenCommission_val"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="2dip"
+                android:layout_toRightOf="@id/forzenCommission_label"
+                android:text="10000.0"
+                android:textColor="#000"
+                android:textSize="15sp" />
+        </RelativeLayout> 
+        
         <RelativeLayout
             android:id="@+id/positionRel"
             android:layout_width="fill_parent"

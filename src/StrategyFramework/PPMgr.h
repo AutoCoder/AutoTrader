@@ -99,7 +99,7 @@ namespace PP {
 		double GetFrozenMargin() const;
 		double GetUsedMargin() const;
 		double GetCommission() const;
-		double GetForzenCommission() const;
+		double GetFrozenCommission() const;
 
 		void   SetAccountInfoInitialized(bool init = true) { m_acccountInfoInitialized = init; };
 
