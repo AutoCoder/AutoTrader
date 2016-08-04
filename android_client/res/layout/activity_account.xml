@@ -84,7 +84,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="8dp"
-                android:text="可用金额："
+                android:text="权益总额："
                 android:textColor="#000"
                 android:textSize="17sp" />
 
@@ -104,7 +104,7 @@
             android:id="@+id/availableRel"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/accountRel"
+            android:layout_below="@id/balanceRel"
             android:clickable="true"
             android:gravity="center_vertical" >
 
@@ -133,7 +133,7 @@
             android:id="@+id/marginRel"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/accountRel"
+            android:layout_below="@id/availableRel"
             android:clickable="true"
             android:gravity="center_vertical" >
 
@@ -142,7 +142,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="8dp"
-                android:text="可用金额："
+                android:text="保证金："
                 android:textColor="#000"
                 android:textSize="17sp" />
 
@@ -162,7 +162,7 @@
             android:id="@+id/forzenMarginRel"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/accountRel"
+            android:layout_below="@id/marginRel"
             android:clickable="true"
             android:gravity="center_vertical" >
 
@@ -171,7 +171,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="8dp"
-                android:text="可用金额："
+                android:text="冻结保证金："
                 android:textColor="#000"
                 android:textSize="17sp" />
 
@@ -191,7 +191,7 @@
             android:id="@+id/commissionRel"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/accountRel"
+            android:layout_below="@id/forzenMarginRel"
             android:clickable="true"
             android:gravity="center_vertical" >
 
@@ -200,7 +200,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="8dp"
-                android:text="可用金额："
+                android:text="手续费："
                 android:textColor="#000"
                 android:textSize="17sp" />
 
@@ -220,7 +220,7 @@
             android:id="@+id/forzenCommissionRel"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/accountRel"
+            android:layout_below="@id/commissionRel"
             android:clickable="true"
             android:gravity="center_vertical" >
 
@@ -229,7 +229,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:padding="8dp"
-                android:text="可用金额："
+                android:text="冻结手续费："
                 android:textColor="#000"
                 android:textSize="17sp" />
 
@@ -249,7 +249,7 @@
             android:id="@+id/positionRel"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/balanceRel"
+            android:layout_below="@id/forzenCommissionRel"
             android:clickable="true"
             android:gravity="center_vertical" >
 
