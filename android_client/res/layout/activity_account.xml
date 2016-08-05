@@ -90,7 +90,7 @@
 
             <TextView
                 android:id="@+id/balance_val"
-                android:layout_width="fill_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="2dip"
@@ -98,20 +98,13 @@
                 android:text="10000.0"
                 android:textColor="#000"
                 android:textSize="15sp" />
-        </RelativeLayout>
-        
-        <RelativeLayout
-            android:id="@+id/availableRel"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/balanceRel"
-            android:clickable="true"
-            android:gravity="center_vertical" >
-
+            
             <TextView
                 android:id="@+id/available_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="2dip"
+                android:layout_toRightOf="@id/balance_val"
                 android:padding="8dp"
                 android:text="可用金额："
                 android:textColor="#000"
@@ -133,7 +126,7 @@
             android:id="@+id/marginRel"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/availableRel"
+            android:layout_below="@id/balanceRel"
             android:clickable="true"
             android:gravity="center_vertical" >
 
@@ -148,7 +141,7 @@
 
             <TextView
                 android:id="@+id/margin_val"
-                android:layout_width="fill_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="2dip"
@@ -156,20 +149,14 @@
                 android:text="10000.0"
                 android:textColor="#000"
                 android:textSize="15sp" />
-        </RelativeLayout>     
-         
-        <RelativeLayout
-            android:id="@+id/forzenMarginRel"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/marginRel"
-            android:clickable="true"
-            android:gravity="center_vertical" >
-
+            
             <TextView
                 android:id="@+id/forzenMargin_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="2dip"
+                android:layout_toRightOf="@id/margin_val"
                 android:padding="8dp"
                 android:text="冻结保证金："
                 android:textColor="#000"
@@ -185,13 +172,13 @@
                 android:text="10000.0"
                 android:textColor="#000"
                 android:textSize="15sp" />
-        </RelativeLayout>  
+        </RelativeLayout>     
                  
         <RelativeLayout
             android:id="@+id/commissionRel"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/forzenMarginRel"
+            android:layout_below="@id/marginRel"
             android:clickable="true"
             android:gravity="center_vertical" >
 
@@ -206,7 +193,7 @@
 
             <TextView
                 android:id="@+id/commission_val"
-                android:layout_width="fill_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="2dip"
@@ -214,20 +201,14 @@
                 android:text="10000.0"
                 android:textColor="#000"
                 android:textSize="15sp" />
-        </RelativeLayout>  
-     
-        <RelativeLayout
-            android:id="@+id/forzenCommissionRel"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/commissionRel"
-            android:clickable="true"
-            android:gravity="center_vertical" >
-
+            
             <TextView
                 android:id="@+id/forzenCommission_label"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="2dip"
+                android:layout_toRightOf="@id/commission_val"
                 android:padding="8dp"
                 android:text="冻结手续费："
                 android:textColor="#000"
@@ -243,13 +224,13 @@
                 android:text="10000.0"
                 android:textColor="#000"
                 android:textSize="15sp" />
-        </RelativeLayout> 
+        </RelativeLayout>  
         
         <RelativeLayout
             android:id="@+id/positionRel"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/forzenCommissionRel"
+            android:layout_below="@id/commissionRel"
             android:clickable="true"
             android:gravity="center_vertical" >
 
