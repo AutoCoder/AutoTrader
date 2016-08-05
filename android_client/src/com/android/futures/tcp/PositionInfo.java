@@ -62,7 +62,7 @@ public class PositionInfo {
 	}
 
 	public double getCommission(){
-		return Commission;
+		return Margin;
 	}
 
 	public void setCommission(double commission){
@@ -70,7 +70,7 @@ public class PositionInfo {
 	}
 
 	public double getForzenCommission(){
-		return ForzenCommission;
+		return Margin;
 	}
 
 	public void setForzenCommission(double forzenCommission){
