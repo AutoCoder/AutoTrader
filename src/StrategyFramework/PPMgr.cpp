@@ -44,7 +44,7 @@ namespace PP {
 	CThostFtdcInvestorPositionFieldWrapper& CThostFtdcInvestorPositionFieldWrapper::operator +=(const CThostFtdcInvestorPositionField& other){
 		if (other.PosiDirection == THOST_FTDC_PD_Long)
 		{
-			assert(IsLongPosEmpty());
+			//初始化中，可能会有同一个合约的多次回报
 			if (IsLongPosEmpty()){
 				memcpy(&m_LongPos, &(other), sizeof(CThostFtdcInvestorPositionField));
 			}
