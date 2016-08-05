@@ -51,7 +51,9 @@ namespace PP {
 			else{
 				m_LongPos.Position += other.Position;
 				m_LongPos.TodayPosition += other.TodayPosition;
-				m_LongPos.YdPosition += other.YdPosition;
+				//m_LongPos.YdPosition += other.YdPosition;
+				//##According debuging, I found YdPosition may not correct when tradepi callback
+				m_LongPos.YdPosition = m_LongPos.Position - m_LongPos.TodayPosition;
 				m_LongPos.LongFrozen += other.LongFrozen;
 				m_LongPos.LongFrozenAmount += other.LongFrozenAmount;
 				m_LongPos.PositionCost = (m_LongPos.PositionCost * m_LongPos.OpenVolume + other.PositionCost * other.OpenVolume) / (m_LongPos.OpenVolume + other.OpenVolume);
@@ -71,7 +73,9 @@ namespace PP {
 			else{
 				m_ShortPos.Position += other.Position;
 				m_ShortPos.TodayPosition += other.TodayPosition;
-				m_ShortPos.YdPosition += other.YdPosition;
+				//m_ShortPos.YdPosition += other.YdPosition;
+				//##According debuging, I found YdPosition may not correct when tradepi callback
+				m_ShortPos.YdPosition = m_ShortPos.Position - m_ShortPos.TodayPosition;
 				m_ShortPos.LongFrozen += other.LongFrozen;
 				m_ShortPos.LongFrozenAmount += other.LongFrozenAmount;
 				m_ShortPos.PositionCost = (m_ShortPos.PositionCost * m_ShortPos.OpenVolume + other.PositionCost * other.OpenVolume) / (m_ShortPos.OpenVolume + other.OpenVolume);
