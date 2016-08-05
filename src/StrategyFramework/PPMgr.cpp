@@ -13,10 +13,11 @@ namespace PP {
 		memset(&m_ShortPos, 0, sizeof(CThostFtdcInvestorPositionField));
 		m_LongPos.PosiDirection = THOST_FTDC_PD_Net;
 		m_ShortPos.PosiDirection = THOST_FTDC_PD_Net;
+
 	}
 
 	bool CThostFtdcInvestorPositionFieldWrapper::IsLongPosEmpty(){
-		return m_LongPos.PosiDirection == THOST_FTDC_PD_Net;
+		return m_LongPos.PosiDirection == THOST_FTDC_PD_Net;;
 	}
 
 	bool CThostFtdcInvestorPositionFieldWrapper::IsShortPosEmpty(){
@@ -98,7 +99,7 @@ namespace PP {
 			strcpy(posField.InstrumentID, tradeField.InstrumentID);
 			strcpy(posField.BrokerID, tradeField.BrokerID);
 			strcpy(posField.InvestorID, tradeField.InvestorID);
-			assert(posField.PosiDirection == tradeField.Direction + 2);
+			posField.PosiDirection == tradeField.Direction + 2;
 			posField.HedgeFlag = tradeField.HedgeFlag;
 			posField.PositionDate = THOST_FTDC_PSD_Today;
 			posField.YdPosition = 0;
@@ -175,15 +176,19 @@ namespace PP {
 		{
 			if (IsLongPosEmpty())
 				initPosFieldFunc(trade, m_LongPos);
-			else
-				appendPosFunc(trade, m_LongPos);
+			else{
+				//开多仓 传入m_LongPos  平空仓 传入m_ShortPos
+				appendPosFunc(trade, tradeField.OffsetFlag == THOST_FTDC_OF_Open ? m_LongPos : m_ShortPos);
+			}
 		}
 		else if (trade.Direction == THOST_FTDC_D_Sell)
 		{	
 			if (IsShortPosEmpty())
 				initPosFieldFunc(trade, m_ShortPos);				
-			else
-				appendPosFunc(trade, m_ShortPos);
+			else{
+				//开空仓 传入m_ShortPos 平多仓 传入m_LongPos 
+				appendPosFunc(trade, tradeField.OffsetFlag == THOST_FTDC_OF_Open ? m_ShortPos : m_LongPos);
+			}
 		}
 		else{
 			assert(false);
