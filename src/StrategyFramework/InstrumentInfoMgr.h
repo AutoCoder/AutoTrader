@@ -50,6 +50,7 @@ namespace Instrument{
 			memcpy(&InstruField, &info.InstruField, sizeof(CThostFtdcInstrumentField));
 			memcpy(&MgrRateField, &info.MgrRateField, sizeof(CThostFtdcInstrumentMarginRateField));
 			memcpy(&ComRateField, &info.ComRateField, sizeof(CThostFtdcInstrumentCommissionRateField));
+			return *this;
 		}
 
 		CThostFtdcInstrumentField					InstruField;

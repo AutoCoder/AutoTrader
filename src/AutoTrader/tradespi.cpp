@@ -18,13 +18,14 @@ CtpTradeSpi::CtpTradeSpi(CThostFtdcTraderApi* p, const char * brokerID, const ch
 	: pUserApi(p)
 	, m_frontID(-1)
 	, m_sessionID(-1)
-	, m_stateChangeHandler(this)
-	, m_ppmgr(ppmgr)
 	, m_OnInitedAccount_Callback(onInitedAccountCallback)
 	, m_OnRtnOrder_callback(onRtnOrderCallback)
 	, m_OnRtnTrade_callback(onRtnTradeCallback)
 	, m_OnCancelOrder_callback(onRtnCancellOrderCallback)
+	, m_ppmgr(ppmgr)
+	, m_stateChangeHandler(this)
 	, m_requestId(0)
+
 {
 	STRCPY(m_brokerID, brokerID);
 	STRCPY(m_userID, userID);
@@ -447,7 +448,7 @@ void CtpTradeSpi::OnRspQryTradingAccount(
 
 
 		//SYNC_PRINT << "[Trade] 资金查询正常，查询投资者持仓:";
-		SYNC_PRINT << "[Trade] Query Trading Account Successfully，next step-> Query Investor Position:";
+		SYNC_PRINT << "[Trade] Query Trading Account Successfully, next step-> Query Investor Position:";
 
 		SYNC_TRADE_LOG << "[OnRspQryTradingAccount] :" << CommonUtils::ConvertTradingAccountFieldToString(*pTradingAccount);
 	}

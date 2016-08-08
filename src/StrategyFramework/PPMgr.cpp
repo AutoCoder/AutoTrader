@@ -96,33 +96,33 @@ namespace PP {
 	}
 
 	CThostFtdcInvestorPositionFieldWrapper& CThostFtdcInvestorPositionFieldWrapper::operator +=(const CThostFtdcTradeField& trade){
-		double delta_amount = tradeField.Price * tradeField.Volume;
-		double margin_ratio_by_volume = －1.0;
+		double delta_amount = trade.Price * trade.Volume;
+		double margin_ratio_by_volume = -1.0;
 		double margin_ratio_by_money = -1.0;
-		double commission_ratio_by_volume = －1.0;
+		double commission_ratio_by_volume = -1.0;
 		double commission_ratio_by_money = -1.0;
-		if (posField.PosiDirection == THOST_FTDC_PD_Long){
-			margin_ratio_by_money = InstrumentManager.Get(tradeField.InstrumentID).MgrRateField.LongMarginRatioByMoney;
-			margin_ratio_by_volume = InstrumentManager.Get(tradeField.InstrumentID).MgrRateField.LongMarginRatioByVolume;
+		if (trade.Direction == THOST_FTDC_D_Buy){
+			margin_ratio_by_money = InstrumentManager.Get(trade.InstrumentID).MgrRateField.LongMarginRatioByMoney;
+			margin_ratio_by_volume = InstrumentManager.Get(trade.InstrumentID).MgrRateField.LongMarginRatioByVolume;
 		}
-		else if (posField.PosiDirection == THOST_FTDC_PD_Short){
-			margin_ratio_by_money = InstrumentManager.Get(tradeField.InstrumentID).MgrRateField.ShortMarginRatioByMoney;
-			margin_ratio_by_volume = InstrumentManager.Get(tradeField.InstrumentID).MgrRateField.ShortMarginRatioByVolume;
+		else if (trade.Direction == THOST_FTDC_D_Sell){
+			margin_ratio_by_money = InstrumentManager.Get(trade.InstrumentID).MgrRateField.ShortMarginRatioByMoney;
+			margin_ratio_by_volume = InstrumentManager.Get(trade.InstrumentID).MgrRateField.ShortMarginRatioByVolume;
 		}
 		else
 			assert(false);
 
-		if (THOST_FTDC_OF_Open == tradeField.OffsetFlag){
-			commission_ratio_by_money = InstrumentManager.Get(tradeField.InstrumentID).ComRateField.OpenRatioByMoney;
-			commission_ratio_by_volume = InstrumentManager.Get(tradeField.InstrumentID).ComRateField.OpenRatioByVolume;
+		if (THOST_FTDC_OF_Open == trade.OffsetFlag){
+			commission_ratio_by_money = InstrumentManager.Get(trade.InstrumentID).ComRateField.OpenRatioByMoney;
+			commission_ratio_by_volume = InstrumentManager.Get(trade.InstrumentID).ComRateField.OpenRatioByVolume;
 		}
-		else if (THOST_FTDC_OF_Close == tradeField.OffsetFlag ||  THOST_FTDC_OF_CloseYesterday == tradeField.OffsetFlag){
-			commission_ratio_by_money = InstrumentManager.Get(tradeField.InstrumentID).ComRateField.CloseRatioByMoney;
-			commission_ratio_by_volume = InstrumentManager.Get(tradeField.InstrumentID).ComRateField.CloseRatioByVolume;
+		else if (THOST_FTDC_OF_Close == trade.OffsetFlag ||  THOST_FTDC_OF_CloseYesterday == trade.OffsetFlag){
+			commission_ratio_by_money = InstrumentManager.Get(trade.InstrumentID).ComRateField.CloseRatioByMoney;
+			commission_ratio_by_volume = InstrumentManager.Get(trade.InstrumentID).ComRateField.CloseRatioByVolume;
 		}
-		else if (THOST_FTDC_OF_CloseToday == tradeField.OffsetFlag){
-			commission_ratio_by_money = InstrumentManager.Get(tradeField.InstrumentID).ComRateField.CloseTodayRatioByMoney;
-			commission_ratio_by_volume = InstrumentManager.Get(tradeField.InstrumentID).ComRateField.CloseTodayRatioByVolume;
+		else if (THOST_FTDC_OF_CloseToday == trade.OffsetFlag){
+			commission_ratio_by_money = InstrumentManager.Get(trade.InstrumentID).ComRateField.CloseTodayRatioByMoney;
+			commission_ratio_by_volume = InstrumentManager.Get(trade.InstrumentID).ComRateField.CloseTodayRatioByVolume;
 		}
 		else {
 			assert(false);

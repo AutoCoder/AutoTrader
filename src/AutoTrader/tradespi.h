@@ -165,6 +165,7 @@ private:
 	bool IsErrorRspInfo(CThostFtdcRspInfoField *pRspInfo);
 
 private:
+	CThostFtdcTraderApi*								pUserApi;
 	TThostFtdcBrokerIDType								m_brokerID;
 	TThostFtdcUserIDType								m_userID;
 	TThostFtdcPasswordType								m_password;
@@ -179,7 +180,7 @@ private:
 	RtnTradeCallback									m_OnRtnTrade_callback;
 	CancelOrderCallback									m_OnCancelOrder_callback;
 	PPMgr&												m_ppmgr;
-	CThostFtdcTraderApi*								pUserApi;
+	
 	TradeThreadStateChangedHandler						m_stateChangeHandler;
 	int              									m_requestId;
 };
