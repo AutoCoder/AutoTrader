@@ -99,17 +99,17 @@ namespace Instrument{
 	bool InformationMgr::SetMarginRate(const std::string& instrumentID, const CThostFtdcInstrumentMarginRateField& mgrRate){
 		assert(!instrumentID.empty());
 		const std::string& prodID = InstrumentIDToProductID(instrumentID);
-		bool is_override = (m_InfoDict.find(prodID) != m_InfoDict.end());
-		if (!is_override) m_InfoDict[prodID].MgrRateField = mgrRate;
-		return is_override;
+		bool prod_existed = (m_InfoDict.find(prodID) != m_InfoDict.end());
+		m_InfoDict[prodID].MgrRateField = mgrRate;
+		return prod_existed;
 	}
 
 	bool InformationMgr::SetCommissionRate(const std::string& instrumentID, const CThostFtdcInstrumentCommissionRateField& comRate){
 		assert(!instrumentID.empty());
 		const std::string& prodID = InstrumentIDToProductID(instrumentID);
-		bool is_override = (m_InfoDict.find(prodID) != m_InfoDict.end());
-		if (!is_override) m_InfoDict[prodID].ComRateField = comRate;
-		return is_override;
+		bool prod_existed = (m_InfoDict.find(prodID) != m_InfoDict.end());
+		m_InfoDict[prodID].ComRateField = comRate;
+		return prod_existed;
 	}
 
 	std::string InformationMgr::AllInstruments() const{
