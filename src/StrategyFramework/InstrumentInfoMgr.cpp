@@ -80,16 +80,18 @@ namespace Instrument{
 	{
 	}
 
-	const Information& InformationMgr::Get(const std::string& productID) const{
-		assert (m_InfoDict.find(productID) != m_InfoDict.end());
-		return m_InfoDict.at(productID);
+	const Information& InformationMgr::Get(const std::string& instrumentID) const{
+		const std::string& prodID = InstrumentIDToProductID(instrumentID);
+		assert (m_InfoDict.find(prodID) != m_InfoDict.end());
+		return m_InfoDict.at(prodID);
 	}
 
-	void InformationMgr::Add(const std::string& productID, const Information& info){
-		assert(!productID.empty());
-
-		if (m_InfoDict.find(productID) == m_InfoDict.end()){
-			m_InfoDict.insert(std::make_pair(productID, info));
+	void InformationMgr::Add(const std::string& instrumentID, const Information& info){
+		assert(!instrumentID.empty());
+		m_InfoVec.push_back(instrumentID);
+		const std::string& prodID = InstrumentIDToProductID(instrumentID);
+		if (m_InfoDict.find(prodID) == m_InfoDict.end()){
+			m_InfoDict.insert(std::make_pair(prodID, info));
 
 		}
 	}
@@ -98,7 +100,7 @@ namespace Instrument{
 		assert(!instrumentID.empty());
 		const std::string& prodID = InstrumentIDToProductID(instrumentID);
 		bool is_override = (m_InfoDict.find(prodID) != m_InfoDict.end());
-		m_InfoDict[prodID].MgrRateField = mgrRate;
+		if (!is_override) m_InfoDict[prodID].MgrRateField = mgrRate;
 		return is_override;
 	}
 
@@ -106,14 +108,14 @@ namespace Instrument{
 		assert(!instrumentID.empty());
 		const std::string& prodID = InstrumentIDToProductID(instrumentID);
 		bool is_override = (m_InfoDict.find(prodID) != m_InfoDict.end());
-		m_InfoDict[prodID].ComRateField = comRate;
+		if (!is_override) m_InfoDict[prodID].ComRateField = comRate;
 		return is_override;
 	}
 
 	std::string InformationMgr::AllInstruments() const{
 		std::string ret = "";
-		for (auto item : m_InfoDict){
-			ret += item.first;
+		for (auto item : m_InfoVec){
+			ret += item;
 			ret += ", ";
 		}
 		return ret.substr(0, ret.size() - 1);
