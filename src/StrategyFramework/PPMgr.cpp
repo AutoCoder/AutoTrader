@@ -96,7 +96,39 @@ namespace PP {
 	}
 
 	CThostFtdcInvestorPositionFieldWrapper& CThostFtdcInvestorPositionFieldWrapper::operator +=(const CThostFtdcTradeField& trade){
-		auto initPosFieldFunc = [](const CThostFtdcTradeField& tradeField, CThostFtdcInvestorPositionField& posField) -> void {
+		double delta_amount = tradeField.Price * tradeField.Volume;
+		double margin_ratio_by_volume = －1.0;
+		double margin_ratio_by_money = -1.0;
+		double commission_ratio_by_volume = －1.0;
+		double commission_ratio_by_money = -1.0;
+		if (posField.PosiDirection == THOST_FTDC_PD_Long){
+			margin_ratio_by_money = InstrumentManager.Get(tradeField.InstrumentID).MgrRateField.LongMarginRatioByMoney;
+			margin_ratio_by_volume = InstrumentManager.Get(tradeField.InstrumentID).MgrRateField.LongMarginRatioByVolume;
+		}
+		else if (posField.PosiDirection == THOST_FTDC_PD_Short){
+			margin_ratio_by_money = InstrumentManager.Get(tradeField.InstrumentID).MgrRateField.ShortMarginRatioByMoney;
+			margin_ratio_by_volume = InstrumentManager.Get(tradeField.InstrumentID).MgrRateField.ShortMarginRatioByVolume;
+		}
+		else
+			assert(false);
+
+		if (THOST_FTDC_OF_Open == tradeField.OffsetFlag){
+			commission_ratio_by_money = InstrumentManager.Get(tradeField.InstrumentID).ComRateField.OpenRatioByMoney;
+			commission_ratio_by_volume = InstrumentManager.Get(tradeField.InstrumentID).ComRateField.OpenRatioByVolume;
+		}
+		else if (THOST_FTDC_OF_Close == tradeField.OffsetFlag ||  THOST_FTDC_OF_CloseYesterday == tradeField.OffsetFlag){
+			commission_ratio_by_money = InstrumentManager.Get(tradeField.InstrumentID).ComRateField.CloseRatioByMoney;
+			commission_ratio_by_volume = InstrumentManager.Get(tradeField.InstrumentID).ComRateField.CloseRatioByVolume;
+		}
+		else if (THOST_FTDC_OF_CloseToday == tradeField.OffsetFlag){
+			commission_ratio_by_money = InstrumentManager.Get(tradeField.InstrumentID).ComRateField.CloseTodayRatioByMoney;
+			commission_ratio_by_volume = InstrumentManager.Get(tradeField.InstrumentID).ComRateField.CloseTodayRatioByVolume;
+		}
+		else {
+			assert(false);
+		}
+
+		auto initPosFieldFunc = [&](const CThostFtdcTradeField& tradeField, CThostFtdcInvestorPositionField& posField) -> void {
 			//!!!Note:如果当前仓位为空，那么必然是开仓
 			assert(tradeField.OffsetFlag == THOST_FTDC_OF_Open);
 			//Original Position is empty, so should be initialize here
@@ -125,36 +157,28 @@ namespace PP {
 			// ///开仓冻结金额
 			// TThostFtdcMoneyType	ShortFrozenAmount;
 			posField.PositionCost = tradeField.Price;
-			//取 Max(LongMargin, ShortMargin)作为当前合约的总仓位
-			posField.UseMargin = InstrumentManager.Get(tradeField.InstrumentID).MgrRateField.LongMarginRatioByVolume * tradeField.Volume;
 			posField.PreMargin = 0;
-			posField.Commission = InstrumentManager.Get(tradeField.InstrumentID).ComRateField.OpenRatioByVolume * tradeField.Volume;
+
+			if (margin_ratio_by_volume < std::numeric_limits<double>::min() /*margin_ratio_by_volume = 0.0*/)
+				posField.UseMargin += margin_ratio_by_money * delta_amount;
+			else
+				posField.UseMargin = margin_ratio_by_volume * posField.Position;
+
+			if (commission_ratio_by_volume < std::numeric_limits<double>::min() /*commission_ratio_by_volume = 0.0*/)
+				posField.Commission += commission_ratio_by_money * delta_amount;
+			else
+				posField.Commission += commission_ratio_by_volume * tradeField.Volume;	
+
 			strcpy(posField.TradingDay, tradeField.TradeDate);
 		};
 
-		auto appendPosFunc = [](const CThostFtdcTradeField& tradeField, CThostFtdcInvestorPositionField& posField) -> void {
+		auto appendPosFunc = [&](const CThostFtdcTradeField& tradeField, CThostFtdcInvestorPositionField& posField) -> void {
 			double amount = posField.PositionCost * posField.Position;
-			double delta_amount = tradeField.Price * tradeField.Volume;
-			double margin_ratio_by_volume = 0.0;
-			double commission_ratio_by_volume = 0.0;
-			if (posField.PosiDirection == THOST_FTDC_PD_Long)
-				margin_ratio_by_volume = InstrumentManager.Get(tradeField.InstrumentID).MgrRateField.LongMarginRatioByVolume;
-			else if (posField.PosiDirection == THOST_FTDC_PD_Short)
-				margin_ratio_by_volume = InstrumentManager.Get(tradeField.InstrumentID).MgrRateField.ShortMarginRatioByVolume;
+
+			if (margin_ratio_by_volume < std::numeric_limits<double>::min() /*margin_ratio_by_volume = 0.0*/) 
+				posField.PreMargin = margin_ratio_by_volume * posField.Position;
 			else
-				assert(false);
-
-			if (THOST_FTDC_OF_Open == tradeField.OffsetFlag)
-				commission_ratio_by_volume = InstrumentManager.Get(tradeField.InstrumentID).ComRateField.OpenRatioByVolume;
-			else if (THOST_FTDC_OF_Close == tradeField.OffsetFlag ||  THOST_FTDC_OF_CloseYesterday == tradeField.OffsetFlag)
-				commission_ratio_by_volume = InstrumentManager.Get(tradeField.InstrumentID).ComRateField.CloseRatioByVolume;
-			else if (THOST_FTDC_OF_CloseToday == tradeField.OffsetFlag)
-				commission_ratio_by_volume = InstrumentManager.Get(tradeField.InstrumentID).ComRateField.CloseTodayRatioByVolume;
-			else {
-				assert(false);
-			}
-
-			posField.PreMargin = margin_ratio_by_volume * posField.Position;
+				posField.PreMargin += margin_ratio_by_money * delta_amount;
 			//update Position
 			if (tradeField.OffsetFlag == THOST_FTDC_OF_Open )
 			{
@@ -172,8 +196,16 @@ namespace PP {
 				posField.CloseAmount += tradeField.Price * tradeField.Volume;
 				posField.PositionCost = (amount - delta_amount) / posField.Position;
 			}
-			posField.UseMargin = margin_ratio_by_volume * posField.Position;
-			posField.Commission += commission_ratio_by_volume * tradeField.Volume;
+
+			if (margin_ratio_by_volume < std::numeric_limits<double>::min() /*margin_ratio_by_volume = 0.0*/)
+				posField.UseMargin += margin_ratio_by_money * delta_amount;
+			else
+				posField.UseMargin = margin_ratio_by_volume * posField.Position;
+			
+			if (commission_ratio_by_volume < std::numeric_limits<double>::min() /*commission_ratio_by_volume = 0.0*/)
+				posField.Commission += commission_ratio_by_money * delta_amount;
+			else
+				posField.Commission += commission_ratio_by_volume * tradeField.Volume;
 		};
 
 		if (trade.Direction == THOST_FTDC_D_Buy)
