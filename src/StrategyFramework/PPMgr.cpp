@@ -190,7 +190,13 @@ namespace PP {
 			}
 			else if (THOST_FTDC_OF_Close == tradeField.OffsetFlag || THOST_FTDC_OF_ForceClose == tradeField.OffsetFlag || 
 				THOST_FTDC_OF_CloseToday == tradeField.OffsetFlag || THOST_FTDC_OF_CloseYesterday == tradeField.OffsetFlag){
-				posField.TodayPosition -= tradeField.Volume;
+				if (posField.TodayPosition < tradeField.Volume){
+					posField.TodayPosition = 0;
+					posField.YdPosition -= (tradeField.Volume - posField.TodayPosition)
+				}
+				else{
+					posField.TodayPosition -= tradeField.Volume;
+				}
 				posField.Position = posField.TodayPosition + posField.YdPosition;
 				posField.CloseVolume += tradeField.Volume; //更新平仓量
 				posField.CloseAmount += tradeField.Price * tradeField.Volume;
@@ -545,8 +551,13 @@ namespace PP {
 	
 	std::string PositionProfitMgr::ToString() const{
 		std::stringstream result;
-		result << "$AccountInfo =>" << std::endl;
-		result << CommonUtils::ConvertAccountInfoToString(m_accountInfo) << std::endl << std::endl;
+		result << "$AccountInfo => {" << std::endl;
+		result << "Balance:" <<  GetBalanceMoney() << "," << std::endl;
+		result << "Available:" << GetAvailableMoney() << "," << std::endl;
+		result << "Margin:" << GetUsedMargin() << "," << std::endl;
+		result << "FrozenMargin:" << GetFrozenMargin() << "," << std::endl;
+		result << "Commission" << GetCommission() << "," << std::endl;
+		result << "FrozenCommission" << GetFrozenCommission() << "," << std::endl << std::endl;
 
 		result << "$PositionField => {" << std::endl;
 		for (auto posfield : m_posFieldMap){
