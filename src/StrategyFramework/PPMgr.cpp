@@ -192,7 +192,7 @@ namespace PP {
 				THOST_FTDC_OF_CloseToday == tradeField.OffsetFlag || THOST_FTDC_OF_CloseYesterday == tradeField.OffsetFlag){
 				if (posField.TodayPosition < tradeField.Volume){
 					posField.TodayPosition = 0;
-					posField.YdPosition -= (tradeField.Volume - posField.TodayPosition)
+					posField.YdPosition -= (tradeField.Volume - posField.TodayPosition);
 				}
 				else{
 					posField.TodayPosition -= tradeField.Volume;
