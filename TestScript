@@ -1,0 +1,33 @@
+仓位管理测试用例：
+
+Note: 以simnow客户端的数值为验证标准。
+
+1） 上一个交易日没有持有任何仓位，当天未进行任何操作之前，Balance == Available 且 Margin & commission & frozenMargin & forzenCommission 均未0. 
+
+2） 上一个交易日没有持有任何仓位，对一个合约进行交易以后，Margin & Commissiont 出现变化，交易合约的分仓位出现变化.
+Available ＝ Balance - Margin - Commissiont
+Balance = old_Balance - PositionProfit
+
+3)  上一个交易日没有持有任何仓位, 对一个合约进行报单但未成交之前，forzenMargin & forzenCommission 出现变化，交易合约分仓位这两个字段爷出现变化，但Margin & Commissiont仍为0. Balance保持不变。
+Available = Balance -  frozenCommission - frozenMargin
+
+4） 上一个交易日没有持有任何仓位，对一个合约进行交易（报单）后，退出ctp连接，然后再次连接。此时应该与case2 和 case3 保持一致。
+
+5） 上一个交易日没有持有任何仓位, 对一个合约进行多空交易（即对锁）, Margin & Commissiont 出现变化, Margin 为多仓Margin和空仓Margin仓位的较大值。Commission为多仓Commission与空仓Commission之和。
+此时 Margin&Commission of 合约 == Margin&Commission of 账户.
+
+如果同时对多个合约进行多空交易，
+ Margin&Commission of 账户 ＝＝ Margin&Commission of 合约1 ＋ ... + Margin&Commission of 合约N
+
+6）上一个交易日没有持有任何仓位, 如果同时对一个合约在多空方向同时进行报单，且均未成交。 对于此合约的forzenMargin和forzenCommission应该是多空方向上的较大值。
+
+7）上一个交易日没有持有任何仓位, 如果同时对多个合约进行报单，且均未成交，对于账户的forzenMargin和forzenCommission 应该是多个合约forzenMargin和forzenCommission 之和。
+
+8）	上一个交易日持有某一合约多方仓位a手， 当前交易日多方开仓b手， 那么该合约的多方今仓b手，昨仓为a手。
+	上一个交易日持有某一合约多方仓位a手， 当前交易日多方开仓b手，平仓c手，如果c > b, 那么该合约多方今仓0手，昨仓为a-(c-b)手
+															  如果c < b, 那么该合约多方今仓b-c手，昨仓为a手
+
+9)  上一个交易日发现交易产生的Commission，进入下一个交易日，Commission归0.
+    上一个交易日仓位产生的Margin,进入下一个交易日，Margin保持不变
+
+10） 上一个交易日的未成交报单，进入下一个交易日，自动取消，frozenMargin & forzenCommission归0。
