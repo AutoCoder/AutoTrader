@@ -175,7 +175,7 @@ namespace PP {
 			double amount = posField.PositionCost * posField.Position;
 
 			if (margin_ratio_by_volume < std::numeric_limits<double>::min() /*margin_ratio_by_volume = 0.0*/) 
-				posField.PreMargin ＋= margin_ratio_by_money * delta_amount;
+				posField.PreMargin += margin_ratio_by_money * delta_amount;
 			else
 				posField.PreMargin = margin_ratio_by_volume * posField.Position;
 			//update Position
