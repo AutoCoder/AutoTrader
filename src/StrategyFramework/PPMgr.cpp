@@ -17,7 +17,7 @@ namespace PP {
 	}
 
 	bool CThostFtdcInvestorPositionFieldWrapper::IsLongPosEmpty(){
-		return m_LongPos.PosiDirection == THOST_FTDC_PD_Net;;
+		return m_LongPos.PosiDirection == THOST_FTDC_PD_Net;
 	}
 
 	bool CThostFtdcInvestorPositionFieldWrapper::IsShortPosEmpty(){
@@ -129,8 +129,6 @@ namespace PP {
 		}
 
 		auto initPosFieldFunc = [&](const CThostFtdcTradeField& tradeField, CThostFtdcInvestorPositionField& posField) -> void {
-			//!!!Note:如果当前仓位为空，那么必然是开仓
-			assert(tradeField.OffsetFlag == THOST_FTDC_OF_Open);
 			//Original Position is empty, so should be initialize here
 			strcpy(posField.InstrumentID, tradeField.InstrumentID);
 			strcpy(posField.BrokerID, tradeField.BrokerID);
