@@ -96,7 +96,7 @@ namespace PP {
 	}
 
 	CThostFtdcInvestorPositionFieldWrapper& CThostFtdcInvestorPositionFieldWrapper::operator +=(const CThostFtdcTradeField& trade){
-		double delta_amount = trade.Price * trade.Volume* InstrumentManager.Get(trade.InstrumentID).InstruField.VolumeMultiple;
+		double delta_amount = trade.Price * trade.Volume * InstrumentManager.Get(trade.InstrumentID).InstruField.VolumeMultiple;
 		const double invalid_init_ratio = 100;
 		double margin_ratio_by_volume = invalid_init_ratio;
 		double margin_ratio_by_money = invalid_init_ratio;
