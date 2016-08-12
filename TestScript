@@ -33,4 +33,6 @@ Available = Balance -  frozenCommission - frozenMargin
 10） 上一个交易日的未成交报单，进入下一个交易日，自动取消，frozenMargin & forzenCommission归0。
 
 11) 上一个交易日持有某一合约多方仓位a手，当前交易日平仓a手后，那么该合约的多方总仓0手，今仓0手，昨仓0手。
-                                   退出ctp连接，再次连接后，该合约多方仍然总仓0手，今仓0手，昨仓0手。
+                                   退出ctp连接，再次连接后，该合约多方仍然总仓0手，今仓0手，昨仓0手。 (Tested:Pass)
+
+12) 当前仓位为0，提交一个报单，报单为成交时，手续费不变，冻结手续费变化，margin and frozenmargin 不变。

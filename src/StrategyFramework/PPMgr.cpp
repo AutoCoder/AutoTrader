@@ -97,10 +97,11 @@ namespace PP {
 
 	CThostFtdcInvestorPositionFieldWrapper& CThostFtdcInvestorPositionFieldWrapper::operator +=(const CThostFtdcTradeField& trade){
 		double delta_amount = trade.Price * trade.Volume;
-		double margin_ratio_by_volume = -1.0;
-		double margin_ratio_by_money = -1.0;
-		double commission_ratio_by_volume = -1.0;
-		double commission_ratio_by_money = -1.0;
+		const double invalid_init_ratio = 100;
+		double margin_ratio_by_volume = invalid_init_ratio;
+		double margin_ratio_by_money = invalid_init_ratio;
+		double commission_ratio_by_volume = invalid_init_ratio;
+		double commission_ratio_by_money = invalid_init_ratio;
 		if (trade.Direction == THOST_FTDC_D_Buy){
 			margin_ratio_by_money = InstrumentManager.Get(trade.InstrumentID).MgrRateField.LongMarginRatioByMoney;
 			margin_ratio_by_volume = InstrumentManager.Get(trade.InstrumentID).MgrRateField.LongMarginRatioByVolume;
@@ -549,6 +550,7 @@ namespace PP {
 	
 	std::string PositionProfitMgr::ToString() const{
 		std::stringstream result;
+		result.precision(10);
 		result << "$AccountInfo => {" << std::endl;
 		result << "Balance:" <<  GetBalanceMoney() << "," << std::endl;
 		result << "Available:" << GetAvailableMoney() << "," << std::endl;
