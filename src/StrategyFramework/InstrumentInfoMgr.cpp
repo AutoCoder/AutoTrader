@@ -183,30 +183,30 @@ namespace Instrument{
 		for (auto key : root.getMemberNames()){
 			Information instu_info;
 			STRCPY(instu_info.InstruField.ProductID, key.c_str());
-			STRCPY(instu_info.InstruField.InstrumentID, root[key][kInstrumentID].asString().c_str());
-			STRCPY(instu_info.InstruField.ExchangeID, root[key][kExchangeID].asString().c_str());
-			instu_info.InstruField.DeliveryYear = root[key][kDeliveryYear].asInt();
-			instu_info.InstruField.DeliveryMonth = root[key][kDeliveryMonth].asInt();
-			instu_info.InstruField.VolumeMultiple = root[key][kVolumeMultiple].asInt();
-			STRCPY(instu_info.InstruField.OpenDate, root[key][kOpenDate].asString().c_str());
-			STRCPY(instu_info.InstruField.ExpireDate, root[key][kExpireDate].asString().c_str());
-			instu_info.InstruField.IsTrading = root[key][kIsTrading].asInt();
-			instu_info.InstruField.PositionType = root[key][kPositionType].asUInt();
+			STRCPY(instu_info.InstruField.InstrumentID, root[key][kBasicInfo][kInstrumentID].asString().c_str());
+			STRCPY(instu_info.InstruField.ExchangeID, root[key][kBasicInfo][kExchangeID].asString().c_str());
+			instu_info.InstruField.DeliveryYear = root[key][kBasicInfo][kDeliveryYear].asInt();
+			instu_info.InstruField.DeliveryMonth = root[key][kBasicInfo][kDeliveryMonth].asInt();
+			instu_info.InstruField.VolumeMultiple = root[key][kBasicInfo][kVolumeMultiple].asInt();
+			STRCPY(instu_info.InstruField.OpenDate, root[key][kBasicInfo][kOpenDate].asString().c_str());
+			STRCPY(instu_info.InstruField.ExpireDate, root[key][kBasicInfo][kExpireDate].asString().c_str());
+			instu_info.InstruField.IsTrading = root[key][kBasicInfo][kIsTrading].asInt();
+			instu_info.InstruField.PositionType = root[key][kBasicInfo][kPositionType].asUInt();
 
-			STRCPY(instu_info.MgrRateField.BrokerID, root[key][kBrokerID].asString().c_str());
-			STRCPY(instu_info.MgrRateField.InvestorID, root[key][kInvestorID].asString().c_str());
-			instu_info.MgrRateField.HedgeFlag = root[key][kHedgeFlag].asUInt();
-			instu_info.MgrRateField.LongMarginRatioByMoney = root[key][kLongMarginRatioByMoney].asDouble();
-			instu_info.MgrRateField.LongMarginRatioByVolume = root[key][kLongMarginRatioByVolume].asDouble();
-			instu_info.MgrRateField.ShortMarginRatioByMoney = root[key][kShortMarginRatioByMoney].asDouble();
-			instu_info.MgrRateField.ShortMarginRatioByVolume = root[key][kShortMarginRatioByVolume].asDouble();
+			STRCPY(instu_info.MgrRateField.BrokerID, root[key][kMarginInfo][kBrokerID].asString().c_str());
+			STRCPY(instu_info.MgrRateField.InvestorID, root[key][kMarginInfo][kInvestorID].asString().c_str());
+			instu_info.MgrRateField.HedgeFlag = root[key][kMarginInfo][kHedgeFlag].asUInt();
+			instu_info.MgrRateField.LongMarginRatioByMoney = root[key][kMarginInfo][kLongMarginRatioByMoney].asDouble();
+			instu_info.MgrRateField.LongMarginRatioByVolume = root[key][kMarginInfo][kLongMarginRatioByVolume].asDouble();
+			instu_info.MgrRateField.ShortMarginRatioByMoney = root[key][kMarginInfo][kShortMarginRatioByMoney].asDouble();
+			instu_info.MgrRateField.ShortMarginRatioByVolume = root[key][kMarginInfo][kShortMarginRatioByVolume].asDouble();
 
-			instu_info.ComRateField.OpenRatioByMoney = root[key][kOpenRatioByMoney].asDouble();
-			instu_info.ComRateField.OpenRatioByVolume = root[key][kOpenRatioByVolume].asDouble();
-			instu_info.ComRateField.CloseRatioByMoney = root[key][kCloseRatioByMoney].asDouble();
-			instu_info.ComRateField.CloseRatioByVolume = root[key][kCloseRatioByVolume].asDouble();
-			instu_info.ComRateField.CloseTodayRatioByMoney = root[key][kCloseTodayRatioByMoney].asDouble();
-			instu_info.ComRateField.CloseTodayRatioByVolume = root[key][kCloseTodayRatioByVolume].asDouble();
+			instu_info.ComRateField.OpenRatioByMoney = root[key][kCommissionInfo][kOpenRatioByMoney].asDouble();
+			instu_info.ComRateField.OpenRatioByVolume = root[key][kCommissionInfo][kOpenRatioByVolume].asDouble();
+			instu_info.ComRateField.CloseRatioByMoney = root[key][kCommissionInfo][kCloseRatioByMoney].asDouble();
+			instu_info.ComRateField.CloseRatioByVolume = root[key][kCommissionInfo][kCloseRatioByVolume].asDouble();
+			instu_info.ComRateField.CloseTodayRatioByMoney = root[key][kCommissionInfo][kCloseTodayRatioByMoney].asDouble();
+			instu_info.ComRateField.CloseTodayRatioByVolume = root[key][kCommissionInfo][kCloseTodayRatioByVolume].asDouble();
 
 			Add(key, instu_info);
 		}

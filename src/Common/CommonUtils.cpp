@@ -431,6 +431,7 @@ std::string CommonUtils::ConvertPositionFieldToString(const CThostFtdcInvestorPo
 		<< " CloseVolume:" << pos.CloseVolume << std::endl
 		<< " OpenCost:" << pos.OpenCost << std::endl
 		<< " OpenVolume:" << pos.OpenVolume << std::endl
+		<< " PositionCost:" << pos.PositionCost << std::endl
 		<< " PositionProfit:" << pos.PositionProfit << std::endl << std::endl;
 
 	return result.str();
