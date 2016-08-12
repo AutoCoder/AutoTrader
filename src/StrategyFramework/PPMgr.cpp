@@ -96,7 +96,7 @@ namespace PP {
 	}
 
 	CThostFtdcInvestorPositionFieldWrapper& CThostFtdcInvestorPositionFieldWrapper::operator +=(const CThostFtdcTradeField& trade){
-		double delta_amount = trade.Price * trade.Volume;
+		double delta_amount = trade.Price * trade.Volume* InstrumentManager.Get(trade.InstrumentID).InstruField.VolumeMultiple;
 		const double invalid_init_ratio = 100;
 		double margin_ratio_by_volume = invalid_init_ratio;
 		double margin_ratio_by_money = invalid_init_ratio;
@@ -175,9 +175,9 @@ namespace PP {
 			double amount = posField.PositionCost * posField.Position;
 
 			if (margin_ratio_by_volume < std::numeric_limits<double>::min() /*margin_ratio_by_volume = 0.0*/) 
-				posField.PreMargin = margin_ratio_by_volume * posField.Position;
+				posField.PreMargin ＋= margin_ratio_by_money * delta_amount;
 			else
-				posField.PreMargin += margin_ratio_by_money * delta_amount;
+				posField.PreMargin = margin_ratio_by_volume * posField.Position;
 			//update Position
 			if (tradeField.OffsetFlag == THOST_FTDC_OF_Open )
 			{
