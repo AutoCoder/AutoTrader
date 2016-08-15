@@ -42,3 +42,6 @@ Available = Balance -  frozenCommission - frozenMargin
 
 14） 当前仓位为0，提交一个报单a手，成交前，仓位不变，冻结手续费发生变化，冻结margin发生变化。
 (Testing: )
+
+15) 当前交易日，如果存在仓位，并有若干报单为成交，再次登陆已经，仓位信息正确（包括，保证金、冻结保证金、手续费、冻结手续费）
+(Testing: )

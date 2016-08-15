@@ -55,6 +55,8 @@ namespace PP {
 				//##According debuging, I found YdPosition may not correct when tradepi callback
 				m_LongPos.YdPosition = m_LongPos.Position - m_LongPos.TodayPosition;
 				m_LongPos.LongFrozen += other.LongFrozen;
+				m_LongPos.FrozenMargin += other.FrozenMargin;
+				m_LongPos.FrozenCommission += other.FrozenCommission;
 				m_LongPos.LongFrozenAmount += other.LongFrozenAmount;
 				m_LongPos.PositionCost = (m_LongPos.PositionCost * m_LongPos.OpenVolume + other.PositionCost * other.OpenVolume) / (m_LongPos.OpenVolume + other.OpenVolume);
 				m_LongPos.OpenVolume += other.OpenVolume;
@@ -63,6 +65,7 @@ namespace PP {
 				m_LongPos.CloseAmount += other.CloseAmount;
 				m_LongPos.UseMargin += other.UseMargin;
 				m_LongPos.Commission += other.Commission;
+				m_LongPos.PosiDirection = other.PosiDirection;
 			}
 		}
 		else if (other.PosiDirection == THOST_FTDC_PD_Short)
@@ -76,8 +79,9 @@ namespace PP {
 				//m_ShortPos.YdPosition += other.YdPosition;
 				//##According debuging, I found YdPosition may not correct when tradepi callback
 				m_ShortPos.YdPosition = m_ShortPos.Position - m_ShortPos.TodayPosition;
-				m_ShortPos.LongFrozen += other.LongFrozen;
-				m_ShortPos.LongFrozenAmount += other.LongFrozenAmount;
+				m_ShortPos.ShortFrozen += other.ShortFrozen;
+				m_ShortPos.FrozenCommission += other.FrozenCommission;
+				m_ShortPos.ShortFrozenAmount += other.ShortFrozenAmount;
 				m_ShortPos.PositionCost = (m_ShortPos.PositionCost * m_ShortPos.OpenVolume + other.PositionCost * other.OpenVolume) / (m_ShortPos.OpenVolume + other.OpenVolume);
 				m_ShortPos.OpenVolume += other.OpenVolume;
 				m_ShortPos.CloseVolume += other.CloseVolume;

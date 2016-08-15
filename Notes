@@ -1,0 +1,2 @@
+1) tradespi连接后的仓位查询，对于没有成交的报单，依然会有回报。回报中仅会有forzenmargin和forzencommission的这些有用信息。
+   所以在程序中，我们不需要在处理仓位查询回报之前 去响应OnTrade和OnOrde的回报 以恢复仓位信息。
