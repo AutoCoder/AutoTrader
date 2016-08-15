@@ -51,9 +51,6 @@ namespace PP {
 			else{
 				m_LongPos.Position += other.Position;
 				m_LongPos.TodayPosition += other.TodayPosition;
-				//m_LongPos.YdPosition += other.YdPosition;
-				//##According debuging, I found YdPosition may not correct when tradepi callback
-				m_LongPos.YdPosition = m_LongPos.Position - m_LongPos.TodayPosition;
 				m_LongPos.LongFrozen += other.LongFrozen;
 				m_LongPos.FrozenMargin += other.FrozenMargin;
 				m_LongPos.FrozenCommission += other.FrozenCommission;
@@ -67,6 +64,9 @@ namespace PP {
 				m_LongPos.Commission += other.Commission;
 				m_LongPos.PosiDirection = other.PosiDirection;
 			}
+
+			//##According debuging, I found YdPosition may not correct when tradepi callback
+			m_LongPos.YdPosition = m_LongPos.Position - m_LongPos.TodayPosition;
 		}
 		else if (other.PosiDirection == THOST_FTDC_PD_Short)
 		{
@@ -76,9 +76,6 @@ namespace PP {
 			else{
 				m_ShortPos.Position += other.Position;
 				m_ShortPos.TodayPosition += other.TodayPosition;
-				//m_ShortPos.YdPosition += other.YdPosition;
-				//##According debuging, I found YdPosition may not correct when tradepi callback
-				m_ShortPos.YdPosition = m_ShortPos.Position - m_ShortPos.TodayPosition;
 				m_ShortPos.ShortFrozen += other.ShortFrozen;
 				m_ShortPos.FrozenCommission += other.FrozenCommission;
 				m_ShortPos.ShortFrozenAmount += other.ShortFrozenAmount;
@@ -91,6 +88,9 @@ namespace PP {
 				m_ShortPos.Commission += other.Commission;
 				m_ShortPos.PosiDirection = other.PosiDirection;
 			}
+
+			//##According debuging, I found YdPosition may not correct when tradepi callback
+			m_ShortPos.YdPosition = m_ShortPos.Position - m_ShortPos.TodayPosition;
 		}
 		else{
 			//do nothing
@@ -102,8 +102,6 @@ namespace PP {
 	CThostFtdcInvestorPositionFieldWrapper& CThostFtdcInvestorPositionFieldWrapper::operator +=(const CThostFtdcTradeField& trade){
 
 		auto initPosFieldFunc = [&](const CThostFtdcTradeField& tradeField, CThostFtdcInvestorPositionField& posField) -> void {
-			//!!!Note:如果当前仓位为空，那么必然是开仓
-			assert(tradeField.OffsetFlag == THOST_FTDC_OF_Open);
 			//Original Position is empty, so should be initialize here
 			strcpy(posField.InstrumentID, tradeField.InstrumentID);
 			strcpy(posField.BrokerID, tradeField.BrokerID);
@@ -154,6 +152,14 @@ namespace PP {
 			else if (THOST_FTDC_OF_Close == tradeField.OffsetFlag || THOST_FTDC_OF_ForceClose == tradeField.OffsetFlag || 
 				THOST_FTDC_OF_CloseToday == tradeField.OffsetFlag || THOST_FTDC_OF_CloseYesterday == tradeField.OffsetFlag){
 				posField.TodayPosition -= tradeField.Volume;
+				if (posField.TodayPosition < tradeField.Volume){
+					posField.TodayPosition = 0;
+					posField.YdPosition -= (tradeField.Volume - posField.TodayPosition);
+				}
+				else{
+					posField.TodayPosition -= tradeField.Volume;
+				}
+
 				posField.Position = posField.TodayPosition + posField.YdPosition;
 				posField.CloseVolume += tradeField.Volume; //更新平仓量
 				posField.CloseAmount += tradeField.Price * tradeField.Volume;
@@ -491,8 +497,14 @@ namespace PP {
 	
 	std::string PositionProfitMgr::ToString() const{
 		std::stringstream result;
-		result << "$AccountInfo =>" << std::endl;
-		result << CommonUtils::ConvertAccountInfoToString(m_accountInfo) << std::endl << std::endl;
+		result.precision(10);
+		result << "$AccountInfo => {" << std::endl;
+		result << "Balance:" << GetBalanceMoney() << "," << std::endl;
+		result << "Available:" << GetAvailableMoney() << "," << std::endl;
+		result << "Margin:" << GetUsedMargin() << "," << std::endl;
+		result << "FrozenMargin" << GetFrozenMargin() << "," << std::endl;
+		result << "Commission" << GetCommission() << "," << std::endl;
+		result << "FrozenCommission" << GetFrozenCommission() << "," << std::endl;
 
 		result << "$PositionField => {" << std::endl;
 		for (auto posfield : m_posFieldMap){
