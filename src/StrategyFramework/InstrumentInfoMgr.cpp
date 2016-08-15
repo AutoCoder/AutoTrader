@@ -112,6 +112,58 @@ namespace Instrument{
 		return prod_existed;
 	}
 
+	double InformationMgr::GetMargin(const std::string& instrumentID, int trade_volume, double trade_price, TThostFtdcDirectionType direction){
+		const double invalid_init_ratio = 100;
+		double margin_ratio_by_volume = invalid_init_ratio;
+		double margin_ratio_by_money = invalid_init_ratio;
+
+		if (direction == THOST_FTDC_D_Buy){
+			margin_ratio_by_money = InstrumentManager.Get(instrumentID).MgrRateField.LongMarginRatioByMoney;
+			margin_ratio_by_volume = InstrumentManager.Get(instrumentID).MgrRateField.LongMarginRatioByVolume;
+		}
+		else if (direction == THOST_FTDC_D_Sell){
+			margin_ratio_by_money = InstrumentManager.Get(instrumentID).MgrRateField.ShortMarginRatioByMoney;
+			margin_ratio_by_volume = InstrumentManager.Get(instrumentID).MgrRateField.ShortMarginRatioByVolume;
+		}
+		else
+			assert(false);
+
+		if (margin_ratio_by_volume < std::numeric_limits<double>::min() /*margin_ratio_by_volume = 0.0*/){
+			double delta_amount = trade_price * trade_volume * InstrumentManager.Get(instrumentID).InstruField.VolumeMultiple;
+			return delta_amount * margin_ratio_by_money;
+		}else{
+			return margin_ratio_by_volume * trade_volume;
+		} 
+	}
+
+	double InformationMgr::GetCommission(const std::string& instrumentID, int trade_volume, double trade_price, TThostFtdcOffsetFlagType flag){
+		const double invalid_init_ratio = 100;
+		double commission_ratio_by_volume = invalid_init_ratio;
+		double commission_ratio_by_money = invalid_init_ratio;
+		if (THOST_FTDC_OF_Open == flag){
+			commission_ratio_by_money = InstrumentManager.Get(instrumentID).ComRateField.OpenRatioByMoney;
+			commission_ratio_by_volume = InstrumentManager.Get(instrumentID).ComRateField.OpenRatioByVolume;
+		}
+		else if (THOST_FTDC_OF_Close == flag ||  THOST_FTDC_OF_CloseYesterday == flag){
+			commission_ratio_by_money = InstrumentManager.Get(instrumentID).ComRateField.CloseRatioByMoney;
+			commission_ratio_by_volume = InstrumentManager.Get(instrumentID).ComRateField.CloseRatioByVolume;
+		}
+		else if (THOST_FTDC_OF_CloseToday == flag){
+			commission_ratio_by_money = InstrumentManager.Get(instrumentID).ComRateField.CloseTodayRatioByMoney;
+			commission_ratio_by_volume = InstrumentManager.Get(instrumentID).ComRateField.CloseTodayRatioByVolume;
+		}
+		else {
+			assert(false);
+		}
+
+		if (commission_ratio_by_volume < std::numeric_limits<double>::min() /*commission_ratio_by_volume = 0.0*/){
+			double delta_amount = trade_volume * trade_price * InstrumentManager.Get(instrumentID).InstruField.VolumeMultiple;
+			return commission_ratio_by_money * delta_amount;
+		}
+		else
+			return commission_ratio_by_volume * trade_volume;
+	}
+
 	std::string InformationMgr::AllInstruments() const{
 		std::string ret = "";
 		for (auto item : m_InfoVec){

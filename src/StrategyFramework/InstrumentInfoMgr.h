@@ -72,6 +72,8 @@ namespace Instrument{
 
 	public:
 		const Information& Get(const std::string& instrumentID) const;
+		double GetMargin(const std::string& instrumentID, int trade_volume, double trade_price, TThostFtdcDirectionType direction);
+		double GetCommission(const std::string& instrumentID, int trade_volume, double trade_price, TThostFtdcOffsetFlagType flag);
 		void Add(const std::string& instrumentID, const Information& info);
 		bool SetMarginRate(const std::string& instrumentID, const CThostFtdcInstrumentMarginRateField& mgrRate);
 		bool SetCommissionRate(const std::string& instrumentID, const CThostFtdcInstrumentCommissionRateField& comRate);

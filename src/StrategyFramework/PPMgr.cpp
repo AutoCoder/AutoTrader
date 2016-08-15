@@ -17,7 +17,7 @@ namespace PP {
 	}
 
 	bool CThostFtdcInvestorPositionFieldWrapper::IsLongPosEmpty(){
-		return m_LongPos.PosiDirection == THOST_FTDC_PD_Net;
+		return m_LongPos.PosiDirection == THOST_FTDC_PD_Net;;
 	}
 
 	bool CThostFtdcInvestorPositionFieldWrapper::IsShortPosEmpty(){
@@ -51,6 +51,9 @@ namespace PP {
 			else{
 				m_LongPos.Position += other.Position;
 				m_LongPos.TodayPosition += other.TodayPosition;
+				//m_LongPos.YdPosition += other.YdPosition;
+				//##According debuging, I found YdPosition may not correct when tradepi callback
+				m_LongPos.YdPosition = m_LongPos.Position - m_LongPos.TodayPosition;
 				m_LongPos.LongFrozen += other.LongFrozen;
 				m_LongPos.LongFrozenAmount += other.LongFrozenAmount;
 				m_LongPos.PositionCost = (m_LongPos.PositionCost * m_LongPos.OpenVolume + other.PositionCost * other.OpenVolume) / (m_LongPos.OpenVolume + other.OpenVolume);
@@ -61,9 +64,6 @@ namespace PP {
 				m_LongPos.UseMargin += other.UseMargin;
 				m_LongPos.Commission += other.Commission;
 			}
-
-			//##According debuging, I found YdPosition may not correct when tradepi callback
-			m_LongPos.YdPosition = m_LongPos.Position - m_LongPos.TodayPosition;
 		}
 		else if (other.PosiDirection == THOST_FTDC_PD_Short)
 		{
@@ -73,6 +73,9 @@ namespace PP {
 			else{
 				m_ShortPos.Position += other.Position;
 				m_ShortPos.TodayPosition += other.TodayPosition;
+				//m_ShortPos.YdPosition += other.YdPosition;
+				//##According debuging, I found YdPosition may not correct when tradepi callback
+				m_ShortPos.YdPosition = m_ShortPos.Position - m_ShortPos.TodayPosition;
 				m_ShortPos.LongFrozen += other.LongFrozen;
 				m_ShortPos.LongFrozenAmount += other.LongFrozenAmount;
 				m_ShortPos.PositionCost = (m_ShortPos.PositionCost * m_ShortPos.OpenVolume + other.PositionCost * other.OpenVolume) / (m_ShortPos.OpenVolume + other.OpenVolume);
@@ -84,9 +87,6 @@ namespace PP {
 				m_ShortPos.Commission += other.Commission;
 				m_ShortPos.PosiDirection = other.PosiDirection;
 			}
-
-			//##According debuging, I found YdPosition may not correct when tradepi callback
-			m_ShortPos.YdPosition = m_ShortPos.Position - m_ShortPos.TodayPosition;
 		}
 		else{
 			//do nothing
@@ -96,40 +96,10 @@ namespace PP {
 	}
 
 	CThostFtdcInvestorPositionFieldWrapper& CThostFtdcInvestorPositionFieldWrapper::operator +=(const CThostFtdcTradeField& trade){
-		double delta_amount = trade.Price * trade.Volume * InstrumentManager.Get(trade.InstrumentID).InstruField.VolumeMultiple;
-		const double invalid_init_ratio = 100;
-		double margin_ratio_by_volume = invalid_init_ratio;
-		double margin_ratio_by_money = invalid_init_ratio;
-		double commission_ratio_by_volume = invalid_init_ratio;
-		double commission_ratio_by_money = invalid_init_ratio;
-		if (trade.Direction == THOST_FTDC_D_Buy){
-			margin_ratio_by_money = InstrumentManager.Get(trade.InstrumentID).MgrRateField.LongMarginRatioByMoney;
-			margin_ratio_by_volume = InstrumentManager.Get(trade.InstrumentID).MgrRateField.LongMarginRatioByVolume;
-		}
-		else if (trade.Direction == THOST_FTDC_D_Sell){
-			margin_ratio_by_money = InstrumentManager.Get(trade.InstrumentID).MgrRateField.ShortMarginRatioByMoney;
-			margin_ratio_by_volume = InstrumentManager.Get(trade.InstrumentID).MgrRateField.ShortMarginRatioByVolume;
-		}
-		else
-			assert(false);
-
-		if (THOST_FTDC_OF_Open == trade.OffsetFlag){
-			commission_ratio_by_money = InstrumentManager.Get(trade.InstrumentID).ComRateField.OpenRatioByMoney;
-			commission_ratio_by_volume = InstrumentManager.Get(trade.InstrumentID).ComRateField.OpenRatioByVolume;
-		}
-		else if (THOST_FTDC_OF_Close == trade.OffsetFlag ||  THOST_FTDC_OF_CloseYesterday == trade.OffsetFlag){
-			commission_ratio_by_money = InstrumentManager.Get(trade.InstrumentID).ComRateField.CloseRatioByMoney;
-			commission_ratio_by_volume = InstrumentManager.Get(trade.InstrumentID).ComRateField.CloseRatioByVolume;
-		}
-		else if (THOST_FTDC_OF_CloseToday == trade.OffsetFlag){
-			commission_ratio_by_money = InstrumentManager.Get(trade.InstrumentID).ComRateField.CloseTodayRatioByMoney;
-			commission_ratio_by_volume = InstrumentManager.Get(trade.InstrumentID).ComRateField.CloseTodayRatioByVolume;
-		}
-		else {
-			assert(false);
-		}
 
 		auto initPosFieldFunc = [&](const CThostFtdcTradeField& tradeField, CThostFtdcInvestorPositionField& posField) -> void {
+			//!!!Note:如果当前仓位为空，那么必然是开仓
+			assert(tradeField.OffsetFlag == THOST_FTDC_OF_Open);
 			//Original Position is empty, so should be initialize here
 			strcpy(posField.InstrumentID, tradeField.InstrumentID);
 			strcpy(posField.BrokerID, tradeField.BrokerID);
@@ -157,23 +127,15 @@ namespace PP {
 			// TThostFtdcMoneyType	ShortFrozenAmount;
 			posField.PositionCost = tradeField.Price;
 			posField.PreMargin = 0;
-
-			if (margin_ratio_by_volume < std::numeric_limits<double>::min() /*margin_ratio_by_volume = 0.0*/)
-				posField.UseMargin += margin_ratio_by_money * delta_amount;
-			else
-				posField.UseMargin = margin_ratio_by_volume * posField.Position;
-
-			if (commission_ratio_by_volume < std::numeric_limits<double>::min() /*commission_ratio_by_volume = 0.0*/)
-				posField.Commission += commission_ratio_by_money * delta_amount;
-			else
-				posField.Commission += commission_ratio_by_volume * tradeField.Volume;	
-
+			posField.UseMargin += InstrumentManager.GetMargin(tradeField.InstrumentID, tradeField.Volume, tradeField.Price, tradeField.Direction);
+			posField.Commission += InstrumentManager.GetCommission(tradeField.InstrumentID, tradeField.Volume, tradeField.Price, trade.OffsetFlag);
+			
 			strcpy(posField.TradingDay, tradeField.TradeDate);
 		};
 
 		auto appendPosFunc = [&](const CThostFtdcTradeField& tradeField, CThostFtdcInvestorPositionField& posField) -> void {
 			double amount = posField.PositionCost * posField.Position;
-
+			double delta_amount = tradeField.Volume * tradeField.Price;
 			posField.PreMargin = posField.UseMargin;
 
 			//update Position
@@ -187,28 +149,16 @@ namespace PP {
 			}
 			else if (THOST_FTDC_OF_Close == tradeField.OffsetFlag || THOST_FTDC_OF_ForceClose == tradeField.OffsetFlag || 
 				THOST_FTDC_OF_CloseToday == tradeField.OffsetFlag || THOST_FTDC_OF_CloseYesterday == tradeField.OffsetFlag){
-				if (posField.TodayPosition < tradeField.Volume){
-					posField.TodayPosition = 0;
-					posField.YdPosition -= (tradeField.Volume - posField.TodayPosition);
-				}
-				else{
-					posField.TodayPosition -= tradeField.Volume;
-				}
+				posField.TodayPosition -= tradeField.Volume;
 				posField.Position = posField.TodayPosition + posField.YdPosition;
 				posField.CloseVolume += tradeField.Volume; //更新平仓量
 				posField.CloseAmount += tradeField.Price * tradeField.Volume;
 				posField.PositionCost = (amount - delta_amount) / posField.Position;
 			}
 
-			if (margin_ratio_by_volume < std::numeric_limits<double>::min() /*margin_ratio_by_volume = 0.0*/)
-				posField.UseMargin += margin_ratio_by_money * delta_amount;
-			else
-				posField.UseMargin = margin_ratio_by_volume * posField.Position;
+			posField.UseMargin += InstrumentManager.GetMargin(tradeField.InstrumentID, tradeField.Volume, tradeField.Price, tradeField.Direction);
+			posField.Commission += InstrumentManager.GetCommission(tradeField.InstrumentID, tradeField.Volume, tradeField.Price, trade.OffsetFlag);
 			
-			if (commission_ratio_by_volume < std::numeric_limits<double>::min() /*commission_ratio_by_volume = 0.0*/)
-				posField.Commission += commission_ratio_by_money * delta_amount;
-			else
-				posField.Commission += commission_ratio_by_volume * tradeField.Volume;
 		};
 
 		if (trade.Direction == THOST_FTDC_D_Buy)
@@ -548,14 +498,8 @@ namespace PP {
 	
 	std::string PositionProfitMgr::ToString() const{
 		std::stringstream result;
-		result.precision(10);
-		result << "$AccountInfo => {" << std::endl;
-		result << "Balance:" <<  GetBalanceMoney() << "," << std::endl;
-		result << "Available:" << GetAvailableMoney() << "," << std::endl;
-		result << "Margin:" << GetUsedMargin() << "," << std::endl;
-		result << "FrozenMargin:" << GetFrozenMargin() << "," << std::endl;
-		result << "Commission:" << GetCommission() << "," << std::endl;
-		result << "FrozenCommission:" << GetFrozenCommission() << "," << std::endl << std::endl;
+		result << "$AccountInfo =>" << std::endl;
+		result << CommonUtils::ConvertAccountInfoToString(m_accountInfo) << std::endl << std::endl;
 
 		result << "$PositionField => {" << std::endl;
 		for (auto posfield : m_posFieldMap){
