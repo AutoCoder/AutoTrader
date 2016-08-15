@@ -203,11 +203,13 @@ namespace PP {
 				case OrderCallBackType::InsertOrder:
 				{
 					if (orderField.Direction == THOST_FTDC_D_Buy){
+						m_LongPos.PosiDirection = THOST_FTDC_PD_Long;
 						m_LongPos.LongFrozen += orderField.VolumeTotalOriginal;
 						m_LongPos.FrozenMargin += margin;
 						m_LongPos.FrozenCommission += commission;
 					}
 					else{ // THOST_FTDC_D_Sell
+						m_ShortPos.PosiDirection = THOST_FTDC_PD_Short;
 						m_ShortPos.ShortFrozen += orderField.VolumeTotalOriginal;
 						m_ShortPos.FrozenMargin += margin;
 						m_ShortPos.FrozenCommission += commission;
