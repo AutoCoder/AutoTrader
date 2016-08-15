@@ -188,25 +188,12 @@ namespace PP {
 
 	void CThostFtdcInvestorPositionFieldWrapper::OnOrder(const CThostFtdcOrderField& orderField, OrderCallBackType ordCBType){
 		if (OrderCallBackType::FinishOrder == ordCBType || OrderCallBackType::CancellOrder == ordCBType || OrderCallBackType::InsertOrder == ordCBType){
-			double commratio = 0.0;
-			if (orderField.CombOffsetFlag[0] == THOST_FTDC_OF_Open)
-				commratio = InstrumentManager.Get(orderField.InstrumentID).ComRateField.OpenRatioByVolume;
-			else if (THOST_FTDC_OF_Close == orderField.CombOffsetFlag[0] ||  THOST_FTDC_OF_CloseYesterday == orderField.CombOffsetFlag[0])
-				commratio = InstrumentManager.Get(orderField.InstrumentID).ComRateField.CloseRatioByVolume;
-			else if (orderField.CombOffsetFlag[0] == THOST_FTDC_OF_CloseToday)
-				commratio = InstrumentManager.Get(orderField.InstrumentID).ComRateField.CloseTodayRatioByVolume;
-			else {
-				assert(false);
-			}
-			double commission = commratio * orderField.VolumeTotalOriginal;
 
-			double margin = 0.0;
-			if (orderField.Direction == THOST_FTDC_D_Buy){
-				margin = InstrumentManager.Get(orderField.InstrumentID).MgrRateField.LongMarginRatioByVolume * orderField.VolumeTotalOriginal;
-			}
-			else if (orderField.Direction == THOST_FTDC_D_Sell){
-				margin = InstrumentManager.Get(orderField.InstrumentID).MgrRateField.ShortMarginRatioByVolume * orderField.VolumeTotalOriginal;
-			}
+			///double commission = commratio * orderField.VolumeTotalOriginal;
+			//Only THOST_FTDC_OPT_LimitPrice is permitted for now.
+			assert(orderField.OrderPriceType == THOST_FTDC_OPT_LimitPrice);
+			double commission = InstrumentManager.GetCommission(orderField.InstrumentID, orderField.VolumeTotalOriginal, orderField.LimitPrice, orderField.CombOffsetFlag[0]);
+			double margin = InstrumentManager.GetCommission(orderField.InstrumentID, orderField.VolumeTotalOriginal, orderField.LimitPrice, orderField.Direction);
 
 			switch(ordCBType){
 				case OrderCallBackType::InsertOrder:
