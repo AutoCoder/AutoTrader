@@ -197,7 +197,7 @@ namespace PP {
 			//Only THOST_FTDC_OPT_LimitPrice is permitted for now.
 			assert(orderField.OrderPriceType == THOST_FTDC_OPT_LimitPrice);
 			double commission = InstrumentManager.GetCommission(orderField.InstrumentID, orderField.VolumeTotalOriginal, orderField.LimitPrice, orderField.CombOffsetFlag[0]);
-			double margin = InstrumentManager.GetCommission(orderField.InstrumentID, orderField.VolumeTotalOriginal, orderField.LimitPrice, orderField.Direction);
+			double margin = InstrumentManager.GetMargin(orderField.InstrumentID, orderField.VolumeTotalOriginal, orderField.LimitPrice, orderField.Direction);
 
 			switch(ordCBType){
 				case OrderCallBackType::InsertOrder:
