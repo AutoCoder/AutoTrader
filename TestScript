@@ -37,4 +37,8 @@ Available = Balance -  frozenCommission - frozenMargin
 
 12) 当前仓位为0，提交一个报单a手，报单未成交时，手续费不变，冻结手续费变化，margin and frozenmargin 不变。
 
-13） 当前仓位为0，提交一个报单a手，成交后，仓位变为a手，今仓变为a手，昨仓为0手，手续费发生变化，margin发生变化。(Testing: margin计算正确)
+13） 当前仓位为0，提交一个报单a手，成交后，仓位变为a手，今仓变为a手，昨仓为0手，手续费发生变化，margin发生变化。
+(Testing: margin计算正确,仓位变化正确)
+
+14） 当前仓位为0，提交一个报单a手，成交前，仓位不变，冻结手续费发生变化，冻结margin发生变化。
+(Testing: )
