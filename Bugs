@@ -5,3 +5,9 @@
 2) 上一次tradespi登陆后，对同一个合约存在仓位和未成交订单，再次登录以后，初始化得到的仓位信息不正确。
    原因：对于同一个合约的仓位查询，如果已有仓位和未成交报单，会有多次回调，operator +=(const CThostFtdcInvestorPositionField& other) 并没有对forzenMagin & forzenCommission信息进行累计。
    状态：Fixed
+
+3) 当前交易日有多笔交易，且全部平仓，再次登陆以后，显示的 Available & Balance 的数值 ＝＝ 真实 Available & Balance 的数值 － 多笔交易产生的手续费。
+
+   原因：在初始化过程中，对account进行查询后，此时的Available & Balance为更新值。对仓位进行查询后，又得到当前交易日多笔交易的手续费。
+   此时显示的Available & Balance 的数值 为真实值扣除了手续费后的值。
+   状态：已发现
