@@ -335,6 +335,24 @@ std::string CommonUtils::OffsetFlagToString(char flag){
 	return tradeType;
 }
 
+std::string CommonUtils::InstrumentIDToProductID(const std::string& instrumentID){
+	assert(!instrumentID.empty());
+	size_t max_idx = instrumentID.size();
+	while (true){
+		char c = instrumentID.at(max_idx-1);
+		if (c >= '0' && c <= '9')
+		{
+			--max_idx;
+		}
+		else{
+			break;
+		}
+	}
+
+	
+	return instrumentID.substr(0, max_idx);
+}
+
 std::string CommonUtils::ConvertTradeToString(const CThostFtdcTradeField& trade){
 	std::stringstream result;
 	

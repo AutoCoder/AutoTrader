@@ -41,7 +41,7 @@ public:
 	static bool InSameMinute(const std::string& time1, const std::string& time2);
 	static std::string StringFromStruct(const CThostFtdcInputOrderField& innerStruct);
 	static std::string OffsetFlagToString(char flag);
-
+	static std::string InstrumentIDToProductID(const std::string& instrumentID);
 
 	static std::string ConvertAccountInfoToString(const CThostFtdcTradingAccountField& account);
 	static std::string ConvertOrderToString(const CThostFtdcOrderField& order);

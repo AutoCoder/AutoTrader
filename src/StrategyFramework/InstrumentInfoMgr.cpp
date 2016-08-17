@@ -6,26 +6,6 @@
 #include "crossplatform.h"
 #include "InstrumentInfoMgr.h"
 
-namespace{
-	std::string InstrumentIDToProductID(const std::string& instrumentID){
-		assert(!instrumentID.empty());
-		size_t max_idx = instrumentID.size();
-		while (true){
-			char c = instrumentID.at(max_idx-1);
-			if (c >= '0' && c <= '9')
-			{
-				--max_idx;
-			}
-			else{
-				break;
-			}
-		}
-
-		
-		return instrumentID.substr(0, max_idx);
-	}
-}
-
 namespace Instrument{
 
 	static const char* FactorSettingFilePath = "InstrumentInfo.json";
@@ -81,7 +61,7 @@ namespace Instrument{
 	}
 
 	const Information& InformationMgr::Get(const std::string& instrumentID) const{
-		const std::string& prodID = InstrumentIDToProductID(instrumentID);
+		const std::string& prodID = CommonUtils::InstrumentIDToProductID(instrumentID);
 		assert (m_InfoDict.find(prodID) != m_InfoDict.end());
 		return m_InfoDict.at(prodID);
 	}
@@ -89,7 +69,7 @@ namespace Instrument{
 	void InformationMgr::Add(const std::string& instrumentID, const Information& info){
 		assert(!instrumentID.empty());
 		m_InfoVec.push_back(instrumentID);
-		const std::string& prodID = InstrumentIDToProductID(instrumentID);
+		const std::string& prodID = CommonUtils::InstrumentIDToProductID(instrumentID);
 		if (m_InfoDict.find(prodID) == m_InfoDict.end()){
 			m_InfoDict.insert(std::make_pair(prodID, info));
 
@@ -98,7 +78,7 @@ namespace Instrument{
 
 	bool InformationMgr::SetMarginRate(const std::string& instrumentID, const CThostFtdcInstrumentMarginRateField& mgrRate){
 		assert(!instrumentID.empty());
-		const std::string& prodID = InstrumentIDToProductID(instrumentID);
+		const std::string& prodID = CommonUtils::InstrumentIDToProductID(instrumentID);
 		bool prod_existed = (m_InfoDict.find(prodID) != m_InfoDict.end());
 		m_InfoDict[prodID].MgrRateField = mgrRate;
 		return prod_existed;
@@ -106,7 +86,7 @@ namespace Instrument{
 
 	bool InformationMgr::SetCommissionRate(const std::string& instrumentID, const CThostFtdcInstrumentCommissionRateField& comRate){
 		assert(!instrumentID.empty());
-		const std::string& prodID = InstrumentIDToProductID(instrumentID);
+		const std::string& prodID = CommonUtils::CommonUtils::InstrumentIDToProductID(instrumentID);
 		bool prod_existed = (m_InfoDict.find(prodID) != m_InfoDict.end());
 		m_InfoDict[prodID].ComRateField = comRate;
 		return prod_existed;
@@ -265,6 +245,34 @@ namespace Instrument{
 
 		m_isSetup = true;
 		in_json_file.close();
+	}
+
+	TThostFtdcExchangeIDTypeType InformationMgr::GetExchangeID(const std::string& instrumentID) const{
+		const std::string& prodID = CommonUtils::InstrumentIDToProductID(instrumentID);
+		auto iter = m_InfoDict.find(prodID);
+		if (iter != m_InfoDict.end()){
+			if (strcmp("SHFE", iter->second.InstruField.ExchangeID) == 0){
+				return THOST_FTDC_EIDT_SHFE;
+			}
+			else if (strcmp("CZCE", iter->second.InstruField.ExchangeID) == 0){
+				return THOST_FTDC_EIDT_CZCE;
+			}
+			else if (strcmp("DCE", iter->second.InstruField.ExchangeID) == 0){
+				return THOST_FTDC_EIDT_DCE;
+			}
+			else if (strcmp("CFFEX", iter->second.InstruField.ExchangeID) == 0){
+				return THOST_FTDC_EIDT_CFFEX;
+			}
+			else if (strcmp("INE", iter->second.InstruField.ExchangeID) == 0)
+			{
+				return THOST_FTDC_EIDT_INE;
+			}
+			else
+				return THOST_FTDC_EIDT_WRONG;
+		}
+		else{
+			return THOST_FTDC_EIDT_WRONG;
+		}
 	}
 }
 

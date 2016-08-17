@@ -55,8 +55,15 @@ namespace PP {
 		CThostFtdcInvestorPositionFieldWrapper& operator +=(const CThostFtdcTradeField& trade);
 		void OnOrder(const CThostFtdcOrderField& order, OrderCallBackType type);
 
-		double 	GetMargin() const;
-		double 	GetFrozenMargin() const;
+		inline double  GetLongMargin() const;
+		inline double  GetShortMargin() const;
+		inline double  GetLongFrozenMargin() const;
+		inline double  GetShortFrozenMargin() const;
+		inline double  GetBiggerMargin() const;
+		inline double  GetBiggerFrozenMargin() const;
+		inline double  GetBothMargin() const;
+		inline double  GetBothFrozenMargin() const;
+
 		double 	GetCommission() const;
 		double 	GetFrozenCommission() const;
 

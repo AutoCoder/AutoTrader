@@ -4,37 +4,14 @@
 #include "ThostFtdcUserApiDataType.h"
 #include "ThostFtdcUserApiStruct.h"
 #include <map>
+#include "CommonUtils.h"
+
 #include "stdafx.h"
 #include "InstrumentInfoMgr.h"
 
+#define THOST_FTDC_EIDT_WRONG 0
+
 namespace Instrument{
-
-
-	//期货期权手续费字段合并
-	struct STRATEGY_API InstFee
-	{
-		TThostFtdcRatioType	OpenRatioByMoney;
-		TThostFtdcRatioType	OpenRatioByVolume;
-		TThostFtdcRatioType	CloseRatioByMoney;
-		TThostFtdcRatioType	CloseRatioByVolume;
-		TThostFtdcRatioType	CloseTodayRatioByMoney;
-		TThostFtdcRatioType	CloseTodayRatioByVolume;
-		TThostFtdcRatioType StrikeRatioByMoney;
-		TThostFtdcRatioType StrikeRatioByVolume;
-#ifdef _REAL_CTP_
-		TThostFtdcRatioType	OrderCommByVolume;
-		TThostFtdcRatioType	OrderActionCommByVolume;
-#endif
-	};
-
-	struct STRATEGY_API OpMgrate //期权保证金率
-	{
-		TThostFtdcMoneyType	FixedMargin;
-		TThostFtdcMoneyType	MiniMargin;
-		TThostFtdcMoneyType	Royalty;
-		TThostFtdcMoneyType	ExchFixedMargin;
-		TThostFtdcMoneyType	ExchMiniMargin;
-	};
 
 	struct STRATEGY_API Information
 	{
@@ -81,6 +58,8 @@ namespace Instrument{
 		InstrumentDictIterator begin() { return m_InfoDict.begin(); } ;
 		InstrumentDictConstIterator end() const { return m_InfoDict.end(); };
 		void serialize() const;
+		TThostFtdcExchangeIDTypeType GetExchangeID(const std::string& instrumentID) const;
+
 	private:
 		void unserialize();
 	private:

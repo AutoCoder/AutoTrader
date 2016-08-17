@@ -7,6 +7,18 @@
 #include "CommonUtils.h"
 
 namespace PP {
+	struct TwoSideMargin{
+		TwoSideMargin()
+			: Long(0.0)
+			, Short(0.0)
+		{}
+
+		double Long;
+		double Short;
+
+		double GetBiggerOne() const { return Long > Short ? Long : Short; }
+	};
+
 
 	CThostFtdcInvestorPositionFieldWrapper::CThostFtdcInvestorPositionFieldWrapper(){
 		memset(&m_LongPos, 0, sizeof(CThostFtdcInvestorPositionField));
@@ -242,15 +254,37 @@ namespace PP {
 		}		
 	}
 
-	double CThostFtdcInvestorPositionFieldWrapper::GetMargin() const{
+	double  CThostFtdcInvestorPositionFieldWrapper::GetLongMargin() const { 
+		return m_LongPos.UseMargin; 
+	}
+
+	double  CThostFtdcInvestorPositionFieldWrapper::GetShortMargin() const { 
+		return m_ShortPos.UseMargin; 
+	}
+
+	double  CThostFtdcInvestorPositionFieldWrapper::GetLongFrozenMargin() const{
+		return m_LongPos.FrozenMargin;
+	}
+
+	double  CThostFtdcInvestorPositionFieldWrapper::GetShortFrozenMargin() const{
+		return m_ShortPos.FrozenMargin;
+	}
+
+	double CThostFtdcInvestorPositionFieldWrapper::GetBiggerMargin() const{
 		return std::max(m_LongPos.UseMargin, m_ShortPos.UseMargin);
 	}
 
-
-	double CThostFtdcInvestorPositionFieldWrapper::GetFrozenMargin() const{
+	double CThostFtdcInvestorPositionFieldWrapper::GetBiggerFrozenMargin() const{
 		return std::max(m_LongPos.FrozenMargin, m_ShortPos.FrozenMargin);
 	}
 
+	double  CThostFtdcInvestorPositionFieldWrapper::GetBothMargin() const{
+		return m_LongPos.UseMargin + m_ShortPos.UseMargin;
+	}
+
+	double  CThostFtdcInvestorPositionFieldWrapper::GetBothFrozenMargin() const{
+		return m_LongPos.FrozenMargin + m_ShortPos.FrozenMargin;
+	}
 
 	double CThostFtdcInvestorPositionFieldWrapper::GetCommission() const{
 		return m_LongPos.Commission + m_ShortPos.Commission;
@@ -367,41 +401,80 @@ namespace PP {
 	}
 
 	double PositionProfitMgr::GetAvailableMoney() const{
-		//todo: loop all positionField and deduct the margin and commission from them.
 		double aMoney = m_accountInfo.Available;
-		for (auto item : m_posFieldMap){
-			aMoney -= item.second.GetMargin();
-			aMoney -= item.second.GetFrozenMargin();
-			aMoney -= item.second.GetCommission();
-			aMoney -= item.second.GetFrozenCommission();
-		}
-		return aMoney;
+		return aMoney - GetUsedMargin() - GetFrozenMargin() - GetCommission() - GetFrozenCommission();
 	}
 
 	double PositionProfitMgr::GetBalanceMoney() const {
 		double bMoney = m_accountInfo.Balance;
-		for (auto item : m_posFieldMap){
-			bMoney -= item.second.GetMargin();
-			bMoney -= item.second.GetFrozenMargin();
-			bMoney -= item.second.GetCommission();
-			bMoney -= item.second.GetFrozenCommission();
-		}
-		return bMoney;
+		return bMoney - GetUsedMargin() - GetFrozenMargin() - GetCommission() - GetFrozenCommission();;
 	}
 
 	double PositionProfitMgr::GetFrozenMargin() const{
 		double ret = 0.0;
+		std::map<std::string, TwoSideMargin> pdMarginDict;
 		for (auto item : m_posFieldMap){
-			ret += item.second.GetFrozenMargin();
-		}		
+			switch(InstrumentManager.GetExchangeID(item.first))
+			{
+				case THOST_FTDC_EIDT_SHFE:
+				case THOST_FTDC_EIDT_CFFEX:
+				{
+					//one-way bigger frozenmargin
+					const std::string& prodID = CommonUtils::InstrumentIDToProductID(item.first);
+					pdMarginDict[prodID].Long += item.second.GetLongFrozenMargin();
+					pdMarginDict[prodID].Short += item.second.GetShortFrozenMargin();
+				}
+				break;
+				case THOST_FTDC_EIDT_CZCE: 
+					ret += item.second.GetBiggerFrozenMargin();
+					break;
+				case THOST_FTDC_EIDT_DCE: //大连商品交易所 two-way margin
+					ret += item.second.GetBothFrozenMargin();
+					break;
+				case THOST_FTDC_EIDT_INE:
+				default:
+					assert(false);
+					break;
+			}
+		}	
+
+		for (auto item : pdMarginDict){
+			ret += item.second.GetBiggerOne();
+		}			
 		return ret;
 	}
 
 	double PositionProfitMgr::GetUsedMargin() const{
 		double ret = 0.0;
+		std::map<std::string, TwoSideMargin> pdMarginDict;
 		for (auto item : m_posFieldMap){
-			ret += item.second.GetMargin();
+			switch(InstrumentManager.GetExchangeID(item.first))
+			{
+				case THOST_FTDC_EIDT_SHFE:
+				case THOST_FTDC_EIDT_CFFEX:
+				{
+					//one-way bigger margin
+					const std::string& prodID = CommonUtils::InstrumentIDToProductID(item.first);
+					pdMarginDict[prodID].Long += item.second.GetLongMargin();
+					pdMarginDict[prodID].Short += item.second.GetShortMargin();
+				}
+				break;
+				case THOST_FTDC_EIDT_CZCE: 
+					ret += item.second.GetBiggerMargin();
+					break;
+				case THOST_FTDC_EIDT_DCE: //大连商品交易所 two-way margin
+					ret += item.second.GetBothMargin();
+					break;
+				case THOST_FTDC_EIDT_INE:
+				default:
+					assert(false);
+					break;
+			}
 		}		
+
+		for (auto item : pdMarginDict){
+			ret += item.second.GetBiggerOne();
+		}
 		return ret;
 	}
 

@@ -1,6 +1,6 @@
 1) 当报单提交未成交时，对应的冻结保证金和冻结手续费均未0.
    原因：因为没有根据合约的byMoney和byVolume去计算。
-   状态：已发现
+   状态：Fixed
 
 2) 上一次tradespi登陆后，对同一个合约存在仓位和未成交订单，再次登录以后，初始化得到的仓位信息不正确。
    原因：对于同一个合约的仓位查询，如果已有仓位和未成交报单，会有多次回调，operator +=(const CThostFtdcInvestorPositionField& other) 并没有对forzenMagin & forzenCommission信息进行累计。
