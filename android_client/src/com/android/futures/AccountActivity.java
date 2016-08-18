@@ -14,6 +14,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.RadioGroup;
+import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.Spinner;
 import android.widget.TextView;
 import java.util.ArrayList;
@@ -36,6 +38,8 @@ public class AccountActivity extends Activity implements Handler.Callback {
 	private Button logOutBtn = null;
 	private Button closeCtpBtn = null;
 	private Button checkMsgBtn = null;
+	private RadioGroup automaticRadioGroup = null;
+	private RadioGroup tickRadioGroup = null;
 	private TextView accountView = null;
 	private TextView balanceView = null;
 	private TextView availableView = null;
@@ -54,13 +58,13 @@ public class AccountActivity extends Activity implements Handler.Callback {
 		try {
 			super.onCreate(savedInstanceState);
 			setContentView(R.layout.activity_account);
-			
+
 			/*
 			 * monitor memory leak
-			*/
-			MyApp app = (MyApp) getApplication();		
+			 */
+			MyApp app = (MyApp) getApplication();
 			RefWatcher refWatcher = app.getRefWatcher();
-		    refWatcher.watch(this);
+			refWatcher.watch(this);
 
 		} catch (Exception e) {
 			Log.e("ERROR", "ERROR IN CODE: " + e.toString());
@@ -78,38 +82,41 @@ public class AccountActivity extends Activity implements Handler.Callback {
 		positionView = (TextView) this.findViewById(R.id.position_val);
 		mInstrumentList = (Spinner) this.findViewById(R.id.instrument_List);
 		mStrategyList = (Spinner) this.findViewById(R.id.strategy_list);
+
+		automaticRadioGroup = (RadioGroup) this.findViewById(R.id.autoRadioGroup);
+		tickRadioGroup = (RadioGroup) this.findViewById(R.id.tickRadioGroup);
 		tradeBtn = (Button) this.findViewById(R.id.trade_btn);
 		monitorBtn = (Button) this.findViewById(R.id.monitor_btn);
 		logOutBtn = (Button) this.findViewById(R.id.LogOut);
 		closeCtpBtn = (Button) this.findViewById(R.id.ReleaseCtp);
 		checkMsgBtn = (Button) this.findViewById(R.id.CheckMessage);
-		
-		Intent intent =getIntent();
-		if (intent.hasExtra("AccountId")){
+
+		Intent intent = getIntent();
+		if (intent.hasExtra("AccountId")) {
 			String account_str = intent.getStringExtra("AccountId");
 			accountView.setText(account_str.toCharArray(), 0, account_str.length());
 		}
-		
-		MyApp app = (MyApp) getApplication();		
+
+		MyApp app = (MyApp) getApplication();
 		mSession = app.GetSession();
 		mSession.SetHandler(mHandler);
 		mSession.Login();
 		updateButtonStatus();
-		
+
 		logOutBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				finish();
 			}
 		});
-		
+
 		closeCtpBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				mSession.LogOut();
 			}
 		});
-		
+
 		checkMsgBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -117,49 +124,92 @@ public class AccountActivity extends Activity implements Handler.Callback {
 				startActivity(intent);
 			}
 		});
-		
+
 		monitorBtn.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-			    Intent intent = new Intent(AccountActivity.this, MyFragmentActivity.class); 
-			    intent.putExtra("instrument", (String) mInstrumentList.getSelectedItem());
-			    intent.putExtra("strategy", (String) mStrategyList.getSelectedItem());
-	            startActivity(intent);
+				Intent intent = new Intent(AccountActivity.this, MyFragmentActivity.class);
+				intent.putExtra("instrument", (String) mInstrumentList.getSelectedItem());
+				intent.putExtra("strategy", (String) mStrategyList.getSelectedItem());
+				startActivity(intent);
 			}
 		});
-		
+
 		tradeBtn.setOnClickListener(new View.OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				if (IsTrading){
+				if (IsTrading) {
 					mSession.StopTrade();
-				}else{
-					mSession.StartTrade((String) mStrategyList.getSelectedItem(), (String) mInstrumentList.getSelectedItem());
+				} else {
+					mSession.StartTrade((String) mStrategyList.getSelectedItem(),
+							(String) mInstrumentList.getSelectedItem());
 				}
 			}
 		});
+
+		automaticRadioGroup.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(RadioGroup arg0, int arg1) {
+				setTradeMode();
+			}
+		});
 		
+		tickRadioGroup.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+			@Override
+			public void onCheckedChanged(RadioGroup arg0, int arg1) {
+				setTickMode();
+			}
+		});
+
+		setTradeMode();
+		setTickMode();
 		progressDlg = new ProgressDialog(this);
 		progressDlg.setTitle("提示");
 		progressDlg.setMessage("登陆中。。。");
-		//progressDlg.setCancelable(false);
+		// progressDlg.setCancelable(false);
 		progressDlg.show();
 	}
-
-	private void updateButtonStatus(){
-		monitorBtn.setEnabled(IsTrading);
-		tradeBtn.setEnabled(IsPositionUpdated);
-		if (IsTrading){
-			tradeBtn.setText(R.string.StopTrade);
-		}else{
-			tradeBtn.setText(R.string.Trade);
+	
+	private void setTradeMode(){
+		int radioButtonId = automaticRadioGroup.getCheckedRadioButtonId();
+		if (R.id.semiAuto == radioButtonId){
+			mSession.SetSemiAutoTrade(true);
+		}
+		else if (R.id.totalAuto == radioButtonId){
+			mSession.SetSemiAutoTrade(false);
+		}
+		else{
+			assert(false);
+		}
+	}	
+	
+	private void setTickMode(){
+		int radioButtonId = tickRadioGroup.getCheckedRadioButtonId();
+		if (R.id.TickAndKLine == radioButtonId){
+			mSession.SetTickReceiving(true);
+		}
+		else if (R.id.KLine == radioButtonId){
+			mSession.SetTickReceiving(false);
+		}
+		else{
+			assert(false);
 		}
 	}
 	
+	private void updateButtonStatus() {
+		monitorBtn.setEnabled(IsTrading);
+		tradeBtn.setEnabled(IsPositionUpdated);
+		if (IsTrading) {
+			tradeBtn.setText(R.string.StopTrade);
+		} else {
+			tradeBtn.setText(R.string.Trade);
+		}
+	}
+
 	@Override
-	protected void onRestart(){
+	protected void onRestart() {
 		super.onRestart();
 		mSession.SetHandler(mHandler);
 		mSession.QueryPosition();
@@ -167,10 +217,10 @@ public class AccountActivity extends Activity implements Handler.Callback {
 
 	@Override
 	public boolean handleMessage(Message msg) {
-		if (msg.what == ClientStatusListener.Logined){
+		if (msg.what == ClientStatusListener.Logined) {
 			progressDlg.setMessage("登陆成功，账户初始化中。。。");
-			
-		} else if (msg.what == ClientStatusListener.LoginFailed){
+
+		} else if (msg.what == ClientStatusListener.LoginFailed) {
 			String err_str = (String) msg.obj;
 			progressDlg.setMessage("登陆失败，Reason:" + err_str);
 			try {
@@ -180,8 +230,8 @@ public class AccountActivity extends Activity implements Handler.Callback {
 			}
 			progressDlg.dismiss();
 			finish();
-			
-		} else if (msg.what == ClientStatusListener.LogOut){
+
+		} else if (msg.what == ClientStatusListener.LogOut) {
 			finish();
 		} else if (msg.what == ClientStatusListener.PositionUpdated) {
 			PositionInfo status = (PositionInfo) msg.obj;
@@ -191,7 +241,8 @@ public class AccountActivity extends Activity implements Handler.Callback {
 			forzenMarginView.setText(Double.toString(status.getForzenMargin()));
 			commissionView.setText(Double.toString(status.getCommission()));
 			forzenCommissionView.setText(Double.toString(status.getForzenCommission()));
-			//String pos_text = String.format("[%s]: (%d * %d)", status.getInstrument(), status.getPrice(), status.getPosition());
+			// String pos_text = String.format("[%s]: (%d * %d)",
+			// status.getInstrument(), status.getPrice(), status.getPosition());
 			positionView.setText(status.getDetails());
 			IsPositionUpdated = true;
 			progressDlg.setMessage("账户初始化完毕。");
@@ -202,7 +253,7 @@ public class AccountActivity extends Activity implements Handler.Callback {
 			}
 			progressDlg.dismiss();
 			updateButtonStatus();
-			
+
 		} else if (msg.what == ClientStatusListener.AccountInfoUpdated) {
 			AccountInfo info = (AccountInfo) msg.obj;
 			ArrayList<String> instrus = info.getInstrumentList();
@@ -219,43 +270,37 @@ public class AccountActivity extends Activity implements Handler.Callback {
 			mSession.setStrategyName(info.getRunningStrategy());
 			updateButtonStatus();
 			progressDlg.setMessage("登陆成功，账户初始化中。。。");
-		}
-		else if (msg.what == ClientStatusListener.Trading){
+		} else if (msg.what == ClientStatusListener.Trading) {
 			IsTrading = true;
 			updateButtonStatus();
-		}
-		else if (msg.what == ClientStatusListener.NoTrading){
+		} else if (msg.what == ClientStatusListener.NoTrading) {
 			IsTrading = false;
 			updateButtonStatus();
-		}
-		else if (msg.what == ClientStatusListener.TradeNotification){
-			sendTradeNotification(msg);  
+		} else if (msg.what == ClientStatusListener.TradeNotification) {
+			sendTradeNotification(msg);
 		}
 		return false;
 	}
 
 	private void sendTradeNotification(Message msg) {
-		TradeEntity tradeEntity = (TradeEntity)msg.obj;
+		TradeEntity tradeEntity = (TradeEntity) msg.obj;
 
-		String title = String.format("%s Price:%5.0f Volume:%d", tradeEntity.getDirectionString(), tradeEntity.getLastPrice(), tradeEntity.getVol());
-		String content = String.format("Order_Ref:%s Trade_Time:%s", tradeEntity.getOrderId(), tradeEntity.getOccurTimeString());
-		PendingIntent pendingIntent = PendingIntent.getActivity(this, notificationID++,  
-		        new Intent(this, TradeListActivity.class), 0);
-		
-		NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE); 
-		final int NOTIFICATION_FLAG = 1;  
-		Notification notify = new Notification.Builder(this)  
-		    .setSmallIcon(R.drawable.messages) 
-		    .setTicker(tradeEntity.getTypeString() + "提醒！")                
-		    .setContentTitle(title)                               
-		    .setContentText(content)
-		    .setContentIntent(pendingIntent)
-		    .setNumber(1)
-		    .getNotification();
-		
-		notify.defaults |= Notification.DEFAULT_SOUND;  
-		notify.defaults |= Notification.DEFAULT_VIBRATE;  
-		notify.flags |= Notification.FLAG_AUTO_CANCEL;  
+		String title = String.format("%s Price:%5.0f Volume:%d", tradeEntity.getDirectionString(),
+				tradeEntity.getLastPrice(), tradeEntity.getVol());
+		String content = String.format("Order_Ref:%s Trade_Time:%s", tradeEntity.getOrderId(),
+				tradeEntity.getOccurTimeString());
+		PendingIntent pendingIntent = PendingIntent.getActivity(this, notificationID++,
+				new Intent(this, TradeListActivity.class), 0);
+
+		NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		final int NOTIFICATION_FLAG = 1;
+		Notification notify = new Notification.Builder(this).setSmallIcon(R.drawable.messages)
+				.setTicker(tradeEntity.getTypeString() + "提醒！").setContentTitle(title).setContentText(content)
+				.setContentIntent(pendingIntent).setNumber(1).getNotification();
+
+		notify.defaults |= Notification.DEFAULT_SOUND;
+		notify.defaults |= Notification.DEFAULT_VIBRATE;
+		notify.flags |= Notification.FLAG_AUTO_CANCEL;
 		manager.notify(NOTIFICATION_FLAG, notify);
 	}
 }

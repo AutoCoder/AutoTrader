@@ -48,12 +48,12 @@ public class ClientSession implements ClientStatusListener {
 		JSONObject meta = new JSONObject();
 		
 		try {
-			meta.put("BrokerId", mBrokerId);
-			meta.put("UserName", mAccount);
-			meta.put("Password", mPassword);
+			meta.put(CommProtocol.Argument.BrokerId, mBrokerId);
+			meta.put(CommProtocol.Argument.UserName, mAccount);
+			meta.put(CommProtocol.Argument.Password, mPassword);
 			JSONObject loginJson = new JSONObject(); 
-			loginJson.put("Action", "Login");
-			loginJson.put("Arguments", meta);
+			loginJson.put(CommProtocol.sAction, CommProtocol.Action.LogIn);
+			loginJson.put(CommProtocol.sArguments, meta);
 			String info = loginJson.toString();
 			String wrapInfo = String.valueOf(info.length()) + info;
 			mSocketHandler.sendMessage(wrapInfo);
@@ -68,12 +68,12 @@ public class ClientSession implements ClientStatusListener {
 		JSONObject meta = new JSONObject();
 		
 		try {
-			meta.put("BrokerId", mBrokerId);
-			meta.put("UserName", mAccount);
-			meta.put("Password", mPassword);
+			meta.put(CommProtocol.Argument.BrokerId, mBrokerId);
+			meta.put(CommProtocol.Argument.UserName, mAccount);
+			meta.put(CommProtocol.Argument.Password, mPassword);
 			JSONObject loginJson = new JSONObject(); 
-			loginJson.put("Action", "Logout");
-			loginJson.put("Arguments", meta);
+			loginJson.put(CommProtocol.sAction, CommProtocol.Action.LogOut);
+			loginJson.put(CommProtocol.sArguments, meta);
 			String info = loginJson.toString();
 			String wrapInfo = String.valueOf(info.length()) + info;
 			mSocketHandler.sendMessage(wrapInfo);
@@ -87,8 +87,8 @@ public class ClientSession implements ClientStatusListener {
 		//{"ActionType":"StartTrade","Arguments":{"InstrumentId":"rb1604","StrategyName":"Pos20Precent_3_5_MACrossStratgy"}}
 		try {
 			JSONObject meta = new JSONObject();
-			meta.put("InstrumentId", instrument);
-			meta.put("StrategyName", strategyName);
+			meta.put(CommProtocol.Argument.InstrumentId, instrument);
+			meta.put(CommProtocol.Argument.StrategyName, strategyName);
 			
 			JSONObject loginJson = new JSONObject(); 
 			loginJson.put("Action", "StartTrade");
@@ -109,7 +109,7 @@ public class ClientSession implements ClientStatusListener {
 		try {
 			
 			JSONObject json = new JSONObject(); 
-			json.put("Action", "StopTrade");
+			json.put(CommProtocol.sAction, CommProtocol.Action.StopTrade);
 			String info = json.toString();
 			String wrapInfo = String.valueOf(info.length()) + info;
 			mSocketHandler.sendMessage(wrapInfo);
@@ -124,7 +124,34 @@ public class ClientSession implements ClientStatusListener {
 	public void QueryPosition(){
 		try {
 			JSONObject json = new JSONObject(); 
-			json.put("Action", "QueryPosition");
+			json.put(CommProtocol.sAction, CommProtocol.Action.QueryPosition);
+			String info = json.toString();
+			String wrapInfo = String.valueOf(info.length()) + info;
+			mSocketHandler.sendMessage(wrapInfo);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 		
+	}
+	
+
+	public void SetTickReceiving(Boolean _on){
+		try {
+			JSONObject json = new JSONObject(); 
+			json.put(CommProtocol.sAction, _on ? CommProtocol.Action.TurnOnTickReceiving : CommProtocol.Action.TurnOffTickReceiving);
+			String info = json.toString();
+			String wrapInfo = String.valueOf(info.length()) + info;
+			mSocketHandler.sendMessage(wrapInfo);
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 	
+	}
+	
+	public void SetSemiAutoTrade(Boolean _on){
+		try {
+			JSONObject json = new JSONObject(); 
+			json.put(CommProtocol.sAction, _on ? CommProtocol.Action.TurnOnSemiAuto : CommProtocol.Action.TurnOffSemiAuto);
 			String info = json.toString();
 			String wrapInfo = String.valueOf(info.length()) + info;
 			mSocketHandler.sendMessage(wrapInfo);
