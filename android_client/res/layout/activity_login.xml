@@ -160,10 +160,9 @@
                 android:layout_marginLeft="20dip"
                 android:layout_toRightOf="@id/host_label"
                 android:hint="127.0.0.1"
-                android:text="121.40.99.4" 
+                android:text="10.0.2.2"
                 android:textColor="#000"
                 android:textSize="15sp" />
-            <!--this ip is for simulator debugging "10.0.2.2" -->
         </RelativeLayout>
 
         <RelativeLayout
