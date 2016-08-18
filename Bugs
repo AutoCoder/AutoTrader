@@ -23,5 +23,6 @@
 5) 客户端成交回报收到重复的两次。
 
    分析：这可能是由于重复连接tradespi，多次产生多次回报引发的。
+   状态：Fixed. Clear trade queue in Client when logout
 
 6) 客户端登陆，最初显示一个浮动dialog提示账户正在初始化，没等初始化完成，这个dialog就消失了。期间account activity的不少控件被置为0.
