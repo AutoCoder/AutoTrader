@@ -77,7 +77,6 @@ public class ClientSession implements ClientStatusListener {
 			String info = loginJson.toString();
 			String wrapInfo = String.valueOf(info.length()) + info;
 			mSocketHandler.sendMessage(wrapInfo);
-
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -224,6 +223,9 @@ public class ClientSession implements ClientStatusListener {
 		mSocketHandler.shutDown();
 		mSocketHandler = null;
 		State = LogOut;
+		
+		mTradeSequence.clear();
+		
 		Message msg = Message.obtain();
 		msg.what = ClientStatusListener.LogOut;
 		mHandler.sendMessage(msg);
