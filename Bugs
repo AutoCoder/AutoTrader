@@ -11,3 +11,11 @@
    原因：在初始化过程中，对account进行查询后，此时的Available & Balance为更新值。对仓位进行查询后，又得到当前交易日多笔交易的手续费。
    此时显示的Available & Balance 的数值 为真实值扣除了手续费后的值。
    状态：已发现
+
+
+4) 空仓状态下，发生一手rb1610交易后，balance与simnow上的参考值不吻合。
+
+   原因：在发生交易的瞬间 [balance = available + margin] or [balance = old_balance - commission]
+        但在后面持续的时间里，随着行情的波动，positionprofit持续变化，balance也持续变化，其delta值为positionprofit
+
+   状态：部分fixed，只能保证balance交易发生一瞬间正确。

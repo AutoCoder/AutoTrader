@@ -5,7 +5,7 @@ Note: 以simnow客户端的数值为验证标准。
 1） 上一个交易日没有持有任何仓位，当天未进行任何操作之前，Balance == Available 且 Margin & commission & frozenMargin & forzenCommission 均未0. 
 
 2） 上一个交易日没有持有任何仓位，对一个合约进行交易以后，Margin & Commissiont 出现变化，交易合约的分仓位出现变化.
-Available ＝ Balance - Margin - Commissiont
+Available ＝ Balance - Margin - Commission
 Balance = old_Balance - PositionProfit
 
 3)  上一个交易日没有持有任何仓位, 对一个合约进行报单但未成交之前，forzenMargin & forzenCommission 出现变化，交易合约分仓位这两个字段爷出现变化，但Margin & Commissiont仍为0. Balance保持不变。

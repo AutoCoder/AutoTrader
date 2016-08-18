@@ -407,7 +407,7 @@ namespace PP {
 
 	double PositionProfitMgr::GetBalanceMoney() const {
 		double bMoney = m_accountInfo.Balance;
-		return bMoney - GetUsedMargin() - GetFrozenMargin() - GetCommission() - GetFrozenCommission();;
+		return bMoney - GetCommission();
 	}
 
 	double PositionProfitMgr::GetFrozenMargin() const{
