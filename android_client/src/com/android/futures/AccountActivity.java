@@ -163,8 +163,6 @@ public class AccountActivity extends Activity implements Handler.Callback {
 			}
 		});
 
-		setTradeMode();
-		setTickMode();
 		progressDlg = new ProgressDialog(this);
 		progressDlg.setTitle("提示");
 		progressDlg.setMessage("登陆中。。。");
@@ -219,6 +217,8 @@ public class AccountActivity extends Activity implements Handler.Callback {
 	public boolean handleMessage(Message msg) {
 		if (msg.what == ClientStatusListener.Logined) {
 			progressDlg.setMessage("登陆成功，账户初始化中。。。");
+			setTradeMode();
+			setTickMode();
 
 		} else if (msg.what == ClientStatusListener.LoginFailed) {
 			String err_str = (String) msg.obj;
