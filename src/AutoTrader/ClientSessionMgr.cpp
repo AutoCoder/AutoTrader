@@ -101,6 +101,13 @@ void ClientSessionMgr::QueryPosition(const SockSessionSP& session){
 	}
 }
 
+void ClientSessionMgr::TurnOffTick(bool off){
+	ClientSessionSP clientSessionSp = GetClientSession(session);
+	if (clientSessionSp){
+		clientSessionSp->SetTickOff(off);
+	}
+}
+
 ClientSessionSP ClientSessionMgr::GetClientSession(const SockSessionSP& session, const std::string& userId){
 	auto iter = std::find_if(m_client_sessions.begin(), m_client_sessions.end(), [&](const std::pair<SockSessionSP, ClientSessionSP >& pair){
 		return (*session.get()) == (*pair.first.get());

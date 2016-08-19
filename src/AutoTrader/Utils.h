@@ -25,6 +25,7 @@ namespace Transmission{
 			int openPrice, int closePrice, int highPrice, int lowPrice, int vol, int total_vol, double turnover, long long timestamp, \
 			const std::string& instru, const std::string& extradata);
 		static void SendDealInfo(const SockSessionSP& session, TradeEventType type, const char* instrument, int direction, char combOffsetFlag, int price, int vol, char*  orderRef, long long timestamp);
+		static void SendOrderPrompt(const SockSessionSP& session, const char* instrument, int direction, char combOffsetFlag, int price, int vol, long long timestamp);
 		static void SendLoginResultInfo(const SockSessionSP& session, ErrorCode code);
 		static void SendLogOutResultInfo(const SockSessionSP& session, ErrorCode code);
 		static void SendPositionInfo(const SockSessionSP& session, double blance, double available, double margin, double forzenMargin, double commission, double forzenCommission, const std::string& detailList);

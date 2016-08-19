@@ -28,6 +28,7 @@
 BaseClientSession::BaseClientSession(const std::string& userId)
 : m_userId(userId)
 , m_isTrading(false)
+, m_semiAuto(false)
 , m_PPMgr(std::unique_ptr<PPMgr>(new PPMgr()))
 , m_total_vol(0)
 , m_ReleaseingCtpAccount(false)
@@ -116,12 +117,8 @@ bool BaseClientSession::ExecutePendingOrder(){
 		WaitAndPopCurrentOrder(ord);//blocking
 		if (m_ReleaseingCtpAccount)
 			break;
-
-		//if socket command set m_isTrading = false here. this function will quit.
-		if (m_isTrading.load()){ //Check this bool var again, prevent to execute new pushed order after user stop trade.
-			m_trade_spi->CancelOrder(ord.GetTriggerTick(), 0, ord.GetInstrumentId());
-			m_trade_spi->ReqOrderInsert(ord);
-		}
+		
+		OnOrderTrigger(ord);
 	}
 	return true;
 }
@@ -140,7 +137,7 @@ void BaseClientSession::StopTrade(){
 	m_isTrading.store(false);
 }
 
-bool BaseClientSession::StartTrade(const std::string& instru, const std::string& strategyName, ErrorCode& errcode){
+bool BaseClientSession::StartTrade(const std::string& instru, const std::string& strategyName, ErrorCode& errcode, std::function<void()> OnOrderTriggerCallBack){
 	if (m_isTrading.load()){
 		errcode = Transmission::TradingNow;
 		return false;

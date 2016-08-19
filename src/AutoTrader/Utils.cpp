@@ -118,6 +118,24 @@ namespace Transmission{
 		Transmission::GetResponseActionQueue().Push_back(Transmission::RemoteServerAction(session, ret));
 	}
 
+    void SendOrderPrompt(const SockSessionSP& session, const char* instrument, int direction, char combOffsetFlag, int price, int vol, long long timestamp){
+		Json::Value root;
+		root["Info"] = "Order_Triggered";
+		root["Details"] = Json::Value::nullRef;
+		root["Details"]["Direction"] = (direction == '0' ? 0 : 1);
+		root["Details"]["OffsetFlag"] = (int)combOffsetFlag;
+		root["Details"]["Price"] = price;
+		root["Details"]["Vol"] = vol;
+		root["Details"]["TIMESTAMP"] = timestamp;
+		root["Details"]["Instrument"] = instrument;
+		Json::FastWriter writer;
+		std::string ret = writer.write(root);
+		ret = str(boost::format("%1%%2%") % ret.length() % ret);
+		Transmission::GetResponseActionQueue().Push_back(Transmission::RemoteServerAction(session, ret));    	
+
+    }
+
+
 	void Utils::SendLoginResultInfo(const SockSessionSP& session, ErrorCode code){
 		std::string err_msg;
 		int err_code = code;

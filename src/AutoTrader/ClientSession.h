@@ -24,9 +24,11 @@ public:
 
 	virtual bool Init_CTP();
 
-	bool StartTrade(const std::string& instru, const std::string& strategyName, ErrorCode& errcode);
+	virtual void OnOrderTrigger(const Order& ord);
 
-	void SendTickToClient(const TickWrapper& tick);
+	virtual void SendTickToClient(const TickWrapper& tick);
+
+	bool StartTrade(const std::string& instru, const std::string& strategyName, ErrorCode& errcode);
 
 	void SendPostionInfoToClient();
 
@@ -35,6 +37,8 @@ public:
 	void OnStartTradeRequest(const std::string& instru, const std::string& strategyName);
 
 	void UpdateSocketSession(const SockSessionSP& s) { m_session = s;  }
+
+	void SetTickOff(bool off) { m_tickoff = off; }
 
 	~ClientSession();
 private:
@@ -55,6 +59,7 @@ private:
 #endif
 
 private:
+	bool                           m_tickoff;
 	std::shared_ptr<SockSession>   m_session;
 
 #ifdef FAKE_MD

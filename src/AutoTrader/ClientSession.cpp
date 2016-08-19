@@ -29,7 +29,8 @@
 #endif
 
 ClientSession::ClientSession(const std::string& userId, const SockSessionSP& s)
-: BaseClientSession(userId) 
+: BaseClientSession(userId)
+, m_tickoff(false)
 , m_session(s)
 {
 #ifndef FAKE_MD
@@ -80,6 +81,21 @@ bool ClientSession::Init_CTP()
 	SYNC_LOG << "CTP Account of " << m_userId << "...Setup";
 
 	return true;
+}
+
+void ClientSession::OnOrderTrigger(const Order& ord){
+	if (!m_isTrading.load())
+		return;
+
+	if (m_semiAuto){
+		Transmission::Utils::SendOrderPrompt(m_session, ord.GetInstrumentId(), ord.GetExchangeDirection(), ord.GetCombOffsetFlagType(), ord.GetRefExchangePrice(), ord.GetVolume(), ord.GetTriggerTick());
+	}
+	else{
+		if (m_isTrading.load()){ //Check this bool var again, prevent to execute new pushed order after user stop trade.
+			m_trade_spi->CancelOrder(ord.GetTriggerTick(), 0, ord.GetInstrumentId());
+			m_trade_spi->ReqOrderInsert(ord);
+		}
+	}
 }
 
 bool ClientSession::StartTrade(const std::string& instru, const std::string& strategyName, ErrorCode& errcode){

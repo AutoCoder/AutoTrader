@@ -36,6 +36,12 @@ public:
 	virtual ~BaseClientSession();
 	virtual bool Init_CTP();
 	virtual void SendTickToClient(const TickWrapper& tick) {};
+	virtual void OnOrderTrigger(const Order& ord){
+		if (m_isTrading.load()){ //Check this bool var again, prevent to execute new pushed order after user stop trade.
+			m_trade_spi->CancelOrder(ord.GetTriggerTick(), 0, ord.GetInstrumentId());
+			m_trade_spi->ReqOrderInsert(ord);
+		}
+	}
 
 	//These below two Functions should be syncd with one mutex, they may conflict with m_pending_order
 	bool AppendOrder(const Order& order);//multi-thread notice
@@ -50,6 +56,12 @@ public:
 	bool StartTrade(const std::string& instru, const std::string& strategyName, ErrorCode& errcode);
 	void StopTrade();
 
+	void TurnOnSemiAutoTrading(bool on){
+
+	}
+
+
+
 protected:
 	bool ExecutePendingOrder();
 
@@ -60,6 +72,7 @@ protected:
 protected:
 	std::string										m_userId;
 	std::atomic<bool>                               m_isTrading; // access by thread-OrderExecutor and thread-ActionQueueInvoker
+	bool                                            m_semiAuto;
 	typedef PP::PositionProfitMgr PPMgr;
 	std::unique_ptr<PPMgr>                          m_PPMgr;
 	int                                             m_total_vol;

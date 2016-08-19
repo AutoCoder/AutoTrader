@@ -39,6 +39,10 @@ public:
 
 	void QueryPosition(const SockSessionSP& session);
 
+	void TurnOffTick(bool off);
+
+	void TurnOffAutoTrading(bool off);
+
 private:
 	ClientSessionMgr();
 	ClientSessionMgr(const ClientSessionMgr&) = delete;
