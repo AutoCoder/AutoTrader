@@ -36,12 +36,7 @@ public:
 	virtual ~BaseClientSession();
 	virtual bool Init_CTP();
 	virtual void SendTickToClient(const TickWrapper& tick) {};
-	virtual void OnOrderTrigger(const Order& ord){
-		if (m_isTrading.load()){ //Check this bool var again, prevent to execute new pushed order after user stop trade.
-			m_trade_spi->CancelOrder(ord.GetTriggerTick(), 0, ord.GetInstrumentId());
-			m_trade_spi->ReqOrderInsert(ord);
-		}
-	}
+	virtual void OnOrderTrigger(const Order& ord);
 
 	//These below two Functions should be syncd with one mutex, they may conflict with m_pending_order
 	bool AppendOrder(const Order& order);//multi-thread notice

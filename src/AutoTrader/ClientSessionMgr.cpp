@@ -101,11 +101,18 @@ void ClientSessionMgr::QueryPosition(const SockSessionSP& session){
 	}
 }
 
-void ClientSessionMgr::TurnOffTick(bool off){
+void ClientSessionMgr::TurnOffTick(const SockSessionSP& session, bool off){
 	ClientSessionSP clientSessionSp = GetClientSession(session);
 	if (clientSessionSp){
 		clientSessionSp->SetTickOff(off);
 	}
+}
+
+void ClientSessionMgr::TurnOnSemiAutoTrading(const SockSessionSP& session, bool on){
+	ClientSessionSP clientSessionSp = GetClientSession(session);
+	if (clientSessionSp){
+		clientSessionSp->TurnOnSemiAutoTrading(on);
+	}	
 }
 
 ClientSessionSP ClientSessionMgr::GetClientSession(const SockSessionSP& session, const std::string& userId){

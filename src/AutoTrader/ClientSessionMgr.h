@@ -39,9 +39,9 @@ public:
 
 	void QueryPosition(const SockSessionSP& session);
 
-	void TurnOffTick(bool off);
+	void TurnOffTick(const SockSessionSP& session, bool off);
 
-	void TurnOffAutoTrading(bool off);
+	void TurnOnSemiAutoTrading(const SockSessionSP& session, bool on);
 
 private:
 	ClientSessionMgr();

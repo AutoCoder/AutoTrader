@@ -159,6 +159,9 @@ bool ClientSession::ReturnFakeCTPMessage(const std::string& instru){
 #endif
 
 void ClientSession::SendTickToClient(const TickWrapper& tick){
+	if (m_tickoff)
+		return;
+
 	if (m_total_vol != 0)
 		Transmission::Utils::SendMDInfo(m_session, tick.PreSettlementPrice(), tick.OpenPrice(), tick.LastPrice(), tick.HighestPrice(), tick.LowestPrice(), tick.Volume() - m_total_vol, tick.Volume(), tick.TurnOver(), tick.toTimeStamp(), tick.InstrumentId(), tick.GetTechVec()->ToJson());
 	

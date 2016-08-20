@@ -137,7 +137,14 @@ void BaseClientSession::StopTrade(){
 	m_isTrading.store(false);
 }
 
-bool BaseClientSession::StartTrade(const std::string& instru, const std::string& strategyName, ErrorCode& errcode, std::function<void()> OnOrderTriggerCallBack){
+void BaseClientSession::OnOrderTrigger(const Order& ord){
+	if (m_isTrading.load()){ //Check this bool var again, prevent to execute new pushed order after user stop trade.
+		m_trade_spi->CancelOrder(ord.GetTriggerTick(), 0, ord.GetInstrumentId());
+		m_trade_spi->ReqOrderInsert(ord);
+	}
+}
+
+bool BaseClientSession::StartTrade(const std::string& instru, const std::string& strategyName, ErrorCode& errcode){
 	if (m_isTrading.load()){
 		errcode = Transmission::TradingNow;
 		return false;
