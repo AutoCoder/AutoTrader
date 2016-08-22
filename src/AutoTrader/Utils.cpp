@@ -128,6 +128,7 @@ namespace Transmission{
 		root["Details"]["Vol"] = vol;
 		root["Details"]["TIMESTAMP"] = timestamp;
 		root["Details"]["Instrument"] = instrument;
+		root["Details"]["ORDER_ID"] = "Empty";
 		Json::FastWriter writer;
 		std::string ret = writer.write(root);
 		ret = str(boost::format("%1%%2%") % ret.length() % ret);
