@@ -215,6 +215,9 @@ public class ReaderTask extends Thread {
 						}
 						else if (infoType.equals("TRADE")){
 							t = TradeEntity.type.Trade;
+						}	
+						else if (infoType.equals("Order_Triggered")){
+							t = TradeEntity.type.Order_Triggered;
 						}else{
 							throw new Exception("unexpected ctp return");
 						}

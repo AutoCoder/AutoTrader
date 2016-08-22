@@ -8,6 +8,7 @@ public class TradeEntity {
 		Insert_Order,
 		Cancell_Order,
 		Trade,
+		Order_Triggered,
 	}
 	
 	private type mType;
@@ -45,6 +46,9 @@ public class TradeEntity {
 			break;
 		case Trade:
 			tradeType = "成交";
+			break;
+		case Order_Triggered:
+			tradeType = "提醒";
 			break;
 		default:
 			tradeType = "未定义";
