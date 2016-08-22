@@ -47,6 +47,10 @@ namespace Transmission{
 			StartTrade,
 			StopTrade,
 			QueryPosition,
+			TurnOnSemiAuto,
+			TurnOffSemiAuto,
+			TurnOnTickReceiving,
+			TurnOffTickReceiving,
 		};
 
 		Parse_Result Parse(char* begin, char* end);

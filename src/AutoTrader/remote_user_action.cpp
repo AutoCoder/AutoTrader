@@ -181,6 +181,22 @@ namespace Transmission{
 					action_type_ = ActionType::QueryPosition;
 					return Parse_Result::Good;
 				}
+				else if (actionType == "TurnOnSemiAuto"){
+					action_type_ = ActionType::TurnOnSemiAuto;
+					return Parse_Result::Good;
+				}
+				else if (actionType == "TurnOffSemiAuto"){
+					action_type_ = ActionType::TurnOffSemiAuto;
+					return Parse_Result::Good;
+				}
+				else if (actionType == "TurnOnTickReceiving"){
+					action_type_ = ActionType::TurnOnTickReceiving;
+					return Parse_Result::Good;					
+				}
+				else if (actionType == "TurnOffTickReceiving"){
+					action_type_ = ActionType::TurnOffTickReceiving;
+					return Parse_Result::Good;					
+				}
 				else{
 					action_type_ = ActionType::Invalid;
 					return Parse_Result::Bad;
@@ -225,6 +241,26 @@ namespace Transmission{
 			case ActionType::QueryPosition:
 			{
 				ClientSessionMgr::getInstance()->QueryPosition(session_);
+			}
+			break;
+			case ActionType::TurnOnSemiAuto:
+			{
+				ClientSessionMgr::getInstance()->TurnOnSemiAutoTrading(session_, true);
+			}
+			break;
+			case ActionType::TurnOffSemiAuto:
+			{
+				ClientSessionMgr::getInstance()->TurnOnSemiAutoTrading(session_, false);
+			}
+			break;
+			case ActionType::TurnOnTickReceiving:
+			{
+				ClientSessionMgr::getInstance()->TurnOffTick(session_, false);
+			}
+			break;
+			case ActionType::TurnOffTickReceiving:
+			{
+				ClientSessionMgr::getInstance()->TurnOffTick(session_, true);
 			}
 			break;
 			default:
