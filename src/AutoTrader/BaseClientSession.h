@@ -51,11 +51,7 @@ public:
 	bool StartTrade(const std::string& instru, const std::string& strategyName, ErrorCode& errcode);
 	void StopTrade();
 
-	void TurnOnSemiAutoTrading(bool on){
-
-	}
-
-
+	void TurnOnSemiAutoTrading(bool on){ m_semiAuto = on; }
 
 protected:
 	bool ExecutePendingOrder();
