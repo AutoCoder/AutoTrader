@@ -33,6 +33,14 @@
             android:checked="true"
             android:text="撤单" >
         </CheckBox>
+        
+        <CheckBox
+            android:id="@+id/Prompt_check"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="提醒" >
+        </CheckBox>
     </LinearLayout>
 
     <ListView
