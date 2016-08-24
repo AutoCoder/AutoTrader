@@ -20,6 +20,7 @@ public class TradeListActivity extends Activity {
 	private CheckBox includeTrade = null;
 	private CheckBox includeInsertOrder = null;
 	private CheckBox includeCancelOrder = null;
+	private CheckBox includePromptOrder = null;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +37,7 @@ public class TradeListActivity extends Activity {
 			includeTrade = (CheckBox)this.findViewById(R.id.trade_check);
 			includeInsertOrder = (CheckBox)this.findViewById(R.id.insertOrder_check);
 			includeCancelOrder = (CheckBox)this.findViewById(R.id.cancelOrder_check);
+			includePromptOrder = (CheckBox)this.findViewById(R.id.Prompt_check);
 			
 			mSession = app.GetSession();
 			listview = (ListView) findViewById(R.id.listview);
@@ -71,12 +73,21 @@ public class TradeListActivity extends Activity {
             } 
         }); 
 		
+		includePromptOrder.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener(){ 
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, 
+                    boolean isChecked) { 
+            	validateFilter();
+            	
+            } 
+        }); 
+		
 		listview.setAdapter(adapter);
 		listview.setTextFilterEnabled(true);  
 	}
 	
 	private void validateFilter(){
-		adapter.setFilter(includeTrade.isChecked(), includeInsertOrder.isChecked(), includeCancelOrder.isChecked());
+		adapter.setFilter(includeTrade.isChecked(), includeInsertOrder.isChecked(), includeCancelOrder.isChecked(), includePromptOrder.isChecked());
 		if (adapter instanceof Filterable) {  
 			Filter filter = ((Filterable) adapter).getFilter();
 			filter.filter(null);  

@@ -22,6 +22,7 @@ public class ListAdapter extends BaseAdapter implements Filterable {
 	private boolean include_trade = true;
 	private boolean include_insertOrder = true;
 	private boolean include_cancelOrder = true;
+	private boolean include_promptOrder = true;
 
 	@SuppressWarnings("unchecked")
 	public ListAdapter(Vector<TradeEntity> list, Context c) {
@@ -31,10 +32,11 @@ public class ListAdapter extends BaseAdapter implements Filterable {
 		this.c = c;
 	}
 
-	public void setFilter(boolean trade, boolean insertOrder, boolean cancelOrder) {
+	public void setFilter(boolean trade, boolean insertOrder, boolean cancelOrder, boolean promptOrder) {
 		include_trade = trade;
 		include_insertOrder = insertOrder;
 		include_cancelOrder = cancelOrder;
+		include_promptOrder = promptOrder;
 	}
 
 	@Override
@@ -126,6 +128,9 @@ public class ListAdapter extends BaseAdapter implements Filterable {
 					filteredData.add(list.get(i));
 				}
 				if (include_cancelOrder && list.get(i).getType() == TradeEntity.type.Cancell_Order) {
+					filteredData.add(list.get(i));
+				}
+				if (include_promptOrder && list.get(i).getType() == TradeEntity.type.Order_Triggered){
 					filteredData.add(list.get(i));
 				}
 			}
