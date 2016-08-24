@@ -80,7 +80,7 @@ void MdProcessor::AppendTick(TickWrapper& info){
 		bool triggered = m_trigger->tryInvoke(m_TickVec, info, orders);
 #endif
 		if (triggered){
-			for (auto ord : orders){
+			for (auto& ord : orders){
 				ord.SetTriggerTick(info.toTimeStamp());
 			}
 
