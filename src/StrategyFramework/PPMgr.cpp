@@ -114,7 +114,7 @@ namespace PP {
 	}
 
 	CThostFtdcInvestorPositionFieldWrapper& CThostFtdcInvestorPositionFieldWrapper::operator +=(const CThostFtdcTradeField& trade){
-		int volumeMultiple = InstrumentManager.VolumeMultiple(tradeField.InstrumentID);
+		int volumeMultiple = InstrumentManager.VolumeMultiple(trade.InstrumentID);
 
 		auto initPosFieldFunc = [&](const CThostFtdcTradeField& tradeField, CThostFtdcInvestorPositionField& posField) -> void {
 			//Original Position is empty, so should be initialize here
