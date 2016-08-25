@@ -11,12 +11,18 @@
 
 TickWrapper::TickWrapper(CThostFtdcDepthMarketDataField* p)
 	: recoveryData(false)
+	, m_isEmpty(false)
 	, m_techvec(nullptr)
 {
 	assert(p);
 	memcpy(&m_MdData, p, sizeof(CThostFtdcDepthMarketDataField));
 	m_uuid = this->toTimeStamp();
 	//m_techvec = new StrategyTech(m_uuid, p->InstrumentID);
+}
+
+TickWrapper::TickWrapper()
+	: m_isEmpty(true)
+{
 }
 
 TickWrapper::~TickWrapper()
@@ -33,6 +39,7 @@ TickWrapper::TickWrapper(const TickWrapper& obj)
 	m_MdData = obj.m_MdData;
 	m_uuid = obj.m_uuid;
 	recoveryData = obj.recoveryData;
+	m_isEmpty = obj.m_isEmpty;
 
 	if (obj.m_techvec){
 		size_t size = obj.m_techvec->ObjSize();
@@ -52,6 +59,7 @@ TickWrapper& TickWrapper::operator = (const TickWrapper& obj)
 	m_MdData = obj.m_MdData;
 	m_uuid = obj.m_uuid;
 	recoveryData = obj.recoveryData;
+	m_isEmpty = obj.m_isEmpty;
 
 	delete m_techvec;
 

@@ -13,12 +13,15 @@ class DBWrapper;
 class STRATEGY_API TickWrapper
 {
 public:
+	TickWrapper();
 	TickWrapper(CThostFtdcDepthMarketDataField* p);
 	TickWrapper(const TickWrapper& obj);
 	TickWrapper& operator = (const TickWrapper& obj);
 	TickWrapper(TickWrapper && obj);
 
 	~TickWrapper();
+
+	bool IsEmpty() const { return m_isEmpty; }
 
 	void serializeToDB(DBWrapper& db) const;
 
@@ -124,6 +127,7 @@ private:
 	CThostFtdcDepthMarketDataField m_MdData;
 	long long m_uuid;
 	bool recoveryData;
+	bool m_isEmpty;
 	//std::shared_ptr<TechVec> m_techvec;
 public:
 	StrategyTech* m_techvec;

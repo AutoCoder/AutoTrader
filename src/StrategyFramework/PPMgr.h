@@ -54,6 +54,7 @@ namespace PP {
 		CThostFtdcInvestorPositionFieldWrapper& operator +=(const CThostFtdcInvestorPositionField& other);
 		CThostFtdcInvestorPositionFieldWrapper& operator +=(const CThostFtdcTradeField& trade);
 		void OnOrder(const CThostFtdcOrderField& order, OrderCallBackType type);
+		void OnTick(const TickWrapper& newTick);
 
 		inline double  GetLongMargin() const;
 		inline double  GetShortMargin() const;
@@ -66,6 +67,7 @@ namespace PP {
 
 		double 	GetCommission() const;
 		double 	GetFrozenCommission() const;
+		double  GetPositionProfit() const;
 
 		int 	GetLongPos() const { return m_LongPos.Position; }
 		int 	GetShortPos() const { return m_ShortPos.Position; }
@@ -76,6 +78,7 @@ namespace PP {
 		
 
 	private:
+		TickWrapper                     m_LastTick;
 		CThostFtdcInvestorPositionField m_LongPos;
 		CThostFtdcInvestorPositionField m_ShortPos;
 	};
@@ -91,7 +94,6 @@ namespace PP {
 
 		void SetAccountInfo(const CThostFtdcTradingAccountField& info);
 		void PushInvestorPosition(const CThostFtdcInvestorPositionField& posInfo);
-		void PushInvestorPositionDetail(const CThostFtdcInvestorPositionDetailField& posDetail);
 
 		/*
 		*  ///Âò
@@ -107,9 +109,10 @@ namespace PP {
 		double GetUsedMargin() const;
 		double GetCommission() const;
 		double GetFrozenCommission() const;
+		double GetPositionProfit() const;
 
 		void   SetAccountInfoInitialized(bool init = true) { m_acccountInfoInitialized = init; };
-
+		void   UpdateLastTick(const TickWrapper& newTick);
 		std::string ToString() const ;
 		std::string PositionOfInstruments() const;
 		const std::vector<CThostFtdcOrderField>& GetAllOrders() const { return m_orderFieldVec; };

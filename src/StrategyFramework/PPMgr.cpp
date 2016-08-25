@@ -257,6 +257,10 @@ namespace PP {
 		}		
 	}
 
+	void CThostFtdcInvestorPositionFieldWrapper::OnTick(const TickWrapper& newTick){
+		m_LastTick = std::move(newTick);
+	}
+
 	double  CThostFtdcInvestorPositionFieldWrapper::GetLongMargin() const { 
 		return m_LongPos.UseMargin; 
 	}
@@ -295,6 +299,17 @@ namespace PP {
 		
 	double CThostFtdcInvestorPositionFieldWrapper::GetFrozenCommission() const{
 		return m_LongPos.FrozenCommission + m_ShortPos.FrozenCommission;
+	}
+
+	double CThostFtdcInvestorPositionFieldWrapper::GetPositionProfit() const{
+		
+		if (m_LastTick.IsEmpty())
+			return 0.0;
+
+		double long_profit = m_LastTick.BidPrice1()/*申买价*/ * m_LongPos.Position - m_LongPos.PositionCost;
+		double short_profit = m_LastTick.AskPrice1()/*申卖价*/* m_ShortPos.Position - m_ShortPos.PositionCost;
+
+		return long_profit + short_profit;
 	}
 
 	PositionProfitMgr::PositionProfitMgr()
@@ -363,8 +378,8 @@ namespace PP {
 		m_posFieldMap[posInfo.InstrumentID] += posInfo;
 	}
 
-	void PositionProfitMgr::PushInvestorPositionDetail(const CThostFtdcInvestorPositionDetailField& posDetail) {
-
+	void PositionProfitMgr::UpdateLastTick(const TickWrapper& newTick){
+		m_posFieldMap[newTick.InstrumentId()].OnTick(newTick);
 	}
 
 	size_t PositionProfitMgr::GetUnclosedPosition(const std::string& instrumentId, TThostFtdcDirectionType type) const{
@@ -496,6 +511,14 @@ namespace PP {
 		}		
 		return ret;
 	}
+
+	double PositionProfitMgr::GetPositionProfit() const{
+		double ret = 0.0;
+		for (auto item : m_posFieldMap){
+			ret += item.second.GetPositionProfit();
+		}		
+		return ret;		
+	}
 	
 	std::string PositionProfitMgr::ToString() const{
 		std::stringstream result;
@@ -507,6 +530,7 @@ namespace PP {
 		result << "FrozenMargin" << GetFrozenMargin() << "," << std::endl;
 		result << "Commission" << GetCommission() << "," << std::endl;
 		result << "FrozenCommission" << GetFrozenCommission() << "," << std::endl;
+		result << "PositionProfit" << GetPositionProfit() << "," << std::endl;
 
 		result << "$PositionField => {" << std::endl;
 		for (auto posfield : m_posFieldMap){
