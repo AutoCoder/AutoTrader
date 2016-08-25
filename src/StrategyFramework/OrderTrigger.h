@@ -37,6 +37,7 @@ public:
 	virtual ~OrderTrigger(){}
 
 	virtual bool tryInvoke(const std::vector<TickWrapper>& data, TickWrapper& info, OrderVec& orders){
+		m_Mgr->UpdateLastTick(info);
 		if (m_strategy->tryInvoke(data, info))
 		{
 			orders = m_strategy->pendingOrders();
@@ -47,6 +48,7 @@ public:
 	}
 
 	virtual bool tryInvoke(const std::vector<TickWrapper>& tickdata, const std::vector<KData>& data, const std::vector<TickWrapper>& curmindata, TickWrapper& info, OrderVec& orders){
+		m_Mgr->UpdateLastTick(info);
 		if (m_strategy->tryInvoke(tickdata, data, curmindata, info))
 		{
 			orders = m_strategy->pendingOrders();
@@ -61,6 +63,7 @@ public:
 	}
 
 private:
+	PP::PositionProfitMgr *m_Mgr;
 	std::unique_ptr<P>    m_positionCtl;
 	std::unique_ptr<S>    m_strategy;
 };
