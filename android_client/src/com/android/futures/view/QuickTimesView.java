@@ -392,7 +392,7 @@ public class QuickTimesView extends SurfaceView implements SurfaceHolder.Callbac
 				}	
 				else if (item.getType() == TradeEntity.type.Order_Triggered){
 					paint.setStyle(Paint.Style.STROKE);
-					paint.setColor(Color.WHITE);
+					canvas.drawCircle(x_pos, y_pos, radius/2, paint);
 					canvas.drawCircle(x_pos, y_pos, radius, paint);
 				}else
 				{
