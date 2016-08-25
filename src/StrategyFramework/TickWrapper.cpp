@@ -22,6 +22,8 @@ TickWrapper::TickWrapper(CThostFtdcDepthMarketDataField* p)
 
 TickWrapper::TickWrapper()
 	: m_isEmpty(true)
+	, m_techvec(nullptr)
+	, recoveryData(false)
 {
 }
 
