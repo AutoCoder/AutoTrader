@@ -49,3 +49,5 @@ Available = Balance -  frozenCommission - frozenMargin
 16) 当前交易日，如果存在rb1601，多空仓位分别为1手，多方保证金为1530，空方保证金为1572，此时 账户的保证金为1572.
               如果此时还有一手rb1701的多仓，保证金为1500， 此时账户的保证金为1500+1530。（局限于上期品种，只验证过rb品种）
     请参照 Notes.2
+
+17) 当前交易日，如果无任何仓位，发生交易时，ppmgr 动态计算的 OpenAmount 应该与 重新连接ctp所获取的 OpenAmount值相吻合。

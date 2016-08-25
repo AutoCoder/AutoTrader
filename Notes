@@ -6,3 +6,5 @@
     大商所： 对锁重复计算保证金
     郑商所： 账户保证金总额 ＝ 　${同一合约保证金} 之和 ; ${同一合约保证金} = max(多方保证金，空方保证金)
     中金所： 单向大边保证金 
+
+3) PositionCost = Price * Volume * VolumeMultiple

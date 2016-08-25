@@ -440,17 +440,19 @@ std::string CommonUtils::ConvertPositionFieldToString(const CThostFtdcInvestorPo
 		<< " Position:" << pos.Position << std::endl
 		<< " TodayPosition:" << pos.TodayPosition << std::endl
 		<< " YdPosition:" << pos.YdPosition << std::endl
-		<< " Commission:" << pos.Commission << std::endl
-		<< " FrozenCommission:" << pos.FrozenCommission << std::endl
 		<< " UseMargin:" << pos.UseMargin << std::endl
-		<< " PreMargin:" << pos.PreMargin << std::endl
+		<< " Commission:" << pos.Commission << std::endl
 		<< " FrozenMargin:" << pos.FrozenMargin << std::endl
+		<< " FrozenCommission:" << pos.FrozenCommission << std::endl
+		<< " PreMargin:" << pos.PreMargin << std::endl
+		<< " PositionProfit:" << pos.PositionProfit << std::endl 
 		<< " CloseProfit:" << pos.CloseProfit << std::endl
-		<< " CloseVolume:" << pos.CloseVolume << std::endl
-		<< " OpenCost:" << pos.OpenCost << std::endl
 		<< " OpenVolume:" << pos.OpenVolume << std::endl
-		<< " PositionCost:" << pos.PositionCost << std::endl
-		<< " PositionProfit:" << pos.PositionProfit << std::endl << std::endl;
+		<< " OpenAmount:" << pos.OpenAmount << std::endl
+		<< " CloseVolume:" << pos.CloseVolume << std::endl
+		<< " CloseAmount:" << pos.CloseAmount << std::endl
+		<< " OpenCost:" << pos.OpenCost << std::endl
+		<< " PositionCost:" << pos.PositionCost << std::endl << std::endl;
 
 	return result.str();
 }

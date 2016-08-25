@@ -67,7 +67,8 @@ namespace PP {
 				m_LongPos.FrozenMargin += other.FrozenMargin;
 				m_LongPos.FrozenCommission += other.FrozenCommission;
 				m_LongPos.LongFrozenAmount += other.LongFrozenAmount;
-				m_LongPos.PositionCost = (m_LongPos.PositionCost * m_LongPos.OpenVolume + other.PositionCost * other.OpenVolume) / (m_LongPos.OpenVolume + other.OpenVolume);
+				//m_LongPos.PositionCost = (m_LongPos.PositionCost * m_LongPos.OpenVolume + other.PositionCost * other.OpenVolume) / (m_LongPos.OpenVolume + other.OpenVolume);
+				m_LongPos.PositionCost += other.PositionCost; // PositionCost = Price * Volume * VolumeMultiple (please refer Note.3)
 				m_LongPos.OpenVolume += other.OpenVolume;
 				m_LongPos.CloseVolume += other.CloseVolume;
 				m_LongPos.OpenAmount += other.OpenAmount;
@@ -77,7 +78,7 @@ namespace PP {
 				m_LongPos.PosiDirection = other.PosiDirection;
 			}
 
-			//##According debuging, I found YdPosition may not correct when tradepi callback
+			//##According debuging, I found YdPosition may not correct when tradespi callback
 			m_LongPos.YdPosition = m_LongPos.Position - m_LongPos.TodayPosition;
 		}
 		else if (other.PosiDirection == THOST_FTDC_PD_Short)
@@ -89,9 +90,10 @@ namespace PP {
 				m_ShortPos.Position += other.Position;
 				m_ShortPos.TodayPosition += other.TodayPosition;
 				m_ShortPos.ShortFrozen += other.ShortFrozen;
+				m_ShortPos.FrozenMargin += other.FrozenMargin;
 				m_ShortPos.FrozenCommission += other.FrozenCommission;
 				m_ShortPos.ShortFrozenAmount += other.ShortFrozenAmount;
-				m_ShortPos.PositionCost = (m_ShortPos.PositionCost * m_ShortPos.OpenVolume + other.PositionCost * other.OpenVolume) / (m_ShortPos.OpenVolume + other.OpenVolume);
+				m_ShortPos.PositionCost += other.PositionCost; // PositionCost = Price * Volume * VolumeMultiple (please refer Note.3)
 				m_ShortPos.OpenVolume += other.OpenVolume;
 				m_ShortPos.CloseVolume += other.CloseVolume;
 				m_ShortPos.OpenAmount += other.OpenAmount;
@@ -112,6 +114,7 @@ namespace PP {
 	}
 
 	CThostFtdcInvestorPositionFieldWrapper& CThostFtdcInvestorPositionFieldWrapper::operator +=(const CThostFtdcTradeField& trade){
+		int volumeMultiple = InstrumentManager.VolumeMultiple(tradeField.InstrumentID);
 
 		auto initPosFieldFunc = [&](const CThostFtdcTradeField& tradeField, CThostFtdcInvestorPositionField& posField) -> void {
 			//Original Position is empty, so should be initialize here
@@ -128,7 +131,7 @@ namespace PP {
 			posField.LongFrozenAmount = 0;
 			posField.OpenVolume = tradeField.Volume; //开仓量
 			posField.CloseVolume = 0; //平仓量
-			posField.OpenAmount = tradeField.Price * tradeField.Volume; //开仓金额
+			posField.OpenAmount = tradeField.Price * tradeField.Volume * volumeMultiple; //开仓金额
 			posField.CloseAmount = 0; //平仓金额
 			//!!!Note: 放弃维护这四个字段，只维护当前账户总冻结手数和冻结金额
 			// ///多头冻结
@@ -139,7 +142,7 @@ namespace PP {
 			// TThostFtdcMoneyType	LongFrozenAmount;
 			// ///开仓冻结金额
 			// TThostFtdcMoneyType	ShortFrozenAmount;
-			posField.PositionCost = tradeField.Price;
+			posField.PositionCost = tradeField.Price * volumeMultiple;
 			posField.PreMargin = 0;
 			posField.UseMargin += InstrumentManager.GetMargin(tradeField.InstrumentID, tradeField.Volume, tradeField.Price, tradeField.Direction);
 			posField.Commission += InstrumentManager.GetCommission(tradeField.InstrumentID, tradeField.Volume, tradeField.Price, trade.OffsetFlag);
@@ -148,8 +151,8 @@ namespace PP {
 		};
 
 		auto appendPosFunc = [&](const CThostFtdcTradeField& tradeField, CThostFtdcInvestorPositionField& posField) -> void {
-			double amount = posField.PositionCost * posField.Position;
-			double delta_amount = tradeField.Volume * tradeField.Price;
+			double amount = posField.PositionCost;
+			double delta_amount = tradeField.Volume * tradeField.Price * volumeMultiple;
 			posField.PreMargin = posField.UseMargin;
 
 			//update Position
@@ -158,8 +161,8 @@ namespace PP {
 				posField.TodayPosition += tradeField.Volume;
 				posField.Position = posField.TodayPosition + posField.YdPosition;
 				posField.OpenVolume += tradeField.Volume; //更新开仓量
-				posField.OpenAmount += tradeField.Price * tradeField.Volume;
-				posField.PositionCost = (amount + delta_amount) / posField.Position;
+				posField.OpenAmount += delta_amount;
+				posField.PositionCost += delta_amount;
 			}
 			else if (THOST_FTDC_OF_Close == tradeField.OffsetFlag || THOST_FTDC_OF_ForceClose == tradeField.OffsetFlag || 
 				THOST_FTDC_OF_CloseToday == tradeField.OffsetFlag || THOST_FTDC_OF_CloseYesterday == tradeField.OffsetFlag){
@@ -174,8 +177,8 @@ namespace PP {
 
 				posField.Position = posField.TodayPosition + posField.YdPosition;
 				posField.CloseVolume += tradeField.Volume; //更新平仓量
-				posField.CloseAmount += tradeField.Price * tradeField.Volume;
-				posField.PositionCost = (amount - delta_amount) / posField.Position;
+				posField.CloseAmount += delta_amount;
+				posField.PositionCost -= delta_amount;
 			}
 
 			posField.UseMargin += InstrumentManager.GetMargin(tradeField.InstrumentID, tradeField.Volume, tradeField.Price, tradeField.Direction);

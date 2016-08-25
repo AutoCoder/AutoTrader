@@ -66,6 +66,12 @@ namespace Instrument{
 		return m_InfoDict.at(prodID);
 	}
 
+	int InformationMgr::VolumeMultiple(const std::string& instrumentID) const{
+		const std::string& prodID = CommonUtils::InstrumentIDToProductID(instrumentID);
+		assert (m_InfoDict.find(prodID) != m_InfoDict.end());
+		return m_InfoDict.at(prodID).InstruField.VolumeMultiple;		
+	}
+
 	void InformationMgr::Add(const std::string& instrumentID, const Information& info){
 		assert(!instrumentID.empty());
 		m_InfoVec.push_back(instrumentID);
