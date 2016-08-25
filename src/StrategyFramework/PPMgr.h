@@ -6,7 +6,7 @@
 #include <map>
 #include "stdafx.h"
 #include "ThostFtdcUserApiStruct.h"
-
+#include "TickWrapper.h"
 
 namespace PP {
 
