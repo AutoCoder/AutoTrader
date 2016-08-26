@@ -27,6 +27,7 @@ class OrderTrigger : public OrderTriggerBase
 {
 public:
 	OrderTrigger(Args ... args)
+	: m_Mgr(nullptr)
 	{
 		//m_positionCtl = std::make_unique<P>();
 		//m_strategy = std::make_unique<S>(args...);
@@ -37,7 +38,9 @@ public:
 	virtual ~OrderTrigger(){}
 
 	virtual bool tryInvoke(const std::vector<TickWrapper>& data, TickWrapper& info, OrderVec& orders){
-		m_Mgr->UpdateLastTick(info);
+		if (m_Mgr) 
+			m_Mgr->UpdateLastTick(info);
+
 		if (m_strategy->tryInvoke(data, info))
 		{
 			orders = m_strategy->pendingOrders();
@@ -48,7 +51,9 @@ public:
 	}
 
 	virtual bool tryInvoke(const std::vector<TickWrapper>& tickdata, const std::vector<KData>& data, const std::vector<TickWrapper>& curmindata, TickWrapper& info, OrderVec& orders){
-		m_Mgr->UpdateLastTick(info);
+		if (m_Mgr) 
+			m_Mgr->UpdateLastTick(info);
+
 		if (m_strategy->tryInvoke(tickdata, data, curmindata, info))
 		{
 			orders = m_strategy->pendingOrders();
@@ -58,7 +63,9 @@ public:
 			return false;
 	}
 
+	//this function must be called before tryInvoke.
 	virtual void BindWithAccount(PP::PositionProfitMgr* mgr){
+		m_Mgr = mgr;
 		m_positionCtl->BindAccount(mgr);
 	}
 

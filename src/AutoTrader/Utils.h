@@ -28,7 +28,7 @@ namespace Transmission{
 		static void SendOrderPrompt(const SockSessionSP& session, const std::string& instrument, int direction, char combOffsetFlag, int price, int vol, long long timestamp);
 		static void SendLoginResultInfo(const SockSessionSP& session, ErrorCode code);
 		static void SendLogOutResultInfo(const SockSessionSP& session, ErrorCode code);
-		static void SendPositionInfo(const SockSessionSP& session, double blance, double available, double margin, double forzenMargin, double commission, double forzenCommission, const std::string& detailList);
+		static void SendPositionInfo(const SockSessionSP& session, double blance, double available, double margin, double forzenMargin, double commission, double forzenCommission, double positionProfit,const std::string& detailList);
 		static void SendAccountInfo(const SockSessionSP& session, const std::vector<std::string>& instruments, const std::vector<std::string>& strategies, bool isTrading, const std::string& instru, const std::string& strategy);
 		static void SendStartTradeResultInfo(const SockSessionSP& session, ErrorCode code);
 		static void SendStopTradeResultInfo(const SockSessionSP& session, ErrorCode code);

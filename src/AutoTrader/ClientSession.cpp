@@ -170,7 +170,7 @@ void ClientSession::SendTickToClient(const TickWrapper& tick){
 
 void ClientSession::SendPostionInfoToClient(){
 	Transmission::Utils::SendPositionInfo(m_session, m_PPMgr->GetBalanceMoney(), m_PPMgr->GetAvailableMoney(), m_PPMgr->GetUsedMargin(), \
-		m_PPMgr->GetFrozenMargin(), m_PPMgr->GetCommission(), m_PPMgr->GetFrozenCommission(), \
+		m_PPMgr->GetFrozenMargin(), m_PPMgr->GetCommission(), m_PPMgr->GetFrozenCommission(), m_PPMgr->GetPositionProfit(), \
 		m_PPMgr->PositionOfInstruments());
 }
 
