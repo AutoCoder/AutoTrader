@@ -258,7 +258,7 @@ namespace PP {
 	}
 
 	void CThostFtdcInvestorPositionFieldWrapper::OnTick(const TickWrapper& newTick){
-		m_LastTick = std::move(newTick);
+		m_LastTick = newTick;
 	}
 
 	double  CThostFtdcInvestorPositionFieldWrapper::GetLongMargin() const { 
@@ -379,7 +379,9 @@ namespace PP {
 	}
 
 	void PositionProfitMgr::UpdateLastTick(const TickWrapper& newTick){
-		m_posFieldMap[newTick.InstrumentId()].OnTick(newTick);
+		auto iter = m_posFieldMap.find(newTick.InstrumentId());
+		if (iter != m_posFieldMap.end())
+			iter->second.OnTick(newTick);
 	}
 
 	size_t PositionProfitMgr::GetUnclosedPosition(const std::string& instrumentId, TThostFtdcDirectionType type) const{
