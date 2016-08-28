@@ -49,13 +49,16 @@ namespace PP {
 		Other,
 	};
 
+	//Todo: Thread Synchronization
 	struct CThostFtdcInvestorPositionFieldWrapper{
 		explicit CThostFtdcInvestorPositionFieldWrapper();
+		//the below 4 APIs will be called by tradeApi thread to update position 
 		CThostFtdcInvestorPositionFieldWrapper& operator +=(const CThostFtdcInvestorPositionField& other);
 		CThostFtdcInvestorPositionFieldWrapper& operator +=(const CThostFtdcTradeField& trade);
 		void OnOrder(const CThostFtdcOrderField& order, OrderCallBackType type);
 		void OnTick(const TickWrapper& newTick);
 
+		// the below APIs will be called by mdSpi thread to generate order
 		inline double  GetLongMargin() const;
 		inline double  GetShortMargin() const;
 		inline double  GetLongFrozenMargin() const;
@@ -94,7 +97,7 @@ namespace PP {
 
 		void SetAccountInfo(const CThostFtdcTradingAccountField& info);
 		void PushInvestorPosition(const CThostFtdcInvestorPositionField& posInfo);
-
+		void UpdateLastTick(const TickWrapper& newTick);
 		/*
 		*  ///Âò
 		*	#define THOST_FTDC_D_Buy '0'
@@ -112,13 +115,10 @@ namespace PP {
 		double GetPositionProfit() const;
 
 		void   SetAccountInfoInitialized(bool init = true) { m_acccountInfoInitialized = init; };
-		void   UpdateLastTick(const TickWrapper& newTick);
+		
 		std::string ToString() const ;
 		std::string PositionOfInstruments() const;
 		const std::vector<CThostFtdcOrderField>& GetAllOrders() const { return m_orderFieldVec; };
-	private:
-		CThostFtdcInvestorPositionField ToPositionInfo(const CThostFtdcTradeField& newestTrade);
-		
 
 	private:
 		typedef std::map<std::string, CThostFtdcInvestorPositionFieldWrapper> PositionInfoMap; // key => InstrumentID

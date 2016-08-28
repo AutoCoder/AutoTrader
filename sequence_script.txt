@@ -1,38 +1,35 @@
-Main_Thread->Main_Thread: 读取持久化配置文件
+Android_Client->Android_Client:启动
 
-loop All_Valid_Users
-    Main_Thread->TraderApi_ThreadPool: 初始化TraderApi_Thread
+AutoTrade_Engine->AutoTrade_Engine:遍历插件，注册账户&合约&策略
+
+AutoTrade_Engine->AutoTrade_Engine:启动socket server
+
+AutoTrade_Engine->AutoTrade_Engine:启动线程分别处理request队列和response队列
+
+AutoTrade_Engine->AutoTrade_Engine:启动md线程，订阅注册合约和策略
+
+Android_Client->AutoTrade_Engine:登陆
+
+AutoTrade_Engine->AutoTrade_Engine: 为client账户创建一个session
+
+AutoTrade_Engine->CTP server:启动对应账户的tradeApi，查询对应账户信息和持仓信息
+
+AutoTrade_Engine->CTP server:查询对应账户信息和持仓信息
+
+CTP server->AutoTrade_Engine:返回账户信息和持仓信息（分笔）
+
+AutoTrade_Engine->Android_Client:返回账户信息和持仓信息
+
+AutoTrade_Engine->Android_Client:返回账户可选策略和合约
+
+Android_Client->AutoTrade_Engine:发送交易请求(合约,策略)
+
+loop 接收tick
+	AutoTrade_Engine->AutoTrade_Engine:执行策略生成报单
+	AutoTrade_Engine->CTP server:报单
+	CTP server->AutoTrade_Engine:回报报单状态
+	AutoTrade_Engine->AutoTrade_Engine:更新冻结保证金&手续费
+	CTP server->AutoTrade_Engine:回报交易
+	AutoTrade_Engine->AutoTrade_Engine:更新保证金&手续费
 end
 
-Main_Thread->MdApi_Thread: 通知所有账户就绪，启动MdApi
-
-MdApi_Thread->MdApi_Thread: 开始采集所有合约
-
-Main_Thread->Serialize_Thread : 启动
-
-loop 检查更新
-    Serialize_Thread->Serialize_Thread: 写入行情数据库
-end
-
-Main_Thread->User_Socket_Server: 启动socket服务器
-
-User_Socket_Server->User_Socket_Server: 等待user连接
-
-User->User_Socket_Server: 连接
-
-User_Socket_Server->User: 返回账户详情
-
-User_Socket_Server->User: 返回可选策略,合约
-
-User->User_Socket_Server: 选择策略(报单,仓位控制)
-
-User_Socket_Server->MdApi_Thread: 注册策略(报单,仓位控制)
-
-User->User_Socket_Server: 启动策略
-
-User_Socket_Server->MdApi_Thread: 通知策略启动
-
-loop 行情&交易更新
-    User_Socket_Server->User: 转发相关行情
-    User_Socket_Server->User: 转发订单操作行为(报单,撤单,成交)
-end

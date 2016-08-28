@@ -8,3 +8,13 @@
     中金所： 单向大边保证金 
 
 3) PositionCost = Price * Volume * VolumeMultiple
+
+4）当前线程分析
+   1) main thread
+   2) mdApi thread & mdSpi thread （接受tick，策略指标计算&报单生成也在这个线程中完成）
+   3) socket server thread （用于和客户端通信）
+   4) request queue handler thread （用于处理从client发来的请求）
+   5) response queue handler threa （用于处理准备发送到client的请求）
+   6) IsMarketingTime thread (定期检查是否处于交易时间，如果否责退出）
+   7) tradeSpi & tradeApi thread (per user) （用于与ctp服务器的交易信息的通信）
+   8) OrderExecute thread (per session) （处理生成的order）
