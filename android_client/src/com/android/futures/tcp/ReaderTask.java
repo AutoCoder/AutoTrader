@@ -153,7 +153,7 @@ public class ReaderTask extends Thread {
 							statusChangeHandler.onStopTrade();
 						}
 					} else if (actionType.equals("QueryPosition")){
-						
+						assert(false);
 					}
 					else{
 
@@ -185,7 +185,8 @@ public class ReaderTask extends Thread {
 						PositionInfo info = new PositionInfo(details.getDouble("Balance"),
 								details.getDouble("Available"), details.getDouble("Margin"), 
 								details.getDouble("ForzenMargin"), details.getDouble("Commission"),
-								details.getDouble("ForzenCommission"), details.getString("PositionOfInstruments"));
+								details.getDouble("ForzenCommission"), details.getDouble("PositionProfit"),
+								details.getString("PositionOfInstruments"));
 						if (statusChangeHandler != null)
 							statusChangeHandler.onPositionUpdated(info);
 					} else if (infoType.equals("ACCOUNT_INFO")) {

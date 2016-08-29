@@ -9,15 +9,17 @@ public class PositionInfo {
 	private double ForzenMargin;
 	private double Commission;
 	private double ForzenCommission;
+	private double PositionProfit;
 
 	
-	PositionInfo(double balance, double available, double margin, double forzenMargin, double commission, double forzenCommission, String details){
+	PositionInfo(double balance, double available, double margin, double forzenMargin, double commission, double forzenCommission, double positionProfit, String details){
 		setBalance(balance);
 		setAvailable(available);
 		setMargin(margin);
 		setForzenMargin(forzenMargin);
 		setCommission(commission);
 		setForzenCommission(forzenCommission);
+		setPositionProfit(positionProfit);
 		setDetails(details);
 	}
 
@@ -75,6 +77,14 @@ public class PositionInfo {
 
 	public void setForzenCommission(double forzenCommission){
 		ForzenCommission = forzenCommission;
+	}
+
+	public double getPositionProfit() {
+		return PositionProfit;
+	}
+
+	public void setPositionProfit(double positionProfit) {
+		PositionProfit = positionProfit;
 	}
 
 

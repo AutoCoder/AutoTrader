@@ -19,6 +19,8 @@ import android.widget.RadioGroup.OnCheckedChangeListener;
 import android.widget.Spinner;
 import android.widget.TextView;
 import java.util.ArrayList;
+import java.util.Timer;  
+import java.util.TimerTask;  
 
 import com.android.futures.MyApp;
 import com.android.futures.entity.TradeEntity;
@@ -30,6 +32,7 @@ import com.android.futures.tcp.ClientStatusListener;
 
 public class AccountActivity extends Activity implements Handler.Callback {
 	private Handler mHandler = null;
+	private Timer   mTimer = null;
 	private ClientSession mSession = null;
 	private Spinner mInstrumentList = null;
 	private Spinner mStrategyList = null;
@@ -47,6 +50,7 @@ public class AccountActivity extends Activity implements Handler.Callback {
 	private TextView forzenMarginView = null;
 	private TextView commissionView = null;
 	private TextView forzenCommissionView = null;
+	private TextView positionProfitView = null;
 	private TextView positionView = null;
 	private boolean IsTrading = false;
 	private boolean IsPositionUpdated = false;
@@ -71,6 +75,7 @@ public class AccountActivity extends Activity implements Handler.Callback {
 			e.printStackTrace();
 		}
 		mHandler = new Handler(this);
+		mTimer = new Timer();
 		accountView = (TextView) this.findViewById(R.id.account_val);
 		balanceView = (TextView) this.findViewById(R.id.balance_val);
 		availableView = (TextView) this.findViewById(R.id.available_val);
@@ -78,6 +83,7 @@ public class AccountActivity extends Activity implements Handler.Callback {
 		forzenMarginView = (TextView) this.findViewById(R.id.forzenMargin_val);
 		commissionView = (TextView) this.findViewById(R.id.commission_val);
 		forzenCommissionView = (TextView) this.findViewById(R.id.forzenCommission_val);
+		positionProfitView = (TextView) this.findViewById(R.id.positionProfi_val);
 
 		positionView = (TextView) this.findViewById(R.id.position_val);
 		mInstrumentList = (Spinner) this.findViewById(R.id.instrument_List);
@@ -206,11 +212,21 @@ public class AccountActivity extends Activity implements Handler.Callback {
 		}
 	}
 
+	private void QueryPositionPeriodly() {  
+        mTimer.schedule(new TimerTask() {  
+            @Override  
+            public void run() {  
+            	mSession.QueryPosition();
+            }  
+        }, 100000, 100000/* 表示10秒之後，每隔10秒執行一次 */);  
+    }  
+	
 	@Override
 	protected void onRestart() {
 		super.onRestart();
 		mSession.SetHandler(mHandler);
 		mSession.QueryPosition();
+		QueryPositionPeriodly();
 	}
 
 	@Override
@@ -241,6 +257,7 @@ public class AccountActivity extends Activity implements Handler.Callback {
 			forzenMarginView.setText(Double.toString(status.getForzenMargin()));
 			commissionView.setText(Double.toString(status.getCommission()));
 			forzenCommissionView.setText(Double.toString(status.getForzenCommission()));
+			positionProfitView.setText(Double.toString(status.getPositionProfit()));
 			// String pos_text = String.format("[%s]: (%d * %d)",
 			// status.getInstrument(), status.getPrice(), status.getPosition());
 			positionView.setText(status.getDetails());
@@ -253,6 +270,7 @@ public class AccountActivity extends Activity implements Handler.Callback {
 			}
 			progressDlg.dismiss();
 			updateButtonStatus();
+			QueryPositionPeriodly();
 
 		} else if (msg.what == ClientStatusListener.AccountInfoUpdated) {
 			AccountInfo info = (AccountInfo) msg.obj;

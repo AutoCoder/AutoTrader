@@ -246,10 +246,39 @@
         </RelativeLayout> 
         
         <RelativeLayout
-            android:id="@+id/positionRel"
+            android:id="@+id/positionProfitRel"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/forzenCommissionRel"
+            android:clickable="true"
+            android:gravity="center_vertical" >
+
+            <TextView
+                android:id="@+id/positionProfi_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:text="持仓收益："
+                android:textColor="#000"
+                android:textSize="17sp" />
+
+            <TextView
+                android:id="@+id/positionProfi_val"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="2dip"
+                android:layout_toRightOf="@id/positionProfi_label"
+                android:text="10000.0"
+                android:textColor="#000"
+                android:textSize="15sp" />
+        </RelativeLayout>       
+          
+        <RelativeLayout
+            android:id="@+id/positionRel"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/positionProfitRel"
             android:clickable="true"
             android:gravity="center_vertical" >
 
