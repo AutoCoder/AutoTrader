@@ -308,7 +308,7 @@ namespace PP {
 			return 0.0;
 
 		double long_profit = m_LastTick.BidPrice1()/*申买价*/ * m_LongPos.Position * volumeMultiple - m_LongPos.PositionCost;
-		double short_profit = m_LastTick.AskPrice1()/*申卖价*/* m_ShortPos.Position * volumeMultiple - m_ShortPos.PositionCost;
+		double short_profit = m_ShortPos.PositionCost - m_LastTick.AskPrice1()/*申卖价*/* m_ShortPos.Position * volumeMultiple;
 
 		return long_profit + short_profit;
 	}
