@@ -125,8 +125,6 @@ namespace PP {
 
 		bool                                            m_acccountInfoInitialized;
 		CThostFtdcTradingAccountField					m_accountInfo;
-		double                                          m_fronzonMargin;      //total
-		double                                          m_fronzonCommission;  //total 
 		std::vector<CThostFtdcOrderField>				m_orderFieldVec;
 		std::vector<CThostFtdcTradeField>				m_tradeFieldVec;
 		PositionInfoMap									m_posFieldMap;

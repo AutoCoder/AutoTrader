@@ -302,12 +302,13 @@ namespace PP {
 	}
 
 	double CThostFtdcInvestorPositionFieldWrapper::GetPositionProfit() const{
-		
+		int volumeMultiple = InstrumentManager.VolumeMultiple(m_LongPos.InstrumentID);
+
 		if (m_LastTick.IsEmpty())
 			return 0.0;
 
-		double long_profit = m_LastTick.BidPrice1()/*申买价*/ * m_LongPos.Position - m_LongPos.PositionCost;
-		double short_profit = m_LastTick.AskPrice1()/*申卖价*/* m_ShortPos.Position - m_ShortPos.PositionCost;
+		double long_profit = m_LastTick.BidPrice1()/*申买价*/ * m_LongPos.Position * volumeMultiple - m_LongPos.PositionCost;
+		double short_profit = m_LastTick.AskPrice1()/*申卖价*/* m_ShortPos.Position * volumeMultiple - m_ShortPos.PositionCost;
 
 		return long_profit + short_profit;
 	}
