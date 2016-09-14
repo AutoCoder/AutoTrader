@@ -133,6 +133,8 @@ namespace PP {
 			posField.CloseVolume = 0; //平仓量
 			posField.OpenAmount = tradeField.Price * tradeField.Volume * volumeMultiple; //开仓金额
 			posField.CloseAmount = 0; //平仓金额
+			posField.FrozenMargin = 0;
+			posField.FrozenCommission = 0;
 			//!!!Note: 放弃维护这四个字段，只维护当前账户总冻结手数和冻结金额
 			// ///多头冻结
 			// TThostFtdcVolumeType	LongFrozen;
@@ -166,7 +168,7 @@ namespace PP {
 			}
 			else if (THOST_FTDC_OF_Close == tradeField.OffsetFlag || THOST_FTDC_OF_ForceClose == tradeField.OffsetFlag || 
 				THOST_FTDC_OF_CloseToday == tradeField.OffsetFlag || THOST_FTDC_OF_CloseYesterday == tradeField.OffsetFlag){
-				posField.TodayPosition -= tradeField.Volume;
+				
 				if (posField.TodayPosition < tradeField.Volume){
 					posField.TodayPosition = 0;
 					posField.YdPosition -= (tradeField.Volume - posField.TodayPosition);
