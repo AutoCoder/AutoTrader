@@ -182,7 +182,7 @@ namespace PP {
 				posField.CloseVolume += tradeField.Volume; //更新平仓量
 				posField.CloseAmount += delta_amount;
 				posField.PositionCost -= delta_amount;
-				posField.UseMargin －= InstrumentManager.GetMargin(tradeField.InstrumentID, tradeField.Volume, tradeField.Price, tradeField.Direction);
+				posField.UseMargin -= InstrumentManager.GetMargin(tradeField.InstrumentID, tradeField.Volume, tradeField.Price, tradeField.Direction);
 			}
 
 			
