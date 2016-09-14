@@ -233,6 +233,8 @@ void CtpTradeSpi::OnFrontConnected(){
 
 void CtpTradeSpi::OnFrontDisconnected(int nReason){
 	SYNC_PRINT << "[Trade] Response | disconnected..." << " Reason=" << nReason;
+	//todo: m_stateChangeHandler.OnFrontDisconnected();
+	//call m_OnFrontDisconnect_callback { reset ppmgr, set it to not ready, infrom client to clean cached positioninfo}
 }
 
 void CtpTradeSpi::ReqUserLogin(){
