@@ -169,7 +169,7 @@ namespace PP {
 			}
 			else if (THOST_FTDC_OF_Close == tradeField.OffsetFlag || THOST_FTDC_OF_ForceClose == tradeField.OffsetFlag || 
 				THOST_FTDC_OF_CloseToday == tradeField.OffsetFlag || THOST_FTDC_OF_CloseYesterday == tradeField.OffsetFlag){
-				
+				int previous_position = posField.Position;
 				if (posField.TodayPosition < tradeField.Volume){
 					posField.TodayPosition = 0;
 					posField.YdPosition -= (tradeField.Volume - posField.TodayPosition);
@@ -182,9 +182,8 @@ namespace PP {
 				posField.CloseVolume += tradeField.Volume; //更新平仓量
 				posField.CloseAmount += delta_amount;
 				posField.PositionCost -= delta_amount;
-				posField.UseMargin -= InstrumentManager.GetMargin(tradeField.InstrumentID, tradeField.Volume, tradeField.Price, tradeField.Direction);
+				posField.UseMargin *= (posField.Position / previous_position);
 			}
-
 			
 			posField.Commission += InstrumentManager.GetCommission(tradeField.InstrumentID, tradeField.Volume, tradeField.Price, trade.OffsetFlag);
 			
