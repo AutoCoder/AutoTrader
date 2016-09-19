@@ -74,6 +74,8 @@ namespace PP {
 
 		int 	GetLongPos() const { return m_LongPos.Position; }
 		int 	GetShortPos() const { return m_ShortPos.Position; }
+		int 	GetYdLongPos() const { return m_LongPos.YdPosition; }
+		int 	GetYdShortPos() const { return m_ShortPos.YdPosition; }
 		std::string ToString();
 	private:
 		bool IsLongPosEmpty();

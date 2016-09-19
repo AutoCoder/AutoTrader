@@ -16,6 +16,7 @@ bool Pos20Precent::CompleteOrders(OrderVec& orders){
 	size_t long_pos = m_ppMgr->GetUnclosedPosition(ord.GetInstrumentId(), THOST_FTDC_D_Buy);
 	size_t short_pos = m_ppMgr->GetUnclosedPosition(ord.GetInstrumentId(), THOST_FTDC_D_Sell);
 	size_t long_ydpos = m_ppMgr->GetYDUnclosedPosition(ord.GetInstrumentId(), THOST_FTDC_D_Buy);
+	/*
 	size_t short_ydpos = m_ppMgr->GetYDUnclosedPosition(ord.GetInstrumentId(), THOST_FTDC_D_Sell);
 	double pos_money = m_ppMgr->GetFrozenMargin() + m_ppMgr->GetUsedMargin();
 	double available = m_ppMgr->GetAvailableMoney();
@@ -32,7 +33,28 @@ bool Pos20Precent::CompleteOrders(OrderVec& orders){
 		ord.SetCombOffsetFlagType(THOST_FTDC_OF_Open);
 		ord.SetVolume(vol);
 		return true;
-	};
+	};*/
+
+	//200 up-limit
+	const int uplimit = 200;
+	auto gen_open_order = [&ord](double available, double pos_money, double purchaseMoney) -> bool {
+		int vol = 0;
+		if (ord.GetExchangeDirection() == THOST_FTDC_D_Buy){
+			vol = uplimit - long_pos;
+		}
+		else if (ord.GetExchangeDirection() == THOST_FTDC_D_Sell){
+			vol = uplimit - short_pos;
+		}
+		else
+			assert(false);
+
+		if (vol == 0)
+			return false;
+
+		ord.SetCombOffsetFlagType(THOST_FTDC_OF_Open);
+		ord.SetVolume(vol);
+		return true;
+	};		
 
 	if (long_pos == short_pos){  // current position is 0, open position
 		return gen_open_order(available, pos_money, purchaseMoney);

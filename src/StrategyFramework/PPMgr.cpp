@@ -409,10 +409,10 @@ namespace PP {
 	size_t PositionProfitMgr::GetYDUnclosedPosition(const std::string& instrumentId, TThostFtdcDirectionType type) const{
 		if (m_posFieldMap.find(instrumentId) != m_posFieldMap.end()){
 			if (type == THOST_FTDC_D_Buy){
-				return m_posFieldMap.at(instrumentId).GetLongPos();
+				return m_posFieldMap.at(instrumentId).GetYdLongPos();
 			}
 			else if (type == THOST_FTDC_D_Sell){
-				return m_posFieldMap.at(instrumentId).GetShortPos();
+				return m_posFieldMap.at(instrumentId).GetYdShortPos();
 			}
 			else{
 				assert(false);
