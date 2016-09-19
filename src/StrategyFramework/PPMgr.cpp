@@ -533,10 +533,10 @@ namespace PP {
 		result << "Balance:" << GetBalanceMoney() << "," << std::endl;
 		result << "Available:" << GetAvailableMoney() << "," << std::endl;
 		result << "Margin:" << GetUsedMargin() << "," << std::endl;
-		result << "FrozenMargin" << GetFrozenMargin() << "," << std::endl;
-		result << "Commission" << GetCommission() << "," << std::endl;
-		result << "FrozenCommission" << GetFrozenCommission() << "," << std::endl;
-		result << "PositionProfit" << GetPositionProfit() << "," << std::endl;
+		result << "FrozenMargin:" << GetFrozenMargin() << "," << std::endl;
+		result << "Commission:" << GetCommission() << "," << std::endl;
+		result << "FrozenCommission:" << GetFrozenCommission() << "," << std::endl;
+		result << "PositionProfit:" << GetPositionProfit() << "," << std::endl;
 
 		result << "$PositionField => {" << std::endl;
 		for (auto posfield : m_posFieldMap){
