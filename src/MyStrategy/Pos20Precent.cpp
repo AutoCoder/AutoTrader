@@ -16,8 +16,8 @@ bool Pos20Precent::CompleteOrders(OrderVec& orders){
 	size_t long_pos = m_ppMgr->GetUnclosedPosition(ord.GetInstrumentId(), THOST_FTDC_D_Buy);
 	size_t short_pos = m_ppMgr->GetUnclosedPosition(ord.GetInstrumentId(), THOST_FTDC_D_Sell);
 	size_t long_ydpos = m_ppMgr->GetYDUnclosedPosition(ord.GetInstrumentId(), THOST_FTDC_D_Buy);
-	/*
 	size_t short_ydpos = m_ppMgr->GetYDUnclosedPosition(ord.GetInstrumentId(), THOST_FTDC_D_Sell);
+	/*
 	double pos_money = m_ppMgr->GetFrozenMargin() + m_ppMgr->GetUsedMargin();
 	double available = m_ppMgr->GetAvailableMoney();
 	double purchaseMoney = (available + pos_money) * 0.2; // 20% up-limit line
