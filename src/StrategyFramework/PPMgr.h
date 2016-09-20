@@ -78,8 +78,9 @@ namespace PP {
 		int 	GetYdShortPos() const { return m_ShortPos.YdPosition; }
 		std::string ToString();
 	private:
-		bool IsLongPosEmpty();
-		bool IsShortPosEmpty();
+		bool IsLongPosEmpty() const;
+		bool IsShortPosEmpty() const;
+		std::string InstrumentId() const; 
 		
 
 	private:

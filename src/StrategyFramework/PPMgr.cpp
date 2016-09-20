@@ -28,12 +28,22 @@ namespace PP {
 
 	}
 
-	bool CThostFtdcInvestorPositionFieldWrapper::IsLongPosEmpty(){
+	bool CThostFtdcInvestorPositionFieldWrapper::IsLongPosEmpty() const {
 		return m_LongPos.PosiDirection == THOST_FTDC_PD_Net;;
 	}
 
-	bool CThostFtdcInvestorPositionFieldWrapper::IsShortPosEmpty(){
+	bool CThostFtdcInvestorPositionFieldWrapper::IsShortPosEmpty() const {
 		return m_ShortPos.PosiDirection == THOST_FTDC_PD_Net;
+	}
+
+	std::string CThostFtdcInvestorPositionFieldWrapper::InstrumentId() const {
+		if (!IsLongPosEmpty())
+			return m_LongPos.InstrumentID;
+
+		if (!IsShortPosEmpty())
+			return m_ShortPos.InstrumentID;
+
+		return "";
 	}
 
 	std::string CThostFtdcInvestorPositionFieldWrapper::ToString(){
@@ -305,7 +315,11 @@ namespace PP {
 	}
 
 	double CThostFtdcInvestorPositionFieldWrapper::GetPositionProfit() const{
-		int volumeMultiple = InstrumentManager.VolumeMultiple(m_LongPos.InstrumentID);
+		const std::string& instr = InstrumentId();
+		if (instr.empty())
+			return 0.0;
+
+		int volumeMultiple = InstrumentManager.VolumeMultiple(instr);
 
 		if (m_LastTick.IsEmpty())
 			return 0.0;
