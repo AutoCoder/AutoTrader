@@ -37,7 +37,7 @@ bool Pos20Precent::CompleteOrders(OrderVec& orders){
 
 	//200 up-limit
 	const int uplimit = 200;
-	auto gen_open_order = [&ord](double available, double pos_money, double purchaseMoney) -> bool {
+	auto gen_open_order = [&](int uplimit) -> bool {
 		int vol = 0;
 		if (ord.GetExchangeDirection() == THOST_FTDC_D_Buy){
 			vol = uplimit - long_pos;
@@ -57,13 +57,13 @@ bool Pos20Precent::CompleteOrders(OrderVec& orders){
 	};		
 
 	if (long_pos == short_pos){  // current position is 0, open position
-		return gen_open_order(available, pos_money, purchaseMoney);
+		return gen_open_order(uplimit);
 	}
 	else{ // close position
 
 		TThostFtdcDirectionType pos_direction = long_pos < short_pos ? THOST_FTDC_D_Sell : THOST_FTDC_D_Buy;
 		if (ord.GetExchangeDirection() == pos_direction){
-			return gen_open_order(available, pos_money, purchaseMoney);
+			return gen_open_order(uplimit);
 		}
 		else{
 			// if yd pos is empty, use THOST_FTDC_OF_CloseToday
