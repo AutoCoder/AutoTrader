@@ -75,7 +75,6 @@ public class AccountActivity extends Activity implements Handler.Callback {
 			e.printStackTrace();
 		}
 		mHandler = new Handler(this);
-		mTimer = new Timer();
 		accountView = (TextView) this.findViewById(R.id.account_val);
 		balanceView = (TextView) this.findViewById(R.id.balance_val);
 		availableView = (TextView) this.findViewById(R.id.available_val);
@@ -212,23 +211,29 @@ public class AccountActivity extends Activity implements Handler.Callback {
 		}
 	}
 
-	private void QueryPositionPeriodly() {  
+	private void QueryPositionPeriodly() { 
+		mTimer = new Timer();
         mTimer.schedule(new TimerTask() {  
             @Override  
             public void run() {  
             	mSession.QueryPosition();
             }  
-        }, 100000, 100000/* 表示10秒之後，每隔10秒執行一次 */);  
+        }, 10000, 10000/* 表示10秒之後，每隔10秒執行一次 */);  
     }  
 	
 	@Override
-	protected void onRestart() {
-		super.onRestart();
+	protected void onResume() {
+		super.onResume();
 		mSession.SetHandler(mHandler);
-		mSession.QueryPosition();
+    	mSession.QueryPosition();
 		QueryPositionPeriodly();
 	}
-
+	
+	@Override
+	protected void onPause(){
+		super.onPause();
+		mTimer.cancel();
+	}
 	@Override
 	public boolean handleMessage(Message msg) {
 		if (msg.what == ClientStatusListener.Logined) {
@@ -270,7 +275,6 @@ public class AccountActivity extends Activity implements Handler.Callback {
 			}
 			progressDlg.dismiss();
 			updateButtonStatus();
-			QueryPositionPeriodly();
 
 		} else if (msg.what == ClientStatusListener.AccountInfoUpdated) {
 			AccountInfo info = (AccountInfo) msg.obj;
