@@ -580,7 +580,7 @@ namespace PP {
 		std::stringstream result;
 		for (const auto& item : m_posFieldMap){
 			result << item.first << " Long:" << item.second.GetLongPos() << " Short:" << item.second.GetShortPos() 
-			<< "Profit: " << item.second.GetPositionProfit() << "\n";
+			<< " Profit: " << item.second.GetPositionProfit() << "\n";
 		}
 		return result.str();
 	}
