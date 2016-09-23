@@ -4,6 +4,7 @@
 #include <string.h>
 #include <vector>
 #include <map>
+#include <mutex>
 #include "stdafx.h"
 #include "ThostFtdcUserApiStruct.h"
 #include "TickWrapper.h"
@@ -76,7 +77,7 @@ namespace PP {
 		int 	GetShortPos() const { return m_ShortPos.Position; }
 		int 	GetYdLongPos() const { return m_LongPos.YdPosition; }
 		int 	GetYdShortPos() const { return m_ShortPos.YdPosition; }
-		std::string ToString();
+		std::string ToString() const;
 	private:
 		bool IsLongPosEmpty() const;
 		bool IsShortPosEmpty() const;
@@ -87,6 +88,7 @@ namespace PP {
 		TickWrapper                     m_LastTick;
 		CThostFtdcInvestorPositionField m_LongPos;
 		CThostFtdcInvestorPositionField m_ShortPos;
+	    mutable std::mutex              m_mtx;
 	};
 
 	class STRATEGY_API PositionProfitMgr

@@ -46,7 +46,7 @@ namespace PP {
 		return "";
 	}
 
-	std::string CThostFtdcInvestorPositionFieldWrapper::ToString(){
+	std::string CThostFtdcInvestorPositionFieldWrapper::ToString() const {
 		std::stringstream result;
 
 		result << "-----------------------------------" << std::endl;
@@ -64,6 +64,7 @@ namespace PP {
 	}
 
 	CThostFtdcInvestorPositionFieldWrapper& CThostFtdcInvestorPositionFieldWrapper::operator +=(const CThostFtdcInvestorPositionField& other){
+		std::lock_guard<std::mutex> lck(m_mtx);
 		if (other.PosiDirection == THOST_FTDC_PD_Long)
 		{
 			//初始化中，可能会有同一个合约的多次回报
@@ -125,7 +126,7 @@ namespace PP {
 
 	CThostFtdcInvestorPositionFieldWrapper& CThostFtdcInvestorPositionFieldWrapper::operator +=(const CThostFtdcTradeField& trade){
 		int volumeMultiple = InstrumentManager.VolumeMultiple(trade.InstrumentID);
-
+		std::lock_guard<std::mutex> lck(m_mtx);
 		auto initPosFieldFunc = [&](const CThostFtdcTradeField& tradeField, CThostFtdcInvestorPositionField& posField) -> void {
 			//Original Position is empty, so should be initialize here
 			strcpy(posField.InstrumentID, tradeField.InstrumentID);
@@ -225,6 +226,7 @@ namespace PP {
 	}
 
 	void CThostFtdcInvestorPositionFieldWrapper::OnOrder(const CThostFtdcOrderField& orderField, OrderCallBackType ordCBType){
+		std::lock_guard<std::mutex> lck(m_mtx);
 		if (OrderCallBackType::FinishOrder == ordCBType || OrderCallBackType::CancellOrder == ordCBType || OrderCallBackType::InsertOrder == ordCBType){
 
 			///double commission = commratio * orderField.VolumeTotalOriginal;
@@ -271,46 +273,57 @@ namespace PP {
 	}
 
 	void CThostFtdcInvestorPositionFieldWrapper::OnTick(const TickWrapper& newTick){
+		std::lock_guard<std::mutex> lck(m_mtx);
 		m_LastTick = newTick;
 	}
 
 	double  CThostFtdcInvestorPositionFieldWrapper::GetLongMargin() const { 
+		std::lock_guard<std::mutex> lck(m_mtx);
 		return m_LongPos.UseMargin; 
 	}
 
 	double  CThostFtdcInvestorPositionFieldWrapper::GetShortMargin() const { 
+		std::lock_guard<std::mutex> lck(m_mtx);
 		return m_ShortPos.UseMargin; 
 	}
 
 	double  CThostFtdcInvestorPositionFieldWrapper::GetLongFrozenMargin() const{
+		std::lock_guard<std::mutex> lck(m_mtx);
 		return m_LongPos.FrozenMargin;
 	}
 
 	double  CThostFtdcInvestorPositionFieldWrapper::GetShortFrozenMargin() const{
+		std::lock_guard<std::mutex> lck(m_mtx);
 		return m_ShortPos.FrozenMargin;
 	}
 
 	double CThostFtdcInvestorPositionFieldWrapper::GetBiggerMargin() const{
+		std::lock_guard<std::mutex> lck(m_mtx);
 		return std::max(m_LongPos.UseMargin, m_ShortPos.UseMargin);
 	}
 
 	double CThostFtdcInvestorPositionFieldWrapper::GetBiggerFrozenMargin() const{
+		std::lock_guard<std::mutex> lck(m_mtx);
 		return std::max(m_LongPos.FrozenMargin, m_ShortPos.FrozenMargin);
 	}
 
 	double  CThostFtdcInvestorPositionFieldWrapper::GetBothMargin() const{
+		std::lock_guard<std::mutex> lck(m_mtx);
 		return m_LongPos.UseMargin + m_ShortPos.UseMargin;
 	}
 
 	double  CThostFtdcInvestorPositionFieldWrapper::GetBothFrozenMargin() const{
+		std::lock_guard<std::mutex> lck(m_mtx);
 		return m_LongPos.FrozenMargin + m_ShortPos.FrozenMargin;
 	}
 
 	double CThostFtdcInvestorPositionFieldWrapper::GetCommission() const{
+		std::lock_guard<std::mutex> lck(m_mtx);
 		return m_LongPos.Commission + m_ShortPos.Commission;
 	}
 		
 	double CThostFtdcInvestorPositionFieldWrapper::GetFrozenCommission() const{
+		std::lock_guard<std::mutex> lck(m_mtx);
 		return m_LongPos.FrozenCommission + m_ShortPos.FrozenCommission;
 	}
 
@@ -321,6 +334,7 @@ namespace PP {
 
 		int volumeMultiple = InstrumentManager.VolumeMultiple(instr);
 
+		std::lock_guard<std::mutex> lck(m_mtx);
 		if (m_LastTick.IsEmpty())
 			return 0.0;
 
@@ -451,7 +465,7 @@ namespace PP {
 	double PositionProfitMgr::GetFrozenMargin() const{
 		double ret = 0.0;
 		std::map<std::string, TwoSideMargin> pdMarginDict;
-		for (auto item : m_posFieldMap){
+		for (const auto& item : m_posFieldMap){
 			switch(InstrumentManager.GetExchangeID(item.first))
 			{
 				case THOST_FTDC_EIDT_SHFE:
@@ -485,7 +499,7 @@ namespace PP {
 	double PositionProfitMgr::GetUsedMargin() const{
 		double ret = 0.0;
 		std::map<std::string, TwoSideMargin> pdMarginDict;
-		for (auto item : m_posFieldMap){
+		for (const auto& item : m_posFieldMap){
 			switch(InstrumentManager.GetExchangeID(item.first))
 			{
 				case THOST_FTDC_EIDT_SHFE:
@@ -518,7 +532,7 @@ namespace PP {
 
 	double PositionProfitMgr::GetCommission() const{
 		double ret = 0.0;
-		for (auto item : m_posFieldMap){
+		for (const auto& item : m_posFieldMap){
 			ret += item.second.GetCommission();
 		}		
 		return ret;
@@ -526,7 +540,7 @@ namespace PP {
 
 	double PositionProfitMgr::GetFrozenCommission() const{
 		double ret = 0.0;
-		for (auto item : m_posFieldMap){
+		for (const auto& item : m_posFieldMap){
 			ret += item.second.GetFrozenCommission();
 		}		
 		return ret;
@@ -534,7 +548,7 @@ namespace PP {
 
 	double PositionProfitMgr::GetPositionProfit() const{
 		double ret = 0.0;
-		for (auto item : m_posFieldMap){
+		for (const auto& item : m_posFieldMap){
 			ret += item.second.GetPositionProfit();
 		}		
 		return ret;		
@@ -553,7 +567,7 @@ namespace PP {
 		result << "PositionProfit:" << GetPositionProfit() << "," << std::endl;
 
 		result << "$PositionField => {" << std::endl;
-		for (auto posfield : m_posFieldMap){
+		for (const auto& posfield : m_posFieldMap){
 			result << "InstrumentID : " << posfield.first << std::endl;
 			result << posfield.second.ToString();
 			result << std::endl;
@@ -564,7 +578,7 @@ namespace PP {
 
 	std::string PositionProfitMgr::PositionOfInstruments() const{
 		std::stringstream result;
-		for (auto item : m_posFieldMap){
+		for (const auto& item : m_posFieldMap){
 			result << item.first << " Long:" << item.second.GetLongPos() << " Short:" << item.second.GetShortPos() 
 			<< "Profit: " << item.second.GetPositionProfit() << "\n";
 		}
