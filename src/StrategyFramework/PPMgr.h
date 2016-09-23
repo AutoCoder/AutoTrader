@@ -50,7 +50,7 @@ namespace PP {
 		Other,
 	};
 
-	//Todo: Thread Synchronization
+	//Notice: Thread Synchronization
 	struct CThostFtdcInvestorPositionFieldWrapper{
 		explicit CThostFtdcInvestorPositionFieldWrapper();
 		//the below 4 APIs will be called by tradeApi thread to update position 
