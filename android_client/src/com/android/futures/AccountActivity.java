@@ -56,6 +56,7 @@ public class AccountActivity extends Activity implements Handler.Callback {
 	private boolean IsPositionUpdated = false;
 	private ProgressDialog progressDlg;
 	private int notificationID = 0;
+	private boolean UpdatePositionPeriodly = false;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -212,6 +213,9 @@ public class AccountActivity extends Activity implements Handler.Callback {
 	}
 
 	private void QueryPositionPeriodly() { 
+		if (UpdatePositionPeriodly)
+			return;
+		
 		mTimer = new Timer();
         mTimer.schedule(new TimerTask() {  
             @Override  
@@ -219,6 +223,8 @@ public class AccountActivity extends Activity implements Handler.Callback {
             	mSession.QueryPosition();
             }  
         }, 10000, 10000/* 表示10秒之後，每隔10秒執行一次 */);  
+        
+        UpdatePositionPeriodly = true;
     }  
 	
 	@Override
@@ -227,13 +233,21 @@ public class AccountActivity extends Activity implements Handler.Callback {
 		mSession.SetHandler(mHandler);
     	mSession.QueryPosition();
 		QueryPositionPeriodly();
+    	
 	}
 	
 	@Override
 	protected void onPause(){
 		super.onPause();
 		mTimer.cancel();
+		UpdatePositionPeriodly = false;
 	}
+	
+	@Override
+	protected void onStop(){
+		super.onStop();
+	}
+	
 	@Override
 	public boolean handleMessage(Message msg) {
 		if (msg.what == ClientStatusListener.Logined) {
