@@ -205,10 +205,6 @@ bool MACrossTech::IsTriggerPoint() const {
 	return false;
 }
 
-bool MACrossTech::MAShortUpLong() const{
-	return m_ma_tech.MAShortUpLong();
-}
-
 int MACrossTech::CreateTableIfNotExists(const std::string& dbname, const std::string& tableName)
 {
 	if (MACrossTech::IsTableCreated == true){

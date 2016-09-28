@@ -1,3 +1,4 @@
+#include <cmath>
 #include "MATech.h"
 
 #define MIN_DETLA 0.01
@@ -13,5 +14,5 @@ bool MATech::MAShortDownLong() const
 
 bool MATech::MAShortEqualLong() const
 {
-	return std::fbs(mShortMAVal - mLongMAVal) < MIN_DETLA;
+	return std::fabs(mShortMAVal - mLongMAVal) < MIN_DETLA;
 }

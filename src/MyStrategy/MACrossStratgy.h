@@ -69,11 +69,13 @@ public:
 
 	virtual bool IsTriggerPoint() const;
 
-	bool MAShortUpLong() const;
-
 	virtual void serializeToDB(DBWrapper& db, const std::string& mark);
 
 	virtual std::string ToJson() const;
+
+	bool MAShortUpLong() const { return m_ma_tech.MAShortUpLong(); }
+	bool MAShortDownLong() const { return m_ma_tech.MAShortDownLong(); }
+	bool MAShortEqualLong() const { return m_ma_tech.MAShortEqualLong(); }
 
 protected:
 	static int CreateTableIfNotExists(const std::string& dbname, const std::string& tableName);
