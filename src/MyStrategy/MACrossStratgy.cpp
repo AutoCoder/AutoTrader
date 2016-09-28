@@ -154,7 +154,7 @@ bool MACrossStratgy::tryInvoke(const std::vector<TickWrapper>& tickdata, const s
 				}
 			}
 		}
-		else
+		else if (curPtr->MAShortDownLong())
 		{ // down
 			if (!tickdata.empty() && tickdata.size() > 500){
 				std::vector<TickWrapper>::const_reverse_iterator stoper = tickdata.rbegin();
@@ -162,7 +162,7 @@ bool MACrossStratgy::tryInvoke(const std::vector<TickWrapper>& tickdata, const s
 				for (auto it = tickdata.rbegin(); it != stoper; it++){
 					StrategyTech* prePtr = it->GetTechVec();
 					auto prePtr_ = dynamic_cast<MACrossTech*>(prePtr);
-					if (prePtr_ == NULL || !prePtr_->MAShortUpLong())
+					if (prePtr_ == NULL || prePtr_->MAShortDownLong())
 					{
 						// not special point
 						orderSingal = false;
