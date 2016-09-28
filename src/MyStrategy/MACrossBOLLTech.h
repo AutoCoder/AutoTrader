@@ -52,6 +52,8 @@ public:
 	virtual bool IsTriggerPoint() const;
 
 	bool MAShortUpLong() const { return m_maTech.MAShortUpLong(); }
+	bool MAShortDownLong() const { return m_maTech.MAShortDownLong(); }
+	bool MAShortEqualLong() const { return m_maTech.MAShortEqualLong(); }
 
 protected:
 	static int CreateTableIfNotExists(const std::string& dbname, const std::string& tableName);

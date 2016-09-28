@@ -11,6 +11,8 @@ struct MATech{
 	double mShortMAVal;
 
 	bool MAShortUpLong() const;
+	bool MAShortDownLong() const;
+	bool MAShortEqualLong() const;
 };
 
 #endif
