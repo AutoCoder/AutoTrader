@@ -52,8 +52,6 @@ private:
 	//send out Account status to fifo, finally got by client
 	void OnRtnTrade(CThostFtdcTradeField* pTrade);
 
-	//send out Account status to fifo, finally got by client
-	void OnCancelOrder(CThostFtdcInputOrderActionField *pInputOrderAction, CThostFtdcRspInfoField *pRspInfo);
 #ifdef FAKE_MD
 	bool ReturnFakeCTPMessage(const std::string& instru);
 #endif

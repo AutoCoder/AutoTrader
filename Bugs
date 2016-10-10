@@ -65,3 +65,4 @@
             2.打开android客户端，检查冻结保证金
             3.simnow 撤单
             4.切换会android客户端，冻结保证金没有更新，tradespi.cpp 撤单的回报是否有调用到
+   分析：通过查看文档，当交易所接受了撤单指令后，OnRspOrderAction不会被回调到。而会回调OnRtnOrder,用于更新委托状态。

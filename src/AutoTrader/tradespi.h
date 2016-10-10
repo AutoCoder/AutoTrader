@@ -18,7 +18,6 @@ namespace PP{
 typedef std::function<void()>															InitedAccountCallback;
 typedef std::function<void(CThostFtdcOrderField*)>										RtnOrderCallback;
 typedef std::function<void(CThostFtdcTradeField*)>										RtnTradeCallback;
-typedef std::function<void(CThostFtdcInputOrderActionField*, CThostFtdcRspInfoField*)>	CancelOrderCallback;
 typedef PP::PositionProfitMgr PPMgr;
 
 class CtpTradeSpi : public CThostFtdcTraderSpi
@@ -91,8 +90,7 @@ public:
 		PPMgr& ppmgr,
 		InitedAccountCallback onInitedAccountCallback,
 		RtnOrderCallback onRtnOrderCallback,
-		RtnTradeCallback onRtnTradeCallback,
-		CancelOrderCallback OnRtnCancellOrderCallback);
+		RtnTradeCallback onRtnTradeCallback);
         virtual	~CtpTradeSpi();
 
 		void ReqOrderInsert(Order ord);
@@ -178,7 +176,6 @@ private:
 	InitedAccountCallback                               m_OnInitedAccount_Callback;
 	RtnOrderCallback									m_OnRtnOrder_callback;
 	RtnTradeCallback									m_OnRtnTrade_callback;
-	CancelOrderCallback									m_OnCancelOrder_callback;
 	PPMgr&												m_ppmgr;
 	
 	TradeThreadStateChangedHandler						m_stateChangeHandler;

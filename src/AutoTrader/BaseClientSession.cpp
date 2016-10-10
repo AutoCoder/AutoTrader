@@ -67,11 +67,10 @@ bool BaseClientSession::Init_CTP(){
 	InitedAccountCallback onInitedAccount_Callback = [](){};
 	RtnOrderCallback onRtnOrder_Callback = std::bind(&BaseClientSession::OnRtnOrder, this, std::placeholders::_1);
 	RtnTradeCallback OnRtnTrade_Callback = std::bind(&BaseClientSession::OnRtnTrade, this, std::placeholders::_1);
-	CancelOrderCallback OnCancelOrder_Callback = [](CThostFtdcInputOrderActionField *pInputOrderAction, CThostFtdcRspInfoField *pRspInfo){};
 
 	m_trade_spi = new CtpTradeSpi(m_trade_api, meta.m_BrokerId.c_str(), meta.m_UserId.c_str(), meta.m_Password.c_str(), \
 		Config::Instance()->ProductName().c_str(), *(m_PPMgr.get()), onInitedAccount_Callback, onRtnOrder_Callback, \
-		OnRtnTrade_Callback, OnCancelOrder_Callback);
+		OnRtnTrade_Callback);
 
 	m_trade_api->RegisterSpi((CThostFtdcTraderSpi*)m_trade_spi);
 	m_trade_api->SubscribePublicTopic(THOST_TERT_RESTART);

@@ -14,14 +14,13 @@ std::vector<CThostFtdcOrderField*> orderList;
 std::vector<CThostFtdcTradeField*> tradeList;
 
 CtpTradeSpi::CtpTradeSpi(CThostFtdcTraderApi* p, const char * brokerID, const char* userID, const char* password, const char* prodname, PPMgr& ppmgr,
-	InitedAccountCallback onInitedAccountCallback, RtnOrderCallback onRtnOrderCallback, RtnTradeCallback onRtnTradeCallback, CancelOrderCallback onRtnCancellOrderCallback)
+	InitedAccountCallback onInitedAccountCallback, RtnOrderCallback onRtnOrderCallback, RtnTradeCallback onRtnTradeCallback)
 	: pUserApi(p)
 	, m_frontID(-1)
 	, m_sessionID(-1)
 	, m_OnInitedAccount_Callback(onInitedAccountCallback)
 	, m_OnRtnOrder_callback(onRtnOrderCallback)
 	, m_OnRtnTrade_callback(onRtnTradeCallback)
-	, m_OnCancelOrder_callback(onRtnCancellOrderCallback)
 	, m_ppmgr(ppmgr)
 	, m_stateChangeHandler(this)
 	, m_requestId(0)
@@ -600,7 +599,6 @@ void CtpTradeSpi::OnRspOrderAction(
 			<< "OrderSysID:" << pInputOrderAction->OrderSysID;
 	}
 	//if (bIsLast) SetEvent(g_tradehEvent);
-	m_OnCancelOrder_callback(pInputOrderAction, pRspInfo);
 }
 
 void CtpTradeSpi::OnRtnOrder(CThostFtdcOrderField *pOrder)
@@ -612,7 +610,7 @@ void CtpTradeSpi::OnRtnOrder(CThostFtdcOrderField *pOrder)
 	bool success = m_ppmgr.PushOrder(*pOrder);
 	if (success){
 		SYNC_PRINT << "[Trade] FrontID:" << pOrder->FrontID << ", SessionID: " << pOrder->SessionID << ", OrderRef:" << pOrder->OrderRef;
-		SYNC_PRINT << "[Trade] Order ID:" << pOrder->BrokerOrderSeq << ", OrderSubmitStatus:" << CommonUtils::InterpretOrderSubmitStatusCode(pOrder->OrderSubmitStatus);
+		SYNC_PRINT << "[Trade] Order ID:" << pOrder->BrokerOrderSeq << ", OrderStatus:" << CommonUtils::InterpretOrderSubmitStatusCode(pOrder->OrderSubmitStatus);
 		m_OnRtnOrder_callback(pOrder);
 	}
 

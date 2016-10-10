@@ -67,11 +67,10 @@ bool ClientSession::Init_CTP()
 	InitedAccountCallback onInitedAccount_Callback = std::bind(&ClientSession::OnAccountInitFinished, this);
 	RtnOrderCallback onRtnOrder_Callback = std::bind(&ClientSession::OnRtnOrder, this, std::placeholders::_1);
 	RtnTradeCallback OnRtnTrade_Callback = std::bind(&ClientSession::OnRtnTrade, this, std::placeholders::_1);
-	CancelOrderCallback OnCancelOrder_Callback = std::bind(&ClientSession::OnCancelOrder, this, std::placeholders::_1, std::placeholders::_2);
 
 	m_trade_spi = new CtpTradeSpi(m_trade_api, meta.m_BrokerId.c_str(), meta.m_UserId.c_str(), meta.m_Password.c_str(), \
 		Config::Instance()->ProductName().c_str(), *(m_PPMgr.get()), \
-		onInitedAccount_Callback, onRtnOrder_Callback, OnRtnTrade_Callback, OnCancelOrder_Callback);
+		onInitedAccount_Callback, onRtnOrder_Callback, OnRtnTrade_Callback);
 
 	m_trade_api->RegisterSpi((CThostFtdcTraderSpi*)m_trade_spi); 
 	m_trade_api->SubscribePublicTopic(THOST_TERT_RESTART);
@@ -186,7 +185,9 @@ void ClientSession::OnRtnOrder(CThostFtdcOrderField* pOrder){
 	BaseClientSession::OnRtnOrder(pOrder);
 	
 	long long timeStamp = CommonUtils::DateTimeToTimestamp(pOrder->InsertDate, pOrder->InsertTime) * 2;
-	Transmission::Utils::SendDealInfo(m_session, Transmission::INSERT_ORDER, pOrder->InstrumentID ,pOrder->Direction, pOrder->CombOffsetFlag[0], pOrder->LimitPrice, pOrder->VolumeTotalOriginal, pOrder->OrderRef, timeStamp);
+	Transmission::TradeEventType type = (pOrder->OrderStatus == THOST_FTDC_OST_Canceled) ? Transmission::CANCELL_ORDER : Transmission::INSERT_ORDER;
+	
+	Transmission::Utils::SendDealInfo(m_session, type, pOrder->InstrumentID ,pOrder->Direction, pOrder->CombOffsetFlag[0], pOrder->LimitPrice, pOrder->VolumeTotalOriginal, pOrder->OrderRef, timeStamp);
 	if (m_PositionInfo_ready)
 		SendPostionInfoToClient();
 }
@@ -196,12 +197,6 @@ void ClientSession::OnRtnTrade(CThostFtdcTradeField* pTrade){
 
 	long long timeStamp = CommonUtils::DateTimeToTimestamp(pTrade->TradeDate, pTrade->TradeTime) * 2;
 	Transmission::Utils::SendDealInfo(m_session, Transmission::TRADE, pTrade->InstrumentID, pTrade->Direction, pTrade->OffsetFlag, pTrade->Price, pTrade->Volume, pTrade->OrderRef, timeStamp);
-	if (m_PositionInfo_ready)
-		SendPostionInfoToClient();
-}
-
-void ClientSession::OnCancelOrder(CThostFtdcInputOrderActionField *pInputOrderAction, CThostFtdcRspInfoField *pRspInfo){
-	Transmission::Utils::SendDealInfo(m_session, Transmission::CANCELL_ORDER, pInputOrderAction->InstrumentID, 0, 0, 0, 0, pInputOrderAction->OrderRef, 0);
 	if (m_PositionInfo_ready)
 		SendPostionInfoToClient();
 }
