@@ -3,14 +3,16 @@
 #include "TriggerFactory.h"
 #include "OrderTrigger.h"
 #include "BigProfitSmallLoseStrategy.h"
+#include "TestCancelOrderStrategy.h"
 #include "Pos1Shou.h"
+#include "TestCancelPosManage.h"
 #include <string>
 #include "AccountMgr.h"
 
 namespace {
 
 OrderTriggerBase* st1;
-
+OrderTriggerBase* st2;
 
 std::string AccountId(){
 	std::string ret = "9999";
@@ -29,15 +31,17 @@ void UnRegisterAccountMeta(){
 void RegisterAllStrategy(){
 	auto factory = TriggerFactory::Instance();
 	st1 = new OrderTrigger<Pos1Shou, BigProfitSmallLoseStrategy, double, double, int>(0.04, 0.02, 500);
+	st2 = new OrderTrigger<TestCancelPosManage, TestCancelOrderStrategy>();
 	factory->RegisterTrigger(AccountId(), "BPSL_4_2_500", st1);
-	// factory->RegisterTrigger(AccountId2(), "Pos20Precent_3_5_MACrossStratgy", st1);
+	factory->RegisterTrigger(AccountId(), "TestCancelStg", st2);
 }
 
 void UnRegisterAllStrategy(){
 	auto factory = TriggerFactory::Instance();
-	// factory->UnRegisterTrigger(AccountId());
-	// factory->UnRegisterTrigger(AccountId2());
-	// delete st1;
+	factory->UnRegisterTrigger(AccountId());
+	//factory->UnRegisterTrigger(AccountId2());
+	delete st1;
+	delete st2;
 }
 
 }
