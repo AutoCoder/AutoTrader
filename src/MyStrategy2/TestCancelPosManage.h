@@ -13,7 +13,7 @@ namespace PP{
 class  TestCancelPosManage
 {
 public:
-	explicit TestCancelPosManage(int quantity = 1);
+	explicit TestCancelPosManage();
 	~TestCancelPosManage(){};
 		
 	void BindAccount(PP::PositionProfitMgr* mgr) { m_ppMgr = mgr; }
@@ -23,7 +23,6 @@ public:
 		
 private:
 	PP::PositionProfitMgr* m_ppMgr;
-	int                    m_quantity;
 };
 
 #endif

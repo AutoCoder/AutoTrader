@@ -3,17 +3,16 @@
 #include "AP_Mgr.h"
 
 
-TestCancelPosManage::TestCancelPosManage(int quantity)
-	: m_quantity(quantity)
+TestCancelPosManage::TestCancelPosManage()
 {
 
 }
 
-bool Pos1Shou::CompleteOrders(OrderVec& orders){
+bool TestCancelPosManage::CompleteOrders(OrderVec& orders){
 
 	for (auto& ord : orders){
 		ord.SetCombOffsetFlagType(THOST_FTDC_OF_Open);
-		ord.SetVolume(vol);
+		ord.SetVolume(1);
 	}
 
 	return true;
