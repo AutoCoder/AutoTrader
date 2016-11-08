@@ -3,7 +3,8 @@ message(STATUS "MyStrategy2 cmake configuring")
 SET(LIBRARY_OUTPUT_PATH ${AUTOTRADE_SOURCE_DIR}/bin)
 
 SET(SRC_LIST BigProfitSmallLoseStrategy.cpp 
-						 TestCancelOrderStrategy.cpp
+			 TestCancelOrderStrategy.cpp
+			 TestCancelPosManage.cpp
 			 Pos1Shou.cpp 
 			 mystrategy.cpp)
 

@@ -23,3 +23,5 @@ protected:
 private:
 	OrderVec m_pendingOrders;
 };
+
+#endif
